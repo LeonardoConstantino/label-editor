@@ -1,8 +1,17 @@
 import { store } from './core/Store';
 import { ElementType } from './domain/models/elements/BaseElement';
+import './styles/main.css';
+
+import { templateManager } from './domain/services/TemplateManager';
+import {UISM} from './core/UISoundManager';
+import { ToastManager } from './components/common/toast';
 import './components/editor/EditorCanvas';
 import './components/editor/Toolbar';
 import './components/editor/ElementInspector';
+import './components/common/modal';
+import './components/preview/DataSourceInput';
+import './components/common/UINumberScrubber';
+import './components/common/tooltip';
 
 // Inicializa a aplicação com uma etiqueta padrão
 const defaultLabel = {
@@ -33,10 +42,26 @@ const defaultLabel = {
   updatedAt: Date.now()
 };
 
-import { templateManager } from './domain/services/TemplateManager';
-
 document.addEventListener('DOMContentLoaded', async () => {
+  // Inicializa o som e contorna autoplay-block
+  UISM.toggle(true);
+
+  const playTestSound = () => {
+    UISM.play(UISM.enumPresets.TAP);
+    document.removeEventListener('click', playTestSound);
+    document.removeEventListener('keydown', playTestSound);
+  };
+  document.addEventListener('click', playTestSound, { once: true });
+  document.addEventListener('keydown', playTestSound, { once: true });
+
   await templateManager.init();
   store.loadLabel(defaultLabel);
   console.log('Application Initialized with Label:', defaultLabel.id);
+
+  ToastManager.show({
+    type: 'info',
+    message: 'Aplicação inicializada com sucesso!',
+    duration: 5000
+  });
+
 });

@@ -1,68 +1,82 @@
 /**
- * Componente de Input Aura Technical (v3)
- * Corrigido avisos de acessibilidade (ID e Label)
+ * AppInput: Campo de entrada técnico com label integrada.
+ * Otimizado para manter o foco durante atualizações.
  */
 export class AppInput extends HTMLElement {
-  private static idCounter = 0;
-  private inputId: string;
+  private input: HTMLInputElement;
+  private labelElement: HTMLElement;
 
   constructor() {
     super();
-    AppInput.idCounter++;
-    this.inputId = `app-input-${AppInput.idCounter}`;
+    this.attachShadow({ mode: 'open' });
+    
+    // Cria os elementos uma única vez
+    this.labelElement = document.createElement('label');
+    this.labelElement.className = 'label-prism';
+    
+    this.input = document.createElement('input');
+    this.input.className = 'input-prism';
   }
 
   static get observedAttributes() {
-    return ['label', 'value', 'placeholder', 'type'];
+    return ['label', 'type', 'value', 'placeholder'];
   }
 
-  connectedCallback() {
+  connectedCallback(): void {
+    this.setupBaseStyles();
     this.render();
+    this.setupEvents();
   }
 
-  attributeChangedCallback(name: string, _oldValue: string, newValue: string) {
-    const input = this.querySelector('input');
-    if (input) {
-      if (name === 'value') input.value = newValue;
-      if (name === 'placeholder') input.placeholder = newValue;
-      if (name === 'type') input.type = newValue;
-    } else {
-      this.render();
+  attributeChangedCallback(name: string, oldVal: string, newVal: string): void {
+    if (oldVal === newVal) return;
+    this.updateValues();
+  }
+
+  private setupBaseStyles(): void {
+    if (!this.shadowRoot) return;
+    this.shadowRoot.innerHTML = `
+      <style>
+        @import "/src/styles/main.css";
+        :host {
+          display: block;
+          margin-bottom: 12px;
+          width: 100%;
+        }
+      </style>
+    `;
+    this.shadowRoot.appendChild(this.labelElement);
+    this.shadowRoot.appendChild(this.input);
+  }
+
+  private render(): void {
+    this.updateValues();
+  }
+
+  private updateValues(): void {
+    const label = this.getAttribute('label') || '';
+    const type = this.getAttribute('type') || 'text';
+    const value = this.getAttribute('value') || '';
+    const placeholder = this.getAttribute('placeholder') || '';
+
+    this.labelElement.textContent = label;
+    this.input.type = type;
+    this.input.placeholder = placeholder;
+    
+    // Crucial: Só atualiza o value se ele for realmente diferente do que o usuário digitou
+    // para não quebrar o cursor durante a digitação.
+    if (this.input.value !== value) {
+      this.input.value = value;
     }
   }
 
-  render() {
-    const label = this.getAttribute('label') || '';
-    const labelIcon = this.getAttribute('label-icon') || '';
-    const value = this.getAttribute('value') || '';
-    const placeholder = this.getAttribute('placeholder') || '';
-    const type = this.getAttribute('type') || 'text';
-
-    this.innerHTML = `
-      <div class="mb-4 w-full">
-        <div class="flex gap-1">
-          ${labelIcon ? `<ui-icon name="${labelIcon}" size="sm"></ui-icon>` : ''}
-          ${label ? `<label for="${this.inputId}" class="label-technical">${label}</label>` : ''}
-        </div>
-        <input 
-          id="${this.inputId}"
-          name="${this.inputId}"
-          type="${type}" 
-          class="input-technical" 
-          placeholder="${placeholder}" 
-          value="${value}"
-        />
-      </div>
-    `;
-
-    this.querySelector('input')?.addEventListener('input', (e) => {
-      const target = e.target as HTMLInputElement;
-      this.dispatchEvent(
-        new CustomEvent('app-input', {
-          detail: { value: target.value },
-          bubbles: true,
-        }),
-      );
+  private setupEvents(): void {
+    this.input.addEventListener('input', (e: any) => {
+      this.dispatchEvent(new CustomEvent('app-input', {
+        detail: e.target.value,
+        bubbles: true,
+        composed: true
+      }));
     });
   }
 }

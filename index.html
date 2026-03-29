@@ -4,81 +4,26 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Label Editor | Tactile Prism</title>
-  <style>
-    /* Estilos globais para o layout principal (não encapsulados) */
-    :root {
-      --color-canvas: #0f1115;
-      --color-surface: rgba(22, 25, 32, 0.85);
-      --color-border-ui: #262a33;
-      --color-accent: #6366f1;
-    }
-
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Inter', system-ui, sans-serif;
-      background-color: var(--color-canvas);
-      color: white;
-      height: 100vh;
-      overflow: hidden;
-      display: grid;
-      grid-template-areas: 
-        "header header"
-        "canvas sidebar";
-      grid-template-rows: 48px 1fr;
-      grid-template-columns: 1fr 288px;
-    }
-
-    header {
-      grid-area: header;
-      background-color: var(--color-surface);
-      border-bottom: 1px solid var(--color-border-ui);
-      display: flex;
-      align-items: center;
-      padding: 0 16px;
-      backdrop-filter: blur(12px);
-      z-index: 10;
-    }
-
-    main {
-      grid-area: canvas;
-      position: relative;
-      overflow: hidden;
-    }
-
-    aside {
-      grid-area: sidebar;
-      background-color: var(--color-surface);
-      border-left: 1px solid var(--color-border-ui);
-      backdrop-filter: blur(12px);
-      z-index: 5;
-    }
-
-    .logo {
-      font-weight: 600;
-      font-size: 14px;
-      letter-spacing: 0.5px;
-      color: var(--color-accent);
-      text-transform: uppercase;
-    }
-  </style>
 </head>
 <body>
-  <header>
-    <div class="logo">Label Editor</div>
-    <div style="flex: 1; margin: 0 24px;">
-      <editor-toolbar></editor-toolbar>
-    </div>
-  </header>
-  
-  <main>
-    <editor-canvas></editor-canvas>
-  </main>
+  <div class="layout-container">
+    <!-- O Canvas ocupa o fundo total -->
+    <editor-canvas class="canvas-workspace"></editor-canvas>
 
-  <aside id="inspector">
-    <element-inspector></element-inspector>
-  </aside>
+    <!-- UI Flutuante -->
+    <editor-toolbar class="toolbar-pill"></editor-toolbar>
 
+    <aside class="panel-glass">
+      <element-inspector></element-inspector>
+    </aside>
+  </div>
+
+  <!-- Modais de Takeover -->
+  <ui-modal id="batch-modal" title="Batch Generation Studio" size="xl">
+    <data-source-input></data-source-input>
+  </ui-modal>
+
+  <script src="https://unpkg.com/canvas-txt@4.1.1"></script>
   <script type="module" src="/src/main.ts"></script>
 </body>
 </html>

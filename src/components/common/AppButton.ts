@@ -1,41 +1,68 @@
+import { UISM } from '../../core/UISoundManager';
+
 /**
- * Componente de Botão Aura Technical (v2)
+ * AppButton: Botão tátil seguindo o Design System Tactile Prism.
  */
 export class AppButton extends HTMLElement {
-  private _initialContent: string = '';
+  private button: HTMLButtonElement;
+
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+    this.button = document.createElement('button');
+  }
 
   static get observedAttributes() {
     return ['variant', 'disabled'];
   }
 
-  connectedCallback() {
-    if (!this._initialContent) {
-      this._initialContent = this.innerHTML;
-    }
+  connectedCallback(): void {
+    this.render();
+    this.setupEvents();
+  }
+
+  attributeChangedCallback(): void {
     this.render();
   }
 
-  attributeChangedCallback() {
-    this.render();
+  private setupEvents(): void {
+    this.button.addEventListener('click', () => {
+      if (this.hasAttribute('disabled')) return;
+      UISM.play(UISM.enumPresets.TAP);
+    });
   }
 
-  render() {
-    // Se ainda não foi conectado, não renderiza para evitar perder o innerHTML
-    if (!this._initialContent && this.innerHTML) {
-      this._initialContent = this.innerHTML;
-    }
+  private render(): void {
+    if (!this.shadowRoot) return;
 
-    const variant = this.getAttribute('variant') || 'primary';
+    const variant = this.getAttribute('variant') || 'secondary';
     const isDisabled = this.hasAttribute('disabled');
 
-    // Limpamos e reconstruímos de forma limpa
-    this.innerHTML = '';
-    const btn = document.createElement('button');
-    btn.className = `btn btn-${variant} w-full`;
-    if (isDisabled) btn.setAttribute('disabled', '');
-    btn.innerHTML = this._initialContent;
+    this.shadowRoot.innerHTML = `
+      <style>
+        @import "/src/styles/main.css";
 
-    this.appendChild(btn);
+        :host {
+          display: inline-block;
+        }
+
+        button {
+          width: 100%;
+        }
+
+        button:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+          filter: grayscale(1);
+        }
+      </style>
+    `;
+
+    this.button.className = `btn-prism btn-${variant}`;
+    this.button.disabled = isDisabled;
+    this.button.innerHTML = `<slot></slot>`;
+    
+    this.shadowRoot.appendChild(this.button);
   }
 }
 

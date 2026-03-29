@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, vi, beforeAll } from 'vitest';
 import { store } from '../Store';
 import eventBus from '../EventBus';
 import { ElementType } from '../../domain/models/elements/BaseElement';
@@ -12,6 +12,24 @@ describe('Store', () => {
     createdAt: Date.now(),
     updatedAt: Date.now()
   };
+
+  beforeAll(() => {
+    // Mock do callback do canvas para snapshots funcionarem nos testes
+    eventBus.on('request:canvas:snapshot', (callback: (ctx: CanvasRenderingContext2D) => void) => {
+      // Mock ctx com getImageData retornando ImageData mockado
+      const mockImageData = {
+        data: new Uint8ClampedArray(4),
+        width: 100,
+        height: 100
+      } as ImageData;
+      const mockCtx = {
+        getImageData: vi.fn(() => mockImageData),
+        putImageData: vi.fn(),
+        canvas: { width: 100, height: 100 }
+      } as any;
+      callback(mockCtx);
+    });
+  });
 
   beforeEach(() => {
     // Reset do store para cada teste (re-loading a base label)
@@ -33,7 +51,7 @@ describe('Store', () => {
     const state = store.getState();
     expect(state.currentLabel?.elements).toHaveLength(1);
     expect(state.currentLabel?.elements[0].id).toBe('el1');
-    expect(state.historyIndex).toBe(1);
+    expect(state.canUndo).toBe(true);
   });
 
   it('should update an element', () => {
@@ -62,15 +80,22 @@ describe('Store', () => {
       dimensions: { width: 50, height: 10 },
       content: 'Hello'
     };
-    
-    eventBus.emit('element:add', newElement); // state 1
-    expect(store.getState().currentLabel?.elements).toHaveLength(1);
 
-    eventBus.emit('history:undo'); // volta para state 0
+    // Após loadLabel, temos snapshot inicial (estado vazio)
+    // Adicionar elemento cria snapshot 1
+    eventBus.emit('element:add', newElement);
+    expect(store.getState().currentLabel?.elements).toHaveLength(1);
+    expect(store.getState().canUndo).toBe(true);
+
+    // Undo volta para snapshot inicial (estado vazio)
+    eventBus.emit('history:undo');
     expect(store.getState().currentLabel?.elements).toHaveLength(0);
+    expect(store.getState().canUndo).toBe(false);
 
-    eventBus.emit('history:redo'); // volta para state 1
+    // Redo volta para snapshot com elemento
+    eventBus.emit('history:redo');
     expect(store.getState().currentLabel?.elements).toHaveLength(1);
+    expect(store.getState().canRedo).toBe(false);
   });
 
   it('should manage selection', () => {

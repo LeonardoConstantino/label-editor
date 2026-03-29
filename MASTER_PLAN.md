@@ -1,51 +1,48 @@
-# Master Plan: Label Editor (v1.0.0)
+# Master Plan: Label Editor MVP+ (Tactile Prism)
 
-Este arquivo coordena a execução de tarefas para a implementação do Editor de Etiquetas e Gerador em Lote.
+Este plano coordena a transição do MVP inicial para a versão MVP+, focada em refinamento visual, arquitetura robusta baseada em eventos e feedback sensorial completo (visual e auditivo).
 
 ## Status do Projeto
-- **Fase Atual:** Infraestrutura & Core
-- **Stack:** TypeScript, Vite, Tailwind CSS v4.2, Web Components, Vitest, IndexedDB.
-- **Progresso Geral:** 5% (Estrutura básica inicial e EventBus prontos)
+- **Fase Atual:** Refatoração de Core & UI (Tactile Prism)
+- **Stack:** TS, Vite, Tailwind v4.2, canvas-txt, jsPDF, UISoundManager.
+- **Progresso:** 15% (Design Tokens, CSS Base e Som prontos)
 
-## Diretrizes para Agentes
-1. **Design System:** Siga rigorosamente o `Design_System.md`. Use as variáveis do `@theme` no Tailwind v4 e aplique a física de mola (`--ease-spring`) em interações.
-2. **Encapsulamento:** Use Web Components com Shadow DOM para todos os elementos de UI.
-3. **Comunicação:** Utilize o `EventBus` (`src/core/EventBus.ts`) para desacoplar componentes.
-4. **Testes:** Toda task DEVE incluir testes unitários/integração usando Vitest e `jsdom`. Nenhuma task é considerada concluída sem 100% de passagem nos critérios de aceite.
-5. **Estado:** O `Store` é a única fonte de verdade para o estado da etiqueta.
+## Diretrizes Críticas
+1. **Física de Hardware:** Use `--ease-spring` em todas as transições. 
+2. **Feedback Auditivo:** Toda interação física (botões, switches, modais) deve invocar o `UISoundManager.play()`.
+3. **Snapshot Visual:** O Undo/Redo agora é via `ImageData`. Toda ação que altera o canvas deve disparar um snapshot.
+4. **Escala mm:** Todo cálculo de domínio permanece em mm. A conversão px ocorre apenas no `CanvasRenderer`.
 
 ---
 
-## Lista de Tarefas (Pipeline)
+## Pipeline de Tasks
 
-### Fase 1: Fundação & Domínio
+### Fase 1: Infraestrutura, Renderers & Feedback
 | ID | Task | Status | Dependências |
 |----|------|--------|--------------|
-| **01** | [Implementação do Store Centralizado](./tasks/01_store.md) | [ ] | — |
-| **02** | [Modelos de Domínio e Tipagens](./tasks/02_models.md) | [ ] | — |
-| **03** | [Serviço de Renderização de Canvas](./tasks/03_renderer.md) | [ ] | 02 |
+| **11** | [Refatoração do Store (History & snapshots)](./tasks/11_store_history.md) | [ ] | 01 |
+| **12** | [Renderers Modulares & canvas-txt](./tasks/12_renderers_strategy.md) | [ ] | 03 |
+| **13** | [OverflowValidator (checkOverflow)](./tasks/13_validator.md) | [ ] | 02 |
 
-### Fase 2: Interface do Editor
+### Fase 2: UI Tactile Prism (Componentes com Som)
 | ID | Task | Status | Dependências |
 |----|------|--------|--------------|
-| **04** | [Layout Principal e EditorCanvas](./tasks/04_layout_canvas.md) | [ ] | 01, 03 |
-| **05** | [Toolbar e Adição de Elementos](./tasks/05_toolbar.md) | [ ] | 04 |
-| **06** | [Inspector de Propriedades](./tasks/06_inspector.md) | [ ] | 04 |
+| **14** | [AppButton & AppInput (Prism Style + Som)](./tasks/14_ui_core.md) | [ ] | — |
+| **15** | [Sistema de Modais, Toasts e Confirmação](./tasks/15_ui_feedback.md) | [ ] | 14 |
+| **16** | [EditorCanvas (Workspace & Artboard)](./tasks/16_canvas_ui.md) | [ ] | 12 |
 
-### Fase 3: Persistência & Ativos
+### Fase 3: Features & Lote
 | ID | Task | Status | Dependências |
 |----|------|--------|--------------|
-| **07** | [Gerenciamento de Templates (IndexedDB)](./tasks/07_persistence.md) | [ ] | 01 |
-| **08** | [Processamento e Otimização de Imagens](./tasks/08_images.md) | [ ] | 06 |
-
-### Fase 4: Geração em Lote & Exportação
-| ID | Task | Status | Dependências |
-|----|------|--------|--------------|
-| **09** | [Parser de Dados (CSV/JSON) e Preview](./tasks/09_data_batch.md) | [ ] | 01, 02 |
-| **10** | [Geração de PDF e Exportação Final](./tasks/10_pdf_export.md) | [ ] | 03, 09 |
+| **17** | [Inspector Numérico e Atributos](./tasks/17_inspector_refactor.md) | [ ] | 16 |
+| **18** | [Batch Processor & String Interpolation](./tasks/18_batch_logic.md) | [ ] | 11, 12 |
+| **19** | [Print System & Lote Preview](./tasks/19_print_batch.md) | [ ] | 18 |
 
 ---
 
 ## Notas de Orquestração
-- **Unidades:** Use `mm` para lógica de domínio e converta para `px` apenas na renderização final baseada no DPI (padrão 300).
-- **Estilo:** Prefira Vanilla CSS dentro do Shadow DOM utilizando as utilities do Tailwind v4 via `@apply` ou variáveis CSS injetadas.
+- **Sons Recomendados:** 
+  - Cliques: `click_mechanical` ou `switch_on`.
+  - Sucesso/Salvo: `action_complete`.
+  - Erro/Overflow: `error_alert`.
+  - Undo/Redo: `history_shuffling`.

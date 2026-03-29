@@ -1,827 +1,1336 @@
-# 🏗️ Arquitetura - Gerador de Etiquetas (MVP)
+# 🏗️ Arquitetura Detalhada - Gerador de Etiquetas (Event-Driven)
 
-Excelente projeto! Um gerador de etiquetas com edição visual é um caso perfeito para aplicar arquitetura modular e escalável. Vamos estruturar isso de forma que o MVP seja sólido e a evolução seja natural.
+## 📐 Decisões Arquiteturais Consolidadas
 
----
+### ✅ Refinamentos Aprovados
 
-## 📋 Análise do Contexto
-
-**Domínio:** Editor gráfico para design de etiquetas + geração em lote
-**Complexidade:** Média-Alta (canvas manipulation, state management, PDF generation)
-**Stack:** Web Components + TypeScript + Vite + TailwindCSS
-**Constraint:** Client-side only, sem backend
-
----
-
-## 🎯 Proposta Arquitetural (3 Variações Avaliadas)
-
-Avaliei internamente 3 abordagens:
-
-| Critério | **Variação 1: MVC Clássico** | **Variação 2: Event-Driven** | **Variação 3: Component-Based State** |
-|----------|------------------------------|------------------------------|---------------------------------------|
-| **Separação de responsabilidades** | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ |
-| **Facilidade de testes** | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ |
-| **Escalabilidade futura** | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ |
-| **Complexidade inicial** | Baixa | Média | Baixa |
-| **Adequação ao Web Components** | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
-
-**✅ Recomendação: Variação 2 - Event-Driven Architecture com Store Centralizado**
-
-Justificativa: 
-- Seu `EventBus` já está pronto e é perfeito para comunicação desacoplada
-- Canvas manipulation se beneficia de event-driven (drag, drop, resize)
-- Facilita undo/redo futuro
-- Permite evolução gradual sem refatoração massiva
+| Aspecto | Decisão | Impacto Arquitetural |
+|---------|---------|---------------------|
+| **Undo/Redo** | Array de `ImageData` | Store mantém snapshots binários do canvas, não objetos |
+| **Posicionamento** | Via input numérico | Simplifica EditorCanvas (sem drag handlers), foco no Inspector |
+| **Export/Import** | Método preparado, UI futura | Interface `ITemplateExporter` desde o início |
+| **Templates pré-definidos** | Não no MVP | TemplateManager sem seed inicial |
+| **Validação Overflow** | `checkOverflow()` ativo | Validator com feedback visual |
+| **Biblioteca externa** | `canvas-txt` para texto | Abstração no TextRenderer |
 
 ---
 
-## 🗂️ Estrutura de Pastas Proposta
+## 🎯 CDNs Sugeridas + Justificativas
+
+### **1. canvas-txt**
+```html
+<script src="https://unpkg.com/canvas-txt@4.1.1"></script>
+```
+**Uso:** Renderização de texto com wrap, alinhamento vertical, ellipsis automático  
+**Benefício:** Elimina lógica manual de `wrapText()`, `truncateText()`, suporta `textOverflow` out-of-the-box  
+**Integração:** Wrapper no `TextRenderer.ts` para manter abstração
+
+---
+
+### **2. jsPDF** (Geração de PDF)
+```html
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+```
+**Uso:** Converter canvas para PDF com controle preciso de dimensões em mm  
+**Benefício:** API nativa para adicionar múltiplas páginas (etiquetas em lote), preserva qualidade  
+**Alternativa:** html2canvas + jsPDF (mais pesado, desnecessário para canvas direto)
+
+---
+
+### **3. uuid** (Geração de IDs)
+```html
+<script src="https://cdn.jsdelivr.net/npm/uuid@9.0.0/dist/umd/uuidv4.min.js"></script>
+```
+**Uso:** Gerar IDs únicos para elementos (`element.id`)  
+**Benefício:** Evita colisões, padrão industrial  
+**Alternativa:** `crypto.randomUUID()` (nativo no browser moderno, preferível se compatibilidade permitir)
+
+---
+
+### **4. PapaParse** (Parse de CSV)
+```html
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+```
+**Uso:** Parsing robusto de CSV para batch data  
+**Benefício:** Lida com edge cases (vírgulas em strings, quebras de linha)  
+**Fase:** Pós-MVP, quando implementar CSV import
+
+---
+
+### **5. idb-keyval** (IndexedDB Simplificado) - **OPCIONAL**
+```html
+<script src="https://cdn.jsdelivr.net/npm/idb-keyval@6.2.1/dist/umd.js"></script>
+```
+**Uso:** Wrapper simples sobre IndexedDB  
+**Benefício:** Reduz boilerplate da sua classe `IndexedDBStorage`  
+**Decisão:** **NÃO USAR** - você já tem `IndexedDBStorage` implementado, manter consistência
+
+---
+
+## 🗂️ Estrutura de Pastas REFINADA
 
 ```
 src/
 ├── core/
-│   ├── EventBus.ts                 # ✅ Já existe
-│   ├── Logger.ts                   # ✅ Já existe
-│   ├── IndexedDBStorage.ts         # ✅ Já existe
-│   └── Store.ts                    # 🆕 State management central
+│   ├── EventBus.ts                 # ✅ Existente
+│   ├── Logger.ts                   # ✅ Existente
+│   ├── IndexedDBStorage.ts         # ✅ Existente
+│   ├── Store.ts                    # 🆕 State manager + history
+│   └── types.ts                    # 🆕 Types compartilhados
 │
 ├── domain/
 │   ├── models/
-│   │   ├── Label.ts                # Modelo da etiqueta
-│   │   ├── elements/
-│   │   │   ├── BaseElement.ts      # Interface base
-│   │   │   ├── BorderElement.ts
-│   │   │   ├── RectangleElement.ts
-│   │   │   ├── TextElement.ts
-│   │   │   └── ImageElement.ts
-│   │   └── CanvasConfig.ts         # Configuração do canvas
+│   │   ├── Label.ts
+│   │   ├── CanvasConfig.ts
+│   │   └── elements/
+│   │       ├── BaseElement.ts      # Interface + factory
+│   │       ├── BorderElement.ts
+│   │       ├── RectangleElement.ts
+│   │       ├── TextElement.ts
+│   │       └── ImageElement.ts
 │   │
 │   ├── services/
-│   │   ├── CanvasRenderer.ts       # Renderização no canvas
-│   │   ├── PDFGenerator.ts         # Geração de PDF
-│   │   ├── TemplateManager.ts      # CRUD de templates (IndexedDB)
-│   │   └── DataSourceParser.ts     # Parse CSV/JSON/lista
+│   │   ├── renderers/
+│   │   │   ├── CanvasRenderer.ts   # Orquestrador
+│   │   │   ├── BorderRenderer.ts   # Renderiza bordas
+│   │   │   ├── RectangleRenderer.ts
+│   │   │   ├── TextRenderer.ts     # Usa canvas-txt
+│   │   │   └── ImageRenderer.ts
+│   │   │
+│   │   ├── TemplateManager.ts      # CRUD templates
+│   │   ├── PDFGenerator.ts         # Batch PDF export
+│   │   ├── DataSourceParser.ts     # Parse lista/CSV/JSON
+│   │   ├── OverflowValidator.ts    # 🆕 Validação de limites
+│   │   └── HistoryManager.ts       # 🆕 Undo/Redo com ImageData
 │   │
 │   └── validators/
-│       └── ElementValidator.ts     # Validação de propriedades
+│       └── ElementValidator.ts     # Validações de propriedades
 │
 ├── components/
 │   ├── editor/
-│   │   ├── EditorCanvas.ts         # Web Component - Canvas principal
-│   │   ├── ElementInspector.ts     # Web Component - Formulário de edição
-│   │   ├── Toolbar.ts              # Web Component - Barra de ferramentas
-│   │   └── LayerPanel.ts           # Web Component - Lista de elementos
+│   │   ├── EditorCanvas.ts         # Canvas de edição
+│   │   ├── ElementInspector.ts     # Formulário de props
+│   │   ├── Toolbar.ts              # Add elements, undo/redo
+│   │   ├── LayerPanel.ts           # Lista z-index
+│   │   └── CanvasConfigPanel.ts    # 🆕 Config de dimensões
 │   │
 │   ├── preview/
-│   │   ├── BatchPreview.ts         # Web Component - Preview em lote
-│   │   └── PrintSettings.ts        # Web Component - Config de impressão
+│   │   ├── BatchPreview.ts         # Grid de etiquetas
+│   │   ├── PrintSettings.ts        # Config de impressão
+│   │   └── DataSourceInput.ts      # 🆕 Input de dados
 │   │
 │   └── common/
-│       ├── Button.ts               # ✅ Se já existe, usar
-│       ├── Input.ts
-│       └── ColorPicker.ts
+│       └── (seus componentes UI existentes)
 │
 ├── utils/
-│   ├── canvas.ts                   # Helpers para canvas API
-│   ├── units.ts                    # Conversão mm ↔ px
-│   └── image.ts                    # toDataURL com compressão
+│   ├── canvas.ts                   # Helpers canvas API
+│   ├── units.ts                    # mm ↔ px conversão
+│   ├── image.ts                    # toDataURL compression
+│   ├── interpolate.ts              # 🆕 {{variable}} replacement
+│   └── cdn-loader.ts               # 🆕 Dynamic script loading
 │
 ├── types/
-│   └── index.ts                    # Types globais
+│   └── index.ts                    # Global types
 │
-└── main.ts                         # Entry point
+├── constants/
+│   └── defaults.ts                 # 🆕 Valores padrão
+│
+└── main.ts
 ```
 
 ---
 
-## 🧩 Arquitetura Visual (Mermaid)
+## 🔄 Fluxo de Dados Detalhado
+
+### **1. Inicialização da Aplicação**
 
 ```mermaid
-graph TB
-    subgraph "UI Layer - Web Components"
-        Toolbar[Toolbar]
-        Canvas[EditorCanvas]
-        Inspector[ElementInspector]
-        LayerPanel[LayerPanel]
-        BatchPreview[BatchPreview]
-    end
+sequenceDiagram
+    participant Main
+    participant EventBus
+    participant Store
+    participant IDB as IndexedDBStorage
+    participant Components
+
+    Main->>EventBus: new EventBus()
+    Main->>Store: new Store(eventBus)
+    Main->>IDB: new IndexedDBStorage('templates', [])
+    Main->>Components: Inject dependencies
     
-    subgraph "Core Layer"
-        EventBus[EventBus]
-        Store[Store Centralizado]
-        IDB[(IndexedDB)]
-    end
+    Components->>EventBus: on('state:change')
+    Components->>EventBus: on('app:ready')
     
-    subgraph "Domain Layer"
-        CanvasRenderer[CanvasRenderer]
-        PDFGen[PDFGenerator]
-        TemplateManager[TemplateManager]
-        DataParser[DataSourceParser]
-    end
-    
-    subgraph "Models"
-        Label[Label]
-        Elements[BorderElement<br/>RectangleElement<br/>TextElement<br/>ImageElement]
-    end
-    
-    Toolbar -->|element:add| EventBus
-    Canvas -->|element:select| EventBus
-    Inspector -->|element:update| EventBus
-    
-    EventBus -->|dispatch| Store
-    Store -->|state change| Canvas
-    Store -->|state change| Inspector
-    Store -->|state change| LayerPanel
-    
-    Store -->|persist| TemplateManager
-    TemplateManager -->|read/write| IDB
-    
-    Canvas -->|render| CanvasRenderer
-    CanvasRenderer -->|draw| Elements
-    
-    BatchPreview -->|generate| PDFGen
-    PDFGen -->|use| CanvasRenderer
-    DataParser -->|feed| BatchPreview
-    
-    style EventBus fill:#a8dadc
-    style Store fill:#457b9d
-    style Canvas fill:#f1faee
+    Main->>EventBus: emit('app:ready')
+    Store->>Store: initializeEmptyLabel()
+    Store->>EventBus: emit('state:change', initialState)
+    Components->>Components: render(initialState)
 ```
+
+**Responsabilidades:**
+- `main.ts`: Bootstrap, DI container, event wiring
+- `Store`: Cria label vazio default (210x297mm A4)
+- `Components`: Subscribe em eventos relevantes
 
 ---
 
-## 💾 Modelagem de Dados (TypeScript)
+### **2. Adição de Elemento**
 
-### 1️⃣ BaseElement (Interface Abstrata)
+```mermaid
+sequenceDiagram
+    participant User
+    participant Toolbar
+    participant EventBus
+    participant Store
+    participant Canvas
+    participant Renderer
 
+    User->>Toolbar: Click "Add Rectangle"
+    Toolbar->>EventBus: emit('element:add', newRectangle)
+    
+    EventBus->>Store: Handler 'element:add'
+    Store->>Store: currentLabel.elements.push(element)
+    Store->>Store: historyManager.snapshot(canvas)
+    Store->>EventBus: emit('state:change', newState)
+    
+    EventBus->>Canvas: Handler 'state:change'
+    Canvas->>Renderer: render(elements)
+    Renderer->>Canvas: drawRect(), drawText()...
+    Canvas->>Canvas: updateCanvas()
+```
+
+**Detalhes Importantes:**
+
+**Toolbar:**
+- Botões para cada tipo de elemento
+- Ao clicar, cria objeto com valores default
+- Emite evento com payload completo
+
+**Store:**
+- Valida elemento via `ElementValidator`
+- Adiciona ao array `currentLabel.elements`
+- Chama `historyManager.snapshot()` **ANTES** de emitir mudança
+- Incrementa `element.zIndex` automaticamente
+
+**Canvas:**
+- Escuta `state:change`
+- Chama `redraw()` que itera sobre `elements` ordenados por `zIndex`
+- Cada elemento é passado para renderer específico
+
+---
+
+### **3. Edição de Elemento (via Inspector)**
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Inspector
+    participant Validator
+    participant EventBus
+    participant Store
+    participant Canvas
+    participant OverflowCheck
+
+    User->>Inspector: Edita "fontSize" = 72
+    Inspector->>Validator: validate({ fontSize: 72 })
+    
+    alt Válido
+        Validator-->>Inspector: OK
+        Inspector->>EventBus: emit('element:update', {id, updates})
+        EventBus->>Store: Handler
+        Store->>Store: Object.assign(element, updates)
+        Store->>OverflowCheck: checkOverflow(element, canvasConfig)
+        
+        alt Overflow detectado
+            OverflowCheck-->>Store: { overflow: true, axis: 'width' }
+            Store->>EventBus: emit('element:warning', warning)
+        end
+        
+        Store->>EventBus: emit('state:change')
+        EventBus->>Canvas: redraw()
+        EventBus->>Inspector: Highlight warnings
+    else Inválido
+        Validator-->>Inspector: Error
+        Inspector->>Inspector: showError()
+    end
+```
+
+**Inspector:**
+- Form com inputs para cada propriedade
+- Validação local (min/max, tipos)
+- Debounce de 300ms para evitar flood de eventos
+- Exibe warnings visuais (ícone amarelo) se overflow
+
+**OverflowValidator:**
+- Verifica se elemento extrapola canvas
+- Retorna objeto `{ overflow: boolean, axis?: 'x' | 'y' | 'both', amount?: number }`
+- Não bloqueia, apenas alerta
+
+---
+
+### **4. Undo/Redo com ImageData**
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Toolbar
+    participant EventBus
+    participant HistoryManager
+    participant Store
+    participant Canvas
+
+    Note over HistoryManager: history = [ImageData1, ImageData2, ImageData3]<br/>currentIndex = 2
+
+    User->>Toolbar: Click "Undo"
+    Toolbar->>EventBus: emit('history:undo')
+    
+    EventBus->>HistoryManager: undo()
+    HistoryManager->>HistoryManager: currentIndex--
+    HistoryManager->>Canvas: getContext().putImageData(history[1])
+    HistoryManager->>HistoryManager: restoreElementsFromSnapshot()
+    HistoryManager->>EventBus: emit('state:restored', elementsSnapshot)
+    
+    EventBus->>Store: Atualiza currentLabel.elements
+    Store->>EventBus: emit('state:change')
+    Canvas->>Canvas: Já renderizado via putImageData
+```
+
+**HistoryManager:**
+
+**Estrutura Interna:**
 ```typescript
-// src/domain/models/elements/BaseElement.ts
-
-export enum ElementType {
-  BORDER = 'border',
-  RECTANGLE = 'rectangle',
-  TEXT = 'text',
-  IMAGE = 'image'
+interface HistorySnapshot {
+  imageData: ImageData;        // Snapshot visual do canvas
+  elements: BaseElement[];     // Deep clone dos elementos
+  timestamp: number;
 }
 
-export interface Position {
-  x: number; // em mm
-  y: number; // em mm
-}
-
-export interface Dimensions {
-  width: number;  // em mm
-  height: number; // em mm
-}
-
-export interface BaseElement {
-  id: string;
-  type: ElementType;
-  position: Position;
-  zIndex: number;
-  locked?: boolean;
-  visible?: boolean;
-}
-
-export interface RenderContext {
-  ctx: CanvasRenderingContext2D;
-  scale: number; // mm -> px
-  data?: Record<string, any>; // Para interpolação de variáveis
+class HistoryManager {
+  private history: HistorySnapshot[] = [];
+  private currentIndex: number = -1;
+  private maxSize: number = 50; // Limite de memória
 }
 ```
 
-### 2️⃣ Elementos Específicos
+**Método `snapshot()`:**
+1. Captura `ctx.getImageData(0, 0, width, height)`
+2. Faz deep clone de `currentLabel.elements` (JSON.parse(JSON.stringify))
+3. Adiciona ao array `history`
+4. Se `history.length > maxSize`, remove mais antigo (FIFO)
+5. Incrementa `currentIndex`
 
-```typescript
-// src/domain/models/elements/BorderElement.ts
+**Método `undo()`:**
+1. Decrementa `currentIndex`
+2. Restaura canvas via `ctx.putImageData(history[currentIndex].imageData)`
+3. Retorna `history[currentIndex].elements` para Store atualizar estado
 
-export enum BorderStyle {
-  SOLID = 'solid',
-  DASHED = 'dashed',
-  DOTTED = 'dotted',
-  DOUBLE = 'double'
-}
+**Método `redo()`:**
+- Inverso do undo
 
-export interface BorderElement extends BaseElement {
-  type: ElementType.BORDER;
-  style: BorderStyle;
-  width: number; // espessura em mm
-  color: string; // hex
-  radius?: number; // raio para cantos arredondados
-}
+**Vantagem:**
+- Visual instantâneo (putImageData é O(1))
+- Captura exata do rendering (incluindo anti-aliasing)
+
+**Desvantagem:**
+- Consome ~4 bytes/pixel (canvas 800x600 = ~2MB por snapshot)
+- Limite de 50 snapshots = ~100MB RAM (aceitável)
+
+---
+
+### **5. Geração de PDF em Lote**
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant DataInput
+    participant Parser
+    participant EventBus
+    participant PDFGen
+    participant Renderer
+    participant jsPDF
+
+    User->>DataInput: Cole lista "Nome1\nNome2\nNome3"
+    DataInput->>Parser: parse(text, format='list')
+    Parser-->>DataInput: [{ nome: "Nome1" }, ...]
+    
+    DataInput->>EventBus: emit('batch:generate', data)
+    
+    EventBus->>PDFGen: generate(label, data)
+    
+    loop Para cada item
+        PDFGen->>PDFGen: createOffscreenCanvas()
+        PDFGen->>Renderer: render(elements, { data: item })
+        Renderer->>Renderer: Interpolate {{nome}} → "Nome1"
+        Renderer-->>PDFGen: Canvas renderizado
+        
+        PDFGen->>jsPDF: addImage(canvas, x, y, w, h)
+        
+        alt Não é último item
+            PDFGen->>jsPDF: addPage()
+        end
+    end
+    
+    PDFGen->>jsPDF: save('etiquetas.pdf')
+    PDFGen->>EventBus: emit('batch:complete')
 ```
 
-```typescript
-// src/domain/models/elements/RectangleElement.ts
+**DataSourceParser:**
 
-export interface RectangleElement extends BaseElement {
-  type: ElementType.RECTANGLE;
-  dimensions: Dimensions;
-  fillColor?: string;
-  strokeColor?: string;
-  strokeWidth?: number; // em mm
-  borderRadius?: number; // em mm
-}
+**Input Formats:**
+1. **Lista Simples:**
+   ```
+   Nome 1
+   Nome 2
+   ```
+   → `[{ text: "Nome 1" }, { text: "Nome 2" }]`
+
+2. **CSV (futuro):**
+   ```
+   nome,valor
+   João,100
+   ```
+   → `[{ nome: "João", valor: "100" }]`
+
+3. **JSON (futuro):**
+   ```json
+   [{"nome": "João"}]
+   ```
+
+**Método `parse()`:**
+- Detecta formato (linha única = lista, vírgula = CSV, `{` = JSON)
+- Retorna array de objetos uniformes
+- Valida estrutura (mínimo 1 registro)
+
+---
+
+**PDFGenerator:**
+
+**Método `generate(label: Label, data: Record<string, any>[])`:**
+
+1. **Setup:**
+   ```typescript
+   const pdf = new jsPDF({
+     orientation: label.config.widthMM > label.config.heightMM ? 'landscape' : 'portrait',
+     unit: 'mm',
+     format: [label.config.widthMM, label.config.heightMM]
+   });
+   ```
+
+2. **Loop de Renderização:**
+   ```typescript
+   for (let i = 0; i < data.length; i++) {
+     const offscreenCanvas = document.createElement('canvas');
+     const ctx = offscreenCanvas.getContext('2d');
+     
+     // Dimensões em pixels (300 DPI)
+     offscreenCanvas.width = (label.config.widthMM / 25.4) * 300;
+     offscreenCanvas.height = (label.config.heightMM / 25.4) * 300;
+     
+     // Renderizar com dados interpolados
+     this.renderer.renderAll(label.elements, {
+       ctx,
+       scale: 300 / 25.4,
+       data: data[i]
+     });
+     
+     // Adicionar ao PDF
+     const imgData = offscreenCanvas.toDataURL('image/png', 0.95);
+     pdf.addImage(imgData, 'PNG', 0, 0, label.config.widthMM, label.config.heightMM);
+     
+     if (i < data.length - 1) {
+       pdf.addPage();
+     }
+   }
+   ```
+
+3. **Export:**
+   ```typescript
+   pdf.save(`etiquetas_${Date.now()}.pdf`);
+   ```
+
+**Otimização:**
+- Canvas offscreen (não adiciona ao DOM)
+- Qualidade 0.95 (balanço tamanho/qualidade)
+- Liberação de memória: `offscreenCanvas = null` após cada iteração
+
+---
+
+### **6. Persistência de Templates**
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Toolbar
+    participant EventBus
+    participant TemplateManager
+    participant IDB as IndexedDBStorage
+
+    User->>Toolbar: Click "Save Template"
+    Toolbar->>EventBus: emit('template:save', { name })
+    
+    EventBus->>TemplateManager: save(currentLabel, name)
+    TemplateManager->>TemplateManager: generateThumbnail(label)
+    TemplateManager->>IDB: setValue({ id, label, thumbnail })
+    IDB-->>TemplateManager: OK
+    
+    TemplateManager->>EventBus: emit('template:saved', template)
+    EventBus->>Toolbar: showSuccess("Template salvo!")
 ```
 
+**TemplateManager:**
+
+**Estrutura de Storage:**
 ```typescript
-// src/domain/models/elements/TextElement.ts
-
-export enum TextOverflow {
-  CLIP = 'clip',
-  ELLIPSIS = 'ellipsis',
-  WRAP = 'wrap',
-  SCALE = 'scale' // auto-resize font
-}
-
-export interface TextElement extends BaseElement {
-  type: ElementType.TEXT;
-  dimensions: Dimensions;
-  content: string; // Pode conter {{variable}}
-  fontFamily: string;
-  fontSize: number; // em pt
-  fontWeight: number | string; // 400, 'bold', etc
-  fontStyle?: 'normal' | 'italic';
-  color: string;
-  textAlign: 'left' | 'center' | 'right';
-  verticalAlign: 'top' | 'middle' | 'bottom';
-  overflow: TextOverflow;
-  lineHeight?: number; // multiplicador
-  dataSource?: 'static' | 'variable'; // static ou nome da variável
-}
-```
-
-```typescript
-// src/domain/models/elements/ImageElement.ts
-
-export interface ImageElement extends BaseElement {
-  type: ElementType.IMAGE;
-  dimensions: Dimensions;
-  src: string; // dataURL
-  fit: 'cover' | 'contain' | 'fill' | 'none';
-  opacity?: number; // 0-1
-  // Parâmetros do canvas
-  smoothing?: boolean;
-  compositeOperation?: GlobalCompositeOperation;
-}
-```
-
-### 3️⃣ Label (Documento Principal)
-
-```typescript
-// src/domain/models/Label.ts
-
-export interface CanvasConfig {
-  widthMM: number;
-  heightMM: number;
-  dpi: number; // padrão 300 para impressão
-  previewScale: number; // 0.5, 1, 2 (zoom do preview)
-}
-
-export interface Label {
-  id: string;
+interface StoredTemplate {
+  id: string;                    // UUID
   name: string;
-  config: CanvasConfig;
-  elements: (BorderElement | RectangleElement | TextElement | ImageElement)[];
-  createdAt: Date;
-  updatedAt: Date;
+  label: Label;                  // Objeto completo
+  thumbnail: string;             // dataURL 200x200px
+  createdAt: number;
+  updatedAt: number;
 }
 
-export interface Template {
-  id: string;
-  label: Label;
-  thumbnail?: string; // dataURL preview
+// IndexedDB key: 'templates'
+// Value: StoredTemplate[]
+```
+
+**Método `save()`:**
+1. Gera thumbnail (renderiza canvas em 200x200px)
+2. Cria objeto `StoredTemplate`
+3. Persiste via `IndexedDBStorage.setValue('templates', templates)`
+
+**Método `load(id: string)`:**
+1. Busca em IndexedDB
+2. Reconstrói objetos Element (deserialização)
+3. Emite `template:loaded`
+
+**Método `list()`:**
+- Retorna array de metadados (id, name, thumbnail)
+- Usado para galeria de templates
+
+**Método `exportJSON()` (preparado):**
+```typescript
+exportJSON(id: string): string {
+  const template = this.getById(id);
+  return JSON.stringify(template.label, null, 2);
+}
+```
+
+**Método `importJSON()` (preparado):**
+```typescript
+importJSON(json: string): void {
+  const label = JSON.parse(json);
+  // Validação de schema
+  this.validateLabelStructure(label);
+  // Adiciona aos templates
+  this.save(label, 'Imported Template');
 }
 ```
 
 ---
 
-## 🔄 Store Centralizado (State Management)
+## 🎨 Renderização com canvas-txt
+
+### **TextRenderer Detalhado**
+
+**Integração da biblioteca:**
 
 ```typescript
-// src/core/Store.ts
-
-import { EventBus } from './EventBus';
-import { Label } from '../domain/models/Label';
-import { BaseElement } from '../domain/models/elements/BaseElement';
-
-export interface AppState {
-  currentLabel: Label | null;
-  selectedElementIds: string[];
-  clipboard: BaseElement[];
-  history: Label[]; // Para undo/redo
-  historyIndex: number;
-}
-
-export class Store {
-  private state: AppState;
-  private eventBus: EventBus;
-
-  constructor(eventBus: EventBus) {
-    this.eventBus = eventBus;
-    this.state = {
-      currentLabel: null,
-      selectedElementIds: [],
-      clipboard: [],
-      history: [],
-      historyIndex: -1
-    };
-
-    this.registerEvents();
+// types/canvas-txt.d.ts
+declare module 'canvas-txt' {
+  interface DrawTextConfig {
+    width: number;
+    height: number;
+    fontSize: number;
+    fontFamily: string;
+    fontWeight: string;
+    fontStyle: string;
+    align: 'left' | 'center' | 'right';
+    vAlign: 'top' | 'middle' | 'bottom';
+    lineHeight: number;
+    debug?: boolean;
   }
 
-  private registerEvents(): void {
-    this.eventBus.on('element:add', (element: BaseElement) => {
-      if (!this.state.currentLabel) return;
-      this.state.currentLabel.elements.push(element);
-      this.pushHistory();
-      this.emit();
-    });
+  export function drawText(
+    ctx: CanvasRenderingContext2D,
+    text: string,
+    x: number,
+    y: number,
+    config: DrawTextConfig
+  ): void;
+}
+```
 
-    this.eventBus.on('element:update', ({ id, updates }: { id: string; updates: Partial<BaseElement> }) => {
-      if (!this.state.currentLabel) return;
-      const element = this.state.currentLabel.elements.find(el => el.id === id);
-      if (element) {
-        Object.assign(element, updates);
-        this.pushHistory();
-        this.emit();
+**TextRenderer.ts:**
+
+```typescript
+import { drawText } from 'canvas-txt';
+
+class TextRenderer {
+  render(element: TextElement, context: RenderContext): void {
+    const { ctx, scale, data } = context;
+    
+    // Interpolação
+    let text = this.interpolate(element.content, data);
+    
+    // Conversão de unidades
+    const x = element.position.x * scale;
+    const y = element.position.y * scale;
+    const width = element.dimensions.width * scale;
+    const height = element.dimensions.height * scale;
+    
+    // Configuração canvas-txt
+    const config = {
+      width,
+      height,
+      fontSize: element.fontSize * scale,
+      fontFamily: element.fontFamily,
+      fontWeight: element.fontWeight.toString(),
+      fontStyle: element.fontStyle || 'normal',
+      align: element.textAlign,
+      vAlign: element.verticalAlign,
+      lineHeight: element.lineHeight || 1.2
+    };
+    
+    // Aplicar cor
+    ctx.fillStyle = element.color;
+    
+    // Renderizar
+    drawText(ctx, text, x, y, config);
+  }
+  
+  private interpolate(text: string, data?: Record<string, any>): string {
+    if (!data) return text;
+    return text.replace(/\{\{(\w+)\}\}/g, (_, key) => data[key] || '');
+  }
+}
+```
+
+**Vantagens:**
+- Elimina código manual de wrap/truncate
+- Suporta alinhamento vertical out-of-the-box
+- Rendering consistente
+
+---
+
+## 🔍 OverflowValidator (checkOverflow)
+
+**Estratégia de Validação:**
+
+```typescript
+interface OverflowResult {
+  overflow: boolean;
+  details?: {
+    axis: 'x' | 'y' | 'both';
+    amountX?: number; // mm além do limite
+    amountY?: number;
+  };
+}
+
+class OverflowValidator {
+  check(element: BaseElement, config: CanvasConfig): OverflowResult {
+    // Elementos sem dimensões (ex: border global)
+    if (!('dimensions' in element)) {
+      return { overflow: false };
+    }
+    
+    const rightEdge = element.position.x + element.dimensions.width;
+    const bottomEdge = element.position.y + element.dimensions.height;
+    
+    const overflowX = rightEdge > config.widthMM;
+    const overflowY = bottomEdge > config.heightMM;
+    
+    if (!overflowX && !overflowY) {
+      return { overflow: false };
+    }
+    
+    return {
+      overflow: true,
+      details: {
+        axis: overflowX && overflowY ? 'both' : overflowX ? 'x' : 'y',
+        amountX: overflowX ? rightEdge - config.widthMM : undefined,
+        amountY: overflowY ? bottomEdge - config.heightMM : undefined
+      }
+    };
+  }
+  
+  checkAll(elements: BaseElement[], config: CanvasConfig): Map<string, OverflowResult> {
+    const results = new Map();
+    elements.forEach(el => {
+      const result = this.check(el, config);
+      if (result.overflow) {
+        results.set(el.id, result);
       }
     });
-
-    this.eventBus.on('element:delete', (id: string) => {
-      if (!this.state.currentLabel) return;
-      this.state.currentLabel.elements = this.state.currentLabel.elements.filter(el => el.id !== id);
-      this.state.selectedElementIds = this.state.selectedElementIds.filter(elId => elId !== id);
-      this.pushHistory();
-      this.emit();
-    });
-
-    this.eventBus.on('element:select', (id: string | string[]) => {
-      this.state.selectedElementIds = Array.isArray(id) ? id : [id];
-      this.emit();
-    });
-  }
-
-  private pushHistory(): void {
-    if (!this.state.currentLabel) return;
-    const snapshot = JSON.parse(JSON.stringify(this.state.currentLabel));
-    this.state.history = this.state.history.slice(0, this.state.historyIndex + 1);
-    this.state.history.push(snapshot);
-    this.state.historyIndex++;
-  }
-
-  private emit(): void {
-    this.eventBus.emit('state:change', this.getState());
-  }
-
-  getState(): Readonly<AppState> {
-    return Object.freeze({ ...this.state });
-  }
-
-  loadLabel(label: Label): void {
-    this.state.currentLabel = label;
-    this.state.history = [JSON.parse(JSON.stringify(label))];
-    this.state.historyIndex = 0;
-    this.emit();
-  }
-
-  undo(): void {
-    if (this.state.historyIndex > 0) {
-      this.state.historyIndex--;
-      this.state.currentLabel = JSON.parse(JSON.stringify(this.state.history[this.state.historyIndex]));
-      this.emit();
-    }
-  }
-
-  redo(): void {
-    if (this.state.historyIndex < this.state.history.length - 1) {
-      this.state.historyIndex++;
-      this.state.currentLabel = JSON.parse(JSON.stringify(this.state.history[this.state.historyIndex]));
-      this.emit();
-    }
+    return results;
   }
 }
 ```
 
----
-
-## 🎨 Exemplo de Web Component (EditorCanvas)
+**Integração no Store:**
 
 ```typescript
-// src/components/editor/EditorCanvas.ts
-
-import { BaseElement } from '../../domain/models/elements/BaseElement';
-import { CanvasRenderer } from '../../domain/services/CanvasRenderer';
-import { EventBus } from '../../core/EventBus';
-import { AppState } from '../../core/Store';
-
-export class EditorCanvas extends HTMLElement {
-  private canvas!: HTMLCanvasElement;
-  private ctx!: CanvasRenderingContext2D;
-  private renderer!: CanvasRenderer;
-  private eventBus: EventBus;
-  private currentState: AppState | null = null;
-
-  constructor(eventBus: EventBus, renderer: CanvasRenderer) {
-    super();
-    this.eventBus = eventBus;
-    this.renderer = renderer;
-    this.attachShadow({ mode: 'open' });
+// Após cada update de elemento
+this.eventBus.on('element:update', ({ id, updates }) => {
+  const element = this.findElement(id);
+  Object.assign(element, updates);
+  
+  // Validar overflow
+  const overflowResult = this.overflowValidator.check(element, this.state.currentLabel.config);
+  
+  if (overflowResult.overflow) {
+    this.eventBus.emit('element:overflow', { id, result: overflowResult });
+  } else {
+    this.eventBus.emit('element:overflow:clear', { id });
   }
+  
+  this.emit();
+});
+```
 
-  connectedCallback(): void {
-    this.render();
-    this.setupCanvas();
-    this.attachListeners();
+**Feedback Visual no Inspector:**
+
+```typescript
+// ElementInspector.ts
+this.eventBus.on('element:overflow', ({ id, result }) => {
+  if (id === this.currentElementId) {
+    this.showWarning(
+      `Elemento ultrapassa ${result.details.axis === 'both' ? 'as bordas' : 'a borda ' + result.details.axis} em ${result.details.amountX || result.details.amountY}mm`
+    );
   }
+});
+```
 
-  private render(): void {
-    if (!this.shadowRoot) return;
-    this.shadowRoot.innerHTML = `
-      <style>
-        :host {
-          display: block;
-          width: 100%;
-          height: 100%;
-        }
-        canvas {
-          border: 1px solid #e5e7eb;
-          background: white;
-          cursor: crosshair;
-        }
-      </style>
-      <canvas></canvas>
-    `;
-  }
+---
 
-  private setupCanvas(): void {
-    this.canvas = this.shadowRoot!.querySelector('canvas')!;
-    this.ctx = this.canvas.getContext('2d')!;
-  }
+## 🏛️ Padrões de Design Aplicados
 
-  private attachListeners(): void {
-    this.eventBus.on<AppState>('state:change', (state) => {
-      this.currentState = state;
-      this.redraw();
-    });
+### **1. Factory Pattern - Criação de Elementos**
 
-    this.canvas.addEventListener('click', (e) => this.handleClick(e));
-    this.canvas.addEventListener('mousemove', (e) => this.handleHover(e));
-  }
+```typescript
+// domain/models/elements/ElementFactory.ts
 
-  private redraw(): void {
-    if (!this.currentState?.currentLabel) return;
+type ElementConfig = Partial<BaseElement> & { type: ElementType };
 
-    const { config, elements } = this.currentState.currentLabel;
+class ElementFactory {
+  private defaults = {
+    [ElementType.RECTANGLE]: {
+      position: { x: 10, y: 10 },
+      dimensions: { width: 50, height: 30 },
+      fillColor: '#ffffff',
+      strokeColor: '#000000',
+      strokeWidth: 1,
+      borderRadius: 0,
+      zIndex: 0,
+      visible: true
+    },
+    [ElementType.TEXT]: {
+      position: { x: 10, y: 10 },
+      dimensions: { width: 100, height: 20 },
+      content: 'Texto',
+      fontFamily: 'Arial',
+      fontSize: 12,
+      fontWeight: 400,
+      color: '#000000',
+      textAlign: 'left',
+      verticalAlign: 'top',
+      overflow: TextOverflow.CLIP,
+      zIndex: 0,
+      visible: true
+    }
+    // ...
+  };
+  
+  create(config: ElementConfig): BaseElement {
+    const defaults = this.defaults[config.type];
+    const element = {
+      id: crypto.randomUUID(),
+      ...defaults,
+      ...config
+    };
     
-    // Ajustar tamanho do canvas
-    const scale = config.previewScale;
-    const widthPx = (config.widthMM / 25.4) * config.dpi * scale;
-    const heightPx = (config.heightMM / 25.4) * config.dpi * scale;
-    
-    this.canvas.width = widthPx;
-    this.canvas.height = heightPx;
+    return element as BaseElement;
+  }
+}
+```
 
-    // Limpar canvas
-    this.ctx.clearRect(0, 0, widthPx, heightPx);
+**Uso:**
+```typescript
+// Toolbar
+const newRect = elementFactory.create({
+  type: ElementType.RECTANGLE,
+  position: { x: 20, y: 30 }
+});
+```
 
-    // Renderizar elementos
+---
+
+### **2. Strategy Pattern - Renderização**
+
+```typescript
+// domain/services/renderers/CanvasRenderer.ts
+
+interface IRenderer {
+  render(element: BaseElement, context: RenderContext): void;
+}
+
+class CanvasRenderer {
+  private renderers: Map<ElementType, IRenderer>;
+  
+  constructor() {
+    this.renderers = new Map([
+      [ElementType.BORDER, new BorderRenderer()],
+      [ElementType.RECTANGLE, new RectangleRenderer()],
+      [ElementType.TEXT, new TextRenderer()],
+      [ElementType.IMAGE, new ImageRenderer()]
+    ]);
+  }
+  
+  render(element: BaseElement, context: RenderContext): void {
+    const renderer = this.renderers.get(element.type);
+    if (!renderer) {
+      throw new Error(`No renderer for type ${element.type}`);
+    }
+    renderer.render(element, context);
+  }
+  
+  renderAll(elements: BaseElement[], context: RenderContext): void {
     elements
       .filter(el => el.visible !== false)
       .sort((a, b) => a.zIndex - b.zIndex)
-      .forEach(element => {
-        this.renderer.render(element, {
-          ctx: this.ctx,
-          scale: (config.dpi / 25.4) * scale
-        });
-      });
-
-    // Destacar selecionados
-    this.highlightSelected();
-  }
-
-  private highlightSelected(): void {
-    if (!this.currentState) return;
-    const selectedIds = this.currentState.selectedElementIds;
-    // Desenhar outline nos elementos selecionados
-    // ... implementação
-  }
-
-  private handleClick(e: MouseEvent): void {
-    // Hit detection e emissão de evento element:select
-    const rect = this.canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    
-    // Encontrar elemento clicado (reverse order, top-most first)
-    const clickedElement = this.findElementAt(x, y);
-    
-    if (clickedElement) {
-      this.eventBus.emit('element:select', clickedElement.id);
-    }
-  }
-
-  private findElementAt(x: number, y: number): BaseElement | null {
-    if (!this.currentState?.currentLabel) return null;
-    
-    const elements = [...this.currentState.currentLabel.elements]
-      .filter(el => el.visible !== false)
-      .sort((a, b) => b.zIndex - a.zIndex); // Top-most first
-
-    for (const element of elements) {
-      if (this.renderer.hitTest(element, x, y, this.currentState.currentLabel.config)) {
-        return element;
-      }
-    }
-    
-    return null;
-  }
-
-  private handleHover(e: MouseEvent): void {
-    // Mudar cursor baseado no elemento sob o mouse
+      .forEach(el => this.render(el, context));
   }
 }
-
-customElements.define('editor-canvas', EditorCanvas);
 ```
+
+**Benefício:**
+- Adicionar novo tipo = nova classe renderer
+- Zero modificação em código existente (Open/Closed Principle)
 
 ---
 
-## 🔧 CanvasRenderer (Service)
+### **3. Observer Pattern - EventBus**
+
+Já implementado no seu `EventBus`, mas vou detalhar os eventos:
+
+**Taxonomia de Eventos:**
 
 ```typescript
-// src/domain/services/CanvasRenderer.ts
+// types/events.ts
 
-import { BaseElement, ElementType, RenderContext } from '../models/elements/BaseElement';
-import { BorderElement, BorderStyle } from '../models/elements/BorderElement';
-import { RectangleElement } from '../models/elements/RectangleElement';
-import { TextElement, TextOverflow } from '../models/elements/TextElement';
-import { ImageElement } from '../models/elements/ImageElement';
+interface EventMap {
+  // Lifecycle
+  'app:ready': void;
+  'app:error': Error;
+  
+  // Elements
+  'element:add': BaseElement;
+  'element:update': { id: string; updates: Partial<BaseElement> };
+  'element:delete': string; // id
+  'element:select': string | string[];
+  'element:deselect': void;
+  'element:overflow': { id: string; result: OverflowResult };
+  'element:overflow:clear': { id: string };
+  
+  // State
+  'state:change': AppState;
+  'state:restored': { elements: BaseElement[] };
+  
+  // History
+  'history:undo': void;
+  'history:redo': void;
+  'history:snapshot': void;
+  
+  // Templates
+  'template:save': { name: string };
+  'template:load': string; // id
+  'template:saved': StoredTemplate;
+  'template:loaded': Label;
+  'template:deleted': string;
+  
+  // Batch
+  'batch:generate': Record<string, any>[];
+  'batch:complete': string; // filename
+  'batch:error': Error;
+  
+  // Canvas Config
+  'canvas:resize': { widthMM: number; heightMM: number };
+  'canvas:zoom': number; // scale
+}
+```
 
-export class CanvasRenderer {
-  render(element: BaseElement, context: RenderContext): void {
-    switch (element.type) {
-      case ElementType.BORDER:
-        this.renderBorder(element as BorderElement, context);
-        break;
-      case ElementType.RECTANGLE:
-        this.renderRectangle(element as RectangleElement, context);
-        break;
-      case ElementType.TEXT:
-        this.renderText(element as TextElement, context);
-        break;
-      case ElementType.IMAGE:
-        this.renderImage(element as ImageElement, context);
-        break;
+**Uso Tipado:**
+```typescript
+eventBus.on<BaseElement>('element:add', (element) => {
+  // element é tipado como BaseElement
+});
+```
+
+---
+
+### **4. Command Pattern - Undo/Redo (Alternativa)**
+
+**Observação:** Você optou por ImageData, mas para referência futura:
+
+```typescript
+interface Command {
+  execute(): void;
+  undo(): void;
+}
+
+class AddElementCommand implements Command {
+  constructor(
+    private store: Store,
+    private element: BaseElement
+  ) {}
+  
+  execute(): void {
+    this.store.addElement(this.element);
+  }
+  
+  undo(): void {
+    this.store.removeElement(this.element.id);
+  }
+}
+
+class HistoryManager {
+  private commands: Command[] = [];
+  private currentIndex = -1;
+  
+  execute(command: Command): void {
+    command.execute();
+    this.commands = this.commands.slice(0, this.currentIndex + 1);
+    this.commands.push(command);
+    this.currentIndex++;
+  }
+  
+  undo(): void {
+    if (this.currentIndex >= 0) {
+      this.commands[this.currentIndex].undo();
+      this.currentIndex--;
     }
   }
+}
+```
 
-  private renderBorder(element: BorderElement, { ctx, scale }: RenderContext): void {
-    const x = element.position.x * scale;
-    const y = element.position.y * scale;
-    const width = element.width * scale;
+**Comparação:**
 
-    ctx.save();
-    ctx.strokeStyle = element.color;
-    ctx.lineWidth = width;
+| Aspecto | ImageData (Escolhido) | Command Pattern |
+|---------|----------------------|----------------|
+| Memória | ~2MB/snapshot | ~10KB/comando |
+| Velocidade Undo | Instantâneo | Reprocessamento |
+| Complexidade | Baixa | Alta |
+| Granularidade | Snapshot completo | Ação específica |
+| **Melhor para** | MVP, simplicidade | Evolução futura |
 
-    switch (element.style) {
-      case BorderStyle.SOLID:
-        ctx.setLineDash([]);
-        break;
-      case BorderStyle.DASHED:
-        ctx.setLineDash([width * 3, width * 2]);
-        break;
-      case BorderStyle.DOTTED:
-        ctx.setLineDash([width, width]);
-        break;
-      case BorderStyle.DOUBLE:
-        // Desenhar duas linhas
-        break;
-    }
+---
 
-    // Desenhar retângulo (assumindo borda ao redor do canvas)
-    ctx.strokeRect(x, y, ctx.canvas.width - 2 * x, ctx.canvas.height - 2 * y);
+## 🧪 Estratégia de Validação
+
+### **ElementValidator**
+
+```typescript
+interface ValidationRule<T> {
+  validate(value: T): boolean;
+  message: string;
+}
+
+class ElementValidator {
+  private rules: Map<string, ValidationRule<any>[]> = new Map([
+    ['fontSize', [
+      {
+        validate: (v) => v > 0 && v <= 500,
+        message: 'Tamanho deve estar entre 1 e 500pt'
+      }
+    ]],
+    ['borderRadius', [
+      {
+        validate: (v) => v >= 0,
+        message: 'Raio não pode ser negativo'
+      }
+    ]],
+    ['color', [
+      {
+        validate: (v) => /^#[0-9A-F]{6}$/i.test(v),
+        message: 'Cor deve ser hex válida (#RRGGBB)'
+      }
+    ]]
+  ]);
+  
+  validate(property: string, value: any): { valid: boolean; errors: string[] } {
+    const rules = this.rules.get(property);
+    if (!rules) return { valid: true, errors: [] };
     
-    ctx.restore();
-  }
-
-  private renderRectangle(element: RectangleElement, { ctx, scale }: RenderContext): void {
-    const x = element.position.x * scale;
-    const y = element.position.y * scale;
-    const width = element.dimensions.width * scale;
-    const height = element.dimensions.height * scale;
-    const radius = (element.borderRadius || 0) * scale;
-
-    ctx.save();
-
-    if (radius > 0) {
-      this.roundRect(ctx, x, y, width, height, radius);
-    } else {
-      ctx.rect(x, y, width, height);
-    }
-
-    if (element.fillColor) {
-      ctx.fillStyle = element.fillColor;
-      ctx.fill();
-    }
-
-    if (element.strokeColor && element.strokeWidth) {
-      ctx.strokeStyle = element.strokeColor;
-      ctx.lineWidth = element.strokeWidth * scale;
-      ctx.stroke();
-    }
-
-    ctx.restore();
-  }
-
-  private renderText(element: TextElement, { ctx, scale, data }: RenderContext): void {
-    const x = element.position.x * scale;
-    const y = element.position.y * scale;
-    const width = element.dimensions.width * scale;
-    const height = element.dimensions.height * scale;
-
-    // Interpolação de variáveis
-    let text = element.content;
-    if (data && element.dataSource !== 'static') {
-      text = text.replace(/\{\{(\w+)\}\}/g, (_, key) => data[key] || '');
-    }
-
-    ctx.save();
-    ctx.fillStyle = element.color;
-    ctx.font = `${element.fontStyle || 'normal'} ${element.fontWeight} ${element.fontSize * scale}px ${element.fontFamily}`;
-    ctx.textBaseline = 'top';
-
-    // Tratamento de overflow
-    switch (element.overflow) {
-      case TextOverflow.CLIP:
-        ctx.fillText(text, x, y, width);
-        break;
-      case TextOverflow.ELLIPSIS:
-        text = this.truncateText(ctx, text, width);
-        ctx.fillText(text, x, y);
-        break;
-      case TextOverflow.WRAP:
-        this.wrapText(ctx, text, x, y, width, element.lineHeight || 1.2);
-        break;
-      case TextOverflow.SCALE:
-        // Auto-ajustar fontSize
-        break;
-    }
-
-    ctx.restore();
-  }
-
-  private renderImage(element: ImageElement, { ctx, scale }: RenderContext): void {
-    const x = element.position.x * scale;
-    const y = element.position.y * scale;
-    const width = element.dimensions.width * scale;
-    const height = element.dimensions.height * scale;
-
-    const img = new Image();
-    img.src = element.src;
-
-    ctx.save();
+    const errors = rules
+      .filter(rule => !rule.validate(value))
+      .map(rule => rule.message);
     
-    if (element.opacity !== undefined) {
-      ctx.globalAlpha = element.opacity;
-    }
-
-    if (element.compositeOperation) {
-      ctx.globalCompositeOperation = element.compositeOperation;
-    }
-
-    ctx.imageSmoothingEnabled = element.smoothing !== false;
-
-    // Aplicar fit
-    switch (element.fit) {
-      case 'cover':
-        // ... cálculo de crop
-        ctx.drawImage(img, x, y, width, height);
-        break;
-      case 'contain':
-        // ... cálculo de letterbox
-        break;
-      case 'fill':
-        ctx.drawImage(img, x, y, width, height);
-        break;
-    }
-
-    ctx.restore();
+    return {
+      valid: errors.length === 0,
+      errors
+    };
   }
-
-  hitTest(element: BaseElement, x: number, y: number, config: any): boolean {
-    const scale = (config.dpi / 25.4) * config.previewScale;
-    const elX = element.position.x * scale;
-    const elY = element.position.y * scale;
-
-    if ('dimensions' in element) {
-      const elWidth = element.dimensions.width * scale;
-      const elHeight = element.dimensions.height * scale;
-      return x >= elX && x <= elX + elWidth && y >= elY && y <= elY + elHeight;
-    }
-
-    return false;
-  }
-
-  private roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, radius: number): void {
-    ctx.beginPath();
-    ctx.moveTo(x + radius, y);
-    ctx.lineTo(x + width - radius, y);
-    ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
-    ctx.lineTo(x + width, y + height - radius);
-    ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
-    ctx.lineTo(x + radius, y + height);
-    ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
-    ctx.lineTo(x, y + radius);
-    ctx.quadraticCurveTo(x, y, x + radius, y);
-    ctx.closePath();
-  }
-
-  private truncateText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string {
-    const ellipsis = '...';
-    let truncated = text;
-
-    while (ctx.measureText(truncated + ellipsis).width > maxWidth && truncated.length > 0) {
-      truncated = truncated.slice(0, -1);
-    }
-
-    return truncated + (truncated !== text ? ellipsis : '');
-  }
-
-  private wrapText(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, maxWidth: number, lineHeight: number): void {
-    const words = text.split(' ');
-    let line = '';
-    let currentY = y;
-
-    for (const word of words) {
-      const testLine = line + word + ' ';
-      const metrics = ctx.measureText(testLine);
-
-      if (metrics.width > maxWidth && line !== '') {
-        ctx.fillText(line, x, currentY);
-        line = word + ' ';
-        currentY += lineHeight * parseInt(ctx.font);
-      } else {
-        line = testLine;
+  
+  validateElement(element: BaseElement): { valid: boolean; errors: Record<string, string[]> } {
+    const allErrors: Record<string, string[]> = {};
+    
+    for (const [key, value] of Object.entries(element)) {
+      const result = this.validate(key, value);
+      if (!result.valid) {
+        allErrors[key] = result.errors;
       }
     }
-
-    ctx.fillText(line, x, currentY);
+    
+    return {
+      valid: Object.keys(allErrors).length === 0,
+      errors: allErrors
+    };
   }
 }
 ```
 
 ---
 
-## ✅ Checklist de Validação Arquitetural
+## 📦 Utils Essenciais
 
-- [x] **Separação adequada de responsabilidades?**
-  - ✅ UI (Web Components), Domain (Services/Models), Core (EventBus/Store) claramente separados
+### **1. units.ts - Conversão de Unidades**
 
-- [x] **Dependências isoladas corretamente?**
-  - ✅ Inversão de dependência: Components recebem EventBus/Store por injeção
-  - ✅ Models não conhecem UI, Services não conhecem Components
-
-- [x] **Sistema escalável horizontalmente?**
-  - ✅ Novos elementos = nova classe + registro no renderer
-  - ✅ Novos componentes = novo Web Component + event listeners
-
-- [x] **Pontos únicos de falha?**
-  - ⚠️ Store é singleton, mas pode ter fallback para localStorage
-  - ⚠️ IndexedDB failure → graceful degradation para localStorage
-
-- [x] **Testes podem ser acoplados facilmente?**
-  - ✅ Services isolados testáveis com mocks simples
-  - ✅ EventBus permite spy de eventos
-  - ✅ Renderer pode ser testado com canvas mock (node-canvas)
+```typescript
+export class UnitConverter {
+  static MM_TO_INCH = 1 / 25.4;
+  
+  static mmToPx(mm: number, dpi: number = 300): number {
+    return mm * this.MM_TO_INCH * dpi;
+  }
+  
+  static pxToMm(px: number, dpi: number = 300): number {
+    return (px / dpi) / this.MM_TO_INCH;
+  }
+  
+  static mmToPt(mm: number): number {
+    return mm * 2.83465; // 1mm = 2.83465pt
+  }
+  
+  static ptToMm(pt: number): number {
+    return pt / 2.83465;
+  }
+}
+```
 
 ---
 
-## 🚀 Próximos Passos Sugeridos
+### **2. image.ts - Compressão de Imagem**
 
-### **MVP - Fase 1 (Core Editor)**
-1. Implementar Store + EventBus integration
-2. Criar BaseElement + RectangleElement + TextElement
-3. Implementar EditorCanvas com drag & drop básico
-4. Criar ElementInspector (formulário de edição)
-5. Implementar CanvasRenderer básico
+```typescript
+export class ImageCompressor {
+  static async compress(
+    file: File,
+    maxWidth: number = 800,
+    quality: number = 0.85
+  ): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      const reader = new FileReader();
+      
+      reader.onload = (e) => {
+        img.src = e.target?.result as string;
+      };
+      
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d')!;
+        
+        // Calcular dimensões mantendo aspect ratio
+        let { width, height } = img;
+        if (width > maxWidth) {
+          height = (height / width) * maxWidth;
+          width = maxWidth;
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        const dataURL = canvas.toDataURL('image/jpeg', quality);
+        resolve(dataURL);
+      };
+      
+      img.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+}
+```
 
-### **MVP - Fase 2 (Persistência)**
-6. TemplateManager com IndexedDB
-7. Toolbar com botões de salvar/carregar
+---
 
-### **MVP - Fase 3 (Geração em Lote)**
-8. DataSourceParser (lista simples)
-9. BatchPreview component
-10. PDFGenerator (usando jsPDF ou html2pdf)
+### **3. interpolate.ts - Substituição de Variáveis**
 
+```typescript
+export class StringInterpolator {
+  static interpolate(
+    template: string,
+    data: Record<string, any>
+  ): string {
+    return template.replace(
+      /\{\{(\w+)(?::(\w+))?\}\}/g,
+      (match, key, formatter) => {
+        const value = data[key];
+        
+        if (value === undefined) {
+          return match; // Mantém placeholder se variável não existe
+        }
+        
+        // Formatadores opcionais (futuro)
+        if (formatter) {
+          return this.format(value, formatter);
+        }
+        
+        return String(value);
+      }
+    );
+  }
+  
+  private static format(value: any, formatter: string): string {
+    switch (formatter) {
+      case 'upper':
+        return String(value).toUpperCase();
+      case 'lower':
+        return String(value).toLowerCase();
+      case 'currency':
+        return `R$ ${Number(value).toFixed(2)}`;
+      default:
+        return String(value);
+    }
+  }
+  
+  static extractVariables(template: string): string[] {
+    const matches = template.matchAll(/\{\{(\w+)(?::(\w+))?\}\}/g);
+    return Array.from(matches, m => m[1]);
+  }
+}
+```
 
-## 📊 Alternativas Técnicas (Revisão)
+**Uso:**
+```typescript
+// Template: "Olá {{nome}}, seu saldo é {{valor:currency}}"
+// Data: { nome: "João", valor: 150.5 }
+// Output: "Olá João, seu saldo é R$ 150.50"
+```
 
-| Decisão | Opção Escolhida | Alternativa Considerada | Justificativa |
-|---------|----------------|-------------------------|---------------|
-| **State Management** | Store + EventBus | Signals/Observables | EventBus já existe, menos overhead |
-| **Canvas vs SVG** | Canvas | SVG com D3.js | Melhor performance para rendering em lote |
-| **PDF Generation** | Custom CSS → PDF | jsPDF direto | Maior controle de layout |
-| **Storage** | IndexedDB | localStorage | Suporte a objetos complexos e maior capacidade |
+---
+
+## 🔐 Segurança e Sanitização
+
+### **XSS Prevention (Inputs de Usuário)**
+
+```typescript
+class Sanitizer {
+  static sanitizeHTML(input: string): string {
+    const div = document.createElement('div');
+    div.textContent = input;
+    return div.innerHTML;
+  }
+  
+  static validateColor(color: string): boolean {
+    return /^#[0-9A-F]{6}$/i.test(color);
+  }
+  
+  static sanitizeImageURL(dataURL: string): boolean {
+    return dataURL.startsWith('data:image/');
+  }
+}
+```
+
+---
+
+## 🚀 Inicialização da Aplicação (main.ts)
+
+```typescript
+// main.ts - Pseudo-implementação
+
+import { EventBus } from './core/EventBus';
+import { Logger } from './core/Logger';
+import { Store } from './core/Store';
+import { IndexedDBStorage } from './core/IndexedDBStorage';
+
+// Services
+import { CanvasRenderer } from './domain/services/renderers/CanvasRenderer';
+import { TemplateManager } from './domain/services/TemplateManager';
+import { PDFGenerator } from './domain/services/PDFGenerator';
+import { OverflowValidator } from './domain/services/OverflowValidator';
+import { HistoryManager } from './domain/services/HistoryManager';
+
+// Components
+import './components/editor/EditorCanvas';
+import './components/editor/Toolbar';
+import './components/editor/ElementInspector';
+// ...
+
+class Application {
+  private eventBus: EventBus;
+  private logger: Logger;
+  private store: Store;
+  private storage: IndexedDBStorage<StoredTemplate[]>;
+  
+  async init() {
+    // 1. Core setup
+    this.eventBus = new EventBus();
+    this.logger = new Logger({ level: LogLevel.DEBUG, prefix: '[App]' });
+    
+    // 2. Storage
+    this.storage = new IndexedDBStorage('templates', []);
+    await this.storage.initialize();
+    
+    // 3. Services
+    const renderer = new CanvasRenderer();
+    const templateManager = new TemplateManager(this.storage, this.eventBus);
+    const pdfGenerator = new PDFGenerator(renderer);
+    const overflowValidator = new OverflowValidator();
+    const historyManager = new HistoryManager();
+    
+    // 4. Store
+    this.store = new Store(this.eventBus, overflowValidator, historyManager);
+    
+    // 5. Dependency Injection nos componentes
+    const editorCanvas = document.querySelector('editor-canvas');
+    editorCanvas.inject({ eventBus: this.eventBus, renderer });
+    
+    const toolbar = document.querySelector('toolbar-component');
+    toolbar.inject({ eventBus: this.eventBus });
+    
+    // ... outros componentes
+    
+    // 6. Emit app ready
+    this.eventBus.emit('app:ready');
+    
+    this.logger.info('App', 'Application initialized successfully');
+  }
+}
+
+// Bootstrap
+const app = new Application();
+app.init().catch(console.error);
+```
+
+---
+
+## 📊 Métricas de Performance
+
+### **Benchmarks Esperados**
+
+| Operação | Tempo Alvo | Métrica |
+|----------|-----------|---------|
+| Renderização canvas (10 elementos) | < 16ms | 60fps |
+| Undo/Redo | < 50ms | Imperceptível |
+| Save template (IndexedDB) | < 100ms | Feedback visual |
+| Geração PDF (50 etiquetas) | < 5s | Progress bar |
+| Load template | < 200ms | Spinner |
+
+### **Otimizações Aplicadas**
+
+1. **Debounce em inputs:**
+   - Inspector inputs: 300ms
+   - Canvas resize: 150ms
+
+2. **Renderização incremental:**
+   - Apenas elementos visíveis (`el.visible !== false`)
+   - Ordenação por z-index uma vez
+
+3. **Lazy loading de imagens:**
+   - ImageElement armazena `src` como dataURL
+   - Objeto `Image` criado on-demand no render
+
+4. **Canvas offscreen para PDF:**
+   - Não polui DOM
+   - GC automático
+
+---
+
+## ✅ Checklist de Implementação (MVP+)
+
+### **Fase 1: Core**
+- [ ] Setup Vite + TypeScript + TailwindCSS
+- [ ] Integrar EventBus, Logger, IndexedDBStorage existentes
+- [ ] Criar Store com state management
+- [ ] Implementar BaseElement + ElementFactory
+- [ ] Criar RectangleElement, TextElement, BorderElement
+- [ ] Implementar CanvasRenderer + Strategy renderers
+- [ ] Integrar canvas-txt no TextRenderer
+
+### **Fase 2: UI Editor**
+- [ ] EditorCanvas component
+  - [ ] Setup canvas com dimensões configuráveis
+  - [ ] Renderização de elementos
+  - [ ] Click selection (hitTest)
+- [ ] Toolbar component
+  - [ ] Botões add element
+  - [ ] Undo/Redo buttons
+- [ ] ElementInspector component
+  - [ ] Form dinâmico baseado em element.type
+  - [ ] Validação + feedback visual
+- [ ] LayerPanel component
+  - [ ] Lista de elementos
+  - [ ] Botões de visibilidade/lock
+
+### **Fase 3: Features**
+- [ ] HistoryManager com ImageData
+- [ ] OverflowValidator + warnings
+- [ ] CanvasConfigPanel (dimensões mm, DPI, zoom)
+- [ ] TemplateManager
+  - [ ] Save/Load
+  - [ ] Thumbnail generation
+- [ ] ImageElement
+  - [ ] Upload via input file
+  - [ ] Compressão com ImageCompressor
+
+### **Fase 4: Batch**
+- [ ] DataSourceInput component
+- [ ] DataSourceParser (lista simples)
+- [ ] String interpolation ({{variable}})
+- [ ] BatchPreview component
+- [ ] PDFGenerator com jsPDF
+- [ ] Progress indicator
+
+### **Fase 5: Polish**
+- [ ] Testes unitários (services)
+- [ ] Error boundaries
+- [ ] Loading states
+- [ ] Tooltips/Help
+- [ ] Deploy GitHub Pages
+
+---
+
+## 🎓 Considerações Finais
+
+### **Pontos Fortes da Arquitetura:**
+
+1. ✅ **Desacoplamento:** EventBus elimina dependências diretas entre componentes
+2. ✅ **Extensibilidade:** Novos elementos = nova classe, zero refactoring
+3. ✅ **Testabilidade:** Services isolados, mocks fáceis
+4. ✅ **Performance:** Renderização otimizada, debounce, offscreen canvas
+5. ✅ **Manutenibilidade:** Separação clara de responsabilidades
+
+### **Riscos Identificados:**
+
+1. ⚠️ **Memória (Undo/Redo):** 50 snapshots * 2MB = 100MB RAM
+   - **Mitigação:** Limite configurável, GC automático de snapshots antigos
+
+2. ⚠️ **IndexedDB Quota:** Navegadores limitam ~50MB por origem
+   - **Mitigação:** Warning ao atingir 80%, cleanup de templates antigos
+
+3. ⚠️ **Canvas Performance:** Muitos elementos (100+) pode degradar
+   - **Mitigação:** Virtualização futura, limite soft de 50 elementos
+
+4. ⚠️ **PDF Geração (Lote Grande):** 1000 etiquetas = ~30s
+   - **Mitigação:** Worker thread (futuro), progress indicator
+
+### **Evolução Pós-MVP:**
+
+1. **Drag & Drop:** Implementar `InteractionManager` para arrastar elementos
+2. **Snap to Grid:** Sistema de guias magnéticas
+3. **Templates Pré-definidos:** Gallery com exemplos (produtos, eventos, etc)
+4. **Export/Import JSON:** UI para backup de templates
+5. **CSV/JSON Import:** Integração com PapaParse
+6. **Undo com Command Pattern:** Migração para granularidade fina
+7. **Multiplayer (Colaboração):** WebRTC para edição simultânea (ambicioso!)

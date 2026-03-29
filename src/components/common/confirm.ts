@@ -1,3 +1,5 @@
+import { UISM } from '../../core/UISoundManager';
+
 /**
  * @component ui-confirm
  * @description Web Component autônomo que substitui window.confirm() com uma
@@ -443,6 +445,7 @@ class UiConfirm extends HTMLElement {
     switch (name) {
       case 'open':
         newVal !== null ? this.#onOpen() : this.#onClose();
+        UISM.play(UISM.enumPresets.SWOOSHIN);
         break;
       case 'variant':
         this.#applyVariant((newVal ?? 'danger') as Variant);

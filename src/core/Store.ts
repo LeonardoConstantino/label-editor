@@ -1,12 +1,15 @@
 import { Label, AnyElement } from '../domain/models/Label';
 import eventBus from './EventBus';
+import { historyManager, HistorySnapshot } from '../domain/services/HistoryManager';
+import { UISM } from './UISoundManager';
+import { overflowValidator } from '../domain/services/OverflowValidator';
 
 export interface AppState {
   currentLabel: Label | null;
   selectedElementIds: string[];
   clipboard: AnyElement[];
-  history: Label[];
-  historyIndex: number;
+  canUndo: boolean;
+  canRedo: boolean;
 }
 
 export class Store {
@@ -17,71 +20,114 @@ export class Store {
       currentLabel: null,
       selectedElementIds: [],
       clipboard: [],
-      history: [],
-      historyIndex: -1
+      canUndo: false,
+      canRedo: false
     };
 
     this.registerEvents();
   }
 
   private registerEvents(): void {
-    // Adição de elemento
     eventBus.on('element:add', (element: AnyElement) => {
-      if (!this.state.currentLabel) return;
-      this.state.currentLabel.elements.push(element);
-      this.pushHistory();
-      this.emit();
+      this.performAction(() => {
+        if (!this.state.currentLabel) return;
+        this.state.currentLabel.elements.push(element);
+        UISM.play(UISM.enumPresets.SWOOSHIN);
+      });
     });
 
-    // Atualização de elemento
     eventBus.on('element:update', ({ id, updates }: { id: string; updates: Partial<AnyElement> }) => {
-      if (!this.state.currentLabel) return;
-      const index = this.state.currentLabel.elements.findIndex(el => el.id === id);
-      if (index !== -1) {
-        this.state.currentLabel.elements[index] = {
-          ...this.state.currentLabel.elements[index],
-          ...updates
-        };
-        this.pushHistory();
-        this.emit();
-      }
+      this.performAction(() => {
+        if (!this.state.currentLabel) return;
+        const index = this.state.currentLabel.elements.findIndex(el => el.id === id);
+        if (index !== -1) {
+          const element = {
+            ...this.state.currentLabel.elements[index],
+            ...updates
+          } as AnyElement;
+          this.state.currentLabel.elements[index] = element;
+
+          const result = overflowValidator.check(element, this.state.currentLabel.config);
+          if (result.overflow) {
+            eventBus.emit('element:warning', { id, result });
+            UISM.play(UISM.enumPresets.WARNING);
+          } else {
+            eventBus.emit('element:warning:clear', { id });
+          }
+        }
+      });
     });
 
-    // Remoção de elemento
     eventBus.on('element:delete', (id: string) => {
-      if (!this.state.currentLabel) return;
-      this.state.currentLabel.elements = this.state.currentLabel.elements.filter(el => el.id !== id);
-      this.state.selectedElementIds = this.state.selectedElementIds.filter(elId => elId !== id);
-      this.pushHistory();
-      this.emit();
+      this.performAction(() => {
+        if (!this.state.currentLabel) return;
+        this.state.currentLabel.elements = this.state.currentLabel.elements.filter(el => el.id !== id);
+        this.state.selectedElementIds = this.state.selectedElementIds.filter(elId => elId !== id);
+        UISM.play(UISM.enumPresets.DELETE);
+      });
     });
 
-    // Seleção de elemento
     eventBus.on('element:select', (ids: string | string[]) => {
       this.state.selectedElementIds = Array.isArray(ids) ? ids : [ids];
       this.emit();
     });
 
-    // Comandos de Histórico
     eventBus.on('history:undo', () => this.undo());
     eventBus.on('history:redo', () => this.redo());
+    
+    eventBus.on('label:config:update', (config: any) => {
+      this.performAction(() => {
+        if (!this.state.currentLabel) return;
+        this.state.currentLabel.config = config;
+      });
+    });
+
+    eventBus.on('history:snapshot', () => this.takeSnapshot());
   }
 
-  private pushHistory(): void {
+  private performAction(action: () => void): void {
     if (!this.state.currentLabel) return;
-    
-    const snapshot = JSON.parse(JSON.stringify(this.state.currentLabel));
-    
-    // Remove o histórico futuro se houve uma nova ação após um undo
-    this.state.history = this.state.history.slice(0, this.state.historyIndex + 1);
-    this.state.history.push(snapshot);
-    
-    // Limita o histórico (ex: 50 estados)
-    if (this.state.history.length > 50) {
-      this.state.history.shift();
-    } else {
-      this.state.historyIndex++;
+    action();
+    this.takeSnapshot();
+    this.state.currentLabel.updatedAt = Date.now();
+    this.emit();
+  }
+
+  private takeSnapshot(): void {
+    if (!this.state.currentLabel) return;
+    eventBus.emit('request:canvas:snapshot', (ctx: CanvasRenderingContext2D) => {
+      historyManager.snapshot(ctx, this.state.currentLabel!.elements);
+      this.updateHistoryStatus();
+    });
+  }
+
+  private undo(): void {
+    const snapshot = historyManager.undo();
+    if (snapshot) {
+      this.applySnapshot(snapshot);
+      UISM.play(UISM.enumPresets.REPLACE);
     }
+  }
+
+  private redo(): void {
+    const snapshot = historyManager.redo();
+    if (snapshot) {
+      this.applySnapshot(snapshot);
+      UISM.play(UISM.enumPresets.REPLACE);
+    }
+  }
+
+  private applySnapshot(snapshot: HistorySnapshot): void {
+    if (!this.state.currentLabel) return;
+    this.state.currentLabel.elements = JSON.parse(JSON.stringify(snapshot.elements));
+    eventBus.emit('command:canvas:restore', snapshot.imageData);
+    this.updateHistoryStatus();
+    this.emit();
+  }
+
+  private updateHistoryStatus(): void {
+    this.state.canUndo = historyManager.canUndo();
+    this.state.canRedo = historyManager.canRedo();
   }
 
   private emit(): void {
@@ -94,28 +140,11 @@ export class Store {
 
   public loadLabel(label: Label): void {
     this.state.currentLabel = label;
-    this.state.history = [JSON.parse(JSON.stringify(label))];
-    this.state.historyIndex = 0;
+    historyManager.clear();
     this.state.selectedElementIds = [];
+    this.takeSnapshot();
     this.emit();
-  }
-
-  public undo(): void {
-    if (this.state.historyIndex > 0) {
-      this.state.historyIndex--;
-      this.state.currentLabel = JSON.parse(JSON.stringify(this.state.history[this.state.historyIndex]));
-      this.emit();
-    }
-  }
-
-  public redo(): void {
-    if (this.state.historyIndex < this.state.history.length - 1) {
-      this.state.historyIndex++;
-      this.state.currentLabel = JSON.parse(JSON.stringify(this.state.history[this.state.historyIndex]));
-      this.emit();
-    }
   }
 }
 
-// Exporta uma instância única (Singleton)
 export const store = new Store();

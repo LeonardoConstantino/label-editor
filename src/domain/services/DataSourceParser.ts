@@ -34,9 +34,11 @@ export class DataSourceParser {
 
   /**
    * Aplica os dados em uma string substituindo variáveis {{key}}
+   * Suporta espaços: {{ nome }}
    */
   public static interpolate(template: string, data: Record<string, any>): string {
-    return template.replace(/\{\{(\w+)\}\}/g, (match, key) => {
+    if (!template) return '';
+    return template.replace(/\{\{\s*(\w+)\s*\}\}/g, (match, key) => {
       return data[key] !== undefined ? String(data[key]) : match;
     });
   }

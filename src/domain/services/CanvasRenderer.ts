@@ -1,97 +1,56 @@
 import { AnyElement, CanvasConfig } from '../models/Label';
 import { ElementType } from '../models/elements/BaseElement';
-import { TextElement, ImageElement, RectangleElement } from '../models/elements/SpecificElements';
+import { IRenderer } from './renderers/IRenderer';
+import { TextRenderer } from './renderers/TextRenderer';
+import { RectangleRenderer } from './renderers/RectangleRenderer';
+import { ImageRenderer } from './renderers/ImageRenderer';
 
 export interface RenderContext {
   ctx: CanvasRenderingContext2D;
   scale: number; // mm -> px
-  data?: Record<string, any>; // Para variáveis dinâmicas futuramente
+  data?: Record<string, any>;
 }
 
+/**
+ * CanvasRenderer: Orquestrador da renderização utilizando o padrão Strategy.
+ */
 export class CanvasRenderer {
+  private renderers: Map<ElementType, IRenderer> = new Map();
+
+  constructor() {
+    this.renderers.set(ElementType.TEXT, new TextRenderer());
+    this.renderers.set(ElementType.RECTANGLE, new RectangleRenderer());
+    this.renderers.set(ElementType.IMAGE, new ImageRenderer());
+  }
+
   /**
-   * Renderiza um elemento individual no canvas
+   * Renderiza todos os elementos visíveis de uma etiqueta.
+   */
+  public renderAll(elements: AnyElement[], context: RenderContext): void {
+    elements
+      .filter(el => el.visible !== false)
+      .sort((a, b) => a.zIndex - b.zIndex)
+      .forEach(element => this.render(element, context));
+  }
+
+  /**
+   * Renderiza um elemento individual delegando para o renderer específico.
    */
   public render(element: AnyElement, context: RenderContext): void {
-    if (element.visible === false) return;
-
-    const { ctx, scale } = context;
-    ctx.save();
-
-    switch (element.type) {
-      case ElementType.TEXT:
-        this.renderText(element as TextElement, context);
-        break;
-      case ElementType.IMAGE:
-        this.renderImage(element as ImageElement, context);
-        break;
-      case ElementType.RECTANGLE:
-        this.renderRectangle(element as RectangleElement, context);
-        break;
-    }
-
-    ctx.restore();
-  }
-
-  private renderText(el: TextElement, { ctx, scale }: RenderContext): void {
-    const x = el.position.x * scale;
-    const y = el.position.y * scale;
-
-    ctx.fillStyle = el.color;
-    ctx.font = `${el.fontWeight} ${el.fontSize * (scale / 3.78)}px ${el.fontFamily}`; // pt to px approx
-    ctx.textBaseline = 'top';
-    ctx.textAlign = el.textAlign as CanvasTextAlign;
-
-    ctx.fillText(el.content, x, y);
-  }
-
-  private renderRectangle(el: RectangleElement, { ctx, scale }: RenderContext): void {
-    const x = el.position.x * scale;
-    const y = el.position.y * scale;
-    const w = el.dimensions.width * scale;
-    const h = el.dimensions.height * scale;
-
-    if (el.fillColor) {
-      ctx.fillStyle = el.fillColor;
-      ctx.fillRect(x, y, w, h);
-    }
-
-    if (el.strokeColor && el.strokeWidth) {
-      ctx.strokeStyle = el.strokeColor;
-      ctx.lineWidth = el.strokeWidth * scale;
-      ctx.strokeRect(x, y, w, h);
-    }
-  }
-
-  private renderImage(el: ImageElement, { ctx, scale }: RenderContext): void {
-    if (!el.src) return;
-
-    const x = el.position.x * scale;
-    const y = el.position.y * scale;
-    const w = el.dimensions.width * scale;
-    const h = el.dimensions.height * scale;
-
-    const img = new Image();
-    img.src = el.src;
-
-    // Nota: Em um ambiente real, a imagem deve estar pré-carregada.
-    // Para o renderer síncrono, assumimos que o browser já tem o cache ou o base64 está pronto.
-    if (img.complete) {
-      ctx.drawImage(img, x, y, w, h);
-    } else {
-      img.onload = () => ctx.drawImage(img, x, y, w, h);
+    const renderer = this.renderers.get(element.type);
+    if (renderer) {
+      renderer.render(element, context);
     }
   }
 
   /**
-   * Verifica se um ponto (x,y em pixels) está dentro do elemento
+   * Verifica se um ponto (px) está dentro de um elemento (hit test).
    */
   public hitTest(element: AnyElement, pxX: number, pxY: number, config: CanvasConfig): boolean {
     const scale = (config.dpi / 25.4) * config.previewScale;
     const elX = element.position.x * scale;
     const elY = element.position.y * scale;
 
-    // Verificação simplificada baseada em bounding box
     if ('dimensions' in element) {
       const elW = (element as any).dimensions.width * scale;
       const elH = (element as any).dimensions.height * scale;

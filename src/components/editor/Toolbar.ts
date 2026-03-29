@@ -1,10 +1,16 @@
 import eventBus from '../../core/EventBus';
 import { ElementType } from '../../domain/models/elements/BaseElement';
+import { store, AppState } from '../../core/Store';
+import { UISM } from '../../core/UISoundManager';
+import '../common/AppButton';
+import '../common/icon';
 
 /**
- * Toolbar: Componente superior com botões de ação
+ * EditorToolbar: A "Pílula de Controle" flutuante do Cockpit.
  */
 export class EditorToolbar extends HTMLElement {
+  private unsubscribe: (() => void) | null = null;
+
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
@@ -12,6 +18,20 @@ export class EditorToolbar extends HTMLElement {
 
   connectedCallback(): void {
     this.render();
+    this.setupListeners();
+  }
+
+  disconnectedCallback(): void {
+    if (this.unsubscribe) this.unsubscribe();
+  }
+
+  private setupListeners(): void {
+    this.unsubscribe = eventBus.on('state:change', (state: AppState) => {
+      const undoBtn = this.shadowRoot?.getElementById('undo');
+      const redoBtn = this.shadowRoot?.getElementById('redo');
+      if (undoBtn) undoBtn.toggleAttribute('disabled', !state.canUndo);
+      if (redoBtn) redoBtn.toggleAttribute('disabled', !state.canRedo);
+    });
   }
 
   private render(): void {
@@ -19,56 +39,59 @@ export class EditorToolbar extends HTMLElement {
 
     this.shadowRoot.innerHTML = `
       <style>
+        @import "/src/styles/main.css";
         :host {
           display: flex;
-          gap: 12px;
-          height: 100%;
           align-items: center;
+          gap: 4px;
         }
-
-        button {
-          background: transparent;
-          border: 1px solid var(--color-border-ui, #262a33);
-          color: #94a3b8;
-          padding: 6px 12px;
-          border-radius: 4px;
-          cursor: pointer;
-          font-size: 12px;
-          font-weight: 500;
-          transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-          display: flex;
-          align-items: center;
-          gap: 6px;
-        }
-
-        button:hover {
-          background: rgba(255, 255, 255, 0.05);
-          color: white;
-          border-color: var(--color-accent, #6366f1);
-          transform: translateY(-1px);
-        }
-
-        button:active {
-          transform: scale(0.95);
-        }
-
         .divider {
           width: 1px;
-          height: 20px;
-          background-color: var(--color-border-ui, #262a33);
-          margin: 0 4px;
+          height: 24px;
+          background-color: var(--color-border-ui);
+          margin: 0 8px;
+          opacity: 0.5;
+        }
+        app-button {
+          --btn-padding: 8px 12px;
+        }
+        #open-batch {
+          margin-left: 4px;
         }
       </style>
       
-      <button id="add-text">Add Text</button>
-      <button id="add-rect">Add Rect</button>
-      <button id="add-image">Add Image</button>
+      <!-- Grupo de Criação -->
+      <app-button id="add-text" variant="secondary" title="Add Text">
+        <ui-icon name="text"></ui-icon>
+      </app-button>
+      <app-button id="add-rect" variant="secondary" title="Add Rectangle">
+        <ui-icon name="rect"></ui-icon>
+      </app-button>
+      <app-button id="add-image" variant="secondary" title="Add Image">
+        <ui-icon name="image"></ui-icon>
+      </app-button>
+      
       <div class="divider"></div>
-      <button id="undo">Undo</button>
-      <button id="redo">Redo</button>
+      
+      <!-- Grupo de Histórico -->
+      <app-button id="undo" variant="secondary" disabled title="Undo">
+        <ui-icon name="undo"></ui-icon>
+      </app-button>
+      <app-button id="redo" variant="secondary" disabled title="Redo">
+        <ui-icon name="redo"></ui-icon>
+      </app-button>
+      
       <div class="divider"></div>
-      <button id="save" style="border-color: #10b981; color: #10b981;">Save</button>
-      <button id="export-pdf" style="border-color: #f59e0b; color: #f59e0b;">Export PDF</button>
+      
+      <!-- Ações Primárias -->
+      <app-button id="save" variant="secondary" title="Save Template">
+        <ui-icon name="save"></ui-icon>
+      </app-button>
+      
+      <app-button id="open-batch" variant="success">
+        GENERATE PDF
+      </app-button>
+      
       <input type="file" id="file-input" style="display: none;" accept="image/*">
     `;
 
@@ -79,67 +102,19 @@ export class EditorToolbar extends HTMLElement {
     const shadow = this.shadowRoot!;
     const fileInput = shadow.getElementById('file-input') as HTMLInputElement;
 
-    shadow.getElementById('export-pdf')?.addEventListener('click', async () => {
-      const { pdfGenerator } = await import('../../domain/services/PDFGenerator');
-      const { store } = await import('../../core/Store');
-      const label = store.getState().currentLabel;
-      if (label) {
-        await pdfGenerator.generateLotePDF(label, [{}]); // Exporta etiqueta única
-        alert('PDF gerado com sucesso!');
-      }
-    });
-
-    shadow.getElementById('add-image')?.addEventListener('click', () => {
-      fileInput.click();
-    });
-
-    fileInput?.addEventListener('change', async (e: any) => {
-      const file = e.target.files?.[0];
-      if (!file) return;
-
-      const { imageProcessor } = await import('../../utils/imageProcessor');
-      const { store } = await import('../../core/Store');
-      
-      const processed = await imageProcessor.process(file);
-      const config = store.getState().currentLabel!.config;
-      
-      // Converte pixels processados para mm para o modelo de domínio
-      // Assumindo que o maxWidth de 1200px é o teto, usamos o DPI configurado.
-      const scale = config.dpi / 25.4;
-
-      eventBus.emit('element:add', {
-        id: 'img-' + Date.now(),
-        type: ElementType.IMAGE,
-        position: { x: 5, y: 5 },
-        zIndex: 5,
-        dimensions: { 
-          width: processed.width / scale, 
-          height: processed.height / scale 
-        },
-        src: processed.src,
-        fit: 'contain'
-      });
-    });
-
-    shadow.getElementById('save')?.addEventListener('click', async () => {
-      const { templateManager } = await import('../../domain/services/TemplateManager');
-      await templateManager.saveCurrentLabel();
-      alert('Etiqueta salva com sucesso!');
-    });
-
     shadow.getElementById('add-text')?.addEventListener('click', () => {
       eventBus.emit('element:add', {
         id: 'txt-' + Date.now(),
         type: ElementType.TEXT,
         position: { x: 10, y: 10 },
         zIndex: 10,
-        dimensions: { width: 40, height: 8 },
-        content: 'New Text',
+        dimensions: { width: 40, height: 10 },
+        content: 'Label Unit 01',
         fontFamily: 'sans-serif',
         fontSize: 14,
         fontWeight: 'normal',
         color: '#000000',
-        textAlign: 'left'
+        textAlign: 'center',
       });
     });
 
@@ -151,17 +126,60 @@ export class EditorToolbar extends HTMLElement {
         zIndex: 5,
         dimensions: { width: 30, height: 20 },
         fillColor: '#e2e8f0',
-        strokeColor: '#64748b',
-        strokeWidth: 1
+        strokeColor: '#6366f1',
+        strokeWidth: 0.5,
       });
     });
 
-    shadow.getElementById('undo')?.addEventListener('click', () => {
-      eventBus.emit('history:undo');
+    shadow
+      .getElementById('add-image')
+      ?.addEventListener('click', () => fileInput.click());
+
+    fileInput?.addEventListener('change', async (e: any) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+
+      const { imageProcessor } = await import('../../utils/imageProcessor');
+      const processed = await imageProcessor.process(file);
+      const config = store.getState().currentLabel!.config;
+      const scale = config.dpi / 25.4;
+
+      eventBus.emit('element:add', {
+        id: 'img-' + Date.now(),
+        type: ElementType.IMAGE,
+        position: { x: 5, y: 5 },
+        zIndex: 8,
+        dimensions: {
+          width: processed.width / scale,
+          height: processed.height / scale,
+        },
+        src: processed.src,
+        fit: 'contain',
+      });
     });
 
-    shadow.getElementById('redo')?.addEventListener('click', () => {
-      eventBus.emit('history:redo');
+    shadow
+      .getElementById('undo')
+      ?.addEventListener('click', () => eventBus.emit('history:undo'));
+    shadow
+      .getElementById('redo')
+      ?.addEventListener('click', () => eventBus.emit('history:redo'));
+
+    shadow.getElementById('save')?.addEventListener('click', async () => {
+      const { templateManager } =
+        await import('../../domain/services/TemplateManager');
+      await templateManager.saveCurrentLabel();
+      const { ToastManager } = await import('../common/toast');
+      ToastManager.show({
+        type: 'success',
+        message: 'Template salvo com sucesso!',
+      });
+    });
+
+    shadow.getElementById('open-batch')?.addEventListener('click', () => {
+      const modal = document.getElementById('batch-modal') as any;
+      if (modal) modal.setAttribute('open', '');
+      UISM.play(UISM.enumPresets.OPEN);
     });
   }
 }

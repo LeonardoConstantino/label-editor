@@ -4,9 +4,9 @@ import { logger } from './Logger';
  * Gerenciamento de storage persistente usando IndexedDB (Versão TS)
  */
 export class IndexedDBStorage<T> {
-  static DB_NAME = 'AuraStorage';
+  static DB_NAME = 'labelEditor';
   static DB_VERSION = 1;
-  static STORE_NAME = 'keyValueStore';
+  static STORE_NAME = 'labelEditorStore';
 
   private _initialized = false;
   private _value: T;

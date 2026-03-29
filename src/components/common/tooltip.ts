@@ -55,88 +55,151 @@ const balloonStyles = new CSSStyleSheet();
 balloonStyles.replaceSync(`
   :host {
     position: fixed;
-    z-index: var(--tooltip-z-index, 9999);
-    max-width: var(--tooltip-max-width, 280px);
-    padding: var(--tooltip-padding, 6px 10px);
-    border-radius: var(--tooltip-radius, 6px);
-    font-size: var(--tooltip-font-size, 0.8125rem);
-    font-family: inherit;
+    z-index: 9999;
+    max-width: 320px;
+    padding: 12px;
+    border-radius: 8px;
+    font-family: var(--font-sans, 'Inter', sans-serif);
+    font-size: 11px;
+    font-weight: 500;
     line-height: 1.5;
     pointer-events: none;
-    border: var(--tooltip-border, none);
-    
-    background: var(--tooltip-bg);
-    color: var(--tooltip-color);
-    box-shadow: var(--tooltip-shadow);
-    
+    user-select: none;
+
+    /* Tactile Prism: Glassmorphism */
+    background: rgba(22, 25, 32, 0.95);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--color-border-ui, #262a33);
+    color: var(--color-text-main, #ffffff);
+    box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.8), 0 0 20px rgba(99, 102, 241, 0.1);
+
+    /* Física de Mola */
     opacity: 0;
-    transform: scale(0.92) translateY(4px);
+    transform: scale(0.95) translateY(4px);
     transition:
-      opacity 120ms ease,
-      transform 120ms cubic-bezier(0.34, 1.56, 0.64, 1),
-      visibility 0s linear 120ms;
+      opacity 150ms ease,
+      transform 250ms var(--ease-spring, cubic-bezier(0.34, 1.56, 0.64, 1));
     visibility: hidden;
-    will-change: opacity, transform;
   }
-  
+
   :host(.is-visible) {
     opacity: 1;
     transform: scale(1) translateY(0px);
-    transition:
-      opacity 160ms ease,
-      transform 160ms cubic-bezier(0.34, 1.56, 0.64, 1);
     visibility: visible;
   }
-  
+
+  /* Variantes com Glow Neon */
+  :host([variant="primary"]) { border-color: var(--color-accent-primary); box-shadow: 0 0 20px rgba(99, 102, 241, 0.2); }
+  :host([variant="success"]) { border-color: var(--color-accent-success); box-shadow: 0 0 20px rgba(16, 185, 129, 0.2); }
+  :host([variant="warning"]) { border-color: #f59e0b; box-shadow: 0 0 20px rgba(245, 158, 11, 0.2); }
+  :host([variant="error"])   { border-color: var(--color-accent-danger); box-shadow: 0 0 20px rgba(244, 63, 94, 0.2); }
+
   [part="arrow"] {
     position: absolute;
-    width: 0; height: 0;
-    border: var(--tooltip-arrow-size, 6px) solid transparent;
+    width: 8px; height: 8px;
+    background: inherit;
+    border: inherit;
+    border-top: none; border-left: none;
   }
-  
-  :host([data-placement="top"]) [part="arrow"] {
-    bottom: calc(var(--tooltip-arrow-size, 6px) * -2);
-    left: 50%; transform: translateX(-50%);
-    border-top-color: var(--tooltip-bg);
-  }
-  :host([data-placement="bottom"]) [part="arrow"] {
-    top: calc(var(--tooltip-arrow-size, 6px) * -2);
-    left: 50%; transform: translateX(-50%);
-    border-bottom-color: var(--tooltip-bg);
-  }
-  :host([data-placement="left"]) [part="arrow"] {
-    right: calc(var(--tooltip-arrow-size, 6px) * -2);
-    top: 50%; transform: translateY(-50%);
-    border-left-color: var(--tooltip-bg);
-  }
-  :host([data-placement="right"]) [part="arrow"] {
-    left: calc(var(--tooltip-arrow-size, 6px) * -2);
-    top: 50%; transform: translateY(-50%);
-    border-right-color: var(--tooltip-bg);
-  }
-  
-  @media (prefers-color-scheme: light) {
-    :host(:not([variant])) {
-      --tooltip-bg: #1e293b;
-      --tooltip-color: #f8fafc;
-      --tooltip-shadow: 0 4px 20px rgba(0,0,0,0.18), 0 1px 4px rgba(0,0,0,0.12);
-    }
-  }
-  @media (prefers-color-scheme: dark) {
-    :host(:not([variant])) {
-      --tooltip-bg: #f1f5f9;
-      --tooltip-color: #0f172a;
-      --tooltip-shadow: 0 4px 20px rgba(0,0,0,0.5), 0 1px 4px rgba(0,0,0,0.3);
-    }
-  }
-  
-  :host([variant="info"])    { --tooltip-bg: #0ea5e9; --tooltip-color: #fff; --tooltip-shadow: 0 4px 16px #0ea5e940; }
-  :host([variant="success"]) { --tooltip-bg: #22c55e; --tooltip-color: #fff; --tooltip-shadow: 0 4px 16px #22c55e40; }
-  :host([variant="warning"]) { --tooltip-bg: #f59e0b; --tooltip-color: #fff; --tooltip-shadow: 0 4px 16px #f59e0b40; }
-  :host([variant="error"])   { --tooltip-bg: #ef4444; --tooltip-color: #fff; --tooltip-shadow: 0 4px 16px #ef444440; }
-  
+
+  :host([data-placement="top"]) [part="arrow"] { bottom: -5px; left: 50%; transform: translateX(-50%) rotate(45deg); }
+  :host([data-placement="bottom"]) [part="arrow"] { top: -5px; left: 50%; transform: translateX(-50%) rotate(-135deg); }
+  :host([data-placement="left"]) [part="arrow"] { right: -5px; top: 50%; transform: translateY(-50%) rotate(-45deg); }
+  :host([data-placement="right"]) [part="arrow"] { left: -5px; top: 50%; transform: translateY(-50%) rotate(135deg); }
+
   [part="content"] {
     display: block;
+    padding: 8px;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+  }
+
+  /* Estilos internos para conteúdo rico */
+  [part="content"] .tooltip-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  [part="content"] .tooltip-header ui-icon {
+    color: var(--color-accent-primary);
+  }
+
+  [part="content"] .tooltip-header span {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-muted, #94a3b8);
+    font-weight: 500;
+  }
+
+  [part="content"] .tooltip-section {
+    margin-bottom: 12px;
+  }
+
+  [part="content"] .tooltip-section:last-child {
+    margin-bottom: 0;
+  }
+
+  [part="content"] .section-title {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-accent-primary);
+    margin-bottom: 8px;
+  }
+
+  [part="content"] .controls-grid {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 8px 12px;
+    align-items: center;
+  }
+
+  [part="content"] kbd {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px 6px;
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 9px;
+    background: rgba(99, 102, 241, 0.15);
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    border-radius: 4px;
+    color: var(--color-text-main);
+    min-width: 48px;
+  }
+
+  [part="content"] .control-desc {
+    font-size: 11px;
+    color: var(--color-text-muted, #94a3b8);
+  }
+
+  [part="content"] .math-note {
+    margin-top: 12px;
+    padding: 8px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    font-size: 10px;
+    color: var(--color-text-muted, #94a3b8);
+  }
+
+  [part="content"] .math-note ui-icon {
+    color: var(--color-accent-primary);
+    flex-shrink: 0;
+  }
+
+  [part="content"] .math-note code {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    color: var(--color-text-main);
   }
 `);
 
@@ -343,11 +406,24 @@ class UiTooltipManager extends HTMLElement {
   }
 
   #setupGlobalListeners(): void {
-    document.addEventListener('keydown', (e: KeyboardEvent) => {
+    // Captura mouseenter em fase de captura para descobrir elementos [data-tooltip] dinâmicos
+    document.addEventListener(
+      'mouseenter',
+      (e) => {
+        const target = (e.target as HTMLElement).closest?.('[data-tooltip]');
+        if (target && !this.#activeTooltips.has(target as HTMLElement)) {
+          this.#attachTooltip(target as HTMLElement);
+        }
+      },
+      { capture: true, passive: true },
+    );
+
+    // Tecla ESC para fechar tudo
+    document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         document
           .querySelectorAll('tooltip-balloon')
-          .forEach((b) => (b as TooltipBalloon).hide());
+          .forEach((b) => (b as any).hide());
       }
     });
   }
@@ -458,7 +534,12 @@ class TooltipInstance {
     if (this.#isOpen) return;
     this.#isOpen = true;
 
+    const id = `tip-${Math.random().toString(36).slice(2, 9)}`;
     this.#balloon = document.createElement('tooltip-balloon') as TooltipBalloon;
+    this.#balloon.id = id;
+
+    // Vincula o target ao tooltip para leitores de tela
+    this.#target.setAttribute('aria-describedby', id);
 
     if (this.#config.variant) {
       this.#balloon.setAttribute('variant', this.#config.variant);
@@ -487,6 +568,7 @@ class TooltipInstance {
   #close(): void {
     if (!this.#isOpen || !this.#balloon) return;
     this.#isOpen = false;
+    this.#target.removeAttribute('aria-describedby'); // Remove o vínculo
     this.#balloon.hide();
     this.#balloon = null;
   }
@@ -580,6 +662,7 @@ class TooltipInstance {
 const TEMPLATE_WRAPPER = document.createElement('template');
 TEMPLATE_WRAPPER.innerHTML = `
 <style>
+  @import "/src/styles/main.css";
   :host { display: contents; }
 </style>
 <slot name="target"></slot>
@@ -668,7 +751,78 @@ class UiTooltip extends HTMLElement {
 
   #extractContent(nodes: Node[]): DocumentFragment {
     const frag = document.createDocumentFragment();
-    nodes.forEach((n) => frag.appendChild(n.cloneNode(true)));
+    const wrapper = document.createElement('div');
+
+    // Função recursiva para clonar elementos preservando custom elements
+    const cloneNodeDeep = (node: Node): Node => {
+      if (node.nodeType === Node.TEXT_NODE) {
+        return node.cloneNode(false);
+      }
+
+      if (node.nodeType === Node.ELEMENT_NODE) {
+        const el = node as Element;
+        const clone = document.createElement(el.nodeName.toLowerCase());
+
+        // Copia todos os atributos
+        for (const attr of Array.from(el.attributes)) {
+          clone.setAttribute(attr.name, attr.value);
+        }
+
+        // Copia children recursivamente
+        for (const child of Array.from(el.childNodes)) {
+          clone.appendChild(cloneNodeDeep(child));
+        }
+
+        return clone;
+      }
+
+      return node.cloneNode(false);
+    };
+
+    nodes.forEach((n) => {
+      wrapper.appendChild(cloneNodeDeep(n));
+    });
+
+    // Transforma classes utilitárias em estrutura semântica para o balloon
+    // Header do tooltip
+    const header = wrapper.querySelector('[class*="tooltip-header"], [class*="header"]');
+    if (header) {
+      header.classList.add('tooltip-header');
+    }
+
+    // Títulos de seção
+    wrapper.querySelectorAll('[class*="section-title"], [class*="title"]').forEach((el) => {
+      el.classList.add('section-title');
+    });
+
+    // Grid de controles
+    wrapper.querySelectorAll('[class*="grid"]').forEach((el) => {
+      el.classList.add('controls-grid');
+    });
+
+    // Kbd elements
+    wrapper.querySelectorAll('kbd, [class*="kbd"]').forEach((el) => {
+      el.classList.add('kbd');
+    });
+
+    // Descrições de controles
+    wrapper.querySelectorAll('[class*="desc"], [class*="text-muted"]').forEach((el) => {
+      if (!el.classList.contains('section-title')) {
+        el.classList.add('control-desc');
+      }
+    });
+
+    // Math notes
+    wrapper.querySelectorAll('[class*="note"], [class*="math"]').forEach((el) => {
+      el.classList.add('math-note');
+    });
+
+    // Seções
+    wrapper.querySelectorAll('[class*="mb-"], [class*="section"]').forEach((el) => {
+      el.classList.add('tooltip-section');
+    });
+
+    frag.appendChild(wrapper);
     return frag;
   }
 

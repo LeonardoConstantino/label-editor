@@ -1,11 +1,29 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, beforeAll } from 'vitest';
 import { canvasRenderer } from '../CanvasRenderer';
 import { ElementType } from '../../models/elements/BaseElement';
+
+// Mock do canvas-txt antes de importar o TextRenderer
+beforeAll(() => {
+  (global as any).canvasTxt = {
+    drawText: vi.fn((ctx, text, x, y, w, h, opts) => {
+      // Simula o comportamento do canvas-txt que centraliza o texto
+      ctx.save();
+      ctx.fillStyle = opts.fillStyle || '#000';
+      ctx.font = `${opts.fontWeight || 'normal'} ${opts.fontSize}px ${opts.fontFamily}`;
+      ctx.textBaseline = 'middle';
+      ctx.textAlign = opts.align || 'left';
+      // canvas-txt usa x + width/2 para centralização
+      ctx.fillText(text, x + w / 2, y + h / 2);
+      ctx.restore();
+    })
+  };
+});
 
 describe('CanvasRenderer', () => {
   let mockCtx: any;
 
   beforeEach(() => {
+    vi.clearAllMocks();
     mockCtx = {
       save: vi.fn(),
       restore: vi.fn(),
@@ -15,10 +33,14 @@ describe('CanvasRenderer', () => {
       drawImage: vi.fn(),
       beginPath: vi.fn(),
       closePath: vi.fn(),
+      fillStyle: '#000',
+      font: '',
+      textBaseline: 'middle',
+      textAlign: 'left'
     };
   });
 
-  it('should render a text element at correct pixel coordinates', () => {
+  it('should render a text element delegating to TextRenderer', () => {
     const textElement = {
       type: ElementType.TEXT,
       position: { x: 10, y: 10 },
@@ -32,11 +54,20 @@ describe('CanvasRenderer', () => {
       textAlign: 'left'
     };
 
-    // scale: 300 DPI / 25.4mm = 11.81 px/mm
-    const scale = 300 / 25.4; 
+    const scale = 300 / 25.4;
+    const x = textElement.position.x * scale;
+    const y = textElement.position.y * scale;
+    const width = textElement.dimensions.width * scale;
+    const height = textElement.dimensions.height * scale;
+
     canvasRenderer.render(textElement as any, { ctx: mockCtx, scale });
 
-    expect(mockCtx.fillText).toHaveBeenCalledWith('Label', 10 * scale, 10 * scale);
+    // canvas-txt usa x + width/2, y + height/2 para centralização
+    expect(mockCtx.fillText).toHaveBeenCalledWith(
+      'Label',
+      x + width / 2,
+      y + height / 2
+    );
     expect(mockCtx.save).toHaveBeenCalled();
     expect(mockCtx.restore).toHaveBeenCalled();
   });
@@ -51,7 +82,7 @@ describe('CanvasRenderer', () => {
 
     // Ponto dentro (15mm, 15mm -> converter para pixels)
     expect(canvasRenderer.hitTest(element as any, 15 * scale, 15 * scale, config as any)).toBe(true);
-    
+
     // Ponto fora
     expect(canvasRenderer.hitTest(element as any, 5 * scale, 5 * scale, config as any)).toBe(false);
   });

@@ -1,3 +1,4 @@
+import { UISM } from '../../core/UISoundManager';
 /**
  * @element ui-modal
  * @description Modal Web Component — Shadow DOM, variantes, tamanhos, animações e acessibilidade.
@@ -467,6 +468,9 @@ export class UiModal extends HTMLElement {
         const shouldOpen = newVal !== null;
         if (shouldOpen && !this.#isVisible && !this.#busy) this.#doOpen();
         if (!shouldOpen && this.#isVisible && !this.#busy) this.#doClose();
+
+        UISM.play(UISM.enumPresets.SWOOSHIN);
+        
         break;
       }
     }

@@ -1,3 +1,4 @@
+import { UISM } from '../../core/UISoundManager';
 /**
  * @component ui-toast / ui-toast-manager
  * ─────────────────────────────────────────────────────────────────────────────
@@ -593,6 +594,7 @@ export class UiToastManager extends HTMLElement {
     toast.setAttribute('message', message);
     toast.setAttribute('duration', String(duration));
     this.appendChild(toast);
+    UISM.play(UISM.enumPresets.NOTIFY);
     return toast;
   }
 
