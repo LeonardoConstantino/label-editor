@@ -38,9 +38,16 @@
   }
 
   /* Scrollbars Estilo Hardware Escuro */
-  ::-webkit-scrollbar { width: 6px; height: 6px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { @apply bg-border-ui rounded-full hover:bg-text-muted transition-colors; }
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-border-ui rounded-full hover:bg-text-muted transition-colors;
+  }
 }
 
 /* ==========================================
@@ -54,7 +61,10 @@
   /* O Canvas Infinito */
   .canvas-workspace {
     @apply absolute inset-0 z-0 flex items-center justify-center overflow-auto;
-    background-image: radial-gradient(var(--color-border-ui) 1px, transparent 0);
+    background-image: radial-gradient(
+      var(--color-border-ui) 1px,
+      transparent 0
+    );
     background-size: 24px 24px;
   }
 
@@ -88,7 +98,8 @@
   .input-prism {
     @apply w-full bg-black/20 border border-border-ui text-text-main rounded-lg px-3 py-2 text-sm font-sans placeholder:text-text-muted outline-none transition-all duration-200;
   }
-  .input-prism:focus, .input-prism:focus-within {
+  .input-prism:focus,
+  .input-prism:focus-within {
     @apply border-accent-primary;
     box-shadow: var(--shadow-neon-primary);
   }
@@ -101,59 +112,210 @@
     @apply inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all cursor-pointer select-none;
     transition-timing-function: var(--ease-spring);
   }
-  .btn-prism:active { transform: scale(0.92); }
+  .btn-prism:active {
+    transform: scale(0.92);
+  }
 
-  .btn-primary { @apply bg-accent-primary text-white hover:bg-accent-hover hover:shadow-[0_0_16px_rgba(99,102,241,0.5)]; }
-  .btn-secondary { @apply bg-surface-solid border border-border-ui text-text-main hover:bg-border-ui; }
-  .btn-success { @apply bg-accent-success text-black font-semibold hover:brightness-110 hover:shadow-[0_0_16px_rgba(16,185,129,0.4)]; }
-  .btn-danger { @apply bg-accent-danger/10 text-accent-danger border border-accent-danger/50 hover:bg-accent-danger hover:text-white; }
+  .btn-primary {
+    @apply bg-accent-primary text-white hover:bg-accent-hover hover:shadow-[0_0_16px_rgba(99,102,241,0.5)];
+  }
+  .btn-secondary {
+    @apply bg-surface-solid border border-border-ui text-text-main hover:bg-border-ui;
+  }
+  .btn-success {
+    @apply bg-accent-success text-black font-semibold hover:brightness-110 hover:shadow-[0_0_16px_rgba(16,185,129,0.4)];
+  }
+  .btn-danger {
+    @apply bg-accent-danger/10 text-accent-danger border border-accent-danger/50 hover:bg-accent-danger hover:text-white;
+  }
 
-  .card-module { @apply bg-surface-solid border border-border-ui rounded-xl p-4 mb-4 shadow-sm; }
+  .card-module {
+    @apply bg-surface-solid border border-border-ui rounded-xl p-4 mb-4 shadow-sm;
+  }
 }
 
 /* ==========================================
    WEB COMPONENTS CUSTOMIZADOS (Shadow Parts)
    ========================================== */
 @layer components {
-  ui-icon { display: inline-flex; align-items: center; justify-content: center; --icon-size: 18px; width: var(--icon-size); height: var(--icon-size); color: currentColor; pointer-events: none; }
-  ui-icon::part(svg) { width: 100%; height: 100%; stroke-width: 1.5px; stroke: currentColor; fill: none; transition: transform 0.3s var(--ease-spring); }
-  button:hover > ui-icon::part(svg), .btn-prism:hover > ui-icon::part(svg) { transform: scale(1.15); }
+  ui-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    --icon-size: 18px;
+    width: var(--icon-size);
+    height: var(--icon-size);
+    color: currentColor;
+    pointer-events: none;
+  }
+  ui-icon::part(svg) {
+    width: 100%;
+    height: 100%;
+    stroke-width: 1.5px;
+    stroke: currentColor;
+    fill: none;
+    transition: transform 0.3s var(--ease-spring);
+  }
+  button:hover > ui-icon::part(svg),
+  .btn-prism:hover > ui-icon::part(svg) {
+    transform: scale(1.15);
+  }
 
   ui-modal {
-    --modal-z: 10000; --modal-backdrop: rgba(0, 0, 0, 0.6); --modal-backdrop-blur: 8px;
-    --modal-bg: var(--color-surface-solid); --modal-border: var(--color-border-ui);
-    --modal-radius: 16px; --modal-padding: 24px; --modal-shadow: var(--shadow-panel), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-    --modal-font: var(--font-sans); --modal-duration: 300ms; --modal-easing: var(--ease-spring);
+    --modal-z: 10000;
+    --modal-backdrop: rgba(0, 0, 0, 0.6);
+    --modal-backdrop-blur: 8px;
+    --modal-bg: var(--color-surface-solid);
+    --modal-border: var(--color-border-ui);
+    --modal-radius: 16px;
+    --modal-padding: 24px;
+    --modal-shadow:
+      var(--shadow-panel), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    --modal-font: var(--font-sans);
+    --modal-duration: 300ms;
+    --modal-easing: var(--ease-spring);
   }
-  ui-modal::part(header) { border-bottom: 1px solid var(--color-border-ui); padding-bottom: 16px; margin-bottom: 20px; color: var(--color-text-main); font-weight: 600; }
-  ui-modal::part(body) { color: var(--color-text-muted); }
-  ui-modal::part(close-btn):hover { color: var(--color-accent-primary); transform: rotate(90deg) scale(1.1); transition: all 0.3s var(--ease-spring); }
+  ui-modal::part(header) {
+    border-bottom: 1px solid var(--color-border-ui);
+    padding-bottom: 16px;
+    margin-bottom: 20px;
+    color: var(--color-text-main);
+    font-weight: 600;
+  }
+  ui-modal::part(body) {
+    color: var(--color-text-muted);
+  }
+  ui-modal::part(close-btn):hover {
+    color: var(--color-accent-primary);
+    transform: rotate(90deg) scale(1.1);
+    transition: all 0.3s var(--ease-spring);
+  }
 
   ui-confirm {
-    --uc-z-index: 10001; --uc-backdrop-color: rgba(0, 0, 0, 0.8);
-    --uc-panel-bg: var(--color-surface-solid); --uc-panel-border: var(--color-border-ui);
-    --uc-panel-radius: 12px; --uc-panel-shadow: var(--shadow-panel), var(--shadow-neon-primary);
-    --uc-font-family: var(--font-sans); --uc-color-title: var(--color-text-main); --uc-color-message: var(--color-text-muted);
-    --uc-btn-cancel-bg: transparent; --uc-btn-cancel-color: var(--color-text-muted); --uc-btn-cancel-border: var(--color-border-ui);
+    --uc-z-index: 10001;
+    --uc-backdrop-color: rgba(0, 0, 0, 0.8);
+    --uc-panel-bg: var(--color-surface-solid);
+    --uc-panel-border: var(--color-border-ui);
+    --uc-panel-radius: 12px;
+    --uc-panel-shadow: var(--shadow-panel), var(--shadow-neon-primary);
+    --uc-font-family: var(--font-sans);
+    --uc-color-title: var(--color-text-main);
+    --uc-color-message: var(--color-text-muted);
+    --uc-btn-cancel-bg: transparent;
+    --uc-btn-cancel-color: var(--color-text-muted);
+    --uc-btn-cancel-border: var(--color-border-ui);
   }
-  ui-confirm::part(title) { font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.05em; }
+  ui-confirm::part(title) {
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
 
   ui-toast-manager {
-    --toast-gap: 12px; --toast-offset: 32px; --toast-width: 320px; --toast-radius: 12px;
-    --toast-font-family: var(--font-sans); --toast-shadow: 0 12px 32px rgba(0, 0, 0, 0.6);
-    --toast-z-index: 9999; --toast-info-bg: var(--color-surface-solid); --toast-info-color: var(--color-text-main);
-    --toast-info-border: var(--color-accent-primary); --toast-success-bg: var(--color-surface-solid);
-    --toast-success-color: var(--color-text-main); --toast-success-border: var(--color-accent-success);
-    --toast-error-bg: var(--color-surface-solid); --toast-error-color: var(--color-text-main);
-    --toast-error-border: var(--color-accent-danger); --toast-progress-bg: var(--color-border-ui);
+    --toast-gap: 12px;
+    --toast-offset: 32px;
+    --toast-width: 320px;
+    --toast-radius: 12px;
+    --toast-font-family: var(--font-sans);
+    --toast-shadow: 0 12px 32px rgba(0, 0, 0, 0.6);
+    --toast-z-index: 9999;
+    --toast-info-bg: var(--color-surface-solid);
+    --toast-info-color: var(--color-text-main);
+    --toast-info-border: var(--color-accent-primary);
+    --toast-success-bg: var(--color-surface-solid);
+    --toast-success-color: var(--color-text-main);
+    --toast-success-border: var(--color-accent-success);
+    --toast-error-bg: var(--color-surface-solid);
+    --toast-error-color: var(--color-text-main);
+    --toast-error-border: var(--color-accent-danger);
+    --toast-progress-bg: var(--color-border-ui);
   }
-  ui-toast-manager::part(toast-root) { border: 1px solid var(--color-border-ui); border-left-width: 4px; backdrop-filter: blur(12px); }
-  ui-toast-manager::part(toast-body) strong { font-family: var(--font-mono); color: white; font-size: 0.75rem; text-transform: uppercase; }
+  ui-toast-manager::part(toast-root) {
+    border: 1px solid var(--color-border-ui);
+    border-left-width: 4px;
+    backdrop-filter: blur(12px);
+  }
+  ui-toast-manager::part(toast-body) strong {
+    font-family: var(--font-mono);
+    color: white;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+  }
 
-  ui-number-scrubber::part(wrapper) { background-color: rgba(10, 12, 16, 0.6); box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.4), 0 1px 0 rgba(255, 255, 255, 0.05); border-radius: 6px; }
-  ui-number-scrubber::part(label) { color: var(--color-text-muted); font-weight: 700; border-right: none; box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.05); background: rgba(255, 255, 255, 0.02); }
-  ui-number-scrubber:hover::part(label) { color: var(--color-text-main); text-shadow: 0 0 8px rgba(255, 255, 255, 0.3); }
-  ui-number-scrubber:focus-within::part(wrapper) { border-color: var(--color-accent-primary); box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.4), 0 0 0 1px var(--color-accent-primary), 0 0 12px rgba(99, 102, 241, 0.2); }
+  ui-number-scrubber::part(wrapper) {
+    background-color: rgba(10, 12, 16, 0.6);
+    box-shadow:
+      inset 0 2px 6px rgba(0, 0, 0, 0.4),
+      0 1px 0 rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+  }
+  ui-number-scrubber::part(label) {
+    color: var(--color-text-muted);
+    font-weight: 700;
+    border-right: none;
+    box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.02);
+  }
+  ui-number-scrubber:hover::part(label) {
+    color: var(--color-text-main);
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+  }
+  ui-number-scrubber:focus-within::part(wrapper) {
+    border-color: var(--color-accent-primary);
+    box-shadow:
+      inset 0 2px 6px rgba(0, 0, 0, 0.4),
+      0 0 0 1px var(--color-accent-primary),
+      0 0 12px rgba(99, 102, 241, 0.2);
+  }
+}
+
+/* ==========================================
+   NATIVE COLOR INPUT (Tactile Prism)
+   ========================================== */
+@layer components {
+  /* 1. O container do input (A carcaça) */
+  input[type='color'].input-prism {
+    padding: 3px; /* Espaço entre a carcaça e o bloco de cor */
+    height: 32px; /* Mesma altura exata do ui-number-scrubber para alinhar perfeito no grid */
+    cursor: pointer;
+    /* Removemos o text-align e outras regras de texto que vêm do .input-prism padrão */
+  }
+
+  /* 2. CHROME / SAFARI / EDGE: Removendo o wrapper inútil */
+  input[type='color'].input-prism::-webkit-color-swatch-wrapper {
+    padding: 0;
+  }
+
+  /* 3. O BLOCO DE COR REAL (A Tinta) */
+  input[type='color'].input-prism::-webkit-color-swatch {
+    border: 1px solid rgba(255, 255, 255, 0.15); /* Borda clarinha para separar cores escuras do fundo */
+    border-radius: 4px; /* Cantos levemente arredondados, menores que o container exterior */
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4); /* Faz a cor parecer líquida/afundada */
+    transition: all 0.2s var(--ease-spring);
+  }
+
+  /* FIREFOX: Equivalente ao bloco de cor */
+  input[type='color'].input-prism::-moz-color-swatch {
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+  }
+
+  /* =========================================
+     O "JUICE" (Micro-interações)
+     ========================================= */
+
+  /* Hover: A cor contrai levemente, parecendo um botão físico */
+  input[type='color'].input-prism:hover::-webkit-color-swatch {
+    transform: scale(0.96);
+    border-color: rgba(255, 255, 255, 0.4);
+  }
+
+  /* Focus/Active: A carcaça externa ganha o Glow Neon do Tactile Prism */
+  input[type='color'].input-prism:focus,
+  input[type='color'].input-prism:active {
+    border-color: var(--color-accent-primary);
+    box-shadow: 0 0 12px rgba(99, 102, 241, 0.3);
+  }
 }
 
 /* ==========================================
@@ -161,24 +323,69 @@
    ========================================== */
 @layer components {
   input[type='checkbox'] {
-    appearance: none; width: 36px; height: 20px; border-radius: 20px; background: #050505;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.8), 0 1px 0 rgba(255, 255, 255, 0.05);
-    position: relative; cursor: pointer; transition: background 0.3s ease;
+    appearance: none;
+    width: 36px;
+    height: 20px;
+    border-radius: 20px;
+    background: #050505;
+    box-shadow:
+      inset 0 2px 4px rgba(0, 0, 0, 0.8),
+      0 1px 0 rgba(255, 255, 255, 0.05);
+    position: relative;
+    cursor: pointer;
+    transition: background 0.3s ease;
   }
   input[type='checkbox']::before {
-    content: ''; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%;
-    background: #3f3f46; transition: all 0.4s var(--ease-spring); box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #3f3f46;
+    transition: all 0.4s var(--ease-spring);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
   }
-  input[type='checkbox']:checked { background: var(--color-accent-primary); box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3), 0 0 12px rgba(99, 102, 241, 0.4); }
-  input[type='checkbox']:checked::before { left: calc(100% - 18px); background: #ffffff; }
+  input[type='checkbox']:checked {
+    background: var(--color-accent-primary);
+    box-shadow:
+      inset 0 2px 4px rgba(0, 0, 0, 0.3),
+      0 0 12px rgba(99, 102, 241, 0.4);
+  }
+  input[type='checkbox']:checked::before {
+    left: calc(100% - 18px);
+    background: #ffffff;
+  }
 }
 
 /* ==========================================
    IMPRESSÃO
    ========================================== */
 @media print {
-  body { background: white !important; }
-  .panel-glass, .toolbar-pill, ui-toast-manager, ui-modal { display: none !important; }
-  .layout-container, .canvas-workspace { display: block !important; padding: 0 !important; background: none !important; box-shadow: none !important; position: static !important; }
-  .label-artboard { margin: 0 !important; box-shadow: none !important; border: none !important; transform: none !important; page-break-after: always; break-after: page; }
+  body {
+    background: white !important;
+  }
+  .panel-glass,
+  .toolbar-pill,
+  ui-toast-manager,
+  ui-modal {
+    display: none !important;
+  }
+  .layout-container,
+  .canvas-workspace {
+    display: block !important;
+    padding: 0 !important;
+    background: none !important;
+    box-shadow: none !important;
+    position: static !important;
+  }
+  .label-artboard {
+    margin: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    transform: none !important;
+    page-break-after: always;
+    break-after: page;
+  }
 }
