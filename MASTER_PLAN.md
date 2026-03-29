@@ -1,48 +1,71 @@
-# Master Plan: Label Editor MVP+ (Tactile Prism)
+# Master Plan: Label Editor v3.5 (Consolidação Total)
 
-Este plano coordena a transição do MVP inicial para a versão MVP+, focada em refinamento visual, arquitetura robusta baseada em eventos e feedback sensorial completo (visual e auditivo).
+Este arquivo coordena a execução de tarefas para a excelência técnica, visual e de segurança do Label Editor.
 
 ## Status do Projeto
-- **Fase Atual:** Refatoração de Core & UI (Tactile Prism)
-- **Stack:** TS, Vite, Tailwind v4.2, canvas-txt, jsPDF, UISoundManager.
-- **Progresso:** 15% (Design Tokens, CSS Base e Som prontos)
+- **Fases 1 a 3:** Concluídas (MVP+) ✅
+- **Fases 4 a 9:** Em progresso (Polimento & Padronização) 🛠️
+- **Stack:** TS, Vite, Tailwind v4.2, UISoundManager, PapaParse, jsPDF, Git Branching.
+- **Progresso Geral:** 80%
 
-## Diretrizes Críticas
-1. **Física de Hardware:** Use `--ease-spring` em todas as transições. 
-2. **Feedback Auditivo:** Toda interação física (botões, switches, modais) deve invocar o `UISoundManager.play()`.
-3. **Snapshot Visual:** O Undo/Redo agora é via `ImageData`. Toda ação que altera o canvas deve disparar um snapshot.
-4. **Escala mm:** Todo cálculo de domínio permanece em mm. A conversão px ocorre apenas no `CanvasRenderer`.
+## Diretrizes para Agentes (Workflow de Elite)
+1. **Branching:** **OBRIGATÓRIO** criar branch para cada task: `git checkout -b task/NN-descricao`.
+2. **Isolamento:** Inserções cirúrgicas. Não reescreva o que já funciona sem motivo técnico.
+3. **Padrões:** Siga estritamente o `Design_System.md`, `Layout_UX_Guide.md` e o `definition_elements.md`.
 
 ---
 
 ## Pipeline de Tasks
 
-### Fase 1: Infraestrutura, Renderers & Feedback
-| ID | Task | Status | Dependências |
-|----|------|--------|--------------|
-| **11** | [Refatoração do Store (History & snapshots)](./tasks/11_store_history.md) | [ ] | 01 |
-| **12** | [Renderers Modulares & canvas-txt](./tasks/12_renderers_strategy.md) | [ ] | 03 |
-| **13** | [OverflowValidator (checkOverflow)](./tasks/13_validator.md) | [ ] | 02 |
+### Fase 4: Refinamento de Design & UX (Cockpit)
+| ID | Task | Status | Dependências | Branch |
+|----|------|--------|--------------|--------|
+| **20** | [Auditoria de Componentes Core](./tasks/20_ui_audit.md) | [ ] | — | `task/20-ui-audit` |
+| **21** | [Refinamento de Profundidade](./tasks/21_cockpit_depth.md) | [ ] | — | `task/21-cockpit-refinement` |
+| **22** | [Sincronização de Temas & Variáveis](./tasks/22_theme_sync.md) | [ ] | — | `task/22-theme-sync` |
+| **23** | [Acessibilidade & Atalhos de Teclado](./tasks/23_shortcuts_acc.md) | [ ] | — | `task/23-shortcuts` |
+| **27** | [Personalização e Limites do Canvas](./tasks/27_canvas_limits.md) | [ ] | — | `task/27-canvas-limits` |
 
-### Fase 2: UI Tactile Prism (Componentes com Som)
-| ID | Task | Status | Dependências |
-|----|------|--------|--------------|
-| **14** | [AppButton & AppInput (Prism Style + Som)](./tasks/14_ui_core.md) | [ ] | — |
-| **15** | [Sistema de Modais, Toasts e Confirmação](./tasks/15_ui_feedback.md) | [ ] | 14 |
-| **16** | [EditorCanvas (Workspace & Artboard)](./tasks/16_canvas_ui.md) | [ ] | 12 |
+### Fase 5: Estabilidade & Performance
+| ID | Task | Status | Dependências | Branch |
+|----|------|--------|--------------|--------|
+| **24** | [Otimização de Lote (Web Workers)](./tasks/24_batch_perf.md) | [ ] | 19 | `task/24-batch-workers` |
+| **25** | [Persistência de Preferências](./tasks/25_user_prefs.md) | [ ] | 07 | `task/25-user-prefs` |
+| **26** | [Layout de Impressão A4 (Multi)](./tasks/26_a4_printing.md) | [ ] | 19 | `task/26-a4-printing` |
 
-### Fase 3: Features & Lote
-| ID | Task | Status | Dependências |
-|----|------|--------|--------------|
-| **17** | [Inspector Numérico e Atributos](./tasks/17_inspector_refactor.md) | [ ] | 16 |
-| **18** | [Batch Processor & String Interpolation](./tasks/18_batch_logic.md) | [ ] | 11, 12 |
-| **19** | [Print System & Lote Preview](./tasks/19_print_batch.md) | [ ] | 18 |
+### Fase 6: Alinhamento Arquitetural (Base)
+| ID | Task | Status | Dependências | Branch |
+|----|------|--------|--------------|--------|
+| **28** | [Utilitário de Unidades Centralizado](./tasks/28_unit_converter.md) | [ ] | — | `task/28-unit-converter` |
+| **29** | [Fábrica de Elementos & Constantes](./tasks/29_element_factory.md) | [ ] | — | `task/29-element-factory` |
+| **30** | [Validador de Propriedades Técnico](./tasks/30_property_validator.md) | [ ] | 29 | `task/30-property-validator` |
+| **31** | [Upgrade no Parser de CSV (PapaParse)](./tasks/31_papaparse_upgrade.md) | [ ] | 18 | `task/31-papaparse-upgrade` |
+| **33** | [Importação/Exportação de JSON](./tasks/33_json_import_export.md) | [ ] | 07 | `task/33-json-import-export` |
+| **34** | [Formatadores na Interpolação](./tasks/34_interpolation_formatters.md) | [ ] | 18 | `task/34-formatters` |
+| **40** | [Prevenção de XSS & Sanitização](./tasks/40_security_xss.md) | [ ] | — | `task/40-security-xss` |
+
+### Fase 7: Gestão de Projetos & Persistência
+| ID | Task | Status | Dependências | Branch |
+|----|------|--------|--------------|--------|
+| **35** | [Galeria de Templates & Digital Twin](./tasks/35_template_gallery.md) | [ ] | 07 | `task/35-template-gallery` |
+| **36** | [Retomada Automática & Tela Inicial](./tasks/36_work_resumption.md) | [ ] | 35 | `task/36-work-resumption` |
+
+### Fase 8: Atributos de Estilo (Opcionais/Futuro)
+| ID | Task | Status | Dependências | Branch |
+|----|------|--------|--------------|--------|
+| **38** | [Tipografia Avançada (Leading/Tracking)](./tasks/38_adv_typography.md) | [ ] | — | `task/38-typography` |
+| **39** | [Efeitos Prism (Sombras/Glow)](./tasks/39_prism_effects.md) | [ ] | — | `task/39-prism-effects` |
+
+### Fase 9: Padronização Estrita (Inventário v1.1)
+| ID | Task | Status | Dependências | Branch |
+|----|------|--------|--------------|--------|
+| **41** | [Modelos Unificados (Sync Inventory)](./tasks/41_unified_models.md) | [ ] | 02 | `task/41-models-sync` |
+| **42** | [BorderElement (Standalone Moldura)](./tasks/42_border_element.md) | [ ] | 41 | `task/42-border-element` |
+| **43** | [Renderers Avançados (Shapes & Blending)](./tasks/43_adv_renderers.md) | [ ] | 12 | `task/43-adv-renderers` |
+| **44** | [TextElement Pro (Overflow & Vertical)](./tasks/44_text_pro.md) | [ ] | 12 | `task/44-text-pro` |
 
 ---
 
 ## Notas de Orquestração
-- **Sons Recomendados:** 
-  - Cliques: `click_mechanical` ou `switch_on`.
-  - Sucesso/Salvo: `action_complete`.
-  - Erro/Overflow: `error_alert`.
-  - Undo/Redo: `history_shuffling`.
+- **Redundância:** A Task 37 foi fundida com a 41. A Task 32 foi fundida com a 42.
+- **Prioridade:** Recomenda-se focar na **Fase 6 (Arquitetura)** para solidificar a base antes de expandir estilos.
