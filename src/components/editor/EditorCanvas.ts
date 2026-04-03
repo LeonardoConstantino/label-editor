@@ -1,6 +1,7 @@
 import { store, AppState } from '../../core/Store';
 import eventBus from '../../core/EventBus';
 import { canvasRenderer } from '../../domain/services/CanvasRenderer';
+import { UISM } from '../../core/UISoundManager';
 
 /**
  * EditorCanvas: O Web Component que renderiza a etiqueta visualmente com layout Tactile Prism.
@@ -133,6 +134,8 @@ export class EditorCanvas extends HTMLElement {
 
     if (clickedElement) {
       eventBus.emit('element:select', clickedElement.id);
+
+      UISM.play(UISM.enumPresets.TAP);
     } else {
       eventBus.emit('element:select', []);
     }

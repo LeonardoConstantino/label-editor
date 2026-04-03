@@ -42,7 +42,7 @@ export class AppButton extends HTMLElement {
   private setupEvents(): void {
     this.button.addEventListener('click', () => {
       if (this.hasAttribute('disabled')) return;
-      UISM.play(UISM.enumPresets.TAP);
+      UISM.play(UISM.enumPresets.CLICK);
     });
   }
 
