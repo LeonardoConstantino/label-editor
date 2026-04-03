@@ -22,7 +22,7 @@ Este arquivo coordena a execução de tarefas para a excelência técnica, visua
 |----|------|--------|--------------|--------|
 | **20** | [Auditoria de Componentes Core](./tasks/20_ui_audit.md) | [x] | — | `task/20-ui-audit` |
 | **21** | [Refinamento de Profundidade](./tasks/21_cockpit_depth.md) | [x] | — | `task/21-cockpit-refinement` |
-| **22** | [Sincronização de Temas & Variáveis](./tasks/22_theme_sync.md) | [ ] | — | `task/22-theme-sync` |
+| **22** | [Sincronização de Temas & Variáveis](./tasks/22_theme_sync.md) | [x] | — | `task/22-theme-sync` |
 | **23** | [Acessibilidade & Atalhos de Teclado](./tasks/23_shortcuts_acc.md) | [ ] | — | `task/23-shortcuts` |
 | **27** | [Personalização e Limites do Canvas](./tasks/27_canvas_limits.md) | [ ] | — | `task/27-canvas-limits` |
 
@@ -63,6 +63,7 @@ Este arquivo coordena a execução de tarefas para a excelência técnica, visua
 | **42** | [BorderElement (Standalone Moldura)](./tasks/42_border_element.md) | [ ] | 41 | `task/42-border-element` |
 | **43** | [Renderers Avançados (Shapes & Blending)](./tasks/43_adv_renderers.md) | [ ] | 12 | `task/43-adv-renderers` |
 | **44** | [TextElement Pro (Overflow & Vertical)](./tasks/44_text_pro.md) | [ ] | 12 | `task/44-text-pro` |
+| **45** | [Tooltips da Toolbar (Power User)](./tasks/45_toolbar_tooltips.md) | [ ] | 20 | `task/45-toolbar-tooltips` |
 
 ---
 

@@ -55,39 +55,131 @@ export class EditorToolbar extends HTMLElement {
         app-button {
           --btn-padding: 8px 12px;
         }
+        .tooltip-rich-panel {
+          width: 200px;
+          padding: 4px;
+        }
       </style>
       
       <!-- Grupo de Criação -->
-      <app-button id="add-text" variant="secondary" title="Add Text">
-        <ui-icon name="text"></ui-icon>
-      </app-button>
-      <app-button id="add-rect" variant="secondary" title="Add Rectangle">
-        <ui-icon name="rect"></ui-icon>
-      </app-button>
-      <app-button id="add-image" variant="secondary" title="Add Image">
-        <ui-icon name="image"></ui-icon>
-      </app-button>
+      <ui-tooltip placement="bottom" delay="300">
+        <app-button slot="target" id="add-text" variant="secondary">
+          <ui-icon name="text"></ui-icon>
+        </app-button>
+        <div slot="content" class="tooltip-rich-panel">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-text-main text-[12px] font-semibold tracking-wide">Texto</span>
+            <kbd class="kbd-prism">T</kbd>
+          </div>
+          <p class="text-text-muted text-[10px] leading-relaxed">
+            Adiciona uma nova camada de texto dinâmico ou estático.
+          </p>
+        </div>
+      </ui-tooltip>
+
+      <ui-tooltip placement="bottom" delay="300">
+        <app-button slot="target" id="add-rect" variant="secondary">
+          <ui-icon name="rect"></ui-icon>
+        </app-button>
+        <div slot="content" class="tooltip-rich-panel">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-text-main text-[12px] font-semibold tracking-wide">Retângulo</span>
+            <kbd class="kbd-prism">R</kbd>
+          </div>
+          <p class="text-text-muted text-[10px] leading-relaxed">
+            Desenha um retângulo no canvas. Segure <kbd class="kbd-prism text-[8px] px-1 py-0 shadow-none">Shift</kbd> para quadrado.
+          </p>
+        </div>
+      </ui-tooltip>
+
+      <ui-tooltip placement="bottom" delay="300">
+        <app-button slot="target" id="add-image" variant="secondary">
+          <ui-icon name="image"></ui-icon>
+        </app-button>
+        <div slot="content" class="tooltip-rich-panel">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-text-main text-[12px] font-semibold tracking-wide">Imagem</span>
+            <kbd class="kbd-prism">I</kbd>
+          </div>
+          <p class="text-text-muted text-[10px] leading-relaxed">
+            Importa um arquivo local de imagem ou logotipo para a etiqueta.
+          </p>
+        </div>
+      </ui-tooltip>
       
       <div class="divider"></div>
       
       <!-- Grupo de Histórico -->
-      <app-button id="undo" variant="secondary" disabled title="Undo">
-        <ui-icon name="undo"></ui-icon>
-      </app-button>
-      <app-button id="redo" variant="secondary" disabled title="Redo">
-        <ui-icon name="redo"></ui-icon>
-      </app-button>
+      <ui-tooltip placement="bottom" delay="300">
+        <app-button slot="target" id="undo" variant="secondary" disabled>
+          <ui-icon name="undo"></ui-icon>
+        </app-button>
+        <div slot="content" class="tooltip-rich-panel">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-text-main text-[12px] font-semibold tracking-wide">Desfazer</span>
+            <div class="flex gap-1">
+              <kbd class="kbd-prism">Ctrl</kbd><span class="text-text-muted">+</span><kbd class="kbd-prism">Z</kbd>
+            </div>
+          </div>
+          <p class="text-text-muted text-[10px] leading-relaxed">
+            Reverte a última modificação realizada no design.
+          </p>
+        </div>
+      </ui-tooltip>
+
+      <ui-tooltip placement="bottom" delay="300">
+        <app-button slot="target" id="redo" variant="secondary" disabled>
+          <ui-icon name="redo"></ui-icon>
+        </app-button>
+        <div slot="content" class="tooltip-rich-panel">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-text-main text-[12px] font-semibold tracking-wide">Refazer</span>
+            <div class="flex gap-1">
+              <kbd class="kbd-prism">Ctrl</kbd><span class="text-text-muted">+</span><kbd class="kbd-prism">Y</kbd>
+            </div>
+          </div>
+          <p class="text-text-muted text-[10px] leading-relaxed">
+            Restaura a ação que foi desfeita anteriormente.
+          </p>
+        </div>
+      </ui-tooltip>
       
       <div class="divider"></div>
       
       <!-- Ações Primárias -->
-      <app-button id="save" variant="secondary" title="Save Template">
-        <ui-icon name="save"></ui-icon>
-      </app-button>
+      <ui-tooltip placement="bottom" delay="300">
+        <app-button slot="target" id="save" variant="secondary">
+          <ui-icon name="save"></ui-icon>
+        </app-button>
+        <div slot="content" class="tooltip-rich-panel">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-text-main text-[12px] font-semibold tracking-wide">Salvar</span>
+            <div class="flex gap-1">
+              <kbd class="kbd-prism">Ctrl</kbd><span class="text-text-muted">+</span><kbd class="kbd-prism">S</kbd>
+            </div>
+          </div>
+          <p class="text-text-muted text-[10px] leading-relaxed">
+            Persiste o design atual no banco de dados local do navegador.
+          </p>
+        </div>
+      </ui-tooltip>
       
-      <app-button id="open-batch" variant="success" style="margin-left: 4px;">
-        GENERATE PDF
-      </app-button>
+      <ui-tooltip placement="bottom" delay="300">
+        <app-button slot="target" id="open-batch" variant="success" style="margin-left: 4px;">
+          GENERATE PDF
+        </app-button>
+        <div slot="content" class="tooltip-rich-panel">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-text-main text-[12px] font-semibold tracking-wide">Gerar Lote</span>
+            <div class="flex gap-1">
+              <kbd class="kbd-prism">Ctrl</kbd><span class="text-text-muted">+</span><kbd class="kbd-prism">E</kbd>
+            </div>
+          </div>
+          <p class="text-text-muted text-[10px] leading-relaxed">
+            Renderiza múltiplas etiquetas em alta qualidade para impressão.
+          </p>
+        </div>
+      </ui-tooltip>
       
       <input type="file" id="file-input" style="display: none;" accept="image/*">
     `;
