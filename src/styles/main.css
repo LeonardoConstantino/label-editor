@@ -58,19 +58,25 @@
     @apply relative w-full h-dvh overflow-hidden bg-canvas;
   }
 
-  /* O Canvas Infinito */
+  /* O Canvas Infinito com Dot Grid Sutil e Técnico */
   .canvas-workspace {
     @apply absolute inset-0 z-0 flex items-center justify-center overflow-auto;
-    background-image: radial-gradient(
-      var(--color-border-ui) 1px,
-      transparent 0
-    );
+    background-image:
+      radial-gradient(
+        circle,
+        rgba(38, 42, 51, 0.4) 1px,
+        transparent 1px
+      );
     background-size: 24px 24px;
+    box-shadow: inset 0 0 120px rgba(0, 0, 0, 0.6);
   }
 
-  /* A Etiqueta Física */
+  /* A Etiqueta Física - Flutuação Visual */
   .label-artboard {
-    @apply bg-white shadow-[0_25px_50px_-12px_rgba(0,0,0,0.9)] relative overflow-hidden;
+    @apply bg-white relative overflow-hidden;
+    box-shadow:
+      0 25px 50px -12px rgba(0, 0, 0, 0.9),
+      0 0 0 1px rgba(0, 0, 0, 0.05);
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
     transition: transform 0.4s var(--ease-spring);
@@ -78,14 +84,17 @@
 
   /* Toolbar Flutuante (Pílula) */
   .toolbar-pill {
-    @apply absolute top-6 left-6 z-50 flex items-center gap-2 p-2 bg-surface-solid/90 backdrop-blur-md rounded-2xl border border-border-ui shadow-panel;
+    @apply absolute top-6 left-6 z-50 flex items-center gap-2 p-2 rounded-2xl border border-border-ui shadow-panel;
+    background-color: rgba(22, 25, 32, 0.85);
+    backdrop-filter: blur(16px);
   }
 
   /* Painel Lateral Glassmorphic */
   .panel-glass {
-    @apply absolute top-0 right-0 h-full w-[340px] z-40 p-6 border-l border-border-ui flex flex-col shrink-0;
-    background-color: var(--color-surface);
+    @apply absolute top-0 right-0 h-full w-[340px] z-40 p-6 flex flex-col shrink-0;
+    background-color: rgba(22, 25, 32, 0.75);
     backdrop-filter: blur(24px);
+    border-left: 1px solid var(--color-border-ui);
     box-shadow: -10px 0 40px rgba(0, 0, 0, 0.5);
     transition: transform 0.4s var(--ease-spring);
   }

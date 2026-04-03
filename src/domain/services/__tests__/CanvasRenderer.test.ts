@@ -5,15 +5,15 @@ import { ElementType } from '../../models/elements/BaseElement';
 // Mock do canvas-txt antes de importar o TextRenderer
 beforeAll(() => {
   (global as any).canvasTxt = {
-    drawText: vi.fn((ctx, text, x, y, w, h, opts) => {
-      // Simula o comportamento do canvas-txt que centraliza o texto
+    drawText: vi.fn((ctx, text, config) => {
+      // Simula o comportamento do canvas-txt v4 API que centraliza o texto
       ctx.save();
-      ctx.fillStyle = opts.fillStyle || '#000';
-      ctx.font = `${opts.fontWeight || 'normal'} ${opts.fontSize}px ${opts.fontFamily}`;
+      ctx.fillStyle = config.fillStyle || '#000';
+      ctx.font = `${config.fontWeight || 'normal'} ${config.fontSize}px ${config.fontFamily}`;
       ctx.textBaseline = 'middle';
-      ctx.textAlign = opts.align || 'left';
+      ctx.textAlign = config.align || 'left';
       // canvas-txt usa x + width/2 para centralização
-      ctx.fillText(text, x + w / 2, y + h / 2);
+      ctx.fillText(text, config.x + config.width / 2, config.y + config.height / 2);
       ctx.restore();
     })
   };
