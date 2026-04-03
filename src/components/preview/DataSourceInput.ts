@@ -26,33 +26,6 @@ export class DataSourceInput extends HTMLElement {
       <style>
         @import "/src/styles/main.css";
         
-        :host {
-          display: flex;
-          flex-direction: column;
-          height: 80vh;
-          width: 1000px;
-          max-width: 90vw;
-          margin: -24px;
-          background: var(--color-canvas);
-          overflow: hidden;
-        }
-
-        .studio-layout {
-          display: flex;
-          flex: 1;
-          overflow: hidden;
-        }
-
-        .data-sidebar {
-          width: 320px;
-          background: var(--color-surface);
-          border-right: 1px solid var(--color-border-ui);
-          padding: 24px;
-          display: flex;
-          flex-direction: column;
-          gap: 20px;
-        }
-
         textarea {
           flex: 1;
           background: rgba(0, 0, 0, 0.3);
@@ -68,51 +41,6 @@ export class DataSourceInput extends HTMLElement {
         }
         textarea:focus { border-color: var(--color-accent-primary); }
 
-        .preview-workspace {
-          flex: 1;
-          padding: 40px;
-          overflow-y: auto;
-          background-image: radial-gradient(var(--color-border-ui) 1px, transparent 0);
-          background-size: 20px 24px;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-        }
-
-        .preview-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-          gap: 32px;
-          width: 100%;
-        }
-
-        .preview-item {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 12px;
-          animation: popIn 0.4s var(--ease-spring) both;
-        }
-
-        .label-thumb {
-          background: white;
-          box-shadow: 0 15px 35px rgba(0,0,0,0.6);
-          border-radius: 2px;
-          overflow: hidden;
-          position: relative;
-        }
-
-        .studio-footer {
-          height: 72px;
-          background: var(--color-surface-solid);
-          border-top: 1px solid var(--color-border-ui);
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 0 32px;
-          z-index: 10;
-        }
-
         .status-badge {
           font-family: var(--font-mono);
           font-size: 10px;
@@ -124,41 +52,38 @@ export class DataSourceInput extends HTMLElement {
         }
 
         .index-tag { font-family: var(--font-mono); font-size: 9px; color: var(--color-text-muted); text-transform: uppercase; }
-
-        @keyframes popIn {
-          from { opacity: 0; transform: scale(0.9) translateY(10px); }
-          to { opacity: 1; transform: scale(1) translateY(0); }
-        }
       </style>
 
-      <div class="studio-layout">
-        <div class="data-sidebar">
-          <div>
-            <h4 class="label-prism">Data Source</h4>
-            <p style="font-size: 11px; color: var(--color-text-muted); margin-bottom: 12px;">
-              Enter one name per line to substitute <kbd class="kbd-prism">{{nome}}</kbd>
-            </p>
+      <div class="studio-container">
+        <div class="studio-main">
+          <div class="studio-sidebar">
+            <div>
+              <h4 class="label-prism">Data Source</h4>
+              <p style="font-size: 11px; color: var(--color-text-muted); margin-bottom: 12px;">
+                Enter one name per line to substitute <kbd class="kbd-prism">{{nome}}</kbd>
+              </p>
+            </div>
+            <textarea id="data-input" placeholder="Line 1&#10;Line 2&#10;..."></textarea>
+            <div class="status-badge" id="data-status">0 records detected</div>
           </div>
-          <textarea id="data-input" placeholder="Line 1&#10;Line 2&#10;..."></textarea>
-          <div class="status-badge" id="data-status">0 records detected</div>
-        </div>
 
-        <div class="preview-workspace">
-          <div id="preview-grid" class="preview-grid">
-            <div style="grid-column: 1/-1; text-align: center; color: var(--color-text-muted); margin-top: 100px;">
-              Waiting for data...
+          <div class="studio-preview">
+            <div id="preview-grid" class="preview-grid">
+              <div style="grid-column: 1/-1; text-align: center; color: var(--color-text-muted); margin-top: 100px;">
+                Waiting for data...
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div class="studio-footer">
-        <div class="status-badge" id="batch-summary">READY TO PROCESS</div>
-        <div style="display: flex; gap: 12px;">
-          <app-button id="btn-close" variant="secondary">CANCEL</app-button>
-          <app-button id="btn-generate" variant="success" style="padding: 0 32px;">
-            ⚡ GENERATE PDF
-          </app-button>
+        <div class="studio-footer">
+          <div class="status-badge" id="batch-summary">READY TO PROCESS</div>
+          <div style="display: flex; gap: 12px;">
+            <app-button id="btn-close" variant="secondary">CANCEL</app-button>
+            <app-button id="btn-generate" variant="success" style="padding: 0 32px;">
+              ⚡ GENERATE PDF
+            </app-button>
+          </div>
         </div>
       </div>
     `;
@@ -214,11 +139,10 @@ export class DataSourceInput extends HTMLElement {
 
     this.dataList.slice(0, maxPreviews).forEach((data, i) => {
       const item = document.createElement('div');
-      item.className = 'preview-item';
+      item.className = 'preview-card';
       
       const thumb = document.createElement('div');
-      thumb.className = 'label-thumb';
-      thumb.style.width = '100%';
+      thumb.className = 'label-thumbnail';
       thumb.style.aspectRatio = `${label.config.widthMM} / ${label.config.heightMM}`;
       
       const canvas = document.createElement('canvas');

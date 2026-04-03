@@ -36,17 +36,60 @@
   body {
     @apply font-sans antialiased bg-canvas text-text-main overflow-hidden select-none;
   }
-
-  /* Scrollbars Estilo Hardware Escuro */
-  ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+  
+  /* ==========================================
+     FIREFOX (Padrão W3C)
+     ========================================== */
+  * {
+    scrollbar-width: thin; /* Deixa a barra fina */
+    /* Cor do Thumb (carrinho) e Cor do Track (fundo) */
+    scrollbar-color: var(--color-border-ui) transparent;
   }
+
+  /* ==========================================
+     CHROME, EDGE, SAFARI (Webkit)
+     ========================================== */
+
+  /* 1. Largura e Altura global da barra */
+  ::-webkit-scrollbar {
+    width: 10px; /* Rolagem vertical */
+    height: 10px; /* Rolagem horizontal (ex: no Canvas) */
+  }
+
+  /* 2. O Trilho (Fundo da barra) */
   ::-webkit-scrollbar-track {
     background: transparent;
+    /* Margem para a barra não bater nos topos e fundos dos painéis */
+    margin: 4px;
   }
+
+  /* 3. O Carrinho (Thumb) - Estado Padrão */
   ::-webkit-scrollbar-thumb {
-    @apply bg-border-ui rounded-full hover:bg-text-muted transition-colors;
+    background-color: var(--color-border-ui);
+    border-radius: 99px; /* Formato de pílula arredondada */
+
+    /* O Truque do "Floating Thumb": 
+       Adicionamos uma borda transparente e limitamos o background ao padding.
+       Isso faz a barra visualmente fina (6px), mas mantém a área de clique em 10px! */
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+
+  /* 4. O Carrinho - Estado Hover (Mouse em cima) */
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: var(
+      --color-text-muted
+    ); /* Acende para um cinza mais claro */
+  }
+
+  /* 5. O Carrinho - Estado Active (Clicando e Arrastando - O Juice!) */
+  ::-webkit-scrollbar-thumb:active {
+    background-color: var(--color-accent-primary); /* Acende em Indigo Neon! */
+  }
+
+  /* 6. O Canto (Onde a barra vertical e horizontal se encontram) */
+  ::-webkit-scrollbar-corner {
+    background: transparent;
   }
 }
 
@@ -61,12 +104,11 @@
   /* O Canvas Infinito com Dot Grid Sutil e Técnico */
   .canvas-workspace {
     @apply absolute inset-0 z-0 flex items-center justify-center overflow-auto;
-    background-image:
-      radial-gradient(
-        circle,
-        rgba(38, 42, 51, 0.4) 1px,
-        transparent 1px
-      );
+    background-image: radial-gradient(
+      circle,
+      rgba(38, 42, 51, 0.4) 1px,
+      transparent 1px
+    );
     background-size: 24px 24px;
     box-shadow: inset 0 0 120px rgba(0, 0, 0, 0.6);
   }
@@ -277,6 +319,132 @@
       inset 0 2px 6px rgba(0, 0, 0, 0.4),
       0 0 0 1px var(--color-accent-primary),
       0 0 12px rgba(99, 102, 241, 0.2);
+  }
+}
+
+/* ==========================================
+   ADVANCED UI: INSPECTOR & EDITOR SPECIFIC
+   ========================================== */
+@layer components {
+  .inspector-header {
+    @apply flex justify-between items-center mb-3;
+  }
+  .inspector-title-group {
+    @apply flex items-center gap-2;
+  }
+  .inspector-title {
+    @apply font-mono text-[10px] uppercase text-text-muted tracking-widest;
+  }
+  .inspector-badge {
+    @apply font-mono text-[9px] text-text-muted/50 bg-black/20 px-1.5 py-0.5 rounded uppercase;
+  }
+
+  .blueprint-box {
+    @apply relative w-full h-45 bg-[#0a0c10] border border-border-ui rounded-xl flex items-center justify-center mb-6 overflow-hidden;
+  }
+  .blueprint-grid {
+    @apply absolute inset-0 pointer-events-none;
+    background-image: radial-gradient(
+      rgba(255, 255, 255, 0.05) 1px,
+      transparent 0
+    );
+    background-size: 16px 16px;
+  }
+  .blueprint-paper {
+    @apply bg-white shadow-panel transition-all duration-400 rounded-xs;
+    transition-timing-function: var(--ease-spring);
+  }
+  .dimension-line {
+    @apply absolute bg-accent-primary opacity-60;
+  }
+
+  .element-card {
+    @apply bg-surface-solid border border-border-ui rounded-xl overflow-hidden transition-all duration-400 mb-2;
+    transition-timing-function: var(--ease-spring);
+  }
+  .element-card.selected {
+    @apply border-accent-primary scale-[1.02] z-10 shadow-neon-primary;
+  }
+  .card-header {
+    @apply p-3 flex items-center gap-2.5 cursor-pointer select-none hover:bg-white/5;
+  }
+  .card-content {
+    @apply px-3 pb-4 pt-1 border-t border-border-ui hidden;
+    animation: slideDown 0.3s var(--ease-spring);
+  }
+  .element-card.selected .card-content {
+    @apply block;
+  }
+
+  .type-tag {
+    @apply font-mono text-[8px] px-1.5 py-0.5 rounded bg-accent-primary/10 text-accent-primary uppercase;
+  }
+  .layer-name {
+    @apply flex-1 text-xs font-medium truncate;
+  }
+
+  .row-ui {
+    @apply flex gap-2.5 mb-2;
+  }
+
+  /* Keyframes para animações tácteis */
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+/* ==========================================
+   BATCH STUDIO (Takeover Layout)
+   ========================================== */
+@layer components {
+  .studio-container {
+    @apply flex flex-col h-[80vh] w-250 max-w-[90vw] -m-6 bg-canvas overflow-hidden;
+  }
+  .studio-main {
+    @apply flex flex-1 overflow-hidden;
+  }
+  .studio-sidebar {
+    @apply w-80 bg-surface/50 border-r border-border-ui p-6 flex flex-col gap-5;
+  }
+  .studio-preview {
+    @apply flex-1 p-10 overflow-y-auto flex flex-col items-center;
+    background-image: radial-gradient(
+      var(--color-border-ui) 1px,
+      transparent 0
+    );
+    background-size: 20px 24px;
+  }
+  .studio-footer {
+    @apply h-[72px] bg-surface-solid border-t border-border-ui flex items-center justify-between px-8 z-10;
+  }
+
+  .preview-grid {
+    @apply grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-8 w-full;
+  }
+  .preview-card {
+    @apply flex flex-col items-center gap-3;
+    animation: popIn 0.4s var(--ease-spring) both;
+  }
+  .label-thumbnail {
+    @apply bg-white shadow-[0_15px_35px_rgba(0,0,0,0.6)] rounded-xs overflow-hidden relative w-full;
+  }
+
+  @keyframes popIn {
+    from {
+      opacity: 0;
+      transform: scale(0.9) translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
   }
 }
 

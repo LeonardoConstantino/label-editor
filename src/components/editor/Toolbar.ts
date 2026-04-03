@@ -47,16 +47,13 @@ export class EditorToolbar extends HTMLElement {
         }
         .divider {
           width: 1px;
-          height: 24px;
+          height: 20px;
           background-color: var(--color-border-ui);
-          margin: 0 8px;
-          opacity: 0.5;
+          margin: 0 6px;
+          opacity: 0.6;
         }
         app-button {
           --btn-padding: 8px 12px;
-        }
-        #open-batch {
-          margin-left: 4px;
         }
       </style>
       
@@ -88,7 +85,7 @@ export class EditorToolbar extends HTMLElement {
         <ui-icon name="save"></ui-icon>
       </app-button>
       
-      <app-button id="open-batch" variant="success">
+      <app-button id="open-batch" variant="success" style="margin-left: 4px;">
         GENERATE PDF
       </app-button>
       

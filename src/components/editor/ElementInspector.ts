@@ -16,7 +16,6 @@ import '../common/tooltip';
 export class ElementInspector extends HTMLElement {
   private unsubscribe: (() => void) | null = null;
   private currentElementsJson: string = '';
-  private currentConfigJson: string = '';
   private currentSelectedId: string | null = null;
   private overflowWarnings: Map<string, OverflowResult> = new Map();
 
@@ -41,8 +40,6 @@ export class ElementInspector extends HTMLElement {
       const selectedId = state.selectedElementIds[0] || null;
 
       const elementsStructureJson = JSON.stringify(elements.map(e => ({ id: e.id, z: e.zIndex, type: e.type, v: e.visible })));
-      const configJson = JSON.stringify(config);
-
       const hasStructureChanged = elementsStructureJson !== this.currentElementsJson || selectedId !== this.currentSelectedId;
 
       if (hasStructureChanged) {
@@ -71,37 +68,8 @@ export class ElementInspector extends HTMLElement {
       <style>
         @import "/src/styles/main.css";
         :host { display: flex; flex-direction: column; height: 100%; gap: 16px; padding: 24px; box-sizing: border-box; }
-        .header-main { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-        .title-group { display: flex; align-items: center; gap: 8px; }
-        .panel-title { font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; color: var(--color-text-muted); letter-spacing: 0.1em; }
-        .unit-count { font-family: var(--font-mono); font-size: 9px; color: var(--color-text-muted); opacity: 0.5; background: rgba(0,0,0,0.2); padding: 2px 6px; border-radius: 4px; }
-        
         #panel-content { display: flex; flex-direction: column; gap: 8px; overflow-y: auto; flex: 1; padding-right: 4px; }
         
-        /* Blueprint & Cards Styles */
-        .blueprint-container { position: relative; width: 100%; height: 180px; background: #0a0c10; border: 1px solid var(--color-border-ui); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 24px; overflow: hidden; }
-        .blueprint-grid { position: absolute; inset: 0; background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 0); background-size: 16px 16px; pointer-events: none; }
-        .blueprint-label { background: white; box-shadow: var(--shadow-panel); transition: all 0.4s var(--ease-spring); border-radius: 2px; }
-        .dimension-line { position: absolute; background: var(--color-accent-primary); opacity: 0.6; }
-        .dim-h { width: 1px; top: 25%; bottom: 25%; right: 24px; }
-        .dim-w { height: 1px; left: 25%; right: 25%; top: 24px; }
-        
-        .element-card { background: var(--color-surface-solid); border: 1px solid var(--color-border-ui); border-radius: 12px; overflow: hidden; transition: all 0.4s var(--ease-spring); }
-        .element-card.selected { border-color: var(--color-accent-primary); box-shadow: var(--shadow-neon-primary); scale: 1.02; z-index: 10; }
-        .card-header { padding: 12px; display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; }
-        .card-header:hover { background: rgba(255, 255, 255, 0.03); }
-        .type-badge { font-family: var(--font-mono); font-size: 8px; padding: 2px 6px; border-radius: 4px; background: rgba(99, 102, 241, 0.1); color: var(--color-accent-primary); text-transform: uppercase; }
-        .element-name { flex: 1; font-size: 12px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .card-content { padding: 0 12px 16px 12px; display: none; border-top: 1px solid var(--color-border-ui); margin-top: 4px; animation: slideDown 0.3s var(--ease-spring); }
-        .element-card.selected .card-content { display: block; }
-        .warning-tag { color: var(--color-accent-warning); font-size: 10px; display: none; margin-right: 4px; }
-        .action-icon { opacity: 0.4; transition: opacity 0.2s; cursor: pointer; }
-        .action-icon.active { opacity: 1; color: var(--color-accent-primary); }
-        .section-title { font-family: var(--font-mono); font-size: 9px; text-transform: uppercase; color: var(--color-text-muted); margin: 16px 0 8px 0; }
-        .row { display: flex; gap: 10px; margin-bottom: 8px; }
-        
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-
         .help-btn { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; border-radius: 4px; color: var(--color-text-muted); cursor: help; background: transparent; border: none; transition: all 0.2s; }
         .help-btn:hover { color: var(--color-accent-primary); background: rgba(99, 102, 241, 0.1); }
         .tooltip-content { padding: 4px; border: 1px solid var(--color-border-ui); }
@@ -111,10 +79,10 @@ export class ElementInspector extends HTMLElement {
         .control-desc { font-size: 10px; color: var(--color-text-muted); }
         .math-note { display: flex; gap: 6px; margin-top: 8px; font-size: 9px; opacity: 0.8; }
       </style>
-      <div class="header-main">
-        <div class="title-group">
-          <span id="panel-title" class="panel-title">LAYERS & PRECISION</span>
-          <span id="unit-count" class="unit-count">0 UNITS</span>
+      <div class="inspector-header">
+        <div class="inspector-title-group">
+          <span id="panel-title" class="inspector-title">LAYERS & PRECISION</span>
+          <span id="unit-count" class="inspector-badge">0 UNITS</span>
         </div>
         
         <ui-tooltip placement="bottom" offset="12">
@@ -127,7 +95,7 @@ export class ElementInspector extends HTMLElement {
               <span style="color: white; font-weight: 600;">Technical Manual</span>
             </div>
             <div class="tooltip-section">
-              <p class="section-title" style="margin-top: 0;">Dimension Scrubbing</p>
+              <p class="label-prism" style="margin-top: 0;">Dimension Scrubbing</p>
               <div class="controls-grid">
                 <kbd class="kbd-prism">Drag</kbd> <span class="control-desc">Adjust ±1.0mm</span>
                 <kbd class="kbd-prism">Shift</kbd> <span class="control-desc">Fast ±10mm</span>
@@ -174,11 +142,11 @@ export class ElementInspector extends HTMLElement {
     if (simH > 40) { simH = 40; simW = 40 * ratio; }
 
     return `
-      <div class="blueprint-container">
+      <div class="blueprint-box">
         <div class="blueprint-grid"></div>
-        <div class="blueprint-label" style="width: ${simW}%; height: ${simH}%;"></div>
-        <div class="dimension-line dim-w" style="top: 20px;"></div>
-        <div class="dimension-line dim-h" style="right: 20px;"></div>
+        <div class="blueprint-paper" style="width: ${simW}%; height: ${simH}%;"></div>
+        <div class="dimension-line" style="height: 1px; left: 25%; right: 25%; top: 24px;"></div>
+        <div class="dimension-line" style="width: 1px; top: 25%; bottom: 25%; right: 24px;"></div>
         <div class="absolute top-1 flex justify-center w-full">
           <ui-number-scrubber label="W" property="widthMM" id="doc-width" value="${widthMM}" unit="mm" step="1" style="width: 100px;"></ui-number-scrubber>
         </div>
@@ -186,11 +154,11 @@ export class ElementInspector extends HTMLElement {
           <ui-number-scrubber label="H" property="heightMM" id="doc-height" value="${heightMM}" unit="mm" step="1" style="width: 100px; transform: rotate(90deg);"></ui-number-scrubber>
         </div>
       </div>
-      <div class="section-title">Global Configuration</div>
-      <div class="row">
+      <div class="label-prism">Global Configuration</div>
+      <div class="row-ui">
         <ui-number-scrubber label="DPI" property="dpi" id="doc-dpi" value="${label.config.dpi}" min="72" max="600" step="1" unit="dpi"></ui-number-scrubber>
       </div>
-      <div class="row">
+      <div class="row-ui">
         <ui-number-scrubber label="Zoom" property="previewScale" id="doc-zoom" value="${label.config.previewScale}" min="0.1" max="5" step="0.1" unit="x"></ui-number-scrubber>
       </div>
     `;
@@ -201,24 +169,24 @@ export class ElementInspector extends HTMLElement {
     return `
       <div class="element-card ${isSelected ? 'selected' : ''}" data-id="${el.id}">
         <div class="card-header">
-          <span class="type-badge">${el.type}</span>
-          <span class="element-name">${content}</span>
+          <span class="type-tag">${el.type}</span>
+          <span class="layer-name">${content}</span>
           <span class="warning-tag" data-warn-id="${el.id}">⚠</span>
-          <ui-icon name="text" class="action-icon ${el.visible !== false ? 'active' : ''}" data-action="toggle-vis" data-id="${el.id}" style="--icon-size: 14px;"></ui-icon>
+          <ui-icon name="text" class="action-icon ${el.visible !== false ? 'active' : ''}" data-action="toggle-vis" data-id="${el.id}" style="--icon-size: 14px; cursor: pointer; opacity: 0.4;"></ui-icon>
         </div>
         <div class="card-content">
-          <div class="section-title">Transform (mm)</div>
-          <div class="row">
+          <div class="label-prism">Transform (mm)</div>
+          <div class="row-ui">
             <ui-number-scrubber label="X" property="position.x" id="pos-x-${el.id}" value="${el.position.x}" step="0.1" unit="mm"></ui-number-scrubber>
             <ui-number-scrubber label="Y" property="position.y" id="pos-y-${el.id}" value="${el.position.y}" step="0.1" unit="mm"></ui-number-scrubber>
           </div>
           ${(el as any).dimensions ? `
-            <div class="row">
+            <div class="row-ui">
               <ui-number-scrubber label="W" property="dimensions.width" id="dim-w-${el.id}" value="${(el as any).dimensions.width}" min="1" step="0.1" unit="mm"></ui-number-scrubber>
               <ui-number-scrubber label="H" property="dimensions.height" id="dim-h-${el.id}" value="${(el as any).dimensions.height}" min="1" step="0.1" unit="mm"></ui-number-scrubber>
             </div>
           ` : ''}
-          <div class="section-title">Properties</div>
+          <div class="label-prism">Properties</div>
           ${(el as any).content !== undefined ? `<app-input label="Content" type="text" id="content-${el.id}" value="${(el as any).content}"></app-input>` : ''}
           ${(el as any).color || (el as any).fillColor ? `<app-input label="Color" type="color" id="color-${el.id}" value="${(el as any).color || (el as any).fillColor}"></app-input>` : ''}
           <div style="margin-top: 16px; display: flex; gap: 8px;">
@@ -245,7 +213,7 @@ export class ElementInspector extends HTMLElement {
       setScrubber('doc-height', config.heightMM);
       setScrubber('doc-dpi', config.dpi);
       setScrubber('doc-zoom', config.previewScale);
-      const thumb = shadow.querySelector('.blueprint-label') as HTMLElement;
+      const thumb = shadow.querySelector('.blueprint-paper') as HTMLElement;
       if (thumb) {
         const ratio = config.widthMM / config.heightMM;
         let simW = 60; let simH = 60 / ratio;
