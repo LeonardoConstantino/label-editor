@@ -21,7 +21,7 @@ Este arquivo coordena a execução de tarefas para a excelência técnica, visua
 | ID | Task | Status | Dependências | Branch |
 |----|------|--------|--------------|--------|
 | **20** | [Auditoria de Componentes Core](./tasks/20_ui_audit.md) | [x] | — | `task/20-ui-audit` |
-| **21** | [Refinamento de Profundidade](./tasks/21_cockpit_depth.md) | [ ] | — | `task/21-cockpit-refinement` |
+| **21** | [Refinamento de Profundidade](./tasks/21_cockpit_depth.md) | [x] | — | `task/21-cockpit-refinement` |
 | **22** | [Sincronização de Temas & Variáveis](./tasks/22_theme_sync.md) | [ ] | — | `task/22-theme-sync` |
 | **23** | [Acessibilidade & Atalhos de Teclado](./tasks/23_shortcuts_acc.md) | [ ] | — | `task/23-shortcuts` |
 | **27** | [Personalização e Limites do Canvas](./tasks/27_canvas_limits.md) | [ ] | — | `task/27-canvas-limits` |
