@@ -17,12 +17,26 @@ export class AppButton extends HTMLElement {
   }
 
   connectedCallback(): void {
+    this.setupBaseStyles();
     this.render();
     this.setupEvents();
   }
 
   attributeChangedCallback(): void {
     this.render();
+  }
+
+  private setupBaseStyles(): void {
+    if (!this.shadowRoot) return;
+    this.shadowRoot.innerHTML = `
+      <style>
+        @import "/src/styles/main.css";
+        :host { display: inline-block; width: auto; }
+        button { width: 100%; outline: none; }
+        button:disabled { opacity: 0.4; cursor: not-allowed; filter: grayscale(1); }
+      </style>
+    `;
+    this.shadowRoot.appendChild(this.button);
   }
 
   private setupEvents(): void {
@@ -33,36 +47,12 @@ export class AppButton extends HTMLElement {
   }
 
   private render(): void {
-    if (!this.shadowRoot) return;
-
     const variant = this.getAttribute('variant') || 'secondary';
     const isDisabled = this.hasAttribute('disabled');
-
-    this.shadowRoot.innerHTML = `
-      <style>
-        @import "/src/styles/main.css";
-
-        :host {
-          display: inline-block;
-        }
-
-        button {
-          width: 100%;
-        }
-
-        button:disabled {
-          opacity: 0.5;
-          cursor: not-allowed;
-          filter: grayscale(1);
-        }
-      </style>
-    `;
 
     this.button.className = `btn-prism btn-${variant}`;
     this.button.disabled = isDisabled;
     this.button.innerHTML = `<slot></slot>`;
-    
-    this.shadowRoot.appendChild(this.button);
   }
 }
 

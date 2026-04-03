@@ -104,7 +104,7 @@ export class ElementInspector extends HTMLElement {
 
         .help-btn { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; border-radius: 4px; color: var(--color-text-muted); cursor: help; background: transparent; border: none; transition: all 0.2s; }
         .help-btn:hover { color: var(--color-accent-primary); background: rgba(99, 102, 241, 0.1); }
-        .tooltip-content { padding: 4px; max-width: 200px; }
+        .tooltip-content { padding: 4px; border: 1px solid var(--color-border-ui); }
         .tooltip-header { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; font-size: 11px; }
         .tooltip-section { margin-bottom: 12px; }
         .controls-grid { display: grid; grid-template-columns: auto 1fr; gap: 8px; align-items: center; }
@@ -119,11 +119,11 @@ export class ElementInspector extends HTMLElement {
         
         <ui-tooltip placement="bottom" offset="12">
           <button slot="target" class="help-btn">
-            <ui-icon name="help" style="--icon-size: 14px;"></ui-icon>
+            <ui-icon name="help" size="md"></ui-icon>
           </button>
           <div slot="content" class="tooltip-content">
             <div class="tooltip-header">
-              <ui-icon name="save" style="--icon-size: 14px; color: var(--color-accent-primary);"></ui-icon>
+              <ui-icon name="save" size="md" style="--icon-color: var(--color-accent-primary);"></ui-icon>
               <span style="color: white; font-weight: 600;">Technical Manual</span>
             </div>
             <div class="tooltip-section">
@@ -134,8 +134,8 @@ export class ElementInspector extends HTMLElement {
                 <kbd class="kbd-prism">Alt</kbd> <span class="control-desc">Fine ±0.1mm</span>
               </div>
               <div class="math-note">
-                <ui-icon name="text" style="--icon-size: 10px;"></ui-icon>
-                <span>Supports math: <code style="color:white">100/2 + 5</code></span>
+                <ui-icon name="text" size="sm"></ui-icon>
+                <span>Supports math:</br><code style="color:white">100/2 + 5</code></span>
               </div>
             </div>
           </div>

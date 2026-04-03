@@ -1,3 +1,5 @@
+import { UISM } from '../../core/UISoundManager';
+
 /**
  * AppInput: Campo de entrada técnico com label integrada.
  * Otimizado para manter o foco durante atualizações.
@@ -10,7 +12,6 @@ export class AppInput extends HTMLElement {
     super();
     this.attachShadow({ mode: 'open' });
     
-    // Cria os elementos uma única vez
     this.labelElement = document.createElement('label');
     this.labelElement.className = 'label-prism';
     
@@ -63,8 +64,6 @@ export class AppInput extends HTMLElement {
     this.input.type = type;
     this.input.placeholder = placeholder;
     
-    // Crucial: Só atualiza o value se ele for realmente diferente do que o usuário digitou
-    // para não quebrar o cursor durante a digitação.
     if (this.input.value !== value) {
       this.input.value = value;
     }
@@ -72,6 +71,7 @@ export class AppInput extends HTMLElement {
 
   private setupEvents(): void {
     this.input.addEventListener('input', (e: any) => {
+      UISM.play(UISM.enumPresets.TAP); // Som sutil de digitação
       this.dispatchEvent(new CustomEvent('app-input', {
         detail: e.target.value,
         bubbles: true,

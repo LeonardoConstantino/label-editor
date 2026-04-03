@@ -304,17 +304,16 @@ const STYLE: string = /* css */ `
 `;
 
 const HTML: string = /* html */ `
-  <div class="overlay" role="dialog" aria-modal="true"
-       aria-labelledby="modal-title" aria-describedby="modal-body" part="dialog">
+  <div class="overlay"aria-hidden="true" aria-labelledby="modal-title" aria-describedby="modal-body" part="dialog">
 
-    <div class="panel" part="panel">
+    <div class="panel" role="dialog" aria-modal="true"  part="panel">
       <div class="stripe" aria-hidden="true"></div>
 
       <header class="header" part="header">
         <span class="icon-badge" aria-hidden="true"></span>
         <div class="title-wrap">
           <slot name="header">
-            <span id="modal-title" class="title"></span>
+            <span id="modal-title" class="title" part="title"></span>
           </slot>
         </div>
         <button class="close-btn" part="close-btn"
@@ -363,10 +362,6 @@ export class UiModal extends HTMLElement {
   #busy: boolean = false;
   #initDone: boolean = false;
   #prevFocus: Element | null = null;
-
-  // ── Form association ───────────────────────────────────────────────────────
-
-  static readonly formAssociated: boolean = true;
 
   // ── Atributos observados ───────────────────────────────────────────────────
 
@@ -468,9 +463,7 @@ export class UiModal extends HTMLElement {
         const shouldOpen = newVal !== null;
         if (shouldOpen && !this.#isVisible && !this.#busy) this.#doOpen();
         if (!shouldOpen && this.#isVisible && !this.#busy) this.#doClose();
-
-        UISM.play(UISM.enumPresets.SWOOSHIN);
-        
+        UISM.play(UISM.enumPresets.SWOOSHIN); // ← toca SWOOSHIN ao fechar também
         break;
       }
     }
@@ -635,7 +628,7 @@ export class UiModal extends HTMLElement {
     this.#overlay.classList.replace('is-open', 'is-closing');
 
     const dur = this.#parseDuration(
-      getComputedStyle(this.#shadow.host).getPropertyValue('--modal-duration'),
+      getComputedStyle(this.#overlay).getPropertyValue('--_dur'),
     );
 
     setTimeout(() => {
@@ -654,9 +647,7 @@ export class UiModal extends HTMLElement {
 
   #cancel(): void {
     if (!this.#isVisible || this.#busy) return;
-    this.#busy = true;
     this.removeAttribute('open');
-    this.#doClose(true);
   }
 
   /**
@@ -692,8 +683,10 @@ export class UiModal extends HTMLElement {
 
     const first = focusable[0]!;
     const last = focusable[focusable.length - 1]!;
-    const active = (this.#shadow.activeElement ??
-      document.activeElement) as HTMLElement | null;
+    const active =
+      this.#shadow.activeElement instanceof HTMLSlotElement
+        ? (document.activeElement as HTMLElement)
+        : (this.#shadow.activeElement as HTMLElement);
 
     // Foco fora do modal → retorna ao início
     if (!active || !focusable.includes(active)) {

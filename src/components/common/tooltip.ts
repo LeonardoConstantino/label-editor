@@ -102,10 +102,10 @@ balloonStyles.replaceSync(`
     border-top: none; border-left: none;
   }
 
-  :host([data-placement="top"]) [part="arrow"] { bottom: -5px; left: 50%; transform: translateX(-50%) rotate(45deg); }
-  :host([data-placement="bottom"]) [part="arrow"] { top: -5px; left: 50%; transform: translateX(-50%) rotate(-135deg); }
-  :host([data-placement="left"]) [part="arrow"] { right: -5px; top: 50%; transform: translateY(-50%) rotate(-45deg); }
-  :host([data-placement="right"]) [part="arrow"] { left: -5px; top: 50%; transform: translateY(-50%) rotate(135deg); }
+  :host([data-placement="top"])    [part="arrow"] { bottom: -5px; left: var(--arrow-offset, 50%); transform: translateX(-50%) rotate(45deg); }
+  :host([data-placement="bottom"]) [part="arrow"] { top: -5px;    left: var(--arrow-offset, 50%); transform: translateX(-50%) rotate(-135deg); }
+  :host([data-placement="left"])   [part="arrow"] { right: -5px;  top:  var(--arrow-offset, 50%); transform: translateY(-50%) rotate(-45deg); }
+  :host([data-placement="right"])  [part="arrow"] { left: -5px;   top:  var(--arrow-offset, 50%); transform: translateY(-50%) rotate(135deg); }
 
   [part="content"] {
     display: block;
@@ -253,6 +253,7 @@ class TooltipBalloon extends HTMLElement {
   position(targetRect: DOMRect, placement: Placement, offset: number): void {
     const tipRect = this.getBoundingClientRect();
     const arrowSize = 6;
+    const margin = 8; // distância mínima da borda da viewport
     const vw = window.innerWidth;
     const vh = window.innerHeight;
 
@@ -260,14 +261,13 @@ class TooltipBalloon extends HTMLElement {
     let chosen: Placement | null = null;
     let coords: Coordinates | null = null;
 
-    // Tenta cada posição na ordem de preferência até encontrar uma que caiba na viewport
     for (const p of order) {
       const c = this.#calcCoords(targetRect, tipRect, p, offset, arrowSize);
       if (
-        c.top >= 4 &&
-        c.left >= 4 &&
-        c.top + tipRect.height <= vh - 4 &&
-        c.left + tipRect.width <= vw - 4
+        c.top >= margin &&
+        c.left >= margin &&
+        c.top + tipRect.height <= vh - margin &&
+        c.left + tipRect.width <= vw - margin
       ) {
         chosen = p;
         coords = c;
@@ -275,7 +275,6 @@ class TooltipBalloon extends HTMLElement {
       }
     }
 
-    // Fallback: usa posição preferida mesmo que não caiba perfeitamente
     if (!chosen) {
       chosen = placement;
       coords = this.#calcCoords(
@@ -287,9 +286,39 @@ class TooltipBalloon extends HTMLElement {
       );
     }
 
+    // --- NOVO: clamp dentro da viewport com margem de segurança ---
+    const raw = coords!;
+    const clampedLeft = Math.min(
+      Math.max(raw.left, margin),
+      vw - tipRect.width - margin,
+    );
+    const clampedTop = Math.min(
+      Math.max(raw.top, margin),
+      vh - tipRect.height - margin,
+    );
+
+    // Calcula o offset da seta para compensar o deslocamento do clamp.
+    // Para placements top/bottom: seta segue o centro horizontal do target.
+    // Para placements left/right: seta segue o centro vertical do target.
+    const arrowMinPct = 10; // evita seta colada no canto do balloon (em %)
+    const arrowMaxPct = 90;
+
+    if (chosen === 'top' || chosen === 'bottom') {
+      const targetCenterX = targetRect.left + targetRect.width / 2;
+      const arrowPct = ((targetCenterX - clampedLeft) / tipRect.width) * 100;
+      const safePct = Math.min(Math.max(arrowPct, arrowMinPct), arrowMaxPct);
+      this.style.setProperty('--arrow-offset', `${safePct}%`);
+    } else {
+      const targetCenterY = targetRect.top + targetRect.height / 2;
+      const arrowPct = ((targetCenterY - clampedTop) / tipRect.height) * 100;
+      const safePct = Math.min(Math.max(arrowPct, arrowMinPct), arrowMaxPct);
+      this.style.setProperty('--arrow-offset', `${safePct}%`);
+    }
+    // --- FIM do bloco novo ---
+
     this.setAttribute('data-placement', chosen);
-    this.style.top = `${coords?.top || 20}px`;
-    this.style.left = `${coords?.left || 20}px`;
+    this.style.top = `${clampedTop}px`;
+    this.style.left = `${clampedLeft}px`;
   }
 
   #calcCoords(
@@ -406,19 +435,22 @@ class UiTooltipManager extends HTMLElement {
   }
 
   #setupGlobalListeners(): void {
-    // Captura mouseenter em fase de captura para descobrir elementos [data-tooltip] dinâmicos
     document.addEventListener(
       'mouseenter',
       (e) => {
-        const target = (e.target as HTMLElement).closest?.('[data-tooltip]');
-        if (target && !this.#activeTooltips.has(target as HTMLElement)) {
-          this.#attachTooltip(target as HTMLElement);
+        // composedPath() retorna todos os elementos atravessando shadow boundaries
+        const path = e.composedPath() as HTMLElement[];
+        const target = path.find(
+          (el) =>
+            el instanceof HTMLElement && el.hasAttribute?.('data-tooltip'),
+        );
+        if (target && !this.#activeTooltips.has(target)) {
+          this.#attachTooltip(target);
         }
       },
       { capture: true, passive: true },
     );
 
-    // Tecla ESC para fechar tudo
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         document
@@ -785,15 +817,19 @@ class UiTooltip extends HTMLElement {
 
     // Transforma classes utilitárias em estrutura semântica para o balloon
     // Header do tooltip
-    const header = wrapper.querySelector('[class*="tooltip-header"], [class*="header"]');
+    const header = wrapper.querySelector(
+      '[class*="tooltip-header"], [class*="header"]',
+    );
     if (header) {
       header.classList.add('tooltip-header');
     }
 
     // Títulos de seção
-    wrapper.querySelectorAll('[class*="section-title"], [class*="title"]').forEach((el) => {
-      el.classList.add('section-title');
-    });
+    wrapper
+      .querySelectorAll('[class*="section-title"], [class*="title"]')
+      .forEach((el) => {
+        el.classList.add('section-title');
+      });
 
     // Grid de controles
     wrapper.querySelectorAll('[class*="grid"]').forEach((el) => {
@@ -806,21 +842,27 @@ class UiTooltip extends HTMLElement {
     });
 
     // Descrições de controles
-    wrapper.querySelectorAll('[class*="desc"], [class*="text-muted"]').forEach((el) => {
-      if (!el.classList.contains('section-title')) {
-        el.classList.add('control-desc');
-      }
-    });
+    wrapper
+      .querySelectorAll('[class*="desc"], [class*="text-muted"]')
+      .forEach((el) => {
+        if (!el.classList.contains('section-title')) {
+          el.classList.add('control-desc');
+        }
+      });
 
     // Math notes
-    wrapper.querySelectorAll('[class*="note"], [class*="math"]').forEach((el) => {
-      el.classList.add('math-note');
-    });
+    wrapper
+      .querySelectorAll('[class*="note"], [class*="math"]')
+      .forEach((el) => {
+        el.classList.add('math-note');
+      });
 
     // Seções
-    wrapper.querySelectorAll('[class*="mb-"], [class*="section"]').forEach((el) => {
-      el.classList.add('tooltip-section');
-    });
+    wrapper
+      .querySelectorAll('[class*="mb-"], [class*="section"]')
+      .forEach((el) => {
+        el.classList.add('tooltip-section');
+      });
 
     frag.appendChild(wrapper);
     return frag;
