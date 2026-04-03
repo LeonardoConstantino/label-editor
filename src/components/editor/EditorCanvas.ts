@@ -135,7 +135,7 @@ export class EditorCanvas extends HTMLElement {
     if (clickedElement) {
       eventBus.emit('element:select', clickedElement.id);
 
-      UISM.play(UISM.enumPresets.TAP);
+      UISM.play(UISM.enumPresets.SELECT);
     } else {
       eventBus.emit('element:select', []);
     }
