@@ -2,6 +2,7 @@ import { store, AppState } from '../../core/Store';
 import eventBus from '../../core/EventBus';
 import { canvasRenderer } from '../../domain/services/CanvasRenderer';
 import { UISM } from '../../core/UISoundManager';
+import { UnitConverter } from '../../utils/units';
 
 /**
  * EditorCanvas: O Web Component que renderiza a etiqueta visualmente com layout Tactile Prism.
@@ -77,38 +78,49 @@ export class EditorCanvas extends HTMLElement {
     if (!label) return;
 
     const { config, elements } = label;
-    const scale = (config.dpi / 25.4) * config.previewScale;
+    // Escala combinada para o preview: (DPI -> Pixels) * Zoom
+    const scale = UnitConverter.mmToPx(1, config.dpi) * config.previewScale;
 
     // Atualiza dimensões da artboard (mm -> px para estilo CSS)
     this.artboard.style.width = `${label.config.widthMM}mm`;
     this.artboard.style.height = `${label.config.heightMM}mm`;
 
     // Ajusta o tamanho do canvas (em pixels reais baseados no DPI)
-    this.canvas.width = label.config.widthMM * scale;
-    this.canvas.height = label.config.heightMM * scale;
+    this.canvas.width = UnitConverter.mmToPx(label.config.widthMM, config.dpi) * config.previewScale;
+    this.canvas.height = UnitConverter.mmToPx(label.config.heightMM, config.dpi) * config.previewScale;
     
     // Sincroniza o tamanho visual do canvas com a artboard
     this.canvas.style.width = '100%';
     this.canvas.style.height = '100%';
 
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.ctx.fillStyle = '#fff';
+    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
     elements
       .filter(el => el.visible !== false)
       .sort((a, b) => a.zIndex - b.zIndex)
       .forEach(element => {
-        canvasRenderer.render(element, { ctx: this.ctx, scale });
+        canvasRenderer.render(element, { 
+          ctx: this.ctx, 
+          scale, 
+          dpi: config.dpi 
+        });
+        
         if (state.selectedElementIds.includes(element.id)) {
-          this.drawSelectionOutline(element, scale);
+          this.drawSelectionOutline(element, scale, config.dpi);
         }
       });
   }
 
-  private drawSelectionOutline(el: any, scale: number): void {
+  private drawSelectionOutline(el: any, scale: number, dpi: number): void {
     if (!el.dimensions) return;
     this.ctx.save();
     this.ctx.strokeStyle = '#6366f1';
-    this.ctx.lineWidth = 2 * (scale / 11.81); // Escala a largura da borda
+    
+    // Borda de seleção técnica: 1.5pt de espessura convertida para pixels
+    this.ctx.lineWidth = UnitConverter.ptToPx(1.5, dpi) * (scale / UnitConverter.mmToPx(1, dpi)); 
+    
     this.ctx.setLineDash([5, 5]);
     this.ctx.strokeRect(
       el.position.x * scale, 
@@ -134,7 +146,6 @@ export class EditorCanvas extends HTMLElement {
 
     if (clickedElement) {
       eventBus.emit('element:select', clickedElement.id);
-
       UISM.play(UISM.enumPresets.SELECT);
     } else {
       eventBus.emit('element:select', []);

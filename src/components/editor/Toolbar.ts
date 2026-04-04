@@ -2,11 +2,14 @@ import eventBus from '../../core/EventBus';
 import { ElementType } from '../../domain/models/elements/BaseElement';
 import { store, AppState } from '../../core/Store';
 import { UISM } from '../../core/UISoundManager';
+import { UnitConverter } from '../../utils/units';
 import '../common/AppButton';
 import '../common/icon';
+import '../common/tooltip';
 
 /**
  * EditorToolbar: A "Pílula de Controle" flutuante do Cockpit.
+ * Agora com suporte a Tooltips de Power User e conversão de precisão.
  */
 export class EditorToolbar extends HTMLElement {
   private unsubscribe: (() => void) | null = null;
@@ -61,7 +64,7 @@ export class EditorToolbar extends HTMLElement {
         }
       </style>
       
-      <!-- Grupo de Criação -->
+      <!-- GRUPO DE CRIAÇÃO -->
       <ui-tooltip placement="bottom" delay="300">
         <app-button slot="target" id="add-text" variant="secondary">
           <ui-icon name="text"></ui-icon>
@@ -109,7 +112,7 @@ export class EditorToolbar extends HTMLElement {
       
       <div class="divider"></div>
       
-      <!-- Grupo de Histórico -->
+      <!-- GRUPO DE HISTÓRICO -->
       <ui-tooltip placement="bottom" delay="300">
         <app-button slot="target" id="undo" variant="secondary" disabled>
           <ui-icon name="undo"></ui-icon>
@@ -146,7 +149,7 @@ export class EditorToolbar extends HTMLElement {
       
       <div class="divider"></div>
       
-      <!-- Ações Primárias -->
+      <!-- AÇÕES PRIMÁRIAS -->
       <ui-tooltip placement="bottom" delay="300">
         <app-button slot="target" id="save" variant="secondary">
           <ui-icon name="save"></ui-icon>
@@ -231,7 +234,6 @@ export class EditorToolbar extends HTMLElement {
       const { imageProcessor } = await import('../../utils/imageProcessor');
       const processed = await imageProcessor.process(file);
       const config = store.getState().currentLabel!.config;
-      const scale = config.dpi / 25.4;
 
       eventBus.emit('element:add', {
         id: 'img-' + Date.now(),
@@ -239,8 +241,8 @@ export class EditorToolbar extends HTMLElement {
         position: { x: 5, y: 5 },
         zIndex: 8,
         dimensions: {
-          width: processed.width / scale,
-          height: processed.height / scale,
+          width: UnitConverter.pxToMm(processed.width, config.dpi),
+          height: UnitConverter.pxToMm(processed.height, config.dpi),
         },
         src: processed.src,
         fit: 'contain',

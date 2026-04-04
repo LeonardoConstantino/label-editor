@@ -3,6 +3,7 @@ import { Label, AnyElement } from '../models/Label';
 import { canvasRenderer } from './CanvasRenderer';
 import { DataSourceParser } from './DataSourceParser';
 import { ElementType } from '../models/elements/BaseElement';
+import { UnitConverter } from '../../utils/units';
 
 /**
  * PDFGenerator: Gera o PDF final com todas as etiquetas do lote.
@@ -19,14 +20,14 @@ export class PDFGenerator {
       format: [label.config.widthMM, label.config.heightMM]
     });
 
-    // Canvas oculto para renderização em alta resolução (300 DPI)
+    // Canvas oculto para renderização em alta resolução (DPI do config ou 300 padrão)
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d')!;
-    const dpi = 300;
-    const scale = dpi / 25.4;
+    const dpi = label.config.dpi || 300;
+    const scale = UnitConverter.mmToPx(1, dpi);
 
-    canvas.width = label.config.widthMM * scale;
-    canvas.height = label.config.heightMM * scale;
+    canvas.width = UnitConverter.mmToPx(label.config.widthMM, dpi);
+    canvas.height = UnitConverter.mmToPx(label.config.heightMM, dpi);
 
     for (let i = 0; i < dataList.length; i++) {
       const data = dataList[i];
@@ -45,8 +46,8 @@ export class PDFGenerator {
           (elementCopy as any).content = DataSourceParser.interpolate((elementCopy as any).content, data);
         }
 
-        // Renderiza no canvas em alta res
-        canvasRenderer.render(elementCopy, { ctx, scale });
+        // Renderiza no canvas em alta res (sem previewScale)
+        canvasRenderer.render(elementCopy, { ctx, scale, dpi });
       });
 
       // Adiciona a imagem do canvas ao PDF
