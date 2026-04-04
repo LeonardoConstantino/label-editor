@@ -36,25 +36,43 @@ export class Store {
       });
     });
 
-    eventBus.on('element:update', ({ id, updates }: { id: string; updates: Partial<AnyElement> }) => {
+    eventBus.on('element:update', ({ id, updates }: { id: string; updates: any }) => {
       this.performAction(() => {
         if (!this.state.currentLabel) return;
         const index = this.state.currentLabel.elements.findIndex(el => el.id === id);
-        if (index !== -1) {
-          const element = {
-            ...this.state.currentLabel.elements[index],
-            ...updates
-          } as AnyElement;
-          this.state.currentLabel.elements[index] = element;
+        if (index === -1) return;
 
-          const result = overflowValidator.check(element, this.state.currentLabel.config);
-          if (result.overflow) {
-            eventBus.emit('element:warning', { id, result });
-            UISM.play(UISM.enumPresets.WARNING);
+        const current = this.state.currentLabel.elements[index];
+        
+        // Merge Inteligente (suporta 1 nível de aninhamento para position e dimensions)
+        const newElement = { ...current } as any;
+        for (const key in updates) {
+          if (typeof updates[key] === 'object' && updates[key] !== null && !Array.isArray(updates[key])) {
+            newElement[key] = { ...newElement[key], ...updates[key] };
           } else {
-            eventBus.emit('element:warning:clear', { id });
+            newElement[key] = updates[key];
           }
         }
+
+        this.state.currentLabel.elements[index] = newElement;
+
+        const result = overflowValidator.check(newElement, this.state.currentLabel.config);
+        if (result.overflow) {
+          eventBus.emit('element:warning', { id, result });
+          UISM.play(UISM.enumPresets.WARNING);
+        } else {
+          eventBus.emit('element:warning:clear', { id });
+        }
+      });
+    });
+
+    eventBus.on('element:reorder', ({ id, direction }: { id: string, direction: 'up' | 'down' }) => {
+      this.performAction(() => {
+        if (!this.state.currentLabel) return;
+        const el = this.state.currentLabel.elements.find(e => e.id === id);
+        if (!el) return;
+        el.zIndex += (direction === 'up' ? 1 : -1);
+        UISM.play(UISM.enumPresets.SWOOSHIN);
       });
     });
 

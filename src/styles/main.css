@@ -139,6 +139,7 @@
     border-left: 1px solid var(--color-border-ui);
     box-shadow: -10px 0 40px rgba(0, 0, 0, 0.5);
     transition: transform 0.4s var(--ease-spring);
+    padding-right: 0;
   }
 }
 
@@ -363,7 +364,7 @@
     transition-timing-function: var(--ease-spring);
   }
   .element-card.selected {
-    @apply border-accent-primary scale-[1.02] z-10 shadow-neon-primary;
+    @apply border-accent-primary z-10 shadow-neon-primary;
   }
   .card-header {
     @apply p-3 flex items-center gap-2.5 cursor-pointer select-none hover:bg-white/5;

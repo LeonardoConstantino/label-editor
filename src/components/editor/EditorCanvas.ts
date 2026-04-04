@@ -12,6 +12,7 @@ export class EditorCanvas extends HTMLElement {
   private artboard: HTMLDivElement;
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
+  private selectionOutlineBorderWidth = 1.5; // em pontos, convertido para pixels no desenho
   private unsubscribe: (() => void) | null = null;
 
   constructor() {
@@ -119,7 +120,7 @@ export class EditorCanvas extends HTMLElement {
     this.ctx.strokeStyle = '#6366f1';
     
     // Borda de seleção técnica: 1.5pt de espessura convertida para pixels
-    this.ctx.lineWidth = UnitConverter.ptToPx(1.5, dpi) * (scale / UnitConverter.mmToPx(1, dpi)); 
+    this.ctx.lineWidth = UnitConverter.ptToPx(this.selectionOutlineBorderWidth, dpi) * (scale / UnitConverter.mmToPx(1, dpi)); 
     
     this.ctx.setLineDash([5, 5]);
     this.ctx.strokeRect(
