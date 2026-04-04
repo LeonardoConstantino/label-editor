@@ -1,27 +1,38 @@
-import { BaseElement, ElementType, Dimensions } from './BaseElement';
+import { BaseElement, Dimensions, BorderStyle, TextOverflow, ImageFit } from './BaseElement';
 
 export interface TextElement extends BaseElement {
-  type: ElementType.TEXT;
   dimensions: Dimensions;
   content: string;
   fontFamily: string;
-  fontSize: number; // em pt
-  fontWeight: string | number;
+  fontSize: number; // pt
+  fontWeight: number | string;
+  fontStyle: string;
   color: string;
   textAlign: 'left' | 'center' | 'right';
-}
-
-export interface ImageElement extends BaseElement {
-  type: ElementType.IMAGE;
-  dimensions: Dimensions;
-  src: string; // base64
-  fit: 'cover' | 'contain' | 'fill';
+  verticalAlign: 'top' | 'middle' | 'bottom';
+  overflow: TextOverflow;
+  lineHeight: number;
 }
 
 export interface RectangleElement extends BaseElement {
-  type: ElementType.RECTANGLE;
   dimensions: Dimensions;
-  fillColor?: string;
-  strokeColor?: string;
-  strokeWidth?: number;
+  fillColor: string;
+  strokeColor: string;
+  strokeWidth: number;
+  borderRadius: number;
+}
+
+export interface ImageElement extends BaseElement {
+  dimensions: Dimensions;
+  src: string;
+  fit: ImageFit;
+  smoothing: boolean;
+  compositeOperation: string;
+}
+
+export interface BorderElement extends BaseElement {
+  style: BorderStyle;
+  width: number; // espessura em mm
+  color: string;
+  radius: number; // cantos em mm
 }

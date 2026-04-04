@@ -1,13 +1,22 @@
-import { BaseElement } from './elements/BaseElement';
-import { TextElement, ImageElement, RectangleElement } from './elements/SpecificElements';
+import { BaseElement, ElementType } from './elements/BaseElement';
+import { 
+  TextElement, 
+  ImageElement, 
+  RectangleElement, 
+  BorderElement 
+} from './elements/SpecificElements';
 
-export type AnyElement = TextElement | ImageElement | RectangleElement | BaseElement;
+// Re-exportando para facilitar o acesso de outros componentes
+export { ElementType };
+
+export type AnyElement = TextElement | ImageElement | RectangleElement | BorderElement;
 
 export interface CanvasConfig {
   widthMM: number;
   heightMM: number;
   dpi: number;
   previewScale: number;
+  backgroundColor: string;
 }
 
 export interface Label {

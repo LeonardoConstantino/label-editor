@@ -3,13 +3,13 @@ import { ElementType } from '../../domain/models/elements/BaseElement';
 import { store, AppState } from '../../core/Store';
 import { UISM } from '../../core/UISoundManager';
 import { UnitConverter } from '../../utils/units';
+import { ElementFactory } from '../../domain/models/elements/ElementFactory';
 import '../common/AppButton';
 import '../common/icon';
 import '../common/tooltip';
 
 /**
  * EditorToolbar: A "Pílula de Controle" flutuante do Cockpit.
- * Agora com suporte a Tooltips de Power User e conversão de precisão.
  */
 export class EditorToolbar extends HTMLElement {
   private unsubscribe: (() => void) | null = null;
@@ -109,6 +109,23 @@ export class EditorToolbar extends HTMLElement {
           </p>
         </div>
       </ui-tooltip>
+
+      <ui-tooltip placement="bottom" delay="300">
+        <app-button slot="target" id="add-border" variant="secondary">
+          <ui-icon name="rect" style="transform: scale(1.2); opacity:
+          0.7;"></ui-icon>
+        </app-button>
+        <div slot="content" class="tooltip-rich-panel">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-text-main text-[12px] font-semibold
+          tracking-wide">Moldura</span>
+            <kbd class="kbd-prism">B</kbd>
+          </div>
+          <p class="text-text-muted text-[10px] leading-relaxed">
+            Adiciona uma borda decorativa ao redor de toda a etiqueta.
+          </p>
+        </div>
+      </ui-tooltip
       
       <div class="divider"></div>
       
@@ -195,32 +212,15 @@ export class EditorToolbar extends HTMLElement {
     const fileInput = shadow.getElementById('file-input') as HTMLInputElement;
 
     shadow.getElementById('add-text')?.addEventListener('click', () => {
-      eventBus.emit('element:add', {
-        id: 'txt-' + Date.now(),
-        type: ElementType.TEXT,
-        position: { x: 10, y: 10 },
-        zIndex: 10,
-        dimensions: { width: 40, height: 10 },
-        content: 'Label Unit 01',
-        fontFamily: 'sans-serif',
-        fontSize: 14,
-        fontWeight: 'normal',
-        color: '#000000',
-        textAlign: 'center',
-      });
+      eventBus.emit('element:add', ElementFactory.create(ElementType.TEXT));
     });
 
     shadow.getElementById('add-rect')?.addEventListener('click', () => {
-      eventBus.emit('element:add', {
-        id: 'rect-' + Date.now(),
-        type: ElementType.RECTANGLE,
-        position: { x: 10, y: 10 },
-        zIndex: 5,
-        dimensions: { width: 30, height: 20 },
-        fillColor: '#e2e8f0',
-        strokeColor: '#6366f1',
-        strokeWidth: 0.5,
-      });
+      eventBus.emit('element:add', ElementFactory.create(ElementType.RECTANGLE));
+    });
+
+    shadow.getElementById('add-border')?.addEventListener('click', () => {
+      eventBus.emit('element:add', ElementFactory.create(ElementType.BORDER));
     });
 
     shadow
@@ -235,18 +235,13 @@ export class EditorToolbar extends HTMLElement {
       const processed = await imageProcessor.process(file);
       const config = store.getState().currentLabel!.config;
 
-      eventBus.emit('element:add', {
-        id: 'img-' + Date.now(),
-        type: ElementType.IMAGE,
-        position: { x: 5, y: 5 },
-        zIndex: 8,
+      eventBus.emit('element:add', ElementFactory.create(ElementType.IMAGE, {
         dimensions: {
           width: UnitConverter.pxToMm(processed.width, config.dpi),
           height: UnitConverter.pxToMm(processed.height, config.dpi),
         },
-        src: processed.src,
-        fit: 'contain',
-      });
+        src: processed.src
+      }));
     });
 
     shadow

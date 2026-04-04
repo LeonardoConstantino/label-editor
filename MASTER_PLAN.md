@@ -36,7 +36,7 @@ Este arquivo coordena a execução de tarefas para a excelência técnica, visua
 ### Fase 6: Alinhamento Arquitetural (Base)
 | ID | Task | Status | Dependências | Branch |
 |----|------|--------|--------------|--------|
-| **28** | [Utilitário de Unidades Centralizado](./tasks/28_unit_converter.md) | [ ] | — | `task/28-unit-converter` |
+| **28** | [Utilitário de Unidades Centralizado](./tasks/28_unit_converter.md) | [x] | — | `task/28-unit-converter` |
 | **29** | [Fábrica de Elementos & Constantes](./tasks/29_element_factory.md) | [ ] | — | `task/29-element-factory` |
 | **30** | [Validador de Propriedades Técnico](./tasks/30_property_validator.md) | [ ] | 29 | `task/30-property-validator` |
 | **31** | [Upgrade no Parser de CSV (PapaParse)](./tasks/31_papaparse_upgrade.md) | [ ] | 18 | `task/31-papaparse-upgrade` |
