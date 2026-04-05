@@ -3,6 +3,7 @@ import eventBus from './EventBus';
 import { historyManager, HistorySnapshot } from '../domain/services/HistoryManager';
 import { UISM } from './UISoundManager';
 import { overflowValidator } from '../domain/services/OverflowValidator';
+import { DEFAULTS } from '../constants/defaults';
 
 export interface AppState {
   currentLabel: Label | null;
@@ -79,7 +80,7 @@ export class Store {
     eventBus.on('element:delete', (id: string) => {
       this.performAction(() => {
         if (!this.state.currentLabel) return;
-        this.state.currentLabel.elements = this.state.currentLabel.elements.filter(el => el.id !== id);
+        this.state.currentLabel.elements = this.state.currentLabel.elements.filter(el => id !== el.id);
         this.state.selectedElementIds = this.state.selectedElementIds.filter(elId => elId !== id);
         UISM.play(UISM.enumPresets.DELETE);
       });
@@ -96,7 +97,29 @@ export class Store {
     eventBus.on('label:config:update', (config: any) => {
       this.performAction(() => {
         if (!this.state.currentLabel) return;
-        this.state.currentLabel.config = config;
+        
+        const { LIMITS } = DEFAULTS;
+        let hasClamped = false;
+
+        // Clamping de dimensões
+        const width = Math.min(Math.max(config.widthMM, LIMITS.MIN_DIMENSION_MM), LIMITS.MAX_WIDTH_MM);
+        const height = Math.min(Math.max(config.heightMM, LIMITS.MIN_DIMENSION_MM), LIMITS.MAX_HEIGHT_MM);
+        const dpi = Math.min(Math.max(config.dpi, LIMITS.MIN_DPI), LIMITS.MAX_DPI);
+
+        if (width !== config.widthMM || height !== config.heightMM || dpi !== config.dpi) {
+          hasClamped = true;
+        }
+
+        this.state.currentLabel.config = {
+          ...config,
+          widthMM: width,
+          heightMM: height,
+          dpi: dpi
+        };
+
+        if (hasClamped) {
+          UISM.play(UISM.enumPresets.WARNING);
+        }
       });
     });
 

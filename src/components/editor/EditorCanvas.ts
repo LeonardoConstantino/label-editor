@@ -85,6 +85,7 @@ export class EditorCanvas extends HTMLElement {
     // Atualiza dimensões da artboard (mm -> px para estilo CSS)
     this.artboard.style.width = `${label.config.widthMM}mm`;
     this.artboard.style.height = `${label.config.heightMM}mm`;
+    this.artboard.style.backgroundColor = config.backgroundColor || '#ffffff';
 
     // Ajusta o tamanho do canvas (em pixels reais baseados no DPI)
     this.canvas.width = UnitConverter.mmToPx(label.config.widthMM, config.dpi) * config.previewScale;
@@ -95,7 +96,7 @@ export class EditorCanvas extends HTMLElement {
     this.canvas.style.height = '100%';
 
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    this.ctx.fillStyle = '#fff';
+    this.ctx.fillStyle = config.backgroundColor || '#ffffff';
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
     elements

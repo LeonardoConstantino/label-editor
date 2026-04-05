@@ -33,8 +33,10 @@ export class PDFGenerator {
       const data = dataList[i];
       if (i > 0) pdf.addPage();
 
-      // Limpa o canvas para a nova etiqueta
+      // Limpa o canvas para a nova etiqueta e preenche com a cor de fundo
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = label.config.backgroundColor || '#ffffff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       // Renderiza cada elemento aplicando os dados (interpolação)
       label.elements.forEach(element => {

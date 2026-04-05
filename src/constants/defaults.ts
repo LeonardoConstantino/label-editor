@@ -12,6 +12,18 @@ export const DEFAULTS = {
     previewScale: 1,
     backgroundColor: '#ffffff'
   },
+
+  /**
+   * LIMITS: Restrições técnicas para garantir estabilidade e performance.
+   * Evita estouro de memória RAM ao renderizar em 300 DPI.
+   */
+  LIMITS: {
+    MAX_WIDTH_MM: 500,  // 0.5 metro
+    MAX_HEIGHT_MM: 500,
+    MIN_DIMENSION_MM: 5,
+    MAX_DPI: 600,
+    MIN_DPI: 72
+  },
   
   COMMON: {
     position: { x: 10, y: 10 },

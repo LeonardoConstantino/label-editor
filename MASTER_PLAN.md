@@ -64,6 +64,7 @@ Este arquivo coordena a execução de tarefas para a excelência técnica, visua
 | **43** | [Renderers Avançados (Shapes & Blending)](./tasks/43_adv_renderers.md) | [ ] | 12 | `task/43-adv-renderers` |
 | **44** | [TextElement Pro (Overflow & Vertical)](./tasks/44_text_pro.md) | [ ] | 12 | `task/44-text-pro` |
 | **45** | [Tooltips da Toolbar (Power User)](./tasks/45_toolbar_tooltips.md) | [x] | 20 | `task/45-toolbar-tooltips` |
+| **46** | [Refatoração Profunda ElementInspector](./tasks/46_inspector_refactor.md) | [ ] | 29 | `task/46-inspector-deep-refactor` |
 
 ---
 
