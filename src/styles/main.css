@@ -437,6 +437,37 @@
     @apply bg-white shadow-[0_15px_35px_rgba(0,0,0,0.6)] rounded-xs overflow-hidden relative w-full;
   }
 
+  /* Preview A4 e Drop Zone */
+  .a4-sheet {
+    background: white;
+    width: 210mm;
+    height: 297mm;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+    padding: var(--a4-margin, 10mm);
+    display: grid;
+    grid-template-columns: repeat(var(--a4-cols, 2), 1fr);
+    grid-gap: var(--a4-gap, 5mm);
+    align-content: start;
+    transform-origin: top center;
+    transition: all 0.4s var(--ease-spring);
+  }
+
+  .drop-zone {
+    @apply w-full h-40 border-2 border-dashed border-border-ui rounded-2xl flex flex-col items-center justify-center gap-3 transition-all cursor-pointer bg-black/10;
+  }
+  .drop-zone.active {
+    @apply border-accent-primary bg-accent-primary/10 scale-[1.02];
+    box-shadow: var(--shadow-neon-primary);
+  }
+  .drop-zone ui-icon { --icon-size: 32px; @apply text-text-muted; }
+  .drop-zone.active ui-icon { @apply text-accent-primary; }
+
+  .data-mini-table {
+    @apply w-full border-collapse mt-4 text-[11px] font-mono;
+  }
+  .data-mini-table th { @apply text-left text-text-muted border-b border-border-ui pb-2; }
+  .data-mini-table td { @apply py-2 border-b border-border-ui/30 truncate max-w-[100px]; }
+
   @keyframes popIn {
     from {
       opacity: 0;
