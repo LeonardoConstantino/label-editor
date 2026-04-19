@@ -13,5 +13,5 @@ Implementar um motor de validação para garantir a integridade dos dados dos el
 - **Feedback:** Emitir alertas via `UISM` ou `toastManager` em caso de dados inválidos.
 
 ## Critérios de Aceite
-- [ ] O sistema impede a entrada de valores que quebrariam a renderização.
-- [ ] Mensagens de erro claras para o usuário final.
+- [x] O sistema impede a entrada de valores que quebrariam a renderização.
+- [x] Mensagens de erro claras para o usuário final.

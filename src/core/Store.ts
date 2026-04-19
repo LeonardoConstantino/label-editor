@@ -3,6 +3,7 @@ import eventBus from './EventBus';
 import { historyManager, HistorySnapshot } from '../domain/services/HistoryManager';
 import { UISM } from './UISoundManager';
 import { overflowValidator } from '../domain/services/OverflowValidator';
+import { elementValidator } from '../domain/validators/ElementValidator';
 import { DEFAULTS } from '../constants/defaults';
 
 export interface AppState {
@@ -30,6 +31,13 @@ export class Store {
 
   private registerEvents(): void {
     eventBus.on('element:add', (element: AnyElement) => {
+      const validation = elementValidator.validate(element);
+      if (!validation.isValid) {
+        eventBus.emit('notify', { type: 'error', message: validation.errors[0] });
+        UISM.play(UISM.enumPresets.WARNING);
+        return;
+      }
+
       this.performAction(() => {
         if (!this.state.currentLabel) return;
         this.state.currentLabel.elements.push(element);
@@ -38,26 +46,24 @@ export class Store {
     });
 
     eventBus.on('element:update', ({ id, updates }: { id: string; updates: any }) => {
+      if (!this.state.currentLabel) return;
+      const index = this.state.currentLabel.elements.findIndex(el => el.id === id);
+      if (index === -1) return;
+
+      const current = this.state.currentLabel.elements[index];
+      const newElement = this.mergeUpdates(current, updates);
+
+      const validation = elementValidator.validate(newElement);
+      if (!validation.isValid) {
+        eventBus.emit('notify', { type: 'error', message: validation.errors[0] });
+        UISM.play(UISM.enumPresets.WARNING);
+        return;
+      }
+
       this.performAction(() => {
-        if (!this.state.currentLabel) return;
-        const index = this.state.currentLabel.elements.findIndex(el => el.id === id);
-        if (index === -1) return;
+        this.state.currentLabel!.elements[index] = newElement;
 
-        const current = this.state.currentLabel.elements[index];
-        
-        // Merge Inteligente (suporta 1 nível de aninhamento para position e dimensions)
-        const newElement = { ...current } as any;
-        for (const key in updates) {
-          if (typeof updates[key] === 'object' && updates[key] !== null && !Array.isArray(updates[key])) {
-            newElement[key] = { ...newElement[key], ...updates[key] };
-          } else {
-            newElement[key] = updates[key];
-          }
-        }
-
-        this.state.currentLabel.elements[index] = newElement;
-
-        const result = overflowValidator.check(newElement, this.state.currentLabel.config);
+        const result = overflowValidator.check(newElement, this.state.currentLabel!.config);
         if (result.overflow) {
           eventBus.emit('element:warning', { id, result });
           UISM.play(UISM.enumPresets.WARNING);
@@ -124,6 +130,18 @@ export class Store {
     });
 
     eventBus.on('history:snapshot', () => this.takeSnapshot());
+  }
+
+  private mergeUpdates(current: AnyElement, updates: any): AnyElement {
+    const newElement = { ...current } as any;
+    for (const key in updates) {
+      if (typeof updates[key] === 'object' && updates[key] !== null && !Array.isArray(updates[key])) {
+        newElement[key] = { ...newElement[key], ...updates[key] };
+      } else {
+        newElement[key] = updates[key];
+      }
+    }
+    return newElement;
   }
 
   private performAction(action: () => void): void {

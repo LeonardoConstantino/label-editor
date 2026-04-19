@@ -255,8 +255,7 @@ export class EditorToolbar extends HTMLElement {
       const { templateManager } =
         await import('../../domain/services/TemplateManager');
       await templateManager.saveCurrentLabel();
-      const { ToastManager } = await import('../common/toast');
-      ToastManager.show({
+      eventBus.emit('notify', {
         type: 'success',
         message: 'Template salvo com sucesso!',
       });

@@ -43,7 +43,10 @@ describe('Store', () => {
       position: { x: 10, y: 10 },
       zIndex: 1,
       dimensions: { width: 50, height: 10 },
-      content: 'Hello'
+      content: 'Hello',
+      fontSize: 12,
+      color: '#000000',
+      opacity: 1
     };
 
     eventBus.emit('element:add', newElement);
@@ -61,7 +64,10 @@ describe('Store', () => {
       position: { x: 10, y: 10 },
       zIndex: 1,
       dimensions: { width: 50, height: 10 },
-      content: 'Hello'
+      content: 'Hello',
+      fontSize: 12,
+      color: '#000000',
+      opacity: 1
     };
     eventBus.emit('element:add', newElement);
 
@@ -71,6 +77,31 @@ describe('Store', () => {
     expect((state.currentLabel?.elements[0] as any).content).toBe('Updated');
   });
 
+  it('should reject invalid updates', () => {
+    const newElement = {
+      id: 'el1',
+      type: ElementType.TEXT,
+      position: { x: 10, y: 10 },
+      zIndex: 1,
+      dimensions: { width: 50, height: 10 },
+      content: 'Hello',
+      color: '#000000',
+      fontSize: 12,
+      opacity: 1
+    };
+    eventBus.emit('element:add', newElement);
+
+    // Tentativa de update inválido (cor mal formatada)
+    const notifySpy = vi.fn();
+    eventBus.on('notify', notifySpy);
+
+    eventBus.emit('element:update', { id: 'el1', updates: { color: 'invalid-color' } });
+
+    const state = store.getState();
+    expect((state.currentLabel?.elements[0] as any).color).toBe('#000000'); // Não deve ter mudado
+    expect(notifySpy).toHaveBeenCalledWith(expect.objectContaining({ type: 'error' }));
+  });
+
   it('should undo and redo changes', () => {
     const newElement = {
       id: 'el1',
@@ -78,7 +109,10 @@ describe('Store', () => {
       position: { x: 10, y: 10 },
       zIndex: 1,
       dimensions: { width: 50, height: 10 },
-      content: 'Hello'
+      content: 'Hello',
+      fontSize: 12,
+      color: '#000000',
+      opacity: 1
     };
 
     // Após loadLabel, temos snapshot inicial (estado vazio)

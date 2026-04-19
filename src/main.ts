@@ -1,5 +1,7 @@
 import { store } from './core/Store';
 import { ElementType } from './domain/models/elements/BaseElement';
+import eventBus from './core/EventBus';
+import { logger } from './core/Logger';
 import './styles/main.css';
 
 import { templateManager } from './domain/services/TemplateManager';
@@ -12,6 +14,11 @@ import './components/common/modal';
 import './components/preview/DataSourceInput';
 import './components/common/UINumberScrubber';
 import './components/common/tooltip';
+
+// Global Notification Listener
+eventBus.on('notify', (options: any) => {
+  ToastManager.show(options);
+});
 
 // Inicializa a aplicação com uma etiqueta padrão
 const defaultLabel = {
@@ -56,9 +63,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   await templateManager.init();
   store.loadLabel(defaultLabel);
-  console.log('Application Initialized with Label:', defaultLabel.id);
+  logger.info('Main', `Application Initialized with Label: ${defaultLabel.id}`);
 
-  ToastManager.show({
+  eventBus.emit('notify', {
     type: 'info',
     message: 'Aplicação inicializada com sucesso!',
     duration: 5000

@@ -24,7 +24,7 @@ Este arquivo coordena a execução de tarefas para a excelência técnica, visua
 | **21** | [Refinamento de Profundidade](./tasks/21_cockpit_depth.md) | [x] | — | `task/21-cockpit-refinement` |
 | **22** | [Sincronização de Temas & Variáveis](./tasks/22_theme_sync.md) | [x] | — | `task/22-theme-sync` |
 | **23** | [Acessibilidade & Atalhos de Teclado](./tasks/23_shortcuts_acc.md) | [ ] | — | `task/23-shortcuts` |
-| **27** | [Personalização e Limites do Canvas](./tasks/27_canvas_limits.md) | [ ] | — | `task/27-canvas-limits` |
+| **27** | [Personalização e Limites do Canvas](./tasks/27_canvas_limits.md) | [x] | — | `task/27-canvas-limits` |
 
 ### Fase 5: Estabilidade & Performance
 | ID | Task | Status | Dependências | Branch |
@@ -38,7 +38,7 @@ Este arquivo coordena a execução de tarefas para a excelência técnica, visua
 |----|------|--------|--------------|--------|
 | **28** | [Utilitário de Unidades Centralizado](./tasks/28_unit_converter.md) | [x] | — | `task/28-unit-converter` |
 | **29** | [Fábrica de Elementos & Constantes](./tasks/29_element_factory.md) | [x] | — | `task/29-element-factory` |
-| **30** | [Validador de Propriedades Técnico](./tasks/30_property_validator.md) | [ ] | 29 | `task/30-property-validator` |
+| **30** | [Validador de Propriedades Técnico](./tasks/30_property_validator.md) | [x] | 29 | `task/30-property-validator` |
 | **31** | [Upgrade no Parser de CSV (PapaParse)](./tasks/31_papaparse_upgrade.md) | [ ] | 18 | `task/31-papaparse-upgrade` |
 | **33** | [Importação/Exportação de JSON](./tasks/33_json_import_export.md) | [ ] | 07 | `task/33-json-import-export` |
 | **34** | [Formatadores na Interpolação](./tasks/34_interpolation_formatters.md) | [ ] | 18 | `task/34-formatters` |
