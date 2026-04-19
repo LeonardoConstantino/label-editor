@@ -1,26 +1,25 @@
+import Papa from 'papaparse';
+
 /**
  * DataSourceParser: Processa arquivos externos para geração em lote.
  */
 export class DataSourceParser {
   /**
-   * Converte um arquivo CSV em um array de objetos.
+   * Converte um arquivo CSV em um array de objetos usando PapaParse.
    */
   public async parseCSV(file: File): Promise<Record<string, string>[]> {
-    const text = await file.text();
-    const lines = text.split(/\r?\n/).filter(line => line.trim() !== '');
-    if (lines.length < 2) return [];
-
-    const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
-    const data = lines.slice(1).map(line => {
-      const values = line.split(',').map(v => v.trim().replace(/^"|"$/g, ''));
-      const obj: Record<string, string> = {};
-      headers.forEach((header, i) => {
-        obj[header] = values[i] || '';
+    return new Promise((resolve, reject) => {
+      Papa.parse(file, {
+        header: true,
+        skipEmptyLines: true,
+        complete: (results) => {
+          resolve(results.data as Record<string, string>[]);
+        },
+        error: (error) => {
+          reject(error);
+        }
       });
-      return obj;
     });
-
-    return data;
   }
 
   /**

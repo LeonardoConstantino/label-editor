@@ -13,5 +13,5 @@ Substituir o parser manual de CSV por uma integração com a biblioteca **PapaPa
 - **Interface:** Manter a compatibilidade com o array de objetos esperado pelo `Batch Studio`.
 
 ## Critérios de Aceite
-- [ ] Suporte a arquivos CSV exportados pelo Excel e Google Sheets sem erros de formatação.
-- [ ] Teste com arquivo contendo caracteres especiais e aspas.
+- [x] Suporte a arquivos CSV exportados pelo Excel e Google Sheets sem erros de formatação.
+- [x] Teste com arquivo contendo caracteres especiais e aspas.

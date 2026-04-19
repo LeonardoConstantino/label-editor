@@ -39,7 +39,7 @@ Este arquivo coordena a execução de tarefas para a excelência técnica, visua
 | **28** | [Utilitário de Unidades Centralizado](./tasks/28_unit_converter.md) | [x] | — | `task/28-unit-converter` |
 | **29** | [Fábrica de Elementos & Constantes](./tasks/29_element_factory.md) | [x] | — | `task/29-element-factory` |
 | **30** | [Validador de Propriedades Técnico](./tasks/30_property_validator.md) | [x] | 29 | `task/30-property-validator` |
-| **31** | [Upgrade no Parser de CSV (PapaParse)](./tasks/31_papaparse_upgrade.md) | [ ] | 18 | `task/31-papaparse-upgrade` |
+| **31** | [Upgrade no Parser de CSV (PapaParse)](./tasks/31_papaparse_upgrade.md) | [x] | 18 | `task/31-papaparse-upgrade` |
 | **33** | [Importação/Exportação de JSON](./tasks/33_json_import_export.md) | [ ] | 07 | `task/33-json-import-export` |
 | **34** | [Formatadores na Interpolação](./tasks/34_interpolation_formatters.md) | [ ] | 18 | `task/34-formatters` |
 | **40** | [Prevenção de XSS & Sanitização](./tasks/40_security_xss.md) | [ ] | — | `task/40-security-xss` |
