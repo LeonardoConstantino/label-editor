@@ -1,4 +1,5 @@
 import { Label, AnyElement } from '../domain/models/Label';
+import { UserPreferences, DEFAULT_PREFERENCES } from '../domain/models/UserPreferences';
 import eventBus from './EventBus';
 import { historyManager, HistorySnapshot } from '../domain/services/HistoryManager';
 import { UISM } from './UISoundManager';
@@ -12,6 +13,7 @@ export interface AppState {
   clipboard: AnyElement[];
   canUndo: boolean;
   canRedo: boolean;
+  preferences: UserPreferences;
 }
 
 export class Store {
@@ -23,7 +25,8 @@ export class Store {
       selectedElementIds: [],
       clipboard: [],
       canUndo: false,
-      canRedo: false
+      canRedo: false,
+      preferences: DEFAULT_PREFERENCES
     };
 
     this.registerEvents();
@@ -126,6 +129,15 @@ export class Store {
         if (hasClamped) {
           UISM.play(UISM.enumPresets.WARNING);
         }
+      });
+    });
+
+    eventBus.on('preferences:update', (prefs: Partial<UserPreferences>) => {
+      this.state.preferences = { ...this.state.preferences, ...prefs };
+      this.emit();
+      // Persiste via PreferenceManager (import dinâmico para evitar circular dependency)
+      import('../domain/services/PreferenceManager').then(m => {
+        m.preferenceManager.savePreferences(this.state.preferences);
       });
     });
 

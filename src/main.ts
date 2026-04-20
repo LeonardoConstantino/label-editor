@@ -62,6 +62,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.addEventListener('keydown', playTestSound, { once: true });
 
   await templateManager.init();
+  
+  // Carrega preferências do usuário
+  const { preferenceManager } = await import('./domain/services/PreferenceManager');
+  const prefs = await preferenceManager.getPreferences();
+  eventBus.emit('preferences:update', prefs);
+  
   store.loadLabel(defaultLabel);
   logger.info('Main', `Application Initialized with Label: ${defaultLabel.id}`);
 

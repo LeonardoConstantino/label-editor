@@ -61,6 +61,7 @@ export class EditorCanvas extends HTMLElement {
   private setupListeners(): void {
     this.unsubscribe = eventBus.on('state:change', (state: AppState) => {
       this.redraw(state);
+      this.updateWorkspaceVisuals(state);
     });
 
     eventBus.on('request:canvas:snapshot', (callback: (ctx: CanvasRenderingContext2D) => void) => {
@@ -72,6 +73,12 @@ export class EditorCanvas extends HTMLElement {
     });
 
     this.canvas.addEventListener('mousedown', (e) => this.handleMouseDown(e));
+  }
+
+  private updateWorkspaceVisuals(state: AppState): void {
+    // O grid do workspace (background) pode ficar sempre ligado para dar a sensação de Cockpit
+    // ou podemos associar a outra preferência no futuro.
+    this.workspace.style.backgroundImage = ''; 
   }
 
   private redraw(state: AppState = store.getState()): void {
@@ -113,6 +120,39 @@ export class EditorCanvas extends HTMLElement {
           this.drawSelectionOutline(element, scale, config.dpi);
         }
       });
+
+    if (state.preferences.showGrid) {
+      this.drawGridOverlay(state, scale);
+    }
+  }
+
+  private drawGridOverlay(state: AppState, scale: number): void {
+    const { gridSizeMM, gridColor, gridOpacity } = state.preferences;
+    const { widthMM, heightMM } = state.currentLabel!.config;
+    const step = gridSizeMM * scale;
+
+    this.ctx.save();
+    this.ctx.beginPath();
+    
+    // Converte HEX para RGBA com a opacidade desejada
+    this.ctx.strokeStyle = gridColor || 'rgba(99, 102, 241, 0.15)'; 
+    this.ctx.globalAlpha = gridOpacity ?? 0.3;
+    this.ctx.lineWidth = 0.5;
+
+    // Linhas Verticais
+    for (let x = 0; x <= widthMM * scale; x += step) {
+      this.ctx.moveTo(x, 0);
+      this.ctx.lineTo(x, heightMM * scale);
+    }
+
+    // Linhas Horizontais
+    for (let y = 0; y <= heightMM * scale; y += step) {
+      this.ctx.moveTo(0, y);
+      this.ctx.lineTo(widthMM * scale, y);
+    }
+
+    this.ctx.stroke();
+    this.ctx.restore();
   }
 
   private drawSelectionOutline(el: any, scale: number, dpi: number): void {

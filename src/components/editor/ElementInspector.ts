@@ -84,20 +84,24 @@ export class ElementInspector extends HTMLElement {
     const elements = state.currentLabel?.elements || [];
     const config = state.currentLabel?.config;
     const selectedId = state.selectedElementIds[0] || null;
+    const prefs = state.preferences;
 
     // REMOVIDO: e.name do hash para evitar rebuild ao renomear camada
     const elementsStructureJson = JSON.stringify(elements.map(e => ({ id: e.id, type: e.type, v: e.visible })));
-    const hasStructureChanged = elementsStructureJson !== this.currentElementsJson || selectedId !== this.currentSelectedId;
+    const hasStructureChanged = elementsStructureJson !== this.currentElementsJson || 
+                               selectedId !== this.currentSelectedId;
 
     if (hasStructureChanged) {
       logger.debug('Inspector', `Rebuild disparado: Mudança na estrutura ou seleção.`);
       this.currentElementsJson = elementsStructureJson;
       this.currentSelectedId = selectedId;
-      this.rebuildPanel(state.currentLabel, selectedId);
+      this.rebuildPanel(state.currentLabel, selectedId, prefs);
     } else {
       this.syncValues(elements, config, selectedId);
     }
   }
+
+  private currentPrefsJson: string = '';
 
   private renderSkeleton(): void {
     if (!this.shadowRoot) return;
@@ -146,7 +150,7 @@ export class ElementInspector extends HTMLElement {
     `;
   }
 
-  private rebuildPanel(label: Label | null, selectedId: string | null): void {
+  private rebuildPanel(label: Label | null, selectedId: string | null, prefs?: any): void {
     const container = this.shadowRoot?.getElementById('panel-content');
     const title = this.shadowRoot?.getElementById('panel-title');
     const countLabel = this.shadowRoot?.getElementById('unit-count');
@@ -155,7 +159,7 @@ export class ElementInspector extends HTMLElement {
     if (!selectedId) {
       if (title) title.textContent = 'LABEL SETUP';
       if (countLabel) countLabel.textContent = 'BLUEPRINT';
-      container.innerHTML = this.renderDocumentSetup(label);
+      container.innerHTML = this.renderDocumentSetup(label, prefs || store.getState().preferences);
     } else {
       if (title) title.textContent = 'PROPERTIES';
       if (countLabel) countLabel.textContent = `${label.elements.length} UNITS`;
@@ -165,7 +169,7 @@ export class ElementInspector extends HTMLElement {
     this.updateWarningVisuals();
   }
 
-  private renderDocumentSetup(label: Label): string {
+  private renderDocumentSetup(label: Label, prefs: any): string {
     const { widthMM, heightMM, backgroundColor } = label.config;
     const ratio = widthMM / heightMM;
     let simW = 60;
@@ -185,6 +189,7 @@ export class ElementInspector extends HTMLElement {
           <ui-number-scrubber label="H" data-doc-prop="heightMM" value="${heightMM}" unit="mm" step="1" style="width: 100px; transform: rotate(90deg); flex: none;"></ui-number-scrubber>
         </div>
       </div>
+      
       <span class="label-prism">Canvas Setup</span>
       <div class="row-ui">
         <ui-number-scrubber label="DPI" data-doc-prop="dpi" value="${label.config.dpi}" min="72" max="600" step="1" unit="dpi"></ui-number-scrubber>
@@ -192,6 +197,34 @@ export class ElementInspector extends HTMLElement {
       </div>
       <div class="row-ui">
         <ui-number-scrubber label="Zoom" data-doc-prop="previewScale" value="${label.config.previewScale}" min="0.1" max="5" step="0.1" unit="x"></ui-number-scrubber>
+      </div>
+
+      <span class="label-prism" style="margin-top: 12px;">Preferences</span>
+      <div class="card-module" style="padding: 12px; display: flex; flex-direction: column; gap: 10px;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-family: var(--font-mono); font-size: 11px; color: var(--color-text-muted);">SHOW GRID</span>
+          <input type="checkbox" data-pref="showGrid" ${prefs.showGrid ? 'checked' : ''}>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-family: var(--font-mono); font-size: 11px; color: var(--color-text-muted);">GRID SIZE</span>
+          <ui-number-scrubber data-pref="gridSizeMM" value="${prefs.gridSizeMM || 5}" min="1" max="50" step="1" unit="mm" style="width: 80px; flex: none;"></ui-number-scrubber>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-family: var(--font-mono); font-size: 11px; color: var(--color-text-muted);">GRID COLOR</span>
+          <app-input type="color" data-pref="gridColor" value="${prefs.gridColor || '#6366f1'}" style="width: 80px; flex: none;"></app-input>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-family: var(--font-mono); font-size: 11px; color: var(--color-text-muted);">GRID OPACITY</span>
+          <ui-number-scrubber data-pref="gridOpacity" value="${prefs.gridOpacity ?? 0.3}" min="0" max="1" step="0.05" unit="α" style="width: 80px; flex: none;"></ui-number-scrubber>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-family: var(--font-mono); font-size: 11px; color: var(--color-text-muted);">UNIT</span>
+          <select data-pref="unit" class="input-prism" style="width: 80px; padding: 2px 6px; height: 24px; font-size: 10px;">
+            <option value="mm" ${prefs.unit === 'mm' ? 'selected' : ''}>MM</option>
+            <option value="px" ${prefs.unit === 'px' ? 'selected' : ''}>PX</option>
+            <option value="pt" ${prefs.unit === 'pt' ? 'selected' : ''}>PT</option>
+          </select>
+        </div>
       </div>
     `;
   }
@@ -374,7 +407,7 @@ export class ElementInspector extends HTMLElement {
   }
 
   private handleGenericInput(e: Event): void {
-    const target = (e.target as HTMLElement).closest('[data-prop], [data-doc-prop]') as HTMLElement;
+    const target = (e.target as HTMLElement).closest('[data-prop], [data-doc-prop], [data-pref]') as HTMLElement;
     if (!target) return;
 
     // Detectamos se é um evento customizado real (nosso) ou borbulhamento nativo
@@ -388,6 +421,7 @@ export class ElementInspector extends HTMLElement {
 
     const docProp = target.getAttribute('data-doc-prop');
     const elProp = target.getAttribute('data-prop');
+    const prefProp = target.getAttribute('data-pref');
 
     let value: any;
     if (isCustom) {
@@ -395,18 +429,22 @@ export class ElementInspector extends HTMLElement {
       value = (detail && typeof detail === 'object' && 'value' in detail) ? detail.value : detail;
     } else if (target instanceof HTMLInputElement) {
       value = target.type === 'checkbox' ? target.checked : target.value;
+    } else if (target instanceof HTMLSelectElement) {
+      value = target.value;
     } else {
       value = (target as any).value;
     }
 
     if (value === undefined) return;
 
-    logInputEvent((e.target as HTMLInputElement).value, docProp || elProp);
+    logInputEvent((e.target as any).value, docProp || elProp || prefProp);
 
     if (docProp) {
       this.emitDocUpdate(docProp, value);
     } else if (elProp && this.currentSelectedId) {
       this.emitElUpdate(this.currentSelectedId, elProp, value);
+    } else if (prefProp) {
+      eventBus.emit('preferences:update', { [prefProp]: value });
     }
   }
 
@@ -467,7 +505,15 @@ export class ElementInspector extends HTMLElement {
       const el = container.querySelector(selector) as any;
       if (!el || val === undefined) return;
       const isInteracting = shadow.activeElement === el || el.shadowRoot?.activeElement || (isScrubber && el.classList.contains('is-scrubbing'));
-      if (!isInteracting && el.value !== val) el.value = val;
+      if (isInteracting) return;
+
+      if (el.type === 'checkbox') {
+        if (el.checked !== val) el.checked = val;
+      } else if (el instanceof HTMLSelectElement) {
+        if (el.value !== val) el.value = val;
+      } else {
+        if (el.value !== val) el.value = val;
+      }
     };
 
     if (!selectedId) {
@@ -476,6 +522,13 @@ export class ElementInspector extends HTMLElement {
       setVal(shadow, '[data-doc-prop="dpi"]', config.dpi);
       setVal(shadow, '[data-doc-prop="previewScale"]', config.previewScale);
       setVal(shadow, '[data-doc-prop="backgroundColor"]', config.backgroundColor, false);
+      
+      const p = store.getState().preferences;
+      setVal(shadow, '[data-pref="showGrid"]', p.showGrid, false);
+      setVal(shadow, '[data-pref="gridSizeMM"]', p.gridSizeMM);
+      setVal(shadow, '[data-pref="gridColor"]', p.gridColor, false);
+      setVal(shadow, '[data-pref="gridOpacity"]', p.gridOpacity);
+      setVal(shadow, '[data-pref="unit"]', p.unit, false);
       return;
     }
 

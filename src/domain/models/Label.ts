@@ -24,6 +24,7 @@ export interface Label {
   name: string;
   config: CanvasConfig;
   elements: AnyElement[];
+  thumbnail?: string; // Imagem base64 para preview
   createdAt: number;
   updatedAt: number;
 }

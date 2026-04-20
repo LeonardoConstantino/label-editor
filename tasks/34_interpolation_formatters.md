@@ -8,7 +8,7 @@ Implementar a capacidade de aplicar formatadores de texto diretamente nas variá
 2. Modificar `src/domain/services/DataSourceParser.ts` e `src/domain/services/renderers/TextRenderer.ts`.
 
 ## Detalhamento
-- **Regex Update:** Atualizar a regex de interpolação para capturar a variável, o formatador opcional e o valor padrão opcional: `/\{\{\s*(\w+)(?::(\w+))?(?:\|\|([^}]+))?\s*\}\}/g`.
+- **Regex Update:** Atualizar a regex de interpolação para capturar a variável, o formatador opcional e o valor padrão opcional: `/\{\{\s*([\w\s."'-]+)(?::([\w,()\s.:-]+))?(?:\|\|([^}]+))?\s*\}\}/g`.
 - **Formatadores Iniciais:**
   - `upper`: Converte texto para MAIÚSCULAS.
   - `lower`: Converte texto para minúsculas.
@@ -24,24 +24,24 @@ Implementar a capacidade de aplicar formatadores de texto diretamente nas variá
   - `json`: Converte objetos em JSON formatado.
 - **Valores Padrão:** Caso a variável não exista ou seja `null`/`undefined`, usar o valor especificado após `||` (ex: `{{ nome||Anônimo }}`).
 - **Extensibilidade:** Implementar um método `format(value, formatter, params)` que possa ser facilmente expandido com novos filtros customizados.
-- **Encadeamento de Formatadores (Opcional):** Permitir aplicação de múltiplos formatadores (ex: `{{ texto:trim:upper }}`).
+- **Encadeamento de Formatadores:** Permitir aplicação de múltiplos formatadores (ex: `{{ texto:trim:upper }}`).
 
 ## Critérios de Aceite
-- [ ] Variáveis com e sem formatadores funcionam corretamente.
-- [ ] Valores padrão são aplicados quando a variável não existe ou é `null`/`undefined`.
-- [ ] O preview no **Batch Studio** reflete a formatação aplicada.
-- [ ] O sistema ignora ou retorna o valor original caso o formatador não exista.
-- [ ] Todos os formatadores iniciais (upper, lower, title, capitalize, currency, percent, number, date, datetime, truncate, trim, json) funcionam conforme especificado.
-- [ ] Formatadores com parâmetros (ex: `truncate(50)`) são processados corretamente.
-- [ ] **Testes Unitários:**
-  - [ ] Teste de formatadores básicos (upper, lower, title, capitalize, trim).
-  - [ ] Teste de formatadores numéricos (currency, percent, number).
-  - [ ] Teste de formatadores de data (date, datetime) com diferentes formatos de entrada.
-  - [ ] Teste de truncate com diferentes tamanhos.
-  - [ ] Teste de formatador json com objetos e arrays.
-  - [ ] Teste de valores padrão quando variável não existe.
-  - [ ] Teste de valores padrão quando variável é `null` ou `undefined`.
-  - [ ] Teste de formatador inexistente retornando valor original.
-  - [ ] Teste de interpolação sem formatador.
-  - [ ] Teste de encadeamento de formatadores (se implementado).
-  - [ ] Teste de edge cases (valores vazios, números negativos, datas inválidas).
+- [x] Variáveis com e sem formatadores funcionam corretamente.
+- [x] Valores padrão são aplicados quando a variável não existe ou é `null`/`undefined`.
+- [x] O preview no **Batch Studio** reflete a formatação aplicada.
+- [x] O sistema ignora ou retorna o valor original caso o formatador não exista.
+- [x] Todos os formatadores iniciais (upper, lower, title, capitalize, currency, percent, number, date, datetime, truncate, trim, json) funcionam conforme especificado.
+- [x] Formatadores com parâmetros (ex: `truncate(50)`) são processados corretamente.
+- [x] **Testes Unitários:**
+  - [x] Teste de formatadores básicos (upper, lower, title, capitalize, trim).
+  - [x] Teste de formatadores numéricos (currency, percent, number).
+  - [x] Teste de formatadores de data (date, datetime) com diferentes formatos de entrada.
+  - [x] Teste de truncate com diferentes tamanhos.
+  - [x] Teste de formatador json com objetos e arrays.
+  - [x] Teste de valores padrão quando variável não existe.
+  - [x] Teste de valores padrão quando variável é `null` ou `undefined`.
+  - [x] Teste de formatador inexistente retornando valor original.
+  - [x] Teste de interpolação sem formatador.
+  - [x] Teste de encadeamento de formatadores.
+  - [x] Teste de edge cases (valores vazios, números negativos, datas inválidas).
