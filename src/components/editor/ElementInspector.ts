@@ -106,13 +106,13 @@ export class ElementInspector extends HTMLElement {
         @import "/src/styles/main.css";
         :host { display: flex; flex-direction: column; height: 100%; gap: 16px; padding: 20px; box-sizing: border-box; color: var(--color-text-main); font-family: var(--font-sans); overflow-y: scroll; }
         #panel-content { display: flex; flex-direction: column; gap: 12px; flex: 1; padding-right: 8px; }
-        #panel-content::-webkit-scrollbar { width: 4px; }
-        #panel-content::-webkit-scrollbar-track { background: transparent; }
-        #panel-content::-webkit-scrollbar-thumb { background: var(--color-border-ui); border-radius: 10px; }
         .row-ui { display: flex; gap: 10px; margin-bottom: 4px; align-items: flex-end; }
         .row-ui > * { flex: 1; min-width: 0; }
         .row-ui > .fixed-small { flex: none; width: 100px; }
         .tooltip-content { padding: 8px; max-width: 220px; }
+        .action-icon { pointer-events: auto !important; transition: all 0.2s var(--ease-spring);
+        .action-icon:hover { transform: scale(1.2); color: var(--color-accent-primary); }
+        .action-icon.active { color: var(--color-accent-primary); }
         @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
       </style>
       <div class="inspector-header">
@@ -204,7 +204,7 @@ export class ElementInspector extends HTMLElement {
           <span class="type-tag">${escapeHTML(el.type)}</span>
           <span class="layer-name" data-layer-id="${id}">${escapeHTML(el.name || el.type)}</span>
           <span class="warning-tag" data-warn-id="${id}" style="display:none; color:var(--color-accent-warning)">⚠</span>
-          <ui-icon name="text" class="action-icon ${el.visible !== false ? 'active' : ''}" 
+          <ui-icon name="${el.visible !== false ? 'eye-off' : 'eye'}" class="action-icon ${el.visible !== false ? 'active' : ''}" 
             data-action="toggle-vis" 
             style="--icon-size: 14px; cursor: pointer; opacity: ${el.visible !== false ? '1' : '0.3'};"></ui-icon>
         </div>
@@ -365,7 +365,14 @@ export class ElementInspector extends HTMLElement {
       UISM.play(UISM.enumPresets.TAP);
     } else if (action === 'toggle-vis') {
       const el = store.getState().currentLabel?.elements.find(item => item.id === id);
-      if (el) eventBus.emit('element:update', { id, updates: { visible: !el.visible } });
+      if (el) {
+        // Toggle robusto: se for explicitamente false vira true, senão vira false
+        const nextVisible = el.visible === false;
+        eventBus.emit('element:update', {
+          id,
+          updates: { visible: nextVisible },
+        });
+      }
       UISM.play(UISM.enumPresets.TOGGLE);
     } else if (action === 'up') {
       eventBus.emit('element:reorder', { id, direction: 'up' });
