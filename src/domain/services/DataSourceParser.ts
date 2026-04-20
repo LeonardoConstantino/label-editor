@@ -17,7 +17,7 @@ export class DataSourceParser {
         },
         error: (error) => {
           reject(error);
-        }
+        },
       });
     });
   }
@@ -31,14 +31,26 @@ export class DataSourceParser {
     return Array.isArray(data) ? data : [data];
   }
 
+  public async parseTXT(file: File): Promise<Record<string, any>[]> {
+    const text = await file.text();
+    const trimmedText = text.trim();
+    return trimmedText
+      ? trimmedText.split('\n').map((v) => ({ nome: v.trim() }))
+      : [];
+  }
+
   /**
    * Aplica os dados em uma string substituindo variáveis {{key}}
-   * Suporta espaços: {{ nome }}
+   * Suporta espaços, pontos e hífens: {{ nome.completo }}
    */
-  public static interpolate(template: string, data: Record<string, any>): string {
+  public static interpolate(
+    template: string,
+    data: Record<string, any>,
+  ): string {
     if (!template) return '';
-    return template.replace(/\{\{\s*(\w+)\s*\}\}/g, (match, key) => {
-      return data[key] !== undefined ? String(data[key]) : match;
+    return template.replace(/\{\{\s*([\w\s.-]+)\s*\}\}/g, (match, key) => {
+      const trimmedKey = key.trim();
+      return data[trimmedKey] !== undefined ? String(data[trimmedKey]) : match;
     });
   }
 }

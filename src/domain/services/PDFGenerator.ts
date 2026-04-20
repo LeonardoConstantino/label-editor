@@ -4,6 +4,7 @@ import { canvasRenderer } from './CanvasRenderer';
 import { DataSourceParser } from './DataSourceParser';
 import { ElementType } from '../models/elements/BaseElement';
 import { UnitConverter } from '../../utils/units';
+import { DEFAULTS } from '../../constants/defaults';
 
 export interface BatchLayoutOptions {
   marginMM: number;
@@ -37,7 +38,7 @@ export class PDFGenerator {
     // Canvas oculto para renderização em alta resolução
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d')!;
-    const dpi = label.config.dpi || 300;
+    const dpi = label.config.dpi || DEFAULTS.CANVAS.dpi;
     const scale = UnitConverter.mmToPx(1, dpi);
 
     canvas.width = UnitConverter.mmToPx(label.config.widthMM, dpi);

@@ -406,16 +406,16 @@
    ========================================== */
 @layer components {
   .studio-container {
-    @apply flex flex-col h-[80vh] w-250 max-w-[90vw] -m-6 bg-canvas overflow-hidden;
+    @apply flex flex-col h-full -m-6 bg-canvas overflow-hidden;
   }
   .studio-main {
     @apply flex flex-1 overflow-hidden;
   }
   .studio-sidebar {
-    @apply w-80 bg-surface/50 border-r border-border-ui p-6 flex flex-col gap-5;
+    @apply w-96 bg-surface-solid/50 border-r border-border-ui p-8 flex flex-col gap-8 overflow-y-auto;
   }
   .studio-preview {
-    @apply flex-1 p-10 overflow-y-auto flex flex-col items-center;
+    @apply flex-1 p-8 overflow-hidden bg-canvas relative;
     background-image: radial-gradient(
       var(--color-border-ui) 1px,
       transparent 0
@@ -423,7 +423,7 @@
     background-size: 20px 24px;
   }
   .studio-footer {
-    @apply h-[72px] bg-surface-solid border-t border-border-ui flex items-center justify-between px-8 z-10;
+    @apply h-20 bg-surface-solid border-t border-border-ui flex items-center justify-between px-10 z-10;
   }
 
   .preview-grid {
@@ -438,11 +438,15 @@
   }
 
   /* Preview A4 e Drop Zone */
+  .a4-viewport {
+    @apply w-full h-full flex justify-center items-start py-12 px-6 bg-canvas/40 rounded-3xl border border-border-ui/20 overflow-auto relative;
+  }
+
   .a4-sheet {
     background: white;
     width: 210mm;
     height: 297mm;
-    box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+    box-shadow: 0 40px 100px rgba(0,0,0,0.6);
     padding: var(--a4-margin, 10mm);
     display: grid;
     grid-template-columns: repeat(var(--a4-cols, 2), 1fr);
@@ -450,17 +454,30 @@
     align-content: start;
     transform-origin: top center;
     transition: all 0.4s var(--ease-spring);
+    flex-shrink: 0;
   }
 
   .drop-zone {
-    @apply w-full h-40 border-2 border-dashed border-border-ui rounded-2xl flex flex-col items-center justify-center gap-3 transition-all cursor-pointer bg-black/10;
+    @apply w-full h-44 border-2 border-dashed border-border-ui rounded-2xl flex flex-col items-center justify-center gap-3 transition-all cursor-pointer bg-black/10 relative overflow-hidden;
   }
+  .drop-zone:hover { @apply border-accent-primary/50 bg-accent-primary/5; }
   .drop-zone.active {
-    @apply border-accent-primary bg-accent-primary/10 scale-[1.02];
+    @apply border-accent-primary bg-accent-primary/10 scale-[1.01];
     box-shadow: var(--shadow-neon-primary);
   }
-  .drop-zone ui-icon { --icon-size: 32px; @apply text-text-muted; }
-  .drop-zone.active ui-icon { @apply text-accent-primary; }
+  .drop-zone.has-file {
+    @apply border-accent-success/40 bg-accent-success/5 border-solid;
+  }
+  .drop-zone ui-icon { --icon-size: 32px; @apply text-text-muted transition-transform duration-300; }
+  .drop-zone:hover ui-icon { @apply scale-110 text-accent-primary; }
+  .drop-zone.has-file ui-icon { @apply text-accent-success; }
+
+  .variable-badge {
+    @apply inline-flex items-center px-2 py-1 rounded bg-accent-primary/10 border border-accent-primary/20 text-accent-primary font-mono text-[10px] uppercase tracking-wider;
+  }
+  .variable-badge.missing {
+    @apply bg-accent-danger/10 border-accent-danger/20 text-accent-danger;
+  }
 
   .data-mini-table {
     @apply w-full border-collapse mt-4 text-[11px] font-mono;
