@@ -17,3 +17,4 @@ Transformar o upload de arquivos de dados em uma experiência fluida e visual, c
 - [x] Drag & Drop funcional com feedback visual de hover.
 - [x] Exibição clara de "X registros carregados" com preview.
 - [x] Notificação de erro se o PapaParse falhar ou o arquivo for inválido.
+- [x] Mapeamento e validação de variáveis entre arquivo e template.
