@@ -253,7 +253,7 @@ class TooltipBalloon extends HTMLElement {
   position(targetRect: DOMRect, placement: Placement, offset: number): void {
     const tipRect = this.getBoundingClientRect();
     const arrowSize = 6;
-    const margin = 8; // distância mínima da borda da viewport
+    const margin = 18; // distância mínima da borda da viewport
     const vw = window.innerWidth;
     const vh = window.innerHeight;
 

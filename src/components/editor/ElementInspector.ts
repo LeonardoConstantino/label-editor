@@ -120,7 +120,7 @@ export class ElementInspector extends HTMLElement {
           <span id="panel-title" class="inspector-title">LAYERS</span>
           <span id="unit-count" class="inspector-badge">0 UNITS</span>
         </div>
-        <ui-tooltip placement="bottom" offset="12">
+        <ui-tooltip placement="bottom" offset="8">
           <button slot="target" class="help-btn" aria-label="Manual Técnico">
             <ui-icon name="help" size="md"></ui-icon>
           </button>
@@ -252,7 +252,69 @@ export class ElementInspector extends HTMLElement {
   private renderTypeSpecificFields(el: AnyElement): string {
     if (isText(el)) {
       return `
-        <span class="label-prism">Typography</span>
+        <div class="flex items-center justify-between mb-1">
+          <span class="label-prism" style="margin:0">Typography</span>
+          <ui-tooltip placement="left" offset="12">
+            <button slot="target" class="help-btn cursor-help opacity-50" aria-label="Manual Técnico">
+              <ui-icon name="help" size="sm"></ui-icon>
+            </button>
+            <div slot="content" class="tooltip-rich-panel w-60">
+  
+              <!-- CABEÇALHO -->
+              <div class="tooltip-rich-header mb-2 pb-1.5 border-b border-white/10 flex items-center gap-1.5">
+                <ui-icon name="brackets" class="w-3.5 h-3.5 text-accent-primary"></ui-icon>
+                <span class="font-mono text-[10px] text-text-main font-semibold uppercase tracking-wider">
+                  Dynamic Interpolation
+                </span>
+              </div>
+
+              <!-- TABELA DE COMANDOS (Grid) -->
+              <div class="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1.5 items-center text-[10px] mb-1">
+                
+                <!-- Item 1 -->
+                <code class="font-mono text-accent-primary bg-accent-primary/10 px-1 py-0.5 rounded border border-accent-primary/20">
+                  :upper
+                </code> 
+                <span class="text-text-muted">MAIÚSCULAS</span>
+                
+                <!-- Item 2 -->
+                <code class="font-mono text-accent-primary bg-accent-primary/10 px-1 py-0.5 rounded border border-accent-primary/20">
+                  :currency
+                </code> 
+                <span class="text-text-muted">R$ 1.250,00</span>
+                
+                <!-- Item 3 -->
+                <code class="font-mono text-accent-primary bg-accent-primary/10 px-1 py-0.5 rounded border border-accent-primary/20">
+                  :date
+                </code> 
+                <span class="text-text-muted">19/04/2026</span>
+                
+                <!-- Item 4 -->
+                <code class="font-mono text-accent-primary bg-accent-primary/10 px-1 py-0.5 rounded border border-accent-primary/20">
+                  :trunc(N)
+                </code> 
+                <span class="text-text-muted">Limita o texto a N chars</span>
+                
+                <!-- Item 5 (Fallback - Note que mudei a cor para Warning para diferenciar lógica) -->
+                <code class="font-mono text-accent-warning bg-accent-warning/10 px-1 py-0.5 rounded border border-accent-warning/20">
+                  ||Default
+                </code> 
+                <span class="text-text-muted">Valor reserva (Fallback)</span>
+
+              </div>
+
+              <!-- RODAPÉ (Dica Oculta) -->
+              <div class="mt-2.5 pt-2 border-t border-white/5 text-[9px] text-accent-success/90 flex gap-1.5 items-start">
+                <ui-icon name="lightbulb" class="w-3 h-3 shrink-0 mt-0.5"></ui-icon>
+                <p class="leading-relaxed">
+                  <strong class="uppercase tracking-wide font-semibold">Tip:</strong> Chain formatters like 
+                  <code class="font-mono text-white bg-white/10 px-1 py-0.5 rounded border border-white/20">:trim:upper</code>
+                </p>
+              </div>
+
+            </div>
+          </ui-tooltip>
+        </div>
         <div class="row-ui">
           <app-input label="Content" data-prop="content" value="${escapeHTML(el.content)}" style="flex:1"></app-input>
         </div>

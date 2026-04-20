@@ -56,7 +56,8 @@ export class DataSourceInput extends HTMLElement {
 
     const vars = new Set<string>();
     // Regex atualizado para bater com o do DataSourceParser.interpolate
-    const regex = /\{\{\s*([\w\s.-]+)\s*\}\}/g;
+    // Captura 1: nome da variável
+    const regex = /\{\{\s*([\w\s."'-]+)(?::([\w,()\s.:-]+))?(?:\|\|([^}]+))?\s*\}\}/g;
 
     label.elements.forEach((el) => {
       if (el.type === ElementType.TEXT && (el as any).content) {
