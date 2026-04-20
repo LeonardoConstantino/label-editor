@@ -31,7 +31,7 @@ Este arquivo coordena a execução de tarefas para a excelência técnica, visua
 |----|------|--------|--------------|--------|
 | **24** | [Otimização de Lote (Web Workers)](./tasks/24_batch_perf.md) | [ ] | 19 | `task/24-batch-workers` |
 | **25** | [Persistência de Preferências](./tasks/25_user_prefs.md) | [ ] | 07 | `task/25-user-prefs` |
-| **26** | [Layout de Impressão A4 (Multi)](./tasks/26_a4_printing.md) | [ ] | 19 | `task/26-a4-printing` |
+| **26** | [Layout de Impressão A4 (Multi)](./tasks/26_a4_printing.md) | [x] | 19 | `task/26-a4-printing` |
 
 ### Fase 6: Alinhamento Arquitetural (Base)
 | ID | Task | Status | Dependências | Branch |
