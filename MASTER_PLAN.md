@@ -23,7 +23,7 @@ Este arquivo coordena a execução de tarefas para a excelência técnica, visua
 | **20** | [Auditoria de Componentes Core](./tasks/20_ui_audit.md) | [x] | — | `task/20-ui-audit` |
 | **21** | [Refinamento de Profundidade](./tasks/21_cockpit_depth.md) | [x] | — | `task/21-cockpit-refinement` |
 | **22** | [Sincronização de Temas & Variáveis](./tasks/22_theme_sync.md) | [x] | — | `task/22-theme-sync` |
-| **23** | [Acessibilidade & Atalhos de Teclado](./tasks/23_shortcuts_acc.md) | [ ] | — | `task/23-shortcuts` |
+| **23** | [Acessibilidade & Atalhos de Teclado](./tasks/23_shortcuts_acc.md) | [x] | — | `task/23-shortcuts` |
 | **27** | [Personalização e Limites do Canvas](./tasks/27_canvas_limits.md) | [x] | — | `task/27-canvas-limits` |
 
 ### Fase 5: Estabilidade & Performance
@@ -47,8 +47,8 @@ Este arquivo coordena a execução de tarefas para a excelência técnica, visua
 ### Fase 7: Gestão de Projetos & Persistência
 | ID | Task | Status | Dependências | Branch |
 |----|------|--------|--------------|--------|
-| **35** | [Galeria de Templates & Digital Twin](./tasks/35_template_gallery.md) | [ ] | 07 | `task/35-template-gallery` |
-| **36** | [Retomada Automática & Tela Inicial](./tasks/36_work_resumption.md) | [ ] | 35 | `task/36-work-resumption` |
+| **35** | [Galeria de Templates & Digital Twin](./tasks/35_template_gallery.md) | [x] | 07 | `task/35-template-gallery` |
+| **36** | [Retomada Automática & Tela Inicial](./tasks/36_work_resumption.md) | [/] | 35 | `task/36-boot-welcome` |
 
 ### Fase 8: Atributos de Estilo (Opcionais/Futuro)
 | ID | Task | Status | Dependências | Branch |

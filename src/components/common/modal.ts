@@ -1,4 +1,5 @@
 import { UISM } from '../../core/UISoundManager';
+import eventBus from '../../core/EventBus';
 /**
  * @element ui-modal
  * @description Modal Web Component — Shadow DOM, variantes, tamanhos, animações e acessibilidade.
@@ -614,6 +615,8 @@ export class UiModal extends HTMLElement {
     this.#overlay.removeAttribute('aria-hidden');
     this.#internals.states?.add('open');
 
+    eventBus.emit('ui:modal:open', { id: this.id });
+
     requestAnimationFrame(() => {
       const first = this.#firstFocusable();
       (first ?? this.#closeBtn).focus();
@@ -639,6 +642,8 @@ export class UiModal extends HTMLElement {
 
       (this.#prevFocus as HTMLElement | null)?.focus?.();
       this.#prevFocus = null;
+
+      eventBus.emit('ui:modal:close', { id: this.id });
 
       if (isCancel) this.#emit('ui-modal:cancel');
       this.#emit('ui-modal:close');

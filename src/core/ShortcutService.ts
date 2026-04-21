@@ -43,8 +43,22 @@ class ShortcutService {
 
     this.manager.init();
     this.registerDefaults();
+    this.setupModalListeners();
     this.isInitialized = true;
     logger.info('ShortcutService', 'Serviço de atalhos refinado e inicializado.');
+  }
+
+  private setupModalListeners(): void {
+    // Usando EventBus em vez de DOM events para garantir captura
+    eventBus.on('ui:modal:open', () => {
+      logger.debug('ShortcutService', 'Contexto alterado para: MODAL');
+      this.pushContext('modal');
+    });
+
+    eventBus.on('ui:modal:close', () => {
+      logger.debug('ShortcutService', 'Contexto restaurado para: GLOBAL');
+      this.popContext();
+    });
   }
 
   private registerDefaults(): void {
@@ -69,8 +83,12 @@ class ShortcutService {
       { description: 'Refazer', category: 'Edição', preventDefault: true });
 
     // --- MANIPULAÇÃO DE ELEMENTOS ---
-    this.manager.register('delete', () => this.handleDelete(), {description: 'Excluir Elemento', context: 'no-input' });
-    this.manager.register('backspace', () => this.handleDelete(), { description: 'Excluir Elemento', context: 'no-input' });
+    this.manager.register('delete', () => this.handleDelete(), {
+      description: 'Excluir Elemento', 
+      context: (ctx) => ctx === 'global', // Bloqueia se estiver em modal ou input
+      preventDefault: true 
+    });
+    this.manager.register('backspace', () => this.handleDelete(), { description: 'Excluir Elemento', context: (ctx) => ctx === 'global', preventDefault: true });
     
     this.manager.register(`${this.metaKeyName}+d`, () => {
       const id = store.getState().selectedElementIds[0];
@@ -134,19 +152,19 @@ class ShortcutService {
         
         const d = deltas[key];
         this.moveSelectedElement(d.x * multiplier, d.y * multiplier);
-      }, {description: descriptionMap[key], context: 'no-input', preventDefault: true });
+      }, {description: descriptionMap[key], context: (ctx) => ctx === 'global', preventDefault: true });
 
       // Garante que Alt+Seta e Shift+Seta funcionem mesmo que o manager 
       // não capture a combinação exata no register (devido à normalização)
       this.manager.register(`shift+${key}`, (e) => {
         const d = deltas[key];
         this.moveSelectedElement(d.x * 10, d.y * 10);
-      }, { description: `${descriptionMap[key]} (Shift) rápido`, context: 'no-input', preventDefault: true });
+      }, { description: `${descriptionMap[key]} rápido`, context: (ctx) => ctx === 'global', preventDefault: true });
 
       this.manager.register(`alt+${key}`, (e) => {
         const d = deltas[key];
         this.moveSelectedElement(d.x * 0.1, d.y * 0.1);
-      }, { description: `${descriptionMap[key]} (Alt) lento`, context: 'no-input', preventDefault: true });
+      }, { description: `${descriptionMap[key]} lento`, context: (ctx) => ctx === 'global', preventDefault: true });
     });
   }
 

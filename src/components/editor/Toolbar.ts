@@ -66,6 +66,15 @@ export class EditorToolbar extends HTMLElement {
           width: 200px;
           padding: 4px;
         }
+        @keyframes pulse-indigo {
+          0% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4); }
+          70% { box-shadow: 0 0 0 10px rgba(99, 102, 241, 0); }
+          100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
+        }
+        .pulse-help {
+          animation: pulse-indigo 2s infinite;
+          border-color: var(--color-accent-primary) !important;
+        }
       </style>
       
       <!-- GRUPO DE CRIAÇÃO -->
@@ -172,6 +181,21 @@ export class EditorToolbar extends HTMLElement {
       
       <!-- AÇÕES PRIMÁRIAS -->
       <ui-tooltip placement="bottom" delay="300">
+        <app-button slot="target" id="open-help" variant="secondary" class="${!localStorage.getItem('has_seen_guide') ? 'pulse-help' : ''}">
+          <ui-icon name="help"></ui-icon>
+        </app-button>
+        <div slot="content" class="tooltip-rich-panel">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-text-main text-[12px] font-semibold tracking-wide">Guia & Atalhos</span>
+            <kbd class="kbd-prism">Ctrl</kbd><span class="text-text-muted">+</span><kbd class="kbd-prism">/</kbd>
+          </div>
+          <p class="text-text-muted text-[10px] leading-relaxed">
+            Acesse o centro de ajuda, tutoriais rápidos e mapa de atalhos.
+          </p>
+        </div>
+      </ui-tooltip>
+
+      <ui-tooltip placement="bottom" delay="300">
         <app-button slot="target" id="save" variant="secondary">
           <ui-icon name="save"></ui-icon>
         </app-button>
@@ -246,6 +270,12 @@ export class EditorToolbar extends HTMLElement {
         },
         src: processed.src
       }));
+    });
+
+    shadow.getElementById('open-help')?.addEventListener('click', () => {
+      eventBus.emit('ui:open:help', { tab: 'guide' });
+      const btn = shadow.getElementById('open-help');
+      if (btn) btn.classList.remove('pulse-help');
     });
 
     shadow
