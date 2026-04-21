@@ -17,6 +17,7 @@ import '../common/icon';
 import '../common/UINumberScrubber';
 import '../common/tooltip';
 import { debounce } from '../../utils/utils';
+import { sharedStyles } from '../../utils/shared-styles';
 
 const isText = (el: AnyElement): el is TextElement => el.type === ElementType.TEXT;
 const isRect = (el: AnyElement): el is RectangleElement => el.type === ElementType.RECTANGLE;
@@ -120,13 +121,11 @@ export class ElementInspector extends HTMLElement {
     }
   }
 
-  private currentPrefsJson: string = '';
-
   private renderSkeleton(): void {
     if (!this.shadowRoot) return;
     this.shadowRoot.innerHTML = `
       <style>
-        @import "/src/styles/main.css";
+        ${sharedStyles};
         :host { display: flex; flex-direction: column; height: 100%; gap: 16px; padding: 20px; box-sizing: border-box; color: var(--color-text-main); font-family: var(--font-sans); overflow-y: scroll; }
         #panel-content { display: flex; flex-direction: column; gap: 12px; flex: 1; padding-right: 8px; }
         .row-ui { display: flex; gap: 10px; margin-bottom: 4px; align-items: flex-end; }

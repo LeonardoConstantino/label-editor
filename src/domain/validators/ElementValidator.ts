@@ -65,7 +65,7 @@ export class ElementValidator {
     if (el.borderRadius < 0) errors.push('Raio da borda não pode ser negativo.');
   }
 
-  private static validateImage(el: any, errors: string[]): void {
+  private static validateImage(_el: any, _errors: string[]): void {
     // Para imagens, src pode estar vazio inicialmente se estivermos esperando upload
     // Mas se houver algo, talvez validar se é uma URL ou Base64 básica?
   }

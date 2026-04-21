@@ -60,7 +60,7 @@ describe('CanvasRenderer', () => {
     const width = textElement.dimensions.width * scale;
     const height = textElement.dimensions.height * scale;
 
-    canvasRenderer.render(textElement as any, { ctx: mockCtx, scale });
+    canvasRenderer.render(textElement as any, { ctx: mockCtx, scale, dpi: 300 });
 
     // canvas-txt usa x + width/2, y + height/2 para centralização
     expect(mockCtx.fillText).toHaveBeenCalledWith(

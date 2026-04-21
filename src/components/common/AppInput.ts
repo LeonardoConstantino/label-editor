@@ -1,4 +1,5 @@
 import { UISM } from '../../core/UISoundManager';
+import { sharedStyles } from '../../utils/shared-styles';
 
 /**
  * AppInput: Campo de entrada técnico com label integrada.
@@ -29,7 +30,7 @@ export class AppInput extends HTMLElement {
     this.setupEvents();
   }
 
-  attributeChangedCallback(name: string, oldVal: string, newVal: string): void {
+  attributeChangedCallback(_name: string, oldVal: string, newVal: string): void {
     if (oldVal === newVal) return;
     this.updateValues();
   }
@@ -38,7 +39,7 @@ export class AppInput extends HTMLElement {
     if (!this.shadowRoot) return;
     this.shadowRoot.innerHTML = `
       <style>
-        @import "/src/styles/main.css";
+        ${sharedStyles}
         :host {
           display: block;
           margin-bottom: 12px;

@@ -3,6 +3,7 @@ import eventBus from '../../core/EventBus';
 import { canvasRenderer } from '../../domain/services/CanvasRenderer';
 import { UISM } from '../../core/UISoundManager';
 import { UnitConverter } from '../../utils/units';
+import { sharedStyles } from '../../utils/shared-styles';
 
 /**
  * EditorCanvas: O Web Component que renderiza a etiqueta visualmente com layout Tactile Prism.
@@ -40,7 +41,7 @@ export class EditorCanvas extends HTMLElement {
 
     this.shadowRoot.innerHTML = `
       <style>
-        @import "/src/styles/main.css";
+        ${sharedStyles};
         :host {
           display: block;
           width: 100%;
@@ -75,7 +76,7 @@ export class EditorCanvas extends HTMLElement {
     this.canvas.addEventListener('mousedown', (e) => this.handleMouseDown(e));
   }
 
-  private updateWorkspaceVisuals(state: AppState): void {
+  private updateWorkspaceVisuals(_state: AppState): void {
     // O grid do workspace (background) pode ficar sempre ligado para dar a sensação de Cockpit
     // ou podemos associar a outra preferência no futuro.
     this.workspace.style.backgroundImage = ''; 

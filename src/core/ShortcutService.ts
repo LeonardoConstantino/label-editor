@@ -63,13 +63,13 @@ class ShortcutService {
 
   private registerDefaults(): void {
     // --- GESTÃO DE PROJETO (Prevenindo conflitos com browser) ---
-    this.manager.register(`${this.metaKeyName}+s`, (e) => {
+    this.manager.register(`${this.metaKeyName}+s`, (_e) => {
       eventBus.emit('template:save');
       UISM.play(UISM.enumPresets.SUCCESS);
       eventBus.emit('notify', { message: 'Etiqueta salva com sucesso!', type: 'success' });
     }, { description: 'Salvar Template', category: 'Projeto', preventDefault: true });
 
-    this.manager.register(`${this.metaKeyName}+alt+n`, (e) => {
+    this.manager.register(`${this.metaKeyName}+alt+n`, (_e) => {
       templateManager.createNewProject();
       UISM.play(UISM.enumPresets.OPEN);
       eventBus.emit('notify', { message: 'Novo projeto criado', type: 'info' });
@@ -156,12 +156,12 @@ class ShortcutService {
 
       // Garante que Alt+Seta e Shift+Seta funcionem mesmo que o manager 
       // não capture a combinação exata no register (devido à normalização)
-      this.manager.register(`shift+${key}`, (e) => {
+      this.manager.register(`shift+${key}`, (_e) => {
         const d = deltas[key];
         this.moveSelectedElement(d.x * 10, d.y * 10);
       }, { description: `${descriptionMap[key]} rápido`, context: (ctx) => ctx === 'global', preventDefault: true });
 
-      this.manager.register(`alt+${key}`, (e) => {
+      this.manager.register(`alt+${key}`, (_e) => {
         const d = deltas[key];
         this.moveSelectedElement(d.x * 0.1, d.y * 0.1);
       }, { description: `${descriptionMap[key]} lento`, context: (ctx) => ctx === 'global', preventDefault: true });

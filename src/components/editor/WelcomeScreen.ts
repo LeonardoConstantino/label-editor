@@ -2,6 +2,7 @@ import { UISM } from '../../core/UISoundManager';
 import { templateManager } from '../../domain/services/TemplateManager';
 import eventBus from '../../core/EventBus';
 import '../common/icon';
+import { sharedStyles } from '../../utils/shared-styles';
 
 /**
  * WelcomeScreen: Tela inicial do Label Forge OS.
@@ -23,7 +24,7 @@ export class WelcomeScreen extends HTMLElement {
 
     this.shadowRoot.innerHTML = `
       <style>
-        @import "/src/styles/main.css";
+        ${sharedStyles};
         :host { display: block; }
 
         .action-btn:hover {

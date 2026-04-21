@@ -3,6 +3,8 @@
  * @description Gerenciador global de tooltips (deve ser adicionado uma vez no documento)
  */
 
+import { sharedStyles } from "../../utils/shared-styles";
+
 /**
  * @element ui-tooltip
  * @description Tooltip wrapper com slots (mantém funcionalidade original)
@@ -694,7 +696,7 @@ class TooltipInstance {
 const TEMPLATE_WRAPPER = document.createElement('template');
 TEMPLATE_WRAPPER.innerHTML = `
 <style>
-  @import "/src/styles/main.css";
+  ${sharedStyles}
   :host { display: contents; }
 </style>
 <slot name="target"></slot>

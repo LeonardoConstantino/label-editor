@@ -1,4 +1,5 @@
 import { UISM } from '../../core/UISoundManager';
+import { sharedStyles } from '../../utils/shared-styles';
 
 /**
  * ui-number-scrubber
@@ -181,7 +182,7 @@ export class UINumberScrubber extends HTMLElement {
 
     this.#shadow.innerHTML = `
       <style>
-        @import "/src/styles/main.css";
+        ${sharedStyles};
         :host { display: block; width: 100%; --progress: 0%; }
         
         .scrubber-wrapper {

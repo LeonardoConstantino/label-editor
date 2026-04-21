@@ -9,6 +9,7 @@ import '../common/icon';
 import '../common/UINumberScrubber';
 import '../common/ui-variable-badge';
 import { DEFAULTS } from '../../constants/defaults';
+import { sharedStyles } from '../../utils/shared-styles';
 
 interface A4Config {
   marginMM: number;
@@ -81,7 +82,7 @@ export class DataSourceInput extends HTMLElement {
 
     this.shadowRoot.innerHTML = `
       <style>
-        @import "/src/styles/main.css";
+        ${sharedStyles};
         
         :host { display: block; height: 100%; }
       </style>

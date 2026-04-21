@@ -5,6 +5,7 @@ import { formatDate } from '../../utils/utils';
 import '../common/AppButton';
 import '../common/icon';
 import { confirmDialog } from '../common/confirm';
+import { sharedStyles } from '../../utils/shared-styles';
 
 /**
  * VaultGallery: Interface de gerenciamento de templates (The Vault).
@@ -60,8 +61,9 @@ export class VaultGallery extends HTMLElement {
   private renderSkeleton(): void {
     this.shadowRoot!.innerHTML = `
     <style>
-      @import "/src/styles/main.css";
+      ${sharedStyles};
       :host { display: block; height: 100%; }
+
       ::-webkit-scrollbar { width: 8px; }
       ::-webkit-scrollbar-track { background: transparent; }
       ::-webkit-scrollbar-thumb { 

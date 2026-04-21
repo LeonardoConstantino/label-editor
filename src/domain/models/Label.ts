@@ -1,4 +1,4 @@
-import { BaseElement, ElementType } from './elements/BaseElement';
+import { ElementType } from './elements/BaseElement';
 import { 
   TextElement, 
   ImageElement, 

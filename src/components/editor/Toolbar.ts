@@ -7,6 +7,7 @@ import { ElementFactory } from '../../domain/models/elements/ElementFactory';
 import '../common/AppButton';
 import '../common/icon';
 import '../common/tooltip';
+import { sharedStyles } from '../../utils/shared-styles';
 
 /**
  * EditorToolbar: A "Pílula de Controle" flutuante do Cockpit.
@@ -46,7 +47,7 @@ export class EditorToolbar extends HTMLElement {
 
     this.shadowRoot.innerHTML = `
       <style>
-        @import "/src/styles/main.css";
+        ${sharedStyles};
         :host {
           display: flex;
           align-items: center;

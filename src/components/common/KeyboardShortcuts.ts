@@ -1,3 +1,5 @@
+import { sharedStyles } from "../../utils/shared-styles";
+
 export interface ShortcutItem {
   type: 'shortcut' | 'longpress';
   key: string;
@@ -113,7 +115,7 @@ export class UIKeyboardShortcuts extends HTMLElement {
 
     this.shadowRoot.innerHTML = `
       <style>
-        @import "/src/styles/main.css";
+        ${sharedStyles}
         
         :host { display: block; width: 100%; }
 

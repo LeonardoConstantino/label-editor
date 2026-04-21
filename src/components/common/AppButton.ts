@@ -1,4 +1,5 @@
 import { UISM } from '../../core/UISoundManager';
+import { sharedStyles } from '../../utils/shared-styles';
 
 /**
  * AppButton: Botão tátil seguindo o Design System Tactile Prism.
@@ -30,7 +31,7 @@ export class AppButton extends HTMLElement {
     if (!this.shadowRoot) return;
     this.shadowRoot.innerHTML = `
       <style>
-        @import "/src/styles/main.css";
+        ${sharedStyles}
         :host { display: inline-block; width: auto; }
         button { width: 100%; outline: none; }
         button:disabled { opacity: 0.4; cursor: not-allowed; filter: grayscale(1); }
