@@ -24,6 +24,7 @@ class ShortcutService {
   private manager: KeyboardShortcutManager;
   private isInitialized = false;
   private propClipboard: PropClipboard | null = null;
+  private metaKeyName: string = 'ctrl';
 
   constructor() {
     this.manager = new KeyboardShortcutManager({
@@ -35,8 +36,11 @@ class ShortcutService {
     });
   }
 
-  init(): void {
+  init(isMac: boolean): void {
     if (this.isInitialized) return;
+
+    this.metaKeyName = isMac ? 'meta' : 'ctrl';
+
     this.manager.init();
     this.registerDefaults();
     this.isInitialized = true;
@@ -45,48 +49,48 @@ class ShortcutService {
 
   private registerDefaults(): void {
     // --- GESTÃO DE PROJETO (Prevenindo conflitos com browser) ---
-    this.manager.register('ctrl+s', (e) => {
+    this.manager.register(`${this.metaKeyName}+s`, (e) => {
       eventBus.emit('template:save');
       UISM.play(UISM.enumPresets.SUCCESS);
       eventBus.emit('notify', { message: 'Etiqueta salva com sucesso!', type: 'success' });
     }, { description: 'Salvar Template', category: 'Projeto', preventDefault: true });
 
-    this.manager.register('ctrl+alt+n', (e) => {
+    this.manager.register(`${this.metaKeyName}+alt+n`, (e) => {
       templateManager.createNewProject();
       UISM.play(UISM.enumPresets.OPEN);
       eventBus.emit('notify', { message: 'Novo projeto criado', type: 'info' });
     }, { description: 'Novo Projeto', category: 'Projeto', preventDefault: true });
 
     // --- HISTÓRICO ---
-    this.manager.register('ctrl+z', () => eventBus.emit('history:undo'), 
+    this.manager.register(`${this.metaKeyName}+z`, () => eventBus.emit('history:undo'), 
       { description: 'Desfazer', category: 'Edição', preventDefault: true });
     
-    this.manager.register('ctrl+shift+z', () => eventBus.emit('history:redo'), 
+    this.manager.register(`${this.metaKeyName}+shift+z`, () => eventBus.emit('history:redo'), 
       { description: 'Refazer', category: 'Edição', preventDefault: true });
 
     // --- MANIPULAÇÃO DE ELEMENTOS ---
-    this.manager.register('delete', () => this.handleDelete(), { context: 'no-input' });
-    this.manager.register('backspace', () => this.handleDelete(), { context: 'no-input' });
+    this.manager.register('delete', () => this.handleDelete(), {description: 'Excluir Elemento', context: 'no-input' });
+    this.manager.register('backspace', () => this.handleDelete(), { description: 'Excluir Elemento', context: 'no-input' });
     
-    this.manager.register('ctrl+d', () => {
+    this.manager.register(`${this.metaKeyName}+d`, () => {
       const id = store.getState().selectedElementIds[0];
       if (id) eventBus.emit('element:duplicate', id);
     }, { description: 'Duplicar', category: 'Edição', context: 'no-input', preventDefault: true });
 
     // --- PROP CLIPBOARD (Cópia de Propriedades) ---
-    this.manager.register('ctrl+alt+c', () => this.copyProperties(), 
+    this.manager.register(`${this.metaKeyName}+alt+c`, () => this.copyProperties(), 
       { description: 'Copiar Propriedades', category: 'Edição', context: 'no-input', preventDefault: true });
     
-    this.manager.register('ctrl+alt+v', () => this.pasteProperties(), 
+    this.manager.register(`${this.metaKeyName}+alt+v`, () => this.pasteProperties(), 
       { description: 'Colar Propriedades', category: 'Edição', context: 'no-input', preventDefault: true });
 
     // --- ORGANIZAÇÃO DE CAMADAS ---
-    this.manager.register('ctrl+[', () => this.reorder('down'), { description: 'Recuar Camada', category: 'Organizar' });
-    this.manager.register('ctrl+]', () => this.reorder('up'), { description: 'Avançar Camada', category: 'Organizar' });
+    this.manager.register(`${this.metaKeyName}+[`, () => this.reorder('down'), { description: 'Recuar Camada', category: 'Organizar' });
+    this.manager.register(`${this.metaKeyName}+]`, () => this.reorder('up'), { description: 'Avançar Camada', category: 'Organizar' });
 
     // --- VISIBILIDADE & BLOQUEIO ---
-    this.manager.register('ctrl+l', () => this.toggleProp('locked'), { description: 'Bloquear/Desbloquear', category: 'Edição' });
-    this.manager.register('ctrl+shift+h', () => this.toggleProp('visible'), { description: 'Ocultar/Mostrar', category: 'Edição' });
+    this.manager.register(`${this.metaKeyName}+l`, () => this.toggleProp('locked'), { description: 'Bloquear/Desbloquear', category: 'Edição' });
+    this.manager.register(`${this.metaKeyName}+shift+h`, () => this.toggleProp('visible'), { description: 'Ocultar/Mostrar', category: 'Edição' });
 
     // --- SELEÇÃO ---
     this.manager.register('escape', () => eventBus.emit('element:select', []), { description: 'Limpar Seleção' });
@@ -98,7 +102,7 @@ class ShortcutService {
     this.registerToolbarShortcuts();
 
     // --- AJUDA ---
-    this.manager.register('ctrl+/', () => {
+    this.manager.register(`${this.metaKeyName}+/`, () => {
       logger.debug('ShortcutService', 'Atalho de ajuda acionado');
       eventBus.emit('ui:open:help'); // Preparado para Task 36
     }, { description: 'Mostrar Atalhos', category: 'Ajuda', preventDefault: true });

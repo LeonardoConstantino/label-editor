@@ -19,6 +19,7 @@ import './components/common/modal';
 import './components/preview/DataSourceInput';
 import './components/common/UINumberScrubber';
 import './components/common/tooltip';
+import { getOSInfo } from './utils/os-detection';
 
 // Global Notification Listener
 eventBus.on('notify', (options: any) => {
@@ -40,6 +41,7 @@ const defaultLabel: Label = {
 };
 
 document.addEventListener('DOMContentLoaded', async () => {
+  const { isMac } = getOSInfo(); // Detecta o sistema operacional e ajusta variáveis globais
   // Inicializa o som e contorna autoplay-block
   UISM.toggle(true);
 
@@ -52,7 +54,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.addEventListener('keydown', playTestSound, { once: true });
 
   await templateManager.init();
-  shortcutService.init();
+  shortcutService.init(isMac);
 
   const shortcuts = shortcutService.listShortcuts();
   eventBus.emit('shortcuts:list:', shortcuts);
