@@ -10,6 +10,7 @@ import { ToastManager } from './components/common/toast';
 import './components/editor/EditorCanvas';
 import './components/editor/Toolbar';
 import './components/editor/ElementInspector';
+import './components/editor/VaultGallery';
 import './components/common/modal';
 import './components/preview/DataSourceInput';
 import './components/common/UINumberScrubber';

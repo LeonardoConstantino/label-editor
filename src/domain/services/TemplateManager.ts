@@ -1,7 +1,9 @@
 import { db } from '../../core/Database';
-import { Label } from '../models/Label';
+import { Label, ElementType } from '../models/Label';
 import { store } from '../../core/Store';
 import { canvasRenderer } from './CanvasRenderer';
+import { DEFAULTS } from '../../constants/defaults';
+import { ElementFactory } from '../models/elements/ElementFactory';
 
 export class TemplateManager {
   private readonly STORE_NAME = 'templates';
@@ -53,13 +55,51 @@ export class TemplateManager {
    * Remove um template pelo ID.
    */
   async deleteTemplate(id: string): Promise<void> {
+  console.log('id :', id);
     await db.delete(this.STORE_NAME, id);
   }
 
   /**
-   * Gera uma imagem base64 do design atual.
+   * Duplica um template existente.
    */
-  private async generateThumbnail(label: Label): Promise<string> {
+  async duplicateTemplate(id: string): Promise<void> {
+    const original = await db.get<Label>(this.STORE_NAME, id);
+    if (!original) return;
+
+    const copy: Label = {
+      ...JSON.parse(JSON.stringify(original)),
+      id: crypto.randomUUID(),
+      name: `${original.name} (Copy)`,
+      createdAt: Date.now(),
+      updatedAt: Date.now()
+    };
+
+    await db.put(this.STORE_NAME, copy);
+  }
+
+  /**
+   * Inicializa um novo projeto limpo usando DEFAULTS.
+   */
+  createNewProject(): void {
+    const newLabel: Label = {
+      id: crypto.randomUUID(),
+      name: 'Nova Etiqueta',
+      config: { ...DEFAULTS.CANVAS },
+      elements: [
+        ElementFactory.create(ElementType.TEXT, {
+          content: 'Minha Nova Etiqueta'
+        })
+      ],
+      createdAt: Date.now(),
+      updatedAt: Date.now()
+    };
+    store.loadLabel(newLabel);
+  }
+
+  /**
+   * Gera uma imagem base64 do design atual de forma pública.
+   */
+  public async captureThumbnail(label: Label): Promise<string> {
     return new Promise((resolve) => {
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
@@ -68,7 +108,7 @@ export class TemplateManager {
         return;
       }
 
-      const targetSize = 300;
+      const targetSize = 400; 
       const ratio = label.config.widthMM / label.config.heightMM;
       let w = targetSize;
       let h = targetSize / ratio;
@@ -92,8 +132,15 @@ export class TemplateManager {
         dpi: 72
       });
 
-      resolve(canvas.toDataURL('image/webp', 0.7));
+      resolve(canvas.toDataURL('image/webp', 0.8));
     });
+  }
+
+  /**
+   * Gera uma imagem base64 do design atual.
+   */
+  private async generateThumbnail(label: Label): Promise<string> {
+    return this.captureThumbnail(label);
   }
 }
 

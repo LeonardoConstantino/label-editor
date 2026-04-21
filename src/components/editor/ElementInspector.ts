@@ -31,6 +31,7 @@ export class ElementInspector extends HTMLElement {
   private abortController: AbortController | null = null;
   private currentElementsJson: string = '';
   private currentSelectedId: string | null = null;
+  private currentThumbnail: string = '';
   private overflowWarnings: Map<string, OverflowResult> = new Map();
 
   constructor() {
@@ -98,6 +99,24 @@ export class ElementInspector extends HTMLElement {
       this.rebuildPanel(state.currentLabel, selectedId, prefs);
     } else {
       this.syncValues(elements, config, selectedId);
+      this.syncDigitalTwin();
+    }
+
+    // Atualiza Digital Twin (Debounced)
+    this.updateDigitalTwin(state.currentLabel);
+  }
+
+  private updateDigitalTwin = debounce(async (label: Label | null) => {
+    if (!label) return;
+    const { templateManager } = await import('../../domain/services/TemplateManager');
+    this.currentThumbnail = await templateManager.captureThumbnail(label);
+    this.syncDigitalTwin();
+  }, 1000);
+
+  private syncDigitalTwin(): void {
+    const monitorImg = this.shadowRoot?.querySelector('#vault-monitor-img') as HTMLImageElement;
+    if (monitorImg && this.currentThumbnail) {
+      monitorImg.src = this.currentThumbnail;
     }
   }
 
@@ -171,26 +190,50 @@ export class ElementInspector extends HTMLElement {
 
   private renderDocumentSetup(label: Label, prefs: any): string {
     const { widthMM, heightMM, backgroundColor } = label.config;
-    const ratio = widthMM / heightMM;
-    let simW = 60;
-    let simH = 60 / ratio;
-    if (simH > 40) { simH = 40; simW = 40 * ratio; }
 
     return `
-      <div class="blueprint-box">
-        <div class="blueprint-grid"></div>
-        <div class="blueprint-paper" style="width: ${simW}%; height: ${simH}%; background-color: ${escapeHTML(backgroundColor || 'white')}"></div>
-        <div class="dimension-line" style="height: 1px; left: 25%; right: 25%; top: 24px;"></div>
-        <div class="dimension-line" style="width: 1px; top: 25%; bottom: 25%; right: 24px;"></div>
-        <div style="position: absolute; top: 4px; left: 0; right: 0; display: flex; justify-content: center;">
-          <ui-number-scrubber label="W" data-doc-prop="widthMM" value="${widthMM}" unit="mm" step="1" style="width: 100px; flex: none;"></ui-number-scrubber>
+      <!-- THE VAULT MONITOR (Digital Twin) -->
+      <div class="relative w-full h-48 bg-[#0a0c10] border border-border-ui rounded-xl flex items-center justify-center mb-6 overflow-hidden group cursor-pointer" 
+           data-action="open-vault" id="btn-open-vault">
+        
+        <!-- A Miniatura Real (Proporcional) -->
+        <div class="relative bg-white shadow-[0_0_15px_rgba(0,0,0,0.8)] transition-all duration-300 group-hover:blur-sm" 
+             style="aspect-ratio: ${widthMM} / ${heightMM}; max-height: 80%; max-width: 80%;">
+          
+          <img id="vault-monitor-img" src="${this.currentThumbnail || ''}" 
+               class="w-full h-full object-contain" 
+               style="${!this.currentThumbnail ? `background-color: ${backgroundColor || 'white'}` : ''}" />
+          
+          <!-- Efeito Scanline CRT (Juice) -->
+          <div class="absolute inset-0 pointer-events-none opacity-10" 
+               style="background: repeating-linear-gradient(0deg, transparent, transparent 2px, #000 2px, #000 4px);"></div>
         </div>
-        <div style="position: absolute; right: 4px; top: 0; bottom: 0; display: flex; align-items: center;">
-          <ui-number-scrubber label="H" data-doc-prop="heightMM" value="${heightMM}" unit="mm" step="1" style="width: 100px; transform: rotate(90deg); flex: none;"></ui-number-scrubber>
+
+        <!-- Overlay de Hover (O Convite) -->
+        <div class="absolute inset-0 bg-accent-primary/10 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity duration-300">
+          <div class="bg-surface-solid border border-accent-primary text-text-main font-mono text-[10px] px-3 py-1.5 rounded uppercase tracking-widest shadow-neon-primary">
+            [ Open Vault ]
+          </div>
+        </div>
+
+        <!-- Réguas de Medida (Cotas sutilmente integradas) -->
+        <div class="absolute top-2 left-0 right-0 flex justify-center pointer-events-none opacity-40">
+           <span class="bg-surface-solid border border-accent-primary text-text-main font-mono text-xs px-2 py-1 rounded" style="background-color: rgba(255, 255, 255, 0.1);">
+             ${widthMM}mm
+           </span>
+        </div>
+        <div class="absolute right-2 top-0 bottom-0 flex items-center pointer-events-none opacity-40">
+           <span class="bg-surface-solid border border-accent-primary text-text-main font-mono text-xs px-2 py-1 rounded" style="background-color: rgba(255, 255, 255, 0.1); writing-mode: vertical-rl;">
+             ${heightMM}mm
+           </span>
         </div>
       </div>
       
       <span class="label-prism">Canvas Setup</span>
+      <div class="row-ui">
+        <ui-number-scrubber label="W" data-doc-prop="widthMM" value="${widthMM}" unit="mm" step="1" style="flex: 1;"></ui-number-scrubber>
+        <ui-number-scrubber label="H" data-doc-prop="heightMM" value="${heightMM}" unit="mm" step="1" style="flex: 1;"></ui-number-scrubber>
+      </div>
       <div class="row-ui">
         <ui-number-scrubber label="DPI" data-doc-prop="dpi" value="${label.config.dpi}" min="72" max="600" step="1" unit="dpi"></ui-number-scrubber>
         <app-input label="Paper" type="color" data-doc-prop="backgroundColor" value="${escapeHTML(backgroundColor || '#ffffff')}" class="fixed-small"></app-input>
@@ -454,6 +497,15 @@ export class ElementInspector extends HTMLElement {
     if (!actionBtn) return;
 
     const action = actionBtn.getAttribute('data-action');
+
+    // Ações Globais (Independente de ID de elemento)
+    if (action === 'open-vault') {
+      const modal = document.getElementById('vault-modal') as any;
+      if (modal) modal.setAttribute('open', '');
+      UISM.play(UISM.enumPresets.OPEN);
+      return;
+    }
+
     const card = target.closest('.element-card');
     const id = card?.getAttribute('data-id') || this.currentSelectedId;
 
