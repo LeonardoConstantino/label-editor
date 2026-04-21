@@ -4,9 +4,19 @@ import { store } from '../../core/Store';
 import { canvasRenderer } from './CanvasRenderer';
 import { DEFAULTS } from '../../constants/defaults';
 import { ElementFactory } from '../models/elements/ElementFactory';
+import eventBus from '../../core/EventBus';
+import { logger } from '../../core/Logger';
 
 export class TemplateManager {
   private readonly STORE_NAME = 'templates';
+
+  constructor() {
+    this.setupListeners();
+  }
+
+  private setupListeners(): void {
+    eventBus.on('template:save', () => this.saveCurrentLabel());
+  }
 
   /**
    * Inicializa o storage.
@@ -31,7 +41,7 @@ export class TemplateManager {
     };
 
     await db.put(this.STORE_NAME, labelToSave);
-    console.log('Label saved to IndexedDB:', labelToSave.name);
+    logger.debug('TemplateManager', 'Label saved to IndexedDB:', labelToSave.name);
   }
 
   /**
@@ -55,7 +65,6 @@ export class TemplateManager {
    * Remove um template pelo ID.
    */
   async deleteTemplate(id: string): Promise<void> {
-  console.log('id :', id);
     await db.delete(this.STORE_NAME, id);
   }
 

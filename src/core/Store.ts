@@ -95,6 +95,25 @@ export class Store {
       });
     });
 
+    eventBus.on('element:duplicate', (id: string) => {
+      this.performAction(() => {
+        if (!this.state.currentLabel) return;
+        const original = this.state.currentLabel.elements.find(el => el.id === id);
+        if (!original) return;
+
+        const copy = JSON.parse(JSON.stringify(original));
+        copy.id = crypto.randomUUID();
+        copy.name = `${original.name || original.type} (Copy)`;
+        copy.position.x += 5; // Offset visual
+        copy.position.y += 5;
+        copy.zIndex = Math.max(...this.state.currentLabel.elements.map(e => e.zIndex)) + 1;
+
+        this.state.currentLabel.elements.push(copy);
+        this.state.selectedElementIds = [copy.id];
+        UISM.play(UISM.enumPresets.COPY);
+      });
+    });
+
     eventBus.on('element:select', (ids: string | string[]) => {
       this.state.selectedElementIds = Array.isArray(ids) ? ids : [ids];
       this.emit();

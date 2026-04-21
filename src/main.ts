@@ -5,7 +5,11 @@ import { logger } from './core/Logger';
 import './styles/main.css';
 
 import { templateManager } from './domain/services/TemplateManager';
-import {UISM} from './core/UISoundManager';
+import { Label } from './domain/models/Label';
+import { DEFAULTS } from './constants/defaults';
+import { ElementFactory } from './domain/models/elements/ElementFactory';
+import { UISM } from './core/UISoundManager';
+import { shortcutService } from './core/ShortcutService';
 import { ToastManager } from './components/common/toast';
 import './components/editor/EditorCanvas';
 import './components/editor/Toolbar';
@@ -22,32 +26,17 @@ eventBus.on('notify', (options: any) => {
 });
 
 // Inicializa a aplicação com uma etiqueta padrão
-const defaultLabel = {
-  id: 'new-label-' + Date.now(),
+const defaultLabel: Label = {
+  id: crypto.randomUUID(),
   name: 'Nova Etiqueta',
-  config: {
-    widthMM: 100,
-    heightMM: 60,
-    dpi: 300,
-    previewScale: 1
-  },
+  config: { ...DEFAULTS.CANVAS },
   elements: [
-    {
-      id: 'default-text',
-      type: ElementType.TEXT,
-      position: { x: 25, y: 15 },
-      zIndex: 1,
-      dimensions: { width: 50, height: 10 },
-      content: 'Minha Etiqueta',
-      fontFamily: 'sans-serif',
-      fontSize: 18,
-      fontWeight: 'bold',
-      color: '#000000',
-      textAlign: 'center'
-    }
+    ElementFactory.create(ElementType.TEXT, {
+      content: 'Minha Nova Etiqueta',
+    }),
   ],
   createdAt: Date.now(),
-  updatedAt: Date.now()
+  updatedAt: Date.now(),
 };
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -63,19 +52,24 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.addEventListener('keydown', playTestSound, { once: true });
 
   await templateManager.init();
-  
+  shortcutService.init();
+
+  const shortcuts = shortcutService.listShortcuts();
+  eventBus.emit('shortcuts:list:', shortcuts);
+  console.log('shortcuts :', shortcuts);
+
   // Carrega preferências do usuário
-  const { preferenceManager } = await import('./domain/services/PreferenceManager');
+  const { preferenceManager } =
+    await import('./domain/services/PreferenceManager');
   const prefs = await preferenceManager.getPreferences();
   eventBus.emit('preferences:update', prefs);
-  
+
   store.loadLabel(defaultLabel);
   logger.info('Main', `Application Initialized with Label: ${defaultLabel.id}`);
 
   eventBus.emit('notify', {
     type: 'info',
     message: 'Aplicação inicializada com sucesso!',
-    duration: 5000
+    duration: 5000,
   });
-
 });

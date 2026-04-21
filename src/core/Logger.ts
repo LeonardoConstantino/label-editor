@@ -74,7 +74,17 @@ export class Logger {
       );
     }
   }
+
+  log(namespace: string, msg: string, ...args: any[]): void {
+    if (this.shouldLog(LogLevel.DEBUG)) {
+      console.log(
+        `%c${this.format(namespace, msg)}`,
+        'color: #50777E',
+        ...args,
+      );
+    }
+  }
 }
 
 // Instância única para o app
-export const logger = new Logger({ level: LogLevel.DEBUG });
+export const logger = new Logger({ level: LogLevel.DEBUG, prefix: '[LabelEditor]' });

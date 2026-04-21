@@ -35,6 +35,10 @@ export class EditorToolbar extends HTMLElement {
       if (undoBtn) undoBtn.toggleAttribute('disabled', !state.canUndo);
       if (redoBtn) redoBtn.toggleAttribute('disabled', !state.canRedo);
     });
+
+    eventBus.on('command:toolbar:upload-image', () => {
+      this.shadowRoot?.getElementById('file-input')?.click();
+    });
   }
 
   private render(): void {
@@ -155,7 +159,7 @@ export class EditorToolbar extends HTMLElement {
           <div class="flex items-center justify-between mb-1.5">
             <span class="text-text-main text-[12px] font-semibold tracking-wide">Refazer</span>
             <div class="flex gap-1">
-              <kbd class="kbd-prism">Ctrl</kbd><span class="text-text-muted">+</span><kbd class="kbd-prism">Y</kbd>
+              <kbd class="kbd-prism">Ctrl</kbd><span class="text-text-muted">+</span><kbd class="kbd-prism">Shift</kbd><span class="text-text-muted">+</span><kbd class="kbd-prism">Z</kbd>
             </div>
           </div>
           <p class="text-text-muted text-[10px] leading-relaxed">
@@ -192,7 +196,7 @@ export class EditorToolbar extends HTMLElement {
           <div class="flex items-center justify-between mb-1.5">
             <span class="text-text-main text-[12px] font-semibold tracking-wide">Gerar Lote</span>
             <div class="flex gap-1">
-              <kbd class="kbd-prism">Ctrl</kbd><span class="text-text-muted">+</span><kbd class="kbd-prism">E</kbd>
+              <kbd class="kbd-prism">P</kbd>
             </div>
           </div>
           <p class="text-text-muted text-[10px] leading-relaxed">
