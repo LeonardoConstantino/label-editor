@@ -1,74 +1,68 @@
-# Master Plan: Label Editor v3.5 (Consolidação Total)
+# Master Plan: Label Editor v4.0 (Consolidação & Performance)
 
-Este arquivo coordena a execução de tarefas para a excelência técnica, visual e de segurança do Label Editor.
+Este Master Plan coordena a fase final de desenvolvimento, focando em estabilidade, performance de renderização e ferramentas de produtividade para o usuário final.
 
 ## Status do Projeto
-- **Fases 1 a 3:** Concluídas (MVP+) ✅
-- **Fases 4 a 9:** Em progresso (Polimento & Padronização) 🛠️
-- **Stack:** TS, Vite, Tailwind v4.2, UISoundManager, PapaParse, jsPDF, Git Branching.
-- **Progresso Geral:** 80%
+- **Progresso Geral:** 85% ✅
+- **Fase Atual:** Refinamento Tático e Otimização de Core.
+- **Stack:** TS, Vite, Tailwind v4.2, Shadow DOM, Event-Driven Architecture.
 
-## Diretrizes para Agentes (Workflow de Elite)
-1. **Branching:** **OBRIGATÓRIO** criar branch para cada task: `git checkout -b task/NN-descricao`.
-2. **Isolamento:** Inserções cirúrgicas. Não reescreva o que já funciona sem motivo técnico.
-3. **Padrões:** Siga estritamente o `Design_System.md`, `Layout_UX_Guide.md` e o `definition_elements.md`.
-
----
-
-## Pipeline de Tasks
-
-### Fase 4: Refinamento de Design & UX (Cockpit)
-| ID | Task | Status | Dependências | Branch |
-|----|------|--------|--------------|--------|
-| **20** | [Auditoria de Componentes Core](./tasks/20_ui_audit.md) | [x] | — | `task/20-ui-audit` |
-| **21** | [Refinamento de Profundidade](./tasks/21_cockpit_depth.md) | [x] | — | `task/21-cockpit-refinement` |
-| **22** | [Sincronização de Temas & Variáveis](./tasks/22_theme_sync.md) | [x] | — | `task/22-theme-sync` |
-| **23** | [Acessibilidade & Atalhos de Teclado](./tasks/23_shortcuts_acc.md) | [x] | — | `task/23-shortcuts` |
-| **27** | [Personalização e Limites do Canvas](./tasks/27_canvas_limits.md) | [x] | — | `task/27-canvas-limits` |
-
-### Fase 5: Estabilidade & Performance
-| ID | Task | Status | Dependências | Branch |
-|----|------|--------|--------------|--------|
-| **24** | [Otimização de Lote (Web Workers)](./tasks/24_batch_perf.md) | [ ] | 19 | `task/24-batch-workers` |
-| **25** | [Persistência de Preferências](./tasks/25_user_prefs.md) | [x] | 07 | `task/25-user-prefs` |
-| **26** | [Layout de Impressão A4 (Multi)](./tasks/26_a4_printing.md) | [x] | 19 | `task/26-a4-printing` |
-
-### Fase 6: Alinhamento Arquitetural (Base)
-| ID | Task | Status | Dependências | Branch |
-|----|------|--------|--------------|--------|
-| **28** | [Utilitário de Unidades Centralizado](./tasks/28_unit_converter.md) | [x] | — | `task/28-unit-converter` |
-| **29** | [Fábrica de Elementos & Constantes](./tasks/29_element_factory.md) | [x] | — | `task/29-element-factory` |
-| **30** | [Validador de Propriedades Técnico](./tasks/30_property_validator.md) | [x] | 29 | `task/30-property-validator` |
-| **31** | [Upgrade no Parser de CSV (PapaParse)](./tasks/31_papaparse_upgrade.md) | [x] | 18 | `task/31-papaparse-upgrade` |
-| **33** | [Importação/Exportação de JSON](./tasks/33_json_import_export.md) | [ ] | 07 | `task/33-json-import-export` |
-| **34** | [Formatadores na Interpolação](./tasks/34_interpolation_formatters.md) | [x] | 18 | `task/34-formatters` |
-| **40** | [Prevenção de XSS & Sanitização](./tasks/40_security_xss.md) | [ ] | — | `task/40-security-xss` |
-
-### Fase 7: Gestão de Projetos & Persistência
-| ID | Task | Status | Dependências | Branch |
-|----|------|--------|--------------|--------|
-| **35** | [Galeria de Templates & Digital Twin](./tasks/35_template_gallery.md) | [x] | 07 | `task/35-template-gallery` |
-| **36** | [Retomada Automática & Tela Inicial](./tasks/36_work_resumption.md) | [/] | 35 | `task/36-boot-welcome` |
-
-### Fase 8: Atributos de Estilo (Opcionais/Futuro)
-| ID | Task | Status | Dependências | Branch |
-|----|------|--------|--------------|--------|
-| **38** | [Tipografia Avançada (Leading/Tracking)](./tasks/38_adv_typography.md) | [ ] | — | `task/38-typography` |
-| **39** | [Efeitos Prism (Sombras/Glow)](./tasks/39_prism_effects.md) | [ ] | — | `task/39-prism-effects` |
-
-### Fase 9: Padronização Estrita (Inventário v1.1)
-| ID | Task | Status | Dependências | Branch |
-|----|------|--------|--------------|--------|
-| **41** | [Modelos Unificados (Sync Inventory)](./tasks/41_unified_models.md) | [ ] | 02 | `task/41-models-sync` |
-| **42** | [BorderElement (Standalone Moldura)](./tasks/42_border_element.md) | [ ] | 41 | `task/42-border-element` |
-| **43** | [Renderers Avançados (Shapes & Blending)](./tasks/43_adv_renderers.md) | [ ] | 12 | `task/43-adv-renderers` |
-| **44** | [TextElement Pro (Overflow & Vertical)](./tasks/44_text_pro.md) | [ ] | 12 | `task/44-text-pro` |
-| **45** | [Tooltips da Toolbar (Power User)](./tasks/45_toolbar_tooltips.md) | [x] | 20 | `task/45-toolbar-tooltips` |
-| **46** | [Refatoração Profunda ElementInspector](./tasks/46_inspector_refactor.md) | [ ] | 29 | `task/46-inspector-deep-refactor` |
-| **47** | [Upload UX Refinado (CSV/JSON)](./tasks/47_upload_ux.md) | [x] | 31 | `task/26-a4-batch-ux` |
+## Workflow de Execução (Obrigatório)
+1. **Branching:** Criar branch específica: `git checkout -b task/NN-descricao`.
+2. **Analysis:** Realizar a "Análise Profunda" descrita na task para evitar regressões.
+3. **Execution:** Seguir os padrões do `GEMINI.md` (Code Style).
+4. **Validation:** Build de produção e testes unitários.
 
 ---
 
-## Notas de Orquestração
-- **Redundância:** A Task 37 foi fundida com a 41. A Task 32 foi fundida com a 42.
-- **Prioridade:** Recomenda-se focar na **Fase 6 (Arquitetura)** para solidificar a base antes de expandir estilos.
+## 🚀 Pipeline de Tasks (Organizado por Impacto)
+
+### Fase A: Core, Performance & Segurança (O alicerce final)
+| ID | Task | Pri | Status | Deps | Branch |
+|----|------|-----|--------|------|--------|
+| **53** | [Otimização de Performance CSS (AdoptedSheets)](./tasks/53_css_perf_optimization.md) | 10 | [ ] | 22 | `task/53-css-perf` |
+| **61** | [Otimização de Updates de DOM (Incremental)](./tasks/61_dom_update_optimization.md) | 10 | [ ] | 46 | `task/61-dom-update` |
+| **40** | [Prevenção de XSS & Sanitização](./tasks/40_security_xss.md) | 10 | [ ] | — | `task/40-security-xss` |
+| **51** | [Correção de Atalhos em Inputs (Focus Protection)](./tasks/51_keyboard_fix.md) | 09 | [ ] | 23 | `task/51-keyboard-fix` |
+| **54** | [Correção do Zoom Visual (CSS Transform)](./tasks/54_canvas_zoom_fix.md) | 09 | [ ] | 21 | `task/54-canvas-zoom` |
+| **60** | [Definição de Code Style (GEMINI.md)](./tasks/60_code_style_definition.md) | 08 | [ ] | — | `task/60-code-style` |
+
+### Fase B: Gestão de Projetos & UX (Retenção do Usuário)
+| ID | Task | Pri | Status | Deps | Branch |
+|----|------|-----|--------|------|--------|
+| **36** | [Retomada Automática & Tela Inicial](./tasks/36_work_resumption.md) | 08 | [/] | 35 | `task/36-boot-welcome` |
+| **33** | [Importação/Exportação de JSON (.label)](./tasks/33_json_import_export.md) | 07 | [ ] | 07 | `task/33-json-io` |
+| **46** | [Refatoração Profunda ElementInspector](./tasks/46_inspector_refactor.md) | 07 | [ ] | 29 | `task/46-inspector-refactor` |
+| **41** | [Modelos Unificados (Sync Inventory)](./tasks/41_unified_models.md) | 07 | [ ] | 02 | `task/41-models-sync` |
+| **56** | [Ajuste de Espaçamento Inspector Header](./tasks/56_inspector_spacing_fix.md) | 04 | [ ] | — | `task/56-inspector-ui` |
+
+### Fase C: Produtividade & Ferramentas de Design (O diferencial)
+| ID | Task | Pri | Status | Deps | Branch |
+|----|------|--------|------|--------|--------|
+| **55** | [Bloqueio de Proporção (Aspect Ratio Link)](./tasks/55_aspect_ratio_lock.md) | 06 | [ ] | 41 | `task/55-ratio-lock` |
+| **62** | [Ferramentas de Alinhamento e Distribuição](./tasks/62_power_layout.md) | 06 | [ ] | 41 | `task/62-power-layout` |
+| **63** | [Smart Snapping & Guias Magnéticas](./tasks/63_smart_snapping.md) | 06 | [ ] | 04 | `task/63-smart-snapping` |
+| **52** | [Action Icon de Lock nos Cards de Camada](./tasks/52_ui_layer_lock.md) | 05 | [ ] | 41 | `task/52-ui-layer-lock` |
+| **58** | [Elemento de Código (QR Code / Barcode)](./tasks/58_element_code.md) | 05 | [ ] | 41 | `task/58-element-code` |
+| **50** | [Metadados e Cálculos no Interpolador](./tasks/50_interpolator_metadata_math.md) | 05 | [ ] | 34 | `task/50-interpolator-meta` |
+
+### Fase D: Refinamentos Avançados & Estética
+| ID | Task | Pri | Status | Deps | Branch |
+|----|------|--------|------|--------|--------|
+| **44** | [TextElement Pro (Overflow & Vertical)](./tasks/44_text_pro.md) | 04 | [ ] | 12 | `task/44-text-pro` |
+| **59** | [Otimização de Histórico (Snapshot Debounce)](./tasks/59_history_debounce.md) | 04 | [ ] | 11 | `task/59-history-debounce` |
+| **49** | [Unificação de Estilo KBD (3D Prism)](./tasks/49_kbd_style_unification.md) | 03 | [ ] | 22 | `task/49-kbd-style` |
+| **38** | [Tipografia Avançada (Leading/Tracking)](./tasks/38_adv_typography.md) | 02 | [ ] | — | `task/38-typography` |
+| **39** | [Efeitos Prism (Sombras/Glow)](./tasks/39_prism_effects.md) | 02 | [ ] | — | `task/39-prism-effects` |
+
+---
+
+## ✅ Histórico de Conquistas (MVP & Core)
+*(Tasks concluídas movidas para o histórico para manter o foco no futuro)*
+
+- **01-15:** Estrutura base, Store, Canvas, Renderers, Persistence, UI Core, Toasts. ✅
+- **20-23:** Auditoria UI, Profundidade Cockpit, Atalhos Base. ✅
+- **25-27:** Preferências, Impressão A4, Limites de Canvas. ✅
+- **28-31:** Unit Converter, Factory, Property Validator, PapaParse. ✅
+- **34-35:** Interpolator, Template Gallery (Vault). ✅
+- **45, 47:** Tooltips, Upload UX. ✅

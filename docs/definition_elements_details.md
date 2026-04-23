@@ -539,3 +539,7 @@ Valores comuns para `compositeOperation`:
 4. **Image** - Depende de upload, async
 
 ---
+
+## Ideia de elementos futuros
+
+Consulte [Ideias de Elementos Futuros](./definition_elements_details_future.md)

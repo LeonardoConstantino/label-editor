@@ -53,3 +53,33 @@ The project uses standard `npm` scripts for its lifecycle:
 - `src/components/`: Reusable Web Components.
 - `src/utils/`: Pure helper functions (Image processing, sanitization).
 - `src/types/`: Global TypeScript definitions.
+
+## Session Logs
+
+### 2026-04-21: Major Feature Push & Production Readiness
+**Major Achievements:**
+- **The Vault (Template Gallery):** Implemented a fullscreen, glassmorphic gallery with real-time design thumbnails (Digital Twin) and flicker-free DOM updates.
+- **Power-User Keyboard Shortcuts:** Built a robust `ShortcutService` with context-awareness, `Prop Clipboard` (Ctrl+Alt+C/V), and single-key creation tools (T, R, I, B, V, P).
+- **BIOS Boot Sequence:** Intelligent startup logic that restores the `last_active_project` or presents a `Welcome Screen` for new users.
+- **Dynamic Help Center:** Integrated a multi-tab Help Center with a "Quick Start Guide" and an interactive keyboard shortcut map.
+- **Technical Grid Overlay:** Added design-time configurable grid (size, color, opacity) that doesn't render in the final output.
+- **Production Refactoring:** Successfully fixed Shadow DOM style injection using a `sharedStyles` utility and relative base paths for seamless GitHub Pages deployment.
+- **Codebase Sanitization:** Cleaned up the project root (docs moved to `/docs`, legacy to `/old`) and resolved 16+ strict TypeScript build errors.
+
+**Architectural Decisions:**
+- **Key Normalization:** Switched to using `event.code` (e.g., `KeyC`) for modifier-based shortcuts to prevent international keyboard character conflicts (like `©`).
+- **Style Injection:** Standardized on Vite `?inline` imports for CSS to bypass relative path breakage in production bundles.
+- **Event-Driven UI:** Reinforced decoupled communication by using the `EventBus` for modal context switching and global notifications.
+
+### 2026-04-22: Planejamento de Consolidação & Performance (v4.0)
+**Major Achievements:**
+- **Backlog Estratégico:** Criação de 15 novas tasks técnicas (49-63) focadas em polimento de elite e prontidão para produção.
+- **Master Plan v4.0:** Reorganização completa do plano de trabalho por impacto e prioridade (0-10).
+- **Workflow de Feature Branches:** Estabelecido o uso obrigatório de branches `task/NN-descricao` e análise profunda pré-execução.
+
+**Architectural Decisions:**
+- **Constructable Stylesheets:** Migração planejada para `adoptedStyleSheets` visando reduzir overhead de memória nos Shadow DOMs.
+- **Rendering Incremental:** Abandono do `innerHTML` em atualizações de estado para evitar perda de foco e flicker.
+- **Context Awareness:** Proteção de inputs contra interferência de atalhos de tecla única.
+- **Math Interpolation:** Opção por formatadores matemáticos (`:add(1)`) em vez de `eval()` por segurança.
+- **Code Style Formalizado:** Definição de regras pragmáticas para TypeScript e Web Components (Task 60).
