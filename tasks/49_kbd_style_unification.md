@@ -1,30 +1,22 @@
-# Task 49: Unificação de Estilo KBD (Tactile Prism)
+# Task 49: Unificação de Estilo KBD e Injeção Dinâmica (Prism Style)
 
 ## Objetivo
-Padronizar o visual das teclas de atalho (`<kbd>`) em toda a aplicação, garantindo que o `TooltipBalloon` herde o estilo 3D definido na classe `.kbd-prism` do sistema de design global.
+Padronizar visualmente todas as representações de teclas (`<kbd>`) no sistema e implementar um mecanismo para injetar atalhos formatados dinamicamente em tooltips e manuais, utilizando o motor do `UIKeyboardShortcuts`.
 
 ## Workflow
 1. `git checkout -b task/49-kbd-unification`
-2. Modificar `src/components/common/tooltip.ts`.
-
-## Detalhamento da Execução
-- `src/components/common/tooltip.ts`
-- `src/styles/main.css` (Referência do estilo `.kbd-prism`)
-- `src/utils/shared-styles.ts`
-
-## Detalhamento da Execução
-1. **Injeção de Estilos Globais:**
-   - No arquivo `tooltip.ts`, garantir que a classe `TooltipBalloon` receba os `sharedStyles` em seu `adoptedStyleSheets`. Atualmente, o balloon é um elemento órfão no `body` que não herda os estilos do Shadow DOM do wrapper.
-2. **Refatoração do CSS Interno (Balloon):**
-   - Remover a regra `[part="content"] kbd` do `balloonStyles` que aplica o fundo indigo e borda simples.
-   - Adicionar uma regra para `.kbd-prism` dentro do `balloonStyles` apenas para definir o `min-width: 48px`, preservando o alinhamento no grid de atalhos do tooltip.
-3. **Mapeamento de Classes Dinâmico:**
-   - Atualizar o método `#extractContent` no `UiTooltip` para adicionar a classe `kbd-prism` em vez de apenas `kbd` ao processar elementos de teclado de slots ricos.
-4. **Consistência Visual:**
-   - Verificar se o brilho, a sombra (juice) e a fonte Mono estão idênticos aos `kbd` utilizados na `Toolbar` e no `KeyboardShortcuts`.
+2. **Arquitetura de Formatação:**
+   - Extrair a lógica de `formatKey` do `UIKeyboardShortcuts.ts` para uma função utilitária em `src/utils/utils.ts` ou um método estático no componente.
+   - Garantir que a formatação suporte ícones (↑, ↓, Ctrl, etc.) de forma consistente.
+3. **Estilização (Tactile Prism):**
+   - Refinar a classe `.kbd-prism` no `shared-styles.ts` para incluir profundidade 3D, bordas de 1px e tipografia técnica (JetBrains Mono/Geist Mono).
+4. **Injeção Dinâmica:**
+   - No `Toolbar.ts`, substituir os atalhos estáticos por uma chamada que resolva o atalho via `ShortcutService`.
+   - Implementar a variante `minimal` no `UIKeyboardShortcuts` que renderiza apenas as teclas formatadas.
+5. **Auditoria Visual:** Garantir que o Help Center e as Tooltips usem o mesmo motor de renderização.
 
 ## Critérios de Aceite
-- [ ] O estilo dos `kbd` dentro dos tooltips possui profundidade 3D e sombra (Juice).
-- [ ] O `TooltipBalloon` utiliza `sharedStyles` para reconhecer classes utilitárias do Tailwind v4.
-- [ ] O alinhamento horizontal dos atalhos nos tooltips da Toolbar é mantido (através do `min-width`).
-- [ ] Nenhuma cor hardcoded de "indigo" permanece na definição de `kbd` do tooltip.
+- [ ] Todas as teclas no app seguem o mesmo padrão visual "Tactile Prism".
+- [ ] Tooltips da Toolbar exibem atalhos atualizados automaticamente se o `ShortcutService` for modificado.
+- [ ] O componente `UIKeyboardShortcuts` é reutilizável para casos de "atalho único" (chips).
+- [ ] Suporte a ícones de setas e modificadores (Ctrl/Shift/Alt) em todas as visualizações.

@@ -25,7 +25,9 @@ Este Master Plan coordena a fase final de desenvolvimento, focando em estabilida
 | **40** | [Prevenção de XSS & Sanitização](./tasks/40_security_xss.md) | 10 | [ ] | — | `task/40-security-xss` |
 | **51** | [Correção de Atalhos em Inputs (Focus Protection)](./tasks/51_keyboard_fix.md) | 09 | [ ] | 23 | `task/51-keyboard-fix` |
 | **54** | [Correção do Zoom Visual (CSS Transform)](./tasks/54_canvas_zoom_fix.md) | 09 | [ ] | 21 | `task/54-canvas-zoom` |
+| **66** | [Gutter do Canvas (Overscan)](./tasks/66_canvas_workspace_padding.md) | 07 | [ ] | — | `task/66-canvas-gutter` |
 | **60** | [Definição de Code Style (GEMINI.md)](./tasks/60_code_style_definition.md) | 08 | [ ] | — | `task/60-code-style` |
+| **70** | [Grande Auditoria de Integridade](./tasks/70_codebase_audit.md) | 09 | [ ] | 60 | `task/70-codebase-audit` |
 
 ### Fase B: Gestão de Projetos & UX (Retenção do Usuário)
 | ID | Task | Pri | Status | Deps | Branch |
@@ -34,16 +36,23 @@ Este Master Plan coordena a fase final de desenvolvimento, focando em estabilida
 | **33** | [Importação/Exportação de JSON (.label)](./tasks/33_json_import_export.md) | 07 | [ ] | 07 | `task/33-json-io` |
 | **46** | [Refatoração Profunda ElementInspector](./tasks/46_inspector_refactor.md) | 07 | [ ] | 29 | `task/46-inspector-refactor` |
 | **41** | [Modelos Unificados (Sync Inventory)](./tasks/41_unified_models.md) | 07 | [ ] | 02 | `task/41-models-sync` |
+| **64** | [Controle Global de Áudio](./tasks/64_ui_sound_toggle.md) | 05 | [ ] | — | `task/64-ui-sound-toggle` |
+| **65** | [Aba About & Compliance](./tasks/65_help_about_legal.md) | 04 | [ ] | — | `task/65-help-about-legal` |
+| **68** | [Contador de Elementos no Vault](./tasks/68_vault_element_count.md) | 04 | [ ] | — | `task/68-vault-element-count` |
 | **56** | [Ajuste de Espaçamento Inspector Header](./tasks/56_inspector_spacing_fix.md) | 04 | [ ] | — | `task/56-inspector-ui` |
 
 ### Fase C: Produtividade & Ferramentas de Design (O diferencial)
 | ID | Task | Pri | Status | Deps | Branch |
 |----|------|--------|------|--------|--------|
 | **55** | [Bloqueio de Proporção (Aspect Ratio Link)](./tasks/55_aspect_ratio_lock.md) | 06 | [ ] | 41 | `task/55-ratio-lock` |
+| **67** | [Impressão Dinâmica (Orientation/Format)](./tasks/67_dynamic_printing_layout.md) | 06 | [ ] | 10 | `task/67-dynamic-pdf` |
+| **69** | [Componente UI Select & Presets](./tasks/69_ui_select_presets.md) | 06 | [ ] | — | `task/69-ui-select-presets` |
 | **62** | [Ferramentas de Alinhamento e Distribuição](./tasks/62_power_layout.md) | 06 | [ ] | 41 | `task/62-power-layout` |
 | **63** | [Smart Snapping & Guias Magnéticas](./tasks/63_smart_snapping.md) | 06 | [ ] | 04 | `task/63-smart-snapping` |
 | **52** | [Action Icon de Lock nos Cards de Camada](./tasks/52_ui_layer_lock.md) | 05 | [ ] | 41 | `task/52-ui-layer-lock` |
 | **58** | [Elemento de Código (QR Code / Barcode)](./tasks/58_element_code.md) | 05 | [ ] | 41 | `task/58-element-code` |
+| **42** | [BorderElement (Standalone Moldura)](./tasks/42_border_element.md) | 05 | [ ] | 41 | `task/42-border-element` |
+| **43** | [Renderers Avançados (Shapes & Blending)](./tasks/43_adv_renderers.md) | 05 | [ ] | 12 | `task/43-adv-renderers` |
 | **50** | [Metadados e Cálculos no Interpolador](./tasks/50_interpolator_metadata_math.md) | 05 | [ ] | 34 | `task/50-interpolator-meta` |
 
 ### Fase D: Refinamentos Avançados & Estética

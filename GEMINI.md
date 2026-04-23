@@ -1,85 +1,58 @@
-# GEMINI.md - Label Editor
+# GEMINI.md - Label Editor v4.0
 
 ## Project Overview
-**Label Editor** is a high-performance, client-side graphical editor for designing labels and generating them in batches. It uses a modern web stack to provide a professional, "Tactile Prism" design experience with a focus on precision and performance.
+**Label Editor** is a high-performance, client-side graphical editor for designing labels and generating them in batches. It uses a modern web stack to provide a professional, "Tactile Prism" design experience with a focus on precision, performance, and privacy.
 
 ### Main Technologies
 - **Bundler:** [Vite](https://vitejs.dev/)
-- **Language:** [TypeScript](https://www.typescriptlang.org/)
-- **Styling:** [Tailwind CSS v4.2](https://tailwindcss.com/) (using the new CSS-first `@theme` configuration)
-- **Component Model:** [Web Components](https://developer.mozilla.org/en-US/docs/Web/API/Web_components) (Shadow DOM)
+- **Language:** [TypeScript](https://www.typescriptlang.org/) (Strict Mode)
+- **Styling:** [Tailwind CSS v4.2](https://tailwindcss.com/) (CSS-first `@theme` configuration)
+- **Component Model:** [Web Components](https://developer.mozilla.org/en-US/docs/Web/API/Web_components) (Shadow DOM + Constructable Stylesheets)
 - **Testing:** [Vitest](https://vitest.dev/) with `jsdom`
 - **Architecture:** Event-Driven with a Centralized Store
-- **Storage:** [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API) for template persistence
+- **Storage:** [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API) for local-only template persistence
 
 ### Architecture
-The project follows a modular, event-driven architecture as outlined in `proposta de arquitetura.md`:
-- **Core Layer:** `EventBus` for decoupled communication, `Store` for centralized state management, and `Logger`/`IndexedDBStorage` for utilities.
-- **Domain Layer:** Models (Label, Elements), Services (CanvasRenderer, PDFGenerator), and Validators.
+The project follows a modular, event-driven architecture:
+- **Core Layer:** `EventBus` for decoupled communication, `Store` for centralized state management, `UISoundManager` for tactile feedback, and `IndexedDBStorage`.
+- **Domain Layer:** Models (Label, Elements), Services (CanvasRenderer, PDFGenerator, HistoryManager), and Validators.
 - **UI Layer:** Pure Web Components (Shadow DOM) that react to state changes via the `EventBus`.
-
-## Building and Running
-The project uses standard `npm` scripts for its lifecycle:
-
-- **Development:** `npm run dev` - Starts the Vite dev server.
-- **Production Build:** `npm run build` - Runs `tsc` and `vite build`.
-- **Preview:** `npm run preview` - Serves the production build locally.
-- **Testing:** `npm run test` - Executes the test suite via Vitest.
-- **Deployment:** `npm run deploy` - Deploys the `dist` folder to GitHub Pages.
 
 ## Development Conventions
 
-### Coding Style & Standards
-- **Component Pattern:** Always use Web Components with Shadow DOM for encapsulation.
-- **Communication:** Use the singleton `EventBus` (`src/core/EventBus.ts`) for inter-component communication. Avoid direct component-to-component coupling.
-- **State Management:** Follow the `Store` pattern proposed in the architecture for handling application state.
-- **Styling:** Adhere to the "Tactile Prism" Design System (`Design_System.md`). Use Tailwind CSS v4 variables defined in the `@theme` block.
-- **Naming:** Follow established TypeScript naming conventions (PascalCase for classes/types, camelCase for variables/functions).
+### Code Style (Tactile Engineering)
+- **TypeScript:** 
+  - **No-Any Policy:** O uso de `any` é proibido. Use tipos genéricos, `unknown` ou interfaces.
+  - **Strict Access:** Defina explicitamente `private`, `protected` ou `public`.
+  - **Readonly:** Use para propriedades imutáveis após inicialização.
+- **Web Components:**
+  - **Tag Naming:** `ui-` (reutilizáveis), `app-` (layout/funcional), `editor-` (específicos do domínio).
+  - **Shadow DOM:** Encapsulamento total de lógica e estilo.
+  - **Performance:** Use `adoptedStyleSheets` para compartilhar CSS e evite `innerHTML` em atualizações de estado frequentes.
+- **Communication:**
+  - **Decoupling:** Componentes nunca se comunicam diretamente; use o `EventBus`.
+  - **Event Namespacing:** Padrão `categoria:acao` (ex: `element:update`, `history:undo`).
 
 ### Design System (Tactile Prism)
 - **Theme:** Native Dark Mode.
 - **Colors:** Canvas (`#0f1115`), Surface (`#161920`), Primary Accent Indigo (`#6366f1`).
-- **Typography:** `Inter`/`Geist` for UI, `JetBrains Mono`/`Geist Mono` for data/code.
+- **Typography:** `Inter`/`Geist` para UI, `JetBrains Mono`/`Geist Mono` para dados/code.
 - **Interactions:** Use spring physics for animations (`--ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1)`).
-
-### Testing Practices
-- **Framework:** Vitest.
-- **Scope:** Prioritize testing for `domain/services` (like `CanvasRenderer`) and `core` utilities.
-- **Environment:** Use `jsdom` for tests that require DOM APIs.
-
-### Project Folders
-- `src/core/`: Essential infrastructure (EventBus, Store, Storage).
-- `src/domain/`: Business logic, models, and rendering services.
-- `src/components/`: Reusable Web Components.
-- `src/utils/`: Pure helper functions (Image processing, sanitization).
-- `src/types/`: Global TypeScript definitions.
 
 ## Session Logs
 
 ### 2026-04-21: Major Feature Push & Production Readiness
-**Major Achievements:**
-- **The Vault (Template Gallery):** Implemented a fullscreen, glassmorphic gallery with real-time design thumbnails (Digital Twin) and flicker-free DOM updates.
-- **Power-User Keyboard Shortcuts:** Built a robust `ShortcutService` with context-awareness, `Prop Clipboard` (Ctrl+Alt+C/V), and single-key creation tools (T, R, I, B, V, P).
-- **BIOS Boot Sequence:** Intelligent startup logic that restores the `last_active_project` or presents a `Welcome Screen` for new users.
-- **Dynamic Help Center:** Integrated a multi-tab Help Center with a "Quick Start Guide" and an interactive keyboard shortcut map.
-- **Technical Grid Overlay:** Added design-time configurable grid (size, color, opacity) that doesn't render in the final output.
-- **Production Refactoring:** Successfully fixed Shadow DOM style injection using a `sharedStyles` utility and relative base paths for seamless GitHub Pages deployment.
-- **Codebase Sanitization:** Cleaned up the project root (docs moved to `/docs`, legacy to `/old`) and resolved 16+ strict TypeScript build errors.
+- **The Vault:** Galeria glassmorphic com Digital Twin.
+- **ShortcutService:** Sistema de atalhos contextuais e Prop Clipboard.
+- **BIOS Boot:** Lógica de restauração de sessão e Welcome Screen.
 
-**Architectural Decisions:**
-- **Key Normalization:** Switched to using `event.code` (e.g., `KeyC`) for modifier-based shortcuts to prevent international keyboard character conflicts (like `©`).
-- **Style Injection:** Standardized on Vite `?inline` imports for CSS to bypass relative path breakage in production bundles.
-- **Event-Driven UI:** Reinforced decoupled communication by using the `EventBus` for modal context switching and global notifications.
+### 2026-04-22: Planejamento de Consolidação & Performance
+- **Backlog v4.0:** Criação das tasks 49-63 focadas em polimento e estabilidade.
+- **Master Plan:** Reorganização por impacto e introdução de prioridades (0-10).
+- **Decisão Técnica:** Adoção de `adoptedStyleSheets` e renderização incremental.
 
-### 2026-04-22: Planejamento de Consolidação & Performance (v4.0)
-**Major Achievements:**
-- **Backlog Estratégico:** Criação de 15 novas tasks técnicas (49-63) focadas em polimento de elite e prontidão para produção.
-- **Master Plan v4.0:** Reorganização completa do plano de trabalho por impacto e prioridade (0-10).
-- **Workflow de Feature Branches:** Estabelecido o uso obrigatório de branches `task/NN-descricao` e análise profunda pré-execução.
-
-**Architectural Decisions:**
-- **Constructable Stylesheets:** Migração planejada para `adoptedStyleSheets` visando reduzir overhead de memória nos Shadow DOMs.
-- **Rendering Incremental:** Abandono do `innerHTML` em atualizações de estado para evitar perda de foco e flicker.
-- **Context Awareness:** Proteção de inputs contra interferência de atalhos de tecla única.
-- **Math Interpolation:** Opção por formatadores matemáticos (`:add(1)`) em vez de `eval()` por segurança.
-- **Code Style Formalizado:** Definição de regras pragmáticas para TypeScript e Web Components (Task 60).
+### 2026-04-23: Expansão Tática & Planejamento de Produção
+- **UX & Comfort:** Controle global de áudio (Mute Quick Toggle) e presets de tamanho de etiqueta (ui-select).
+- **Compliance:** Definição da aba "About" com Termos de Uso e Política de Privacidade local-only.
+- **Larga Escala:** Suporte para etiquetas de até 500mm com Workspace Gutter e impressão em A3/Paisagem.
+- **Qualidade:** Task 70 (Grande Auditoria) para garantir segurança (XSS) e cobertura de testes.
