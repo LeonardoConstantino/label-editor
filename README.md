@@ -1,4 +1,4 @@
-# Label Editor | Tactile Prism
+# Label Editor | Tactile Prism | [🚀 Live Demo](https://leonardoconstantino.github.io/label-editor/)
 
 Um editor avançado de etiquetas com interface moderna, suporte a múltiplos elementos, persistência local e exportação em PDF.
 
