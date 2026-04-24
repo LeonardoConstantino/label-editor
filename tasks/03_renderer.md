@@ -15,7 +15,7 @@ Criar o `CanvasRenderer` responsável por desenhar os modelos de domínio no con
 5. **Testes:** `src/domain/services/__tests__/CanvasRenderer.test.ts` usando um mock de CanvasRenderingContext2D.
 
 ## Critérios de Aceite
-- [ ] Elementos de texto são renderizados com a fonte e cor corretas.
-- [ ] Elementos de imagem respeitam o `object-fit` (cover/contain).
-- [ ] O renderer converte corretamente 25.4mm para o número esperado de pixels em 300 DPI.
-- [ ] Testes validam o `hitTest` para elementos em diferentes posições.
+- [x] Elementos de texto são renderizados com a fonte e cor corretas.
+- [x] Elementos de imagem respeitam o `object-fit` (cover/contain).
+- [x] O renderer converte corretamente 25.4mm para o número esperado de pixels em 300 DPI.
+- [x] Testes validam o `hitTest` para elementos em diferentes posições.

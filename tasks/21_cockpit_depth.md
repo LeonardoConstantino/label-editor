@@ -13,6 +13,6 @@ Ajustar o macro-layout para garantir a sensação de profundidade do Cockpit. A 
 - **Panels:** Garantir que o `.panel-glass` tenha `backdrop-filter: blur(24px)` e a borda esquerda correta.
 
 ## Critérios de Aceite
-- [ ] A etiqueta visualmente "salta" do fundo escuro.
-- [ ] A toolbar e o inspector não bloqueiam a visão do grid por completo (transparência correta).
-- [ ] Layout responsivo mantido em 100vw/vh.
+- [x] A etiqueta visualmente "salta" do fundo escuro.
+- [x] A toolbar e o inspector não bloqueiam a visão do grid por completo (transparência correta).
+- [x] Layout responsivo mantido em 100vw/vh.

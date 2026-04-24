@@ -15,7 +15,7 @@ Gerar um arquivo PDF pronto para impressão, contendo todas as etiquetas do lote
 5. **Testes:** Verificar se o PDF gerado tem as dimensões de página corretas.
 
 ## Critérios de Aceite
-- [ ] O PDF exportado mantém a qualidade das imagens e nitidez do texto.
-- [ ] As dimensões físicas no PDF coincidem com as configuradas no editor (ex: etiqueta de 50x30mm).
-- [ ] Suporte para geração de lotes com 100+ etiquetas sem travar o navegador (uso de workers se necessário).
-- [ ] Critério binário: PDF aberto em leitor mostra as medidas corretas.
+- [x] O PDF exportado mantém a qualidade das imagens e nitidez do texto.
+- [x] As dimensões físicas no PDF coincidem com as configuradas no editor (ex: etiqueta de 50x30mm).
+- [-] Suporte para geração de lotes com 100+ etiquetas sem travar o navegador (uso de workers se necessário). **[MOVIDO PARA TASK 24]**
+- [x] Critério binário: PDF aberto em leitor mostra as medidas corretas.

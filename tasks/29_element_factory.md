@@ -13,6 +13,6 @@ Implementar o padrão **Factory** para criação de elementos da etiqueta e cent
 - **Auto-ID:** A factory deve gerar automaticamente um `UUID` (usando `crypto.randomUUID()`) e definir o `zIndex` base para cada novo elemento.
 
 ## Critérios de Aceite
-- [ ] `Toolbar` não contém mais objetos literais complexos (chama a Factory).
-- [ ] Todo novo elemento possui um ID único e seguro.
-- [ ] Mudança de "estilo padrão" global agora é feita apenas em `defaults.ts`.
+- [x] `Toolbar` não contém mais objetos literais complexos (chama a Factory).
+- [x] Todo novo elemento possui um ID único e seguro.
+- [x] Mudança de "estilo padrão" global agora é feita apenas em `defaults.ts`.

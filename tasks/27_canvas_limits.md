@@ -14,6 +14,6 @@ Permitir que o usuário configure a cor de fundo da etiqueta (papel) e estabelec
 - **Renderização:** Garantir que o `CanvasRenderer` preencha o fundo com a cor selecionada antes de desenhar os elementos.
 
 ## Critérios de Aceite
-- [ ] O usuário consegue mudar a cor da etiqueta (ex: simular papel pardo ou etiquetas coloridas).
-- [ ] O sistema bloqueia dimensões absurdas que comprometeriam a RAM.
-- [ ] A cor de fundo é preservada no histórico (Undo/Redo) e na exportação de PDF.
+- [x] O usuário consegue mudar a cor da etiqueta (ex: simular papel pardo ou etiquetas coloridas).
+- [x] O sistema bloqueia dimensões absurdas que comprometeriam a RAM.
+- [x] A cor de fundo é preservada no histórico (Undo/Redo) e na exportação de PDF.

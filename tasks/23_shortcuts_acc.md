@@ -14,5 +14,5 @@ Implementar atalhos de teclado essenciais para navegação e precisão, reforça
 - **Sons:** Integrar `UISM.play('select')` ao trocar de elemento.
 
 ## Critérios de Aceite
-- [ ] Atalhos funcionam sem conflitar com o input de texto.
-- [ ] Feedback visual e sonoro imediato ao usar atalhos.
+- [x] Atalhos funcionam sem conflitar com o input de texto.
+- [x] Feedback visual e sonoro imediato ao usar atalhos.

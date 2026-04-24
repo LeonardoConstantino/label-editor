@@ -17,7 +17,7 @@ Refatorar o `Store` para utilizar o `HistoryManager` baseado em `ImageData`. O e
 4. **Memory Management:** Implementar limite de 50 snapshots (FIFO) para evitar estouro de memória.
 
 ## Critérios de Aceite
-- [ ] O Undo/Redo restaura o visual exato do canvas instantaneamente.
-- [ ] O Store sincroniza o array de elementos com o snapshot restaurado.
-- [ ] Feedback sonoro presente ao navegar no histórico.
-- [ ] Testes validam que o `currentIndex` do histórico é atualizado corretamente.
+- [x] O Undo/Redo restaura o visual exato do canvas instantaneamente.
+- [x] O Store sincroniza o array de elementos com o snapshot restaurado.
+- [x] Feedback sonoro presente ao navegar no histórico.
+- [x] Testes validam que o `currentIndex` do histórico é atualizado corretamente.

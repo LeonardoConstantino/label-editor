@@ -19,6 +19,6 @@ Implementar "Cards de Ação Rápida" em todos os botões da Toolbar utilizando 
   - Texto (T), Retângulo (R), Imagem (I), Undo (Ctrl+Z), Redo (Ctrl+Y), Save (Ctrl+S), Batch (Ctrl+E).
 
 ## Critérios de Aceite
-- [ ] Todos os botões da toolbar possuem tooltips ricos.
-- [ ] O visual segue o padrão "Technical Card" definido na solicitação.
-- [ ] O delay evita disparos acidentais durante a navegação rápida.
+- [x] Todos os botões da toolbar possuem tooltips ricos.
+- [x] O visual segue o padrão "Technical Card" definido na solicitação.
+- [x] O delay evita disparos acidentais durante a navegação rápida.

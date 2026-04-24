@@ -13,5 +13,5 @@ Garantir que todos os Web Components registrados no projeto utilizem o novo sist
 - **Icons:** Garantir que o `ui-icon` herde a cor do elemento pai via `currentColor`.
 
 ## Critérios de Aceite
-- [ ] 100% de consistência cromática entre o editor e o batch studio.
-- [ ] Redução de redundância de CSS dentro dos Shadow DOMs.
+- [x] 100% de consistência cromática entre o editor e o batch studio.
+- [x] Redução de redundância de CSS dentro dos Shadow DOMs.

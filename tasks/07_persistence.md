@@ -16,7 +16,7 @@ Implementar a persistência local de templates de etiquetas usando IndexedDB, pe
 5. **Testes:** `src/domain/services/__tests__/TemplateManager.test.ts` usando um mock de IndexedDB (fake-indexeddb).
 
 ## Critérios de Aceite
-- [ ] Salvar uma etiqueta persiste os dados e a thumbnail no IndexedDB.
-- [ ] Carregar uma etiqueta restaura todos os elementos e configurações no Store.
-- [ ] Operações de banco de dados são assíncronas e tratam erros (ex: falta de espaço).
-- [ ] Testes confirmam a persistência e recuperação de um objeto Label completo.
+- [x] Salvar uma etiqueta persiste os dados e a thumbnail no IndexedDB.
+- [x] Carregar uma etiqueta restaura todos os elementos e configurações no Store.
+- [x] Operações de banco de dados são assíncronas e tratam erros (ex: falta de espaço).
+- [x] Testes confirmam a persistência e recuperação de um objeto Label completo.

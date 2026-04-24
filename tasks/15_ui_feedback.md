@@ -23,7 +23,7 @@ Implementar o sistema de feedback do usuário (Notificações, Diálogos de Conf
    - Botão de fechar com animação de rotação e som.
 
 ## Critérios de Aceite
-- [ ] Toasts aparecem na lateral com animação fluida e som correspondente.
-- [ ] Diálogos de confirmação exibem o brilho neon e usam a fonte Mono no título.
-- [ ] Modais bloqueiam a interação com o fundo através de um backdrop com blur de 8px.
-- [ ] Feedback sonoro presente em todas as aberturas de UI de destaque.
+- [x] Toasts aparecem na lateral com animação fluida e som correspondente.
+- [x] Diálogos de confirmação exibem o brilho neon e usam a fonte Mono no título.
+- [x] Modais bloqueiam a interação com o fundo através de um backdrop com blur de 8px.
+- [x] Feedback sonoro presente em todas as aberturas de UI de destaque.

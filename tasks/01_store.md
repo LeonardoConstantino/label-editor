@@ -16,7 +16,7 @@ Implementar a classe `Store` para gerenciar o estado global da aplicação (etiq
 5. **Testes:** Criar `src/core/__tests__/Store.test.ts` verificando se o estado reflete as ações enviadas pelo EventBus.
 
 ## Critérios de Aceite
-- [ ] O Store atualiza o estado corretamente ao receber um evento `element:add`.
-- [ ] O histórico registra snapshots após cada mutação.
-- [ ] O método `undo()` restaura o estado anterior da etiqueta.
-- [ ] Testes automatizados cobrem a criação, atualização e deleção de elementos no Store.
+- [x] O Store atualiza o estado corretamente ao receber um evento `element:add`.
+- [x] O histórico registra snapshots após cada mutação.
+- [x] O método `undo()` restaura o estado anterior da etiqueta.
+- [x] Testes automatizados cobrem a criação, atualização e deleção de elementos no Store.

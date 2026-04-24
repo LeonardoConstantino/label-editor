@@ -20,18 +20,36 @@ The project follows a modular, event-driven architecture:
 
 ## Development Conventions
 
-### Code Style (Tactile Engineering)
-- **TypeScript:** 
-  - **No-Any Policy:** O uso de `any` é proibido. Use tipos genéricos, `unknown` ou interfaces.
-  - **Strict Access:** Defina explicitamente `private`, `protected` ou `public`.
-  - **Readonly:** Use para propriedades imutáveis após inicialização.
-- **Web Components:**
-  - **Tag Naming:** `ui-` (reutilizáveis), `app-` (layout/funcional), `editor-` (específicos do domínio).
-  - **Shadow DOM:** Encapsulamento total de lógica e estilo.
-  - **Performance:** Use `adoptedStyleSheets` para compartilhar CSS e evite `innerHTML` em atualizações de estado frequentes.
-- **Communication:**
-  - **Decoupling:** Componentes nunca se comunicam diretamente; use o `EventBus`.
-  - **Event Namespacing:** Padrão `categoria:acao` (ex: `element:update`, `history:undo`).
+### Code Style (Pragmatic Excellence)
+
+#### 1. TypeScript & Tipagem Estrita
+- ❌ **Proibido:** Uso de `any` em qualquer contexto.
+- ✅ **Permitido:** `unknown` combinado com *type guards* quando o tipo for realmente imprevisível.
+- ✅ **Obrigatório:** Modificadores de acesso explícitos (`private`, `protected`, `public`) em todos os membros de classe.
+- ✅ **Obrigatório:** Tipagem explícita de retorno em todas as funções e métodos públicos.
+
+#### 2. Web Components (Shadow DOM)
+- ✅ **Shadow DOM:** Uso obrigatório para isolamento total de estilos e encapsulamento.
+- ✅ **Estilização:** Preferir `adoptedStyleSheets` para carregar CSS compartilhado (evitar injeção de `<style>` no `innerHTML`).
+- ✅ **Nomenclatura:** Prefixos semânticos `ui-` (reutilizáveis), `app-` (layout/funcional), `editor-` (domínio específico).
+- ✅ **Lifecycles:** `connectedCallback` e `disconnectedCallback` devem ser usados apenas para inicializar/limpar a UI e listeners, nunca para lógica de negócio pesada.
+
+#### 3. Arquitetura & Comunicação
+- **Decoupling:** Componentes nunca devem ter referências diretas entre si. Toda comunicação ocorre via `EventBus`.
+- **Namespacing:** Eventos seguem o padrão `categoria:acao` (ex: `element:update`, `ui:modal:open`).
+- **Domain Isolation:** Lógica de negócio, cálculos matemáticos e manipulação de dados devem residir em `Services` ou `Models` no Domain Layer, mantendo a UI como uma View Layer pura.
+
+#### 4. Performance & Otimização
+- ❌ **Evitar:** `innerHTML` em loops de renderização ou atualizações de estado de alta frequência.
+- ✅ **Incremental Updates:** Utilizar referências diretas a elementos do DOM para atualizar apenas valores específicos (`textContent`, `value`) em vez de reconstruir o componente.
+- ✅ **Batching:** Usar `DocumentFragment` para inserções em massa no DOM.
+- ✅ **Flow Control:** Aplicar *Debounce* ou *Throttle* em eventos de alto volume (input, resize, scroll).
+
+#### 5. Filosofia de Qualidade
+> "O código deve ser óbvio antes de ser elegante."
+- **Clareza > Elegância:** Se a lógica não puder ser entendida em menos de 2 minutos, ela precisa ser simplificada ou comentada.
+- **Refatoração Incremental:** Priorizar melhorias graduais e cirúrgicas sobre reescritas completas ("Rewrites").
+- **Encapsulamento:** Baixo acoplamento é o objetivo principal para garantir testabilidade.
 
 ### Design System (Tactile Prism)
 - **Theme:** Native Dark Mode.
@@ -52,7 +70,11 @@ The project follows a modular, event-driven architecture:
 - **Decisão Técnica:** Adoção de `adoptedStyleSheets` e renderização incremental.
 
 ### 2026-04-23: Expansão Tática & Planejamento de Produção
-- **UX & Comfort:** Controle global de áudio (Mute Quick Toggle) e presets de tamanho de etiqueta (ui-select).
-- **Compliance:** Definição da aba "About" com Termos de Uso e Política de Privacidade local-only.
-- **Larga Escala:** Suporte para etiquetas de até 500mm com Workspace Gutter e impressão em A3/Paisagem.
-- **Qualidade:** Task 70 (Grande Auditoria) para garantir segurança (XSS) e cobertura de testes.
+- **UX & Comfort:** Controle global de áudio e presets de tamanho de etiqueta.
+- **Compliance:** Definição da aba "About" com Termos e Privacidade local-only.
+- **Larga Escala:** Suporte para etiquetas de até 500mm e impressão em A3/Paisagem.
+
+### 2026-04-24: Auditoria de Progresso & Consolidação de Regras
+- **Auditoria Geral:** Revisão dos critérios de aceite das Tasks 01 a 50. Sincronização do estado real do projeto com a documentação.
+- **Finalização Task 60:** Formalização das diretrizes de **Code Style** e **Pragmatic Excellence** no GEMINI.md.
+- **Restauração de Backlog:** Reativação das tasks de performance (Web Workers) e acabamento de PDF (Sangria/Corte).

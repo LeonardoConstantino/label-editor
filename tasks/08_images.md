@@ -15,7 +15,7 @@ Aprimorar o `imageProcessor` para tratar uploads de usuários, redimensionando e
 5. **Testes:** Verificar se imagens grandes são redimensionadas corretamente.
 
 ## Critérios de Aceite
-- [ ] Imagens enviadas são comprimidas para < 200KB sempre que possível.
-- [ ] O `imageProcessor` retorna tanto o base64 quanto as dimensões (width/height) em mm.
-- [ ] Erros de formato de arquivo são tratados com mensagens claras.
-- [ ] Testes validam a redução de tamanho (bytes) após o processamento.
+- [x] Imagens enviadas são comprimidas para < 200KB sempre que possível.
+- [x] O `imageProcessor` retorna tanto o base64 quanto as dimensões (width/height) em mm.
+- [x] Erros de formato de arquivo são tratados com mensagens claras.
+- [x] Testes validam a redução de tamanho (bytes) após o processamento.

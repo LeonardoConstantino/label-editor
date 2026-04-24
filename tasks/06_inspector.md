@@ -14,7 +14,7 @@ Criar o painel lateral que permite editar as propriedades (posição, tamanho, c
 4. **Juice:** Aplicar micro-interações de hover nos inputs conforme `Design_System.md`.
 
 ## Critérios de Aceite
-- [ ] O painel exibe as propriedades corretas ao selecionar um elemento.
-- [ ] Mudar um valor no inspector reflete instantaneamente no canvas.
-- [ ] Inputs seguem o estilo `bg-black/20` com labels em uppercase minúsculo.
-- [ ] Teste de integração: simular input e verificar se o Store recebeu o evento de atualização.
+- [x] O painel exibe as propriedades corretas ao selecionar um elemento.
+- [x] Mudar um valor no inspector reflete instantaneamente no canvas.
+- [x] Inputs seguem o estilo `bg-black/20` com labels em uppercase minúsculo.
+- [x] Teste de integração: simular input e verificar se o Store recebeu o evento de atualização.

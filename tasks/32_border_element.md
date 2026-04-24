@@ -12,5 +12,5 @@ Implementar o `BorderElement` como um objeto independente e preparar o sistema p
 - **Extensibilidade:** Garantir que o `CanvasRenderer` (orquestrador) consiga registrar o novo tipo sem refatoração profunda.
 
 ## Critérios de Aceite
-- [ ] Novo botão "Border" na Toolbar.
-- [ ] Borda independente renderizada corretamente no Canvas e exportada para PDF.
+- [x] Novo botão "Border" na Toolbar.
+- [x] Borda independente renderizada corretamente no Canvas e exportada para PDF.

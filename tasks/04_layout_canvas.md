@@ -18,7 +18,7 @@ Criar a estrutura visual base do editor e o Web Component `EditorCanvas` que exi
 4. **Design System:** Aplicar `panel-glass` e sombras conforme o guia.
 
 ## Critérios de Aceite
-- [ ] O canvas aparece centralizado com fundo branco (etiqueta) sobre fundo escuro (editor).
-- [ ] O canvas redesenha automaticamente quando o Store emite novo estado.
-- [ ] Layout responsivo usando Grid/Flexbox do Tailwind v4.
-- [ ] Teste básico de montagem do Web Component.
+- [x] O canvas aparece centralizado com fundo branco (etiqueta) sobre fundo escuro (editor).
+- [x] O canvas redesenha automaticamente quando o Store emite novo estado.
+- [x] Layout responsivo usando Grid/Flexbox do Tailwind v4.
+- [x] Teste básico de montagem do Web Component.

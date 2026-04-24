@@ -13,6 +13,6 @@ Revisar os componentes `AppButton`, `AppInput` e `UINumberScrubber` para garanti
 - **Scrubber:** Verificar se as Shadow Parts (`::part`) estão sendo estilizadas corretamente no `main.css`.
 
 ## Critérios de Aceite
-- [ ] Nenhum componente possui cores hexadecimais hardcoded (devem usar `var(--color-...)`).
-- [ ] Todos os componentes reagem ao feedback sonoro do `UISM`.
-- [ ] O visual é idêntico em todos os estados definidos no Design System.
+- [x] Nenhum componente possui cores hexadecimais hardcoded (devem usar `var(--color-...)`).
+- [x] Todos os componentes reagem ao feedback sonoro do `UISM`.
+- [x] O visual é idêntico em todos os estados definidos no Design System.

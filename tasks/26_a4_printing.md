@@ -16,5 +16,5 @@ Implementar a capacidade de organizar múltiplas etiquetas em uma única página
 ## Critérios de Aceite
 - [x] O usuário pode visualizar como as etiquetas serão distribuídas em folhas A4 antes de imprimir.
 - [x] A impressão real (Ctrl+P) respeita o layout de grade configurado.
-- [x] Suporte a "sangria" e marcas de corte opcionais (via PDF Generator).
+- [ ] Suporte a "sangria" e marcas de corte opcionais (via PDF Generator).
 - [x] Cálculo dinâmico de etiquetas por folha A4 no preview.

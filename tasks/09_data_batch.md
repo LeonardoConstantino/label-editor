@@ -15,7 +15,7 @@ Implementar a funcionalidade de importar fontes de dados externas para substitui
 5. **Testes:** Validar o parse de diferentes formatos de CSV (vírgula vs ponto e vírgula).
 
 ## Critérios de Aceite
-- [ ] Upload de CSV gera uma lista de registros corretamente.
-- [ ] Variáveis nas etiquetas são substituídas pelos valores do dado correspondente no preview.
-- [ ] O sistema alerta se uma variável na etiqueta não existir no arquivo de dados.
-- [ ] Testes unitários para o parser de CSV e JSON.
+- [x] Upload de CSV gera uma lista de registros corretamente.
+- [x] Variáveis nas etiquetas são substituídas pelos valores do dado correspondente no preview.
+- [x] O sistema alerta se uma variável na etiqueta não existir no arquivo de dados.
+- [x] Testes unitários para o parser de CSV e JSON.

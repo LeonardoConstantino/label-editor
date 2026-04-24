@@ -15,6 +15,6 @@ Implementar um validador de limites para alertar o usuário quando um elemento e
 4. **Feedback:** Integrar `UISoundManager.play('error_alert')` na primeira ocorrência de overflow.
 
 ## Critérios de Aceite
-- [ ] O sistema detecta overflow nos eixos X, Y ou ambos.
-- [ ] Eventos de alerta são emitidos e limpos automaticamente quando o elemento volta aos limites.
-- [ ] Testes unitários validam o cálculo de overflow para diferentes tamanhos de etiqueta.
+- [x] O sistema detecta overflow nos eixos X, Y ou ambos.
+- [x] Eventos de alerta são emitidos e limpos automaticamente quando o elemento volta aos limites.
+- [x] Testes unitários validam o cálculo de overflow para diferentes tamanhos de etiqueta.

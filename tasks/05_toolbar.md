@@ -16,7 +16,7 @@ Implementar a barra de ferramentas superior para adicionar novos elementos (text
 5. **Testes:** Verificar se o clique nos botões dispara os eventos esperados no `EventBus`.
 
 ## Critérios de Aceite
-- [ ] Botões para Texto, Retângulo, Círculo e Imagem funcionais.
-- [ ] Botões de Undo/Redo desabilitados quando não houver histórico disponível.
-- [ ] Visual segue estritamente a Toolbar Superior do `Design_System.md`.
-- [ ] Testes unitários confirmam a emissão correta de `element:add`.
+- [x] Botões para Texto, Retângulo, Círculo e Imagem funcionais.
+- [x] Botões de Undo/Redo desabilitados quando não houver histórico disponível.
+- [x] Visual segue estritamente a Toolbar Superior do `Design_System.md`.
+- [x] Testes unitários confirmam a emissão correta de `element:add`.

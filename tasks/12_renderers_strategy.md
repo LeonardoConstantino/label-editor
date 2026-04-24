@@ -16,7 +16,7 @@ Implementar o padrão **Strategy** para renderização, integrando a biblioteca 
 4. **Performance:** Redesenhar apenas elementos visíveis e ordenados por `zIndex`.
 
 ## Critérios de Aceite
-- [ ] Textos longos fazem wrap automático dentro da área delimitada pelo elemento.
-- [ ] Alinhamento vertical (top/middle/bottom) funcionando conforme configuração.
-- [ ] O `CanvasRenderer` delega corretamente a renderização baseado no tipo do elemento.
-- [ ] Nenhuma lógica de desenho direto permanece no orquestrador.
+- [-] Textos longos fazem wrap automático dentro da área delimitada pelo elemento. **[MOVIDO PARA TASK 44]**
+- [x] Alinhamento vertical (top/middle/bottom) funcionando conforme configuração.
+- [x] O `CanvasRenderer` delega corretamente a renderização baseado no tipo do elemento.
+- [x] Nenhuma lógica de desenho direto permanece no orquestrador.

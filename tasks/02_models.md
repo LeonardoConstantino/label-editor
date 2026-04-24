@@ -16,6 +16,6 @@ Definir as interfaces fundamentais para etiquetas e elementos (Texto, Imagem, Re
 4. **Validação:** Adicionar tipos para `CanvasConfig` incluindo DPI e escala de preview.
 
 ## Critérios de Aceite
-- [ ] Interfaces TypeScript completas para todos os tipos de elementos propostos.
-- [ ] Uso exclusivo de `mm` para medidas dimensionais.
-- [ ] Arquivo `src/domain/models/index.ts` exportando todos os tipos.
+- [x] Interfaces TypeScript completas para todos os tipos de elementos propostos.
+- [x] Uso exclusivo de `mm` para medidas dimensionais.
+- [x] Arquivo `src/domain/models/index.ts` exportando todos os tipos.

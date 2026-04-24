@@ -16,5 +16,5 @@ Garantir que o usuário nunca perca o trabalho ao atualizar a página e fornecer
   - "Import .label file" (abre Task 33).
 
 ## Critérios de Aceite
-- [ ] Atualizar a página (`F5`) restaura o design exatamente onde o usuário parou.
-- [ ] A aplicação não inicia em um estado vazio/confuso para novos usuários.
+- [x] Atualizar a página (`F5`) restaura o design exatamente onde o usuário parou.
+- [x] A aplicação não inicia em um estado vazio/confuso para novos usuários.

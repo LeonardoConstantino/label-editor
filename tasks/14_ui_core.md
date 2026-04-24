@@ -20,7 +20,7 @@ Implementar os componentes de UI base (Botões e Inputs) seguindo o estilo visua
 3. **Shadow DOM:** Garantir que todos os estilos e fontes (Inter/JetBrains Mono) sejam herdados corretamente das variáveis globais.
 
 ## Critérios de Aceite
-- [ ] Clicar no botão reproduz o som mecânico configurado.
-- [ ] O visual do botão reflete a variante (Primary, Secondary, Success).
-- [ ] O input brilha em Neon ao receber foco.
-- [ ] O botão tem feedback tátil (escala 0.92) no clique.
+- [x] Clicar no botão reproduz o som mecânico configurado.
+- [x] O visual do botão reflete a variante (Primary, Secondary, Success).
+- [x] O input brilha em Neon ao receber foco.
+- [x] O botão tem feedback tátil (escala 0.92) no clique.

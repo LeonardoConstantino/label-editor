@@ -17,6 +17,6 @@ Implementar uma interface visual para gerenciar etiquetas salvas e, como destaqu
 - **Persistence Sync:** Garantir que ao abrir a galeria, os dados venham atualizados do IndexedDB.
 
 ## Critérios de Aceite
-- [ ] O usuário vê seu próprio design (em miniatura) dentro do desenho técnico do Blueprint quando nada está selecionado.
-- [ ] Carregar um template da galeria substitui o design atual com sucesso.
-- [ ] Miniaturas são geradas sem impactar a performance do editor.
+- [x] O usuário vê seu próprio design (em miniatura) dentro do desenho técnico do Blueprint quando nada está selecionado.
+- [x] Carregar um template da galeria substitui o design atual com sucesso.
+- [x] Miniaturas são geradas sem impactar a performance do editor.

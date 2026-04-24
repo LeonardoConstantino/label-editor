@@ -14,6 +14,6 @@ Implementar um sistema para persistir as preferências do usuário (como zoom pa
 4. **Initial Load:** Carregar preferências ao inicializar a aplicação.
 
 ## Critérios de Aceite
-- [ ] Preferências são salvas automaticamente ao serem alteradas.
-- [ ] A aplicação inicializa com as últimas preferências do usuário.
-- [ ] Testes garantem que falhas no storage não travam a aplicação (graceful degradation).
+- [x] Preferências são salvas automaticamente ao serem alteradas.
+- [x] A aplicação inicializa com as últimas preferências do usuário.
+- [x] Testes garantem que falhas no storage não travam a aplicação (graceful degradation).
