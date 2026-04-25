@@ -9,7 +9,7 @@ import '../common/icon';
 import '../common/UINumberScrubber';
 import '../common/ui-variable-badge';
 import { DEFAULTS } from '../../constants/defaults';
-import { sharedStyles } from '../../utils/shared-styles';
+import { sharedSheet } from '../../utils/shared-styles';
 
 interface A4Config {
   marginMM: number;
@@ -42,6 +42,9 @@ export class DataSourceInput extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
+    if (this.shadowRoot) {
+      this.shadowRoot.adoptedStyleSheets = [sharedSheet];
+    }
   }
 
   connectedCallback(): void {
@@ -82,8 +85,6 @@ export class DataSourceInput extends HTMLElement {
 
     this.shadowRoot.innerHTML = `
       <style>
-        ${sharedStyles};
-        
         :host { display: block; height: 100%; }
       </style>
 

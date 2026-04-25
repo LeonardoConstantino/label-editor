@@ -1,5 +1,5 @@
 import { UISM } from '../../core/UISoundManager';
-import { sharedStyles } from '../../utils/shared-styles';
+import { sharedSheet } from '../../utils/shared-styles';
 
 /**
  * AppInput: Campo de entrada técnico com label integrada.
@@ -18,6 +18,10 @@ export class AppInput extends HTMLElement {
     
     this.input = document.createElement('input');
     this.input.className = 'input-prism';
+
+    if (this.shadowRoot) {
+      this.shadowRoot.adoptedStyleSheets = [sharedSheet];
+    }
   }
 
   static get observedAttributes() {
@@ -39,7 +43,6 @@ export class AppInput extends HTMLElement {
     if (!this.shadowRoot) return;
     this.shadowRoot.innerHTML = `
       <style>
-        ${sharedStyles}
         :host {
           display: block;
           margin-bottom: 12px;

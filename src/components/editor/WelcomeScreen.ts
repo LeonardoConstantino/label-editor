@@ -2,7 +2,7 @@ import { UISM } from '../../core/UISoundManager';
 import { templateManager } from '../../domain/services/TemplateManager';
 import eventBus from '../../core/EventBus';
 import '../common/icon';
-import { sharedStyles } from '../../utils/shared-styles';
+import { sharedSheet } from '../../utils/shared-styles';
 
 /**
  * WelcomeScreen: Tela inicial do Label Forge OS.
@@ -12,6 +12,9 @@ export class WelcomeScreen extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
+    if (this.shadowRoot) {
+      this.shadowRoot.adoptedStyleSheets = [sharedSheet];
+    }
   }
 
   connectedCallback(): void {
@@ -24,7 +27,6 @@ export class WelcomeScreen extends HTMLElement {
 
     this.shadowRoot.innerHTML = `
       <style>
-        ${sharedStyles};
         :host { display: block; }
 
         .action-btn:hover {

@@ -3,7 +3,7 @@ import helpData from '../../assets/data/helpData';
 import { shortcutService } from '../../core/ShortcutService';
 import '../common/icon';
 import '../common/KeyboardShortcuts';
-import { sharedStyles } from '../../utils/shared-styles';
+import { sharedSheet } from '../../utils/shared-styles';
 
 /**
  * HelpCenter: Hub de conhecimento dinâmico.
@@ -15,6 +15,9 @@ export class HelpCenter extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
+    if (this.shadowRoot) {
+      this.shadowRoot.adoptedStyleSheets = [sharedSheet];
+    }
   }
 
   connectedCallback(): void {
@@ -31,7 +34,6 @@ export class HelpCenter extends HTMLElement {
 
     this.shadowRoot.innerHTML = `
       <style>
-        ${sharedStyles};
         :host { display: block; height: 100%; }
         .tab-btn.active {
           text-shadow: 0 0 10px rgba(99,102,241,0.5);

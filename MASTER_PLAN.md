@@ -20,7 +20,7 @@ Este Master Plan coordena a fase final de desenvolvimento, focando em estabilida
 ### Fase A: Core, Performance & Segurança (O alicerce final)
 | ID | Task | Pri | Status | Deps | Branch |
 |----|------|-----|--------|------|--------|
-| **53** | [Otimização de Performance CSS (AdoptedSheets)](./tasks/53_css_perf_optimization.md) | 10 | [ ] | 22 | `task/53-css-perf` |
+| **53** | [Otimização de Performance CSS (AdoptedSheets)](./tasks/53_css_perf_optimization.md) | 10 | [x] | 22 | `task/53-css-perf` |
 | **61** | [Otimização de Updates de DOM (Incremental)](./tasks/61_dom_update_optimization.md) | 10 | [ ] | 46 | `task/61-dom-update` |
 | **40** | [Prevenção de XSS & Sanitização](./tasks/40_security_xss.md) | 10 | [ ] | — | `task/40-security-xss` |
 | **51** | [Correção de Atalhos em Inputs (Focus Protection)](./tasks/51_keyboard_fix.md) | 09 | [ ] | 23 | `task/51-keyboard-fix` |

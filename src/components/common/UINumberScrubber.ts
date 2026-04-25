@@ -1,5 +1,5 @@
 import { UISM } from '../../core/UISoundManager';
-import { sharedStyles } from '../../utils/shared-styles';
+import { sharedSheet } from '../../utils/shared-styles';
 
 /**
  * ui-number-scrubber
@@ -23,6 +23,7 @@ export class UINumberScrubber extends HTMLElement {
   constructor() {
     super();
     this.#shadow = this.attachShadow({ mode: 'open' });
+    this.#shadow.adoptedStyleSheets = [sharedSheet];
   }
 
   get value(): number {
@@ -182,7 +183,6 @@ export class UINumberScrubber extends HTMLElement {
 
     this.#shadow.innerHTML = `
       <style>
-        ${sharedStyles};
         :host { display: block; width: 100%; --progress: 0%; }
         
         .scrubber-wrapper {

@@ -1,5 +1,5 @@
 import { UISM } from '../../core/UISoundManager';
-import { sharedStyles } from '../../utils/shared-styles';
+import { sharedSheet } from '../../utils/shared-styles';
 
 /**
  * AppButton: Botão tátil seguindo o Design System Tactile Prism.
@@ -11,6 +11,10 @@ export class AppButton extends HTMLElement {
     super();
     this.attachShadow({ mode: 'open' });
     this.button = document.createElement('button');
+
+    if (this.shadowRoot) {
+      this.shadowRoot.adoptedStyleSheets = [sharedSheet];
+    }
   }
 
   static get observedAttributes() {
@@ -31,7 +35,6 @@ export class AppButton extends HTMLElement {
     if (!this.shadowRoot) return;
     this.shadowRoot.innerHTML = `
       <style>
-        ${sharedStyles}
         :host { display: inline-block; width: auto; }
         button { width: 100%; outline: none; }
         button:disabled { opacity: 0.4; cursor: not-allowed; filter: grayscale(1); }

@@ -5,7 +5,7 @@ import { formatDate } from '../../utils/utils';
 import '../common/AppButton';
 import '../common/icon';
 import { confirmDialog } from '../common/confirm';
-import { sharedStyles } from '../../utils/shared-styles';
+import { sharedSheet } from '../../utils/shared-styles';
 
 /**
  * VaultGallery: Interface de gerenciamento de templates (The Vault).
@@ -20,6 +20,9 @@ export class VaultGallery extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
+    if (this.shadowRoot) {
+      this.shadowRoot.adoptedStyleSheets = [sharedSheet];
+    }
   }
 
   connectedCallback(): void {
@@ -61,7 +64,6 @@ export class VaultGallery extends HTMLElement {
   private renderSkeleton(): void {
     this.shadowRoot!.innerHTML = `
     <style>
-      ${sharedStyles};
       :host { display: block; height: 100%; }
 
       ::-webkit-scrollbar { width: 8px; }

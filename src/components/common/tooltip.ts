@@ -3,7 +3,7 @@
  * @description Gerenciador global de tooltips (deve ser adicionado uma vez no documento)
  */
 
-import { sharedStyles } from "../../utils/shared-styles";
+import { sharedSheet } from "../../utils/shared-styles";
 
 /**
  * @element ui-tooltip
@@ -212,8 +212,8 @@ class TooltipBalloon extends HTMLElement {
     super();
     this.#shadow = this.attachShadow({ mode: 'open' });
 
-    // Aplica stylesheet compartilhado (performático - reutiliza a mesma instância)
-    this.#shadow.adoptedStyleSheets = [balloonStyles];
+    // Aplica stylesheets (o global primeiro, depois o específico do balão)
+    this.#shadow.adoptedStyleSheets = [sharedSheet, balloonStyles];
 
     // Adiciona estrutura HTML
     const container = document.createElement('div');
@@ -696,7 +696,6 @@ class TooltipInstance {
 const TEMPLATE_WRAPPER = document.createElement('template');
 TEMPLATE_WRAPPER.innerHTML = `
 <style>
-  ${sharedStyles}
   :host { display: contents; }
 </style>
 <slot name="target"></slot>
@@ -722,6 +721,7 @@ class UiTooltip extends HTMLElement {
   constructor() {
     super();
     this.#shadow = this.attachShadow({ mode: 'open' });
+    this.#shadow.adoptedStyleSheets = [sharedSheet];
     this.#shadow.appendChild(TEMPLATE_WRAPPER.content.cloneNode(true));
     this.#targetSlot = this.#shadow.querySelector('slot[name="target"]')!;
     this.#contentSlot = this.#shadow.querySelector('slot[name="content"]')!;

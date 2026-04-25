@@ -1,4 +1,4 @@
-import { sharedStyles } from "../../utils/shared-styles";
+import { sharedSheet } from "../../utils/shared-styles";
 
 export interface ShortcutItem {
   type: 'shortcut' | 'longpress';
@@ -17,6 +17,9 @@ export class UIKeyboardShortcuts extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
+    if (this.shadowRoot) {
+      this.shadowRoot.adoptedStyleSheets = [sharedSheet];
+    }
   }
 
   // Permite injetar o array de atalhos via JS
@@ -115,8 +118,6 @@ export class UIKeyboardShortcuts extends HTMLElement {
 
     this.shadowRoot.innerHTML = `
       <style>
-        ${sharedStyles}
-        
         :host { display: block; width: 100%; }
 
         /* O truque do pontilhado "Menu de Restaurante" para a variante Default */

@@ -3,7 +3,7 @@ import eventBus from '../../core/EventBus';
 import { canvasRenderer } from '../../domain/services/CanvasRenderer';
 import { UISM } from '../../core/UISoundManager';
 import { UnitConverter } from '../../utils/units';
-import { sharedStyles } from '../../utils/shared-styles';
+import { sharedSheet } from '../../utils/shared-styles';
 
 /**
  * EditorCanvas: O Web Component que renderiza a etiqueta visualmente com layout Tactile Prism.
@@ -19,6 +19,9 @@ export class EditorCanvas extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
+    if (this.shadowRoot) {
+      this.shadowRoot.adoptedStyleSheets = [sharedSheet];
+    }
     
     this.workspace = document.createElement('div');
     this.artboard = document.createElement('div');
@@ -41,7 +44,6 @@ export class EditorCanvas extends HTMLElement {
 
     this.shadowRoot.innerHTML = `
       <style>
-        ${sharedStyles};
         :host {
           display: block;
           width: 100%;

@@ -7,7 +7,7 @@ import { ElementFactory } from '../../domain/models/elements/ElementFactory';
 import '../common/AppButton';
 import '../common/icon';
 import '../common/tooltip';
-import { sharedStyles } from '../../utils/shared-styles';
+import { sharedSheet } from '../../utils/shared-styles';
 
 /**
  * EditorToolbar: A "Pílula de Controle" flutuante do Cockpit.
@@ -18,6 +18,9 @@ export class EditorToolbar extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
+    if (this.shadowRoot) {
+      this.shadowRoot.adoptedStyleSheets = [sharedSheet];
+    }
   }
 
   connectedCallback(): void {
@@ -47,7 +50,6 @@ export class EditorToolbar extends HTMLElement {
 
     this.shadowRoot.innerHTML = `
       <style>
-        ${sharedStyles};
         :host {
           display: flex;
           align-items: center;

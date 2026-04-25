@@ -22,7 +22,7 @@ Eliminar a redundância de CSS e o overhead de parsing nos Web Components, migra
    - Garantir que a renderização inicial (First Contentful Paint) não sofra regressão.
 
 ## Critérios de Aceite
-- [ ] O CSS global é processado apenas uma vez, independentemente do número de componentes na tela.
-- [ ] Estilos visuais permanecem idênticos em todos os componentes.
-- [ ] Remoção de todas as instâncias de `${sharedStyles}` de dentro de strings `innerHTML`.
-- [ ] O projeto continua funcionando corretamente após o build de produção (`npm run build`).
+- [x] O CSS global é processado apenas uma vez, independentemente do número de componentes na tela.
+- [x] Estilos visuais permanecem idênticos em todos os componentes.
+- [x] Remoção de todas as instâncias de `${sharedStyles}` de dentro de strings `innerHTML`.
+- [x] O projeto continua funcionando corretamente após o build de produção (`npm run build`).
