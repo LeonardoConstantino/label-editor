@@ -6,6 +6,7 @@ import '../common/AppButton';
 import '../common/icon';
 import { confirmDialog } from '../common/confirm';
 import { sharedSheet } from '../../utils/shared-styles';
+import { escapeHTML } from '../../utils/sanitize';
 
 /**
  * VaultGallery: Interface de gerenciamento de templates (The Vault).
@@ -221,8 +222,8 @@ export class VaultGallery extends HTMLElement {
 
         <!-- METADADOS DO CARTUCHO -->
         <div class="p-4 bg-surface-solid">
-          <h4 class="font-sans text-[13px] font-bold text-text-main truncate mb-2.5 group-hover:text-accent-primary transition-colors" title="${label.name}">
-            ${label.name}
+          <h4 class="font-sans text-[13px] font-bold text-text-main truncate mb-2.5 group-hover:text-accent-primary transition-colors" title="${escapeHTML(label.name)}">
+            ${escapeHTML(label.name)}
           </h4>
           <div class="flex items-center justify-between">
             <span class="px-2 py-1 rounded bg-black/40 border border-white/5 text-[9px] font-mono text-text-muted uppercase tracking-widest shadow-inner">

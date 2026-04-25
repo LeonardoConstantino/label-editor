@@ -1,4 +1,5 @@
 import { sharedSheet } from "../../utils/shared-styles";
+import { escapeHTML } from "../../utils/sanitize";
 
 export interface ShortcutItem {
   type: 'shortcut' | 'longpress';
@@ -206,7 +207,7 @@ export class UIKeyboardShortcuts extends HTMLElement {
           (s) => `
         <div class="flex items-center gap-3 p-1.5 hover:bg-white/5 rounded transition-colors">
           <div class="min-w-15 flex justify-end">${this.formatKey(s.key, s.type)}</div>
-          <span class="text-[11px] text-text-muted truncate">${this.getDescription(s)}</span>
+          <span class="text-[11px] text-text-muted truncate">${escapeHTML(this.getDescription(s))}</span>
         </div>
       `,
         )
@@ -236,7 +237,7 @@ export class UIKeyboardShortcuts extends HTMLElement {
           
           <h3 class="font-mono text-[10px] text-accent-primary uppercase tracking-[0.15em] font-bold mb-4 flex items-center gap-2">
             <ui-icon name="folder" size="sm" class="opacity-80"></ui-icon>
-            ${category}
+            ${escapeHTML(category)}
           </h3>
           
           <div class="flex flex-col gap-3.5">
@@ -244,7 +245,7 @@ export class UIKeyboardShortcuts extends HTMLElement {
               .map(
                 (s) => `
               <div class="flex items-center text-[12px] group">
-                <span class="text-text-main group-hover:text-white transition-colors">${this.getDescription(s)}</span>
+                <span class="text-text-main group-hover:text-white transition-colors">${escapeHTML(this.getDescription(s))}</span>
                 <span class="dot-leader"></span>
                 <span class="shrink-0 flex items-center justify-end">${this.formatKey(s.key, s.type)}</span>
               </div>

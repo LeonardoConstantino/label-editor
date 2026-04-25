@@ -10,6 +10,7 @@ import '../common/UINumberScrubber';
 import '../common/ui-variable-badge';
 import { DEFAULTS } from '../../constants/defaults';
 import { sharedSheet } from '../../utils/shared-styles';
+import { escapeHTML } from '../../utils/sanitize';
 
 interface A4Config {
   marginMM: number;
@@ -61,7 +62,8 @@ export class DataSourceInput extends HTMLElement {
     const vars = new Set<string>();
     // Regex atualizado para bater com o do DataSourceParser.interpolate
     // Captura 1: nome da variável
-    const regex = /\{\{\s*([\w\s."'-]+)(?::([\w,()\s.:-]+))?(?:\|\|([^}]+))?\s*\}\}/g;
+    const regex =
+      /\{\{\s*([\w\s."'-]+)(?::([\w,()\s.:-]+))?(?:\|\|([^}]+))?\s*\}\}/g;
 
     label.elements.forEach((el) => {
       if (el.type === ElementType.TEXT && (el as any).content) {
@@ -138,7 +140,7 @@ export class DataSourceInput extends HTMLElement {
                       .map((f) => {
                         const isUsed = this.labelPlaceholders.includes(f);
                         return `<ui-variable-badge state="${isUsed ? 'used' : 'missing'}">
-                          ${f}
+                          ${escapeHTML(f)}
                         </ui-variable-badge>`;
                       })
                       .join('')}
@@ -159,7 +161,7 @@ export class DataSourceInput extends HTMLElement {
                       .map((p) => {
                         const isAvailable = this.dataFields.includes(p);
                         return `<span class="variable-badge ${isAvailable ? '' : 'missing'}">
-                        {{${p}}} ${isAvailable ? '' : '⚠️'}
+                        {{${escapeHTML(p)}}} ${isAvailable ? '' : '⚠️'}
                       </span>`;
                       })
                       .join('')}
@@ -284,8 +286,8 @@ export class DataSourceInput extends HTMLElement {
       });
     }
 
-    this.setupConfigListeners(shadow)
-    
+    this.setupConfigListeners(shadow);
+
     shadow.getElementById('cfg-crop')?.addEventListener('change', (e: any) => {
       this.a4Config.showCropMarks = e.target.checked;
       this.updatePreview();
@@ -333,36 +335,36 @@ export class DataSourceInput extends HTMLElement {
   }
 
   private setupConfigListeners(shadow: ShadowRoot): void {
-  const configHandlers: Record<string, (value: any) => void> = {
-    'cfg-cols': (value) => {
-      this.a4Config.columns = value || 1;
-      this.updatePreview();
-    },
-    'cfg-gap': (value) => {
-      this.a4Config.gapMM = value || 0;
-      this.updatePreview();
-    },
-    'cfg-margin': (value) => {
-      this.a4Config.marginMM = value || 0;
-      this.updatePreview();
-    },
-    'cfg-zoom': (value) => {
-      this.a4Config.zoom = (value || 45) / 100;
-      const sheet = shadow.getElementById('a4-sheet')!;
-      sheet.style.transform = `scale(${this.a4Config.zoom})`;
-    }
-  };
+    const configHandlers: Record<string, (value: any) => void> = {
+      'cfg-cols': (value) => {
+        this.a4Config.columns = value || 1;
+        this.updatePreview();
+      },
+      'cfg-gap': (value) => {
+        this.a4Config.gapMM = value || 0;
+        this.updatePreview();
+      },
+      'cfg-margin': (value) => {
+        this.a4Config.marginMM = value || 0;
+        this.updatePreview();
+      },
+      'cfg-zoom': (value) => {
+        this.a4Config.zoom = (value || 45) / 100;
+        const sheet = shadow.getElementById('a4-sheet')!;
+        sheet.style.transform = `scale(${this.a4Config.zoom})`;
+      },
+    };
 
-  Object.entries(configHandlers).forEach(([id, handler]) => {
-    const element = shadow.getElementById(id);
-    if (!element) return;
+    Object.entries(configHandlers).forEach(([id, handler]) => {
+      const element = shadow.getElementById(id);
+      if (!element) return;
 
-    const listener = (e: any) => handler(e.detail.value);
-    
-    element.addEventListener('change', listener);
-    element.addEventListener('input', listener);
-  });
-}
+      const listener = (e: any) => handler(e.detail.value);
+
+      element.addEventListener('change', listener);
+      element.addEventListener('input', listener);
+    });
+  }
 
   private async handleFile(file: File): Promise<void> {
     try {
@@ -415,7 +417,7 @@ export class DataSourceInput extends HTMLElement {
         <div class="overflow-x-auto border border-border-ui/30 rounded-lg">
           <table class="data-mini-table">
             <thead>
-              <tr>${displayHeaders.map((h) => `<th>${h}</th>`).join('')}${headers.length > 4 ? '<th>...</th>' : ''}</tr>
+              <tr>${displayHeaders.map((h) => `<th>${escapeHTML(h)}</th>`).join('')}${headers.length > 4 ? '<th>...</th>' : ''}</tr>
             </thead>
             <tbody>
               ${this.dataList
@@ -423,7 +425,7 @@ export class DataSourceInput extends HTMLElement {
                 .map(
                   (row) => `
                 <tr>
-                  ${displayHeaders.map((h) => `<td>${row[h]}</td>`).join('')}
+                  ${displayHeaders.map((h) => `<td>${escapeHTML(String(row[h]))}</td>`).join('')}
                   ${headers.length > 4 ? '<td class="text-text-muted">...</td>' : ''}
                 </tr>
               `,
@@ -455,20 +457,25 @@ export class DataSourceInput extends HTMLElement {
     }
 
     sheet.innerHTML = '';
-    
+
     // Cálculo Dinâmico de etiquetas por folha A4
     const PAGE_WIDTH = 210;
     const PAGE_HEIGHT = 297;
-    const availableWidth = PAGE_WIDTH - (this.a4Config.marginMM * 2);
-    const availableHeight = PAGE_HEIGHT - (this.a4Config.marginMM * 2);
-    
+    const availableWidth = PAGE_WIDTH - this.a4Config.marginMM * 2;
+    const availableHeight = PAGE_HEIGHT - this.a4Config.marginMM * 2;
+
     // Quantas colunas cabem de fato considerando o GAP?
     const colWidth = label.config.widthMM;
     const rowHeight = label.config.heightMM;
-    
-    const maxCols = Math.floor((availableWidth + this.a4Config.gapMM) / (colWidth + this.a4Config.gapMM));
-    const maxRows = Math.floor((availableHeight + this.a4Config.gapMM) / (rowHeight + this.a4Config.gapMM));
-    
+
+    const maxCols = Math.floor(
+      (availableWidth + this.a4Config.gapMM) / (colWidth + this.a4Config.gapMM),
+    );
+    const maxRows = Math.floor(
+      (availableHeight + this.a4Config.gapMM) /
+        (rowHeight + this.a4Config.gapMM),
+    );
+
     // O usuário pode ter configurado mais colunas do que cabem. Respeitamos o menor valor.
     const effectiveCols = Math.min(this.a4Config.columns, maxCols || 1);
     const labelsPerPage = effectiveCols * (maxRows || 1);

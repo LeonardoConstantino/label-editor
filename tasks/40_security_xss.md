@@ -14,6 +14,6 @@ Implementar uma camada de segurança robusta em toda a aplicação, utilizando o
 - **Template Literals:** Adotar o uso da função `safe` nos Web Components para gerar HTML dinâmico de forma segura.
 
 ## Critérios de Aceite
-- [/] Scripts inseridos em campos de texto (ex: `<script>alert(1)</script>`) são renderizados como texto literal, sem execução.
+- [x] Scripts inseridos em campos de texto (ex: `<script>alert(1)</script>`) são renderizados como texto literal, sem execução.
 - [x] Caracteres como `<` e `>` não quebram o layout do Inspector ou do Canvas.
-- [ ] 100% dos pontos de renderização de conteúdo dinâmico cobertos pelo `sanitize.ts`.
+- [x] 100% dos pontos de renderização de conteúdo dinâmico cobertos pelo `sanitize.ts`.
