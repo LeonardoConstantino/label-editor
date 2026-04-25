@@ -48,16 +48,49 @@ export class EditorCanvas extends HTMLElement {
           display: block;
           width: 100%;
           height: 100%;
-          overflow: hidden;
+          overflow: auto;
+          background-color: var(--color-canvas);
+        }
+
+        /* Container principal que permite o scroll */
+        .canvas-workspace {
+          display: flex;
+          min-width: 100%;
+          min-height: 100%;
+          padding: 150px; /* Respiro fixo (Task 66) */
+          box-sizing: border-box;
+        }
+
+        /* Camada de centralização que cresce com o conteúdo */
+        .artboard-scaler {
+          display: block;
+          margin: auto; /* Truque mestre para centralizar com scroll funcional */
+          position: relative;
+        }
+
+        .label-artboard {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.5), 0 18px 36px -18px rgba(0, 0, 0, 0.5);
+          transition: transform 0.2s var(--ease-spring);
+          background-color: white;
+          flex: none;
         }
       </style>
     `;
 
     this.workspace.className = 'canvas-workspace';
+    const scaler = document.createElement('div');
+    scaler.className = 'artboard-scaler';
+    scaler.id = 'scaler';
+
     this.artboard.className = 'label-artboard';
     
     this.artboard.appendChild(this.canvas);
-    this.workspace.appendChild(this.artboard);
+    scaler.appendChild(this.artboard);
+    this.workspace.appendChild(scaler);
     this.shadowRoot.appendChild(this.workspace);
   }
 
@@ -80,8 +113,6 @@ export class EditorCanvas extends HTMLElement {
 
   private updateWorkspaceVisuals(_state: AppState): void {
     // O grid do workspace (background) pode ficar sempre ligado para dar a sensação de Cockpit
-    // ou podemos associar a outra preferência no futuro.
-    this.workspace.style.backgroundImage = ''; 
   }
 
   private redraw(state: AppState = store.getState()): void {
@@ -89,17 +120,31 @@ export class EditorCanvas extends HTMLElement {
     if (!label) return;
 
     const { config, elements } = label;
-    // Escala combinada para o preview: (DPI -> Pixels) * Zoom
-    const scale = UnitConverter.mmToPx(1, config.dpi) * config.previewScale;
+    const zoom = config.previewScale;
+    const scale = UnitConverter.mmToPx(1, config.dpi);
 
-    // Atualiza dimensões da artboard (mm -> px para estilo CSS)
-    this.artboard.style.width = `${label.config.widthMM}mm`;
-    this.artboard.style.height = `${label.config.heightMM}mm`;
+    // 1. Atualiza as dimensões REAIS da artboard (1:1 com DPI)
+    const wPx = UnitConverter.mmToPx(label.config.widthMM, config.dpi);
+    const hPx = UnitConverter.mmToPx(label.config.heightMM, config.dpi);
+    
+    this.artboard.style.width = `${wPx}px`;
+    this.artboard.style.height = `${hPx}px`;
     this.artboard.style.backgroundColor = config.backgroundColor || '#ffffff';
+    
+    // 2. Aplica o Zoom Visual (mantendo a centralização no scaler)
+    this.artboard.style.transform = `translate(-50%, -50%) scale(${zoom})`;
+
+    // 3. ATUALIZA O SCALER (A chave para o Gutter funcionar em etiquetas pequenas)
+    // O scaler ocupa o espaço visual total que a etiqueta toma com o zoom.
+    const scaler = this.shadowRoot?.getElementById('scaler');
+    if (scaler) {
+      scaler.style.width = `${wPx * zoom}px`;
+      scaler.style.height = `${hPx * zoom}px`;
+    }
 
     // Ajusta o tamanho do canvas (em pixels reais baseados no DPI)
-    this.canvas.width = UnitConverter.mmToPx(label.config.widthMM, config.dpi) * config.previewScale;
-    this.canvas.height = UnitConverter.mmToPx(label.config.heightMM, config.dpi) * config.previewScale;
+    this.canvas.width = wPx;
+    this.canvas.height = hPx;
     
     // Sincroniza o tamanho visual do canvas com a artboard
     this.canvas.style.width = '100%';
@@ -178,6 +223,12 @@ export class EditorCanvas extends HTMLElement {
 
   private handleMouseDown(e: MouseEvent): void {
     const rect = this.canvas.getBoundingClientRect();
+    
+    // CORREÇÃO SELEÇÃO (Task 54): 
+    // rect.width/height já refletem o tamanho escalonado pelo CSS transform.
+    // Ao dividir a distância do clique (clientX - rect.left) pela largura visual (rect.width),
+    // obtemos a porcentagem do clique no canvas.
+    // Multiplicando pelo tamanho interno do canvas (this.canvas.width), voltamos à coordenada real.
     const x = ((e.clientX - rect.left) / rect.width) * this.canvas.width;
     const y = ((e.clientY - rect.top) / rect.height) * this.canvas.height;
 

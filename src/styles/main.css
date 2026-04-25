@@ -103,7 +103,7 @@
 
   /* O Canvas Infinito com Dot Grid Sutil e Técnico */
   .canvas-workspace {
-    @apply absolute inset-0 z-0 flex items-center justify-center overflow-auto;
+    z-index: 0;
     background-image: radial-gradient(
       circle,
       rgba(38, 42, 51, 0.4) 1px,

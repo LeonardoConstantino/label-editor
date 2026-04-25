@@ -24,8 +24,7 @@ Este Master Plan coordena a fase final de desenvolvimento, focando em estabilida
 | **61** | [Otimização de Updates de DOM (Incremental)](./tasks/61_dom_update_optimization.md) | 10 | [ ] | 46 | `task/61-dom-update` |
 | **40** | [Prevenção de XSS & Sanitização](./tasks/40_security_xss.md) | 10 | [x] | — | `task/40-security-xss` |
 | **51** | [Correção de Atalhos em Inputs (Focus Protection)](./tasks/51_keyboard_fix.md) | 09 | [x] | 23 | `task/51-keyboard-fix` |
-| **54** | [Correção do Zoom Visual (CSS Transform)](./tasks/54_canvas_zoom_fix.md) | 09 | [ ] | 21 | `task/54-canvas-zoom` |
-| **66** | [Gutter do Canvas (Overscan)](./tasks/66_canvas_workspace_padding.md) | 07 | [ ] | — | `task/66-canvas-gutter` |
+| **54** | [Zoom Visual e Respiro do Canvas (Gutter)](./tasks/54_canvas_zoom_fix.md) | 09 | [x] | 21 | `task/54-canvas-zoom` |
 | **60** | [Definição de Code Style (GEMINI.md)](./tasks/60_code_style_definition.md) | 08 | [x] | — | `task/60-code-style` |
 | **70** | [Grande Auditoria de Integridade](./tasks/70_codebase_audit.md) | 09 | [ ] | 60 | `task/70-codebase-audit` |
 

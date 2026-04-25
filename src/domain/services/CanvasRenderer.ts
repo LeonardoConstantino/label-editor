@@ -51,8 +51,9 @@ export class CanvasRenderer {
    * Verifica se um ponto (px) está dentro de um elemento (hit test).
    */
   public hitTest(element: AnyElement, pxX: number, pxY: number, config: CanvasConfig): boolean {
-    // Escala combinada: DPI + Zoom de Preview
-    const scale = UnitConverter.mmToPx(1, config.dpi) * config.previewScale;
+    // Escala: Apenas DPI (mm -> px internos). 
+    // O previewScale não entra aqui pois o zoom é visual (CSS transform).
+    const scale = UnitConverter.mmToPx(1, config.dpi);
     
     const elX = element.position.x * scale;
     const elY = element.position.y * scale;
@@ -65,8 +66,8 @@ export class CanvasRenderer {
 
     // BorderElement não tem dimensions, mas podemos fazer hit test na borda
     if (element.type === ElementType.BORDER) {
-      const canvasW = UnitConverter.mmToPx(config.widthMM, config.dpi) * config.previewScale;
-      const canvasH = UnitConverter.mmToPx(config.heightMM, config.dpi) * config.previewScale;
+      const canvasW = UnitConverter.mmToPx(config.widthMM, config.dpi);
+      const canvasH = UnitConverter.mmToPx(config.heightMM, config.dpi);
       const margin = element.position.x * scale;
       // Hit test simples para borda (clique próximo à moldura)
       const isNearEdge = (
