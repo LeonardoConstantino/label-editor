@@ -21,8 +21,9 @@ Garantir que os atalhos de teclado (especialmente as teclas únicas e setas) nã
    - Padronizar atalhos de movimentação (setas) para respeitarem o contexto de foco.
 
 ## Critérios de Aceite
-- [ ] Digitar em qualquer input não dispara ferramentas (T, R, I, B, V, P).
-- [ ] Tecla `Delete` funciona normalmente em textos sem excluir o elemento do canvas.
-- [ ] Setas direcionais movem o cursor dentro de inputs de texto/número em vez de mover o elemento.
-- [ ] Atalhos de sistema (`Ctrl+Z`, `Ctrl+S`, `Ctrl+Y`) continuam funcionando mesmo com foco no input.
-- [ ] O sistema de Long Press é ignorado durante a digitação.
+- [x] Digitar em qualquer input não dispara ferramentas (T, R, I, B, V, P).
+- [x] Tecla `Delete` funciona normalmente em textos sem excluir o elemento do canvas.
+- [x] Setas direcionais movem o cursor dentro de inputs de texto/número em vez de mover o elemento.
+- [x] Atalhos de sistema (`Ctrl+Z`, `Ctrl+S`, `Ctrl+Y`) continuam funcionando mesmo com foco no input.
+- [x] O sistema de Long Press é ignorado durante a digitação.
+- [x] Detecção de foco perfura o Shadow DOM para suportar Web Components.

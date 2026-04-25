@@ -85,10 +85,10 @@ class ShortcutService {
     // --- MANIPULAÇÃO DE ELEMENTOS ---
     this.manager.register('delete', () => this.handleDelete(), {
       description: 'Excluir Elemento', 
-      context: (ctx) => ctx === 'global', // Bloqueia se estiver em modal ou input
+      context: 'no-input',
       preventDefault: true 
     });
-    this.manager.register('backspace', () => this.handleDelete(), { description: 'Excluir Elemento', context: (ctx) => ctx === 'global', preventDefault: true });
+    this.manager.register('backspace', () => this.handleDelete(), { description: 'Excluir Elemento', context: 'no-input', preventDefault: true });
     
     this.manager.register(`${this.metaKeyName}+d`, () => {
       const id = store.getState().selectedElementIds[0];
@@ -152,19 +152,19 @@ class ShortcutService {
         
         const d = deltas[key];
         this.moveSelectedElement(d.x * multiplier, d.y * multiplier);
-      }, {description: descriptionMap[key], context: (ctx) => ctx === 'global', preventDefault: true });
+      }, {description: descriptionMap[key], context: 'no-input', preventDefault: true });
 
       // Garante que Alt+Seta e Shift+Seta funcionem mesmo que o manager 
       // não capture a combinação exata no register (devido à normalização)
       this.manager.register(`shift+${key}`, (_e) => {
         const d = deltas[key];
         this.moveSelectedElement(d.x * 10, d.y * 10);
-      }, { description: `${descriptionMap[key]} rápido`, context: (ctx) => ctx === 'global', preventDefault: true });
+      }, { description: `${descriptionMap[key]} rápido`, context: 'no-input', preventDefault: true });
 
       this.manager.register(`alt+${key}`, (_e) => {
         const d = deltas[key];
         this.moveSelectedElement(d.x * 0.1, d.y * 0.1);
-      }, { description: `${descriptionMap[key]} lento`, context: (ctx) => ctx === 'global', preventDefault: true });
+      }, { description: `${descriptionMap[key]} lento`, context: 'no-input', preventDefault: true });
     });
   }
 

@@ -414,7 +414,8 @@ class KeyboardShortcutManager {
     const currentContext = isInputFocused ? 'no-input' : this.getCurrentContext();
 
     // === 1. LONG PRESS ===
-    if (this.options.enableLongPress) {
+    // Bloqueia long press se input estiver focado para evitar interferência na digitação
+    if (this.options.enableLongPress && !isInputFocused) {
       this._handleLongPress(code, key, e);
     }
 
@@ -465,7 +466,7 @@ class KeyboardShortcutManager {
 
     for (const { handler, config } of handlers) {
       // Verifica contexto
-      if (!this._checkContext(config.context, isInputFocused)) {
+      if (!this._checkContext(config.context, isInputFocused, normalizedKey)) {
         continue;
       }
 
@@ -660,8 +661,17 @@ class KeyboardShortcutManager {
    */
   private _checkContext(
     requiredContext: string | ((currentContext: string) => boolean),
-    isInputFocused: boolean
+    isInputFocused: boolean,
+    normalizedKey: string
   ): boolean {
+    // Regra de Proteção de Input (Task 51):
+    const hasModifiers = normalizedKey.includes('+');
+    
+    if (isInputFocused && !hasModifiers) {
+      this._log(`Atalho [${normalizedKey}] BLOQUEADO: Foco em input detectado.`);
+      return false;
+    }
+
     if (requiredContext === 'global') return true;
     if (requiredContext === 'no-input') return !isInputFocused;
 
@@ -743,10 +753,16 @@ class KeyboardShortcutManager {
   }
 
   /**
-   * Verifica se foco está em input
+   * Verifica se foco está em input (Suporta Shadow DOM)
    */
   private _isInputFocused(): boolean {
-    const el = document.activeElement;
+    let el = document.activeElement;
+    
+    // Perfura o Shadow DOM para encontrar o elemento real com foco
+    while (el && el.shadowRoot && el.shadowRoot.activeElement) {
+      el = el.shadowRoot.activeElement;
+    }
+
     return (
       ['INPUT', 'TEXTAREA', 'SELECT'].includes(el?.tagName || '') ||
       (el as HTMLElement)?.isContentEditable === true
