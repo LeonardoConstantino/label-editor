@@ -108,9 +108,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  const shortcuts = shortcutService.listShortcuts();
-  eventBus.emit('shortcuts:list:', shortcuts);
-
   // Carrega preferências do usuário
   const { preferenceManager } =
     await import('./domain/services/PreferenceManager');

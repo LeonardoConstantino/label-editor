@@ -17,7 +17,7 @@ Adicionar visibilidade técnica à Galeria de Templates (The Vault), exibindo a 
    - Manter a tipografia técnica (JetBrains Mono) e as cores do sistema (Indigo/Text-Muted).
 
 ## Critérios de Aceite
-- [ ] O total de elementos é visível em cada card do Vault.
-- [ ] A tooltip detalha os tipos de elementos presentes na etiqueta.
-- [ ] Se uma etiqueta estiver vazia, deve mostrar "0 UNITS" ou similar.
-- [ ] Integração perfeita com o sistema de design "Tactile Prism".
+- [x] O total de elementos é visível em cada card do Vault.
+- [x] A tooltip detalha os tipos de elementos presentes na etiqueta.
+- [x] Se uma etiqueta estiver vazia, deve mostrar "0 UNITS" ou similar.
+- [x] Integração perfeita com o sistema de design "Tactile Prism".

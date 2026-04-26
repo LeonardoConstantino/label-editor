@@ -3,6 +3,8 @@
  * @module UISoundManager
  */
 
+import { logger } from "./Logger";
+
 /**
  * Configuração de envelope ADSR
  */
@@ -884,4 +886,4 @@ export class UISoundManager {
   }
 }
 
-export const UISM = new UISoundManager({enabled: false});
+export const UISM = new UISoundManager({enabled: false, logger: logger});
