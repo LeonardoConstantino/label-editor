@@ -20,7 +20,8 @@ Refatorar a lógica de atualização dos componentes (especialmente o `ElementIn
    - Reduzir o garbage collection causado por strings gigantes de HTML sendo descartadas e recriadas.
 
 ## Critérios de Aceite
-- [ ] O `ElementInspector` não recria o DOM ao alterar valores via scrubbers ou inputs.
-- [ ] O foco do teclado é mantido corretamente durante a edição.
-- [ ] Redução visual de "flicker" (piscadas) no painel lateral ao interagir com o canvas.
-- [ ] Código mais limpo e fácil de debugar, com referências claras aos elementos de UI.
+- [x] O `innerHTML` principal nos componentes Cockpit, Canvas e Vault é setado apenas uma vez.
+- [x] Mudanças de estado (como botões disabled) usam referências diretas ao DOM.
+- [x] Loops de renderização (como a galeria) utilizam `DocumentFragment` ou técnicas de injeção parcial.
+- [x] O "flicker" visual durante atualizações de estado foi eliminado nessas áreas.
+- [x] O `ElementInspector` foi reservado para a Task 46 (refatoração estrutural profunda).

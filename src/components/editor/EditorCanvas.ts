@@ -40,7 +40,7 @@ export class EditorCanvas extends HTMLElement {
   }
 
   private render(): void {
-    if (!this.shadowRoot) return;
+    if (!this.shadowRoot || this.shadowRoot.querySelector('.canvas-workspace')) return;
 
     this.shadowRoot.innerHTML = `
       <style>

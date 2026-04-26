@@ -27,6 +27,7 @@ export class EditorToolbar extends HTMLElement {
   connectedCallback(): void {
     this.render();
     this.setupListeners();
+    this.updateUI(); // Estado inicial
   }
 
   disconnectedCallback(): void {
@@ -35,10 +36,7 @@ export class EditorToolbar extends HTMLElement {
 
   private setupListeners(): void {
     this.unsubscribe = eventBus.on('state:change', (state: AppState) => {
-      const undoBtn = this.shadowRoot?.getElementById('undo');
-      const redoBtn = this.shadowRoot?.getElementById('redo');
-      if (undoBtn) undoBtn.toggleAttribute('disabled', !state.canUndo);
-      if (redoBtn) redoBtn.toggleAttribute('disabled', !state.canRedo);
+      this.updateUI(state);
     });
 
     eventBus.on('command:toolbar:upload-image', () => {
@@ -46,8 +44,22 @@ export class EditorToolbar extends HTMLElement {
     });
   }
 
+  /**
+   * Atualização Incremental (Task 61)
+   */
+  private updateUI(state: AppState = store.getState()): void {
+    const shadow = this.shadowRoot;
+    if (!shadow) return;
+
+    const undoBtn = shadow.getElementById('undo') as any;
+    const redoBtn = shadow.getElementById('redo') as any;
+
+    if (undoBtn) undoBtn.toggleAttribute('disabled', !state.canUndo);
+    if (redoBtn) redoBtn.toggleAttribute('disabled', !state.canRedo);
+  }
+
   private render(): void {
-    if (!this.shadowRoot) return;
+    if (!this.shadowRoot || this.shadowRoot.querySelector('#add-text')) return;
 
     this.shadowRoot.innerHTML = `
       <style>
