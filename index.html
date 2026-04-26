@@ -36,6 +36,25 @@
     <ui-help-center></ui-help-center>
   </ui-modal>
 
+  <ui-modal id="project-modal" heading="Project Management" size="lg">
+    <div class="flex flex-col gap-6 p-2">
+      <div class="card-module">
+        <h3 class="label-prism">Transfer design</h3>
+        <p class="text-text-muted text-xs mb-4">Mova seus designs entre diferentes dispositivos ou faça um backup de segurança.</p>
+        <div class="flex gap-4">
+          <app-button id="btn-export-file" variant="secondary" style="flex: 1;">
+            <ui-icon name="download"></ui-icon> EXPORT .LABEL
+          </app-button>
+          <app-button id="btn-import-trigger" variant="primary" style="flex: 1;">
+            <ui-icon name="upload"></ui-icon> IMPORT .LABEL
+          </app-button>
+        </div>
+      </div>
+    </div>
+  </ui-modal>
+
+  <input type="file" id="global-import-input" accept=".label,.json" style="display: none;" />
+
   <ui-tooltip-manager></ui-tooltip-manager>
   <script src="https://unpkg.com/canvas-txt@4.1.1"></script>
   <script type="module" src="/src/main.ts"></script>

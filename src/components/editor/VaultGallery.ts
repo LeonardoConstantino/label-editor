@@ -119,6 +119,12 @@ export class VaultGallery extends HTMLElement {
         <h3 class="font-mono text-[11px] text-text-main uppercase tracking-[0.25em] font-bold">The Vault</h3>
       </div>
       
+      <div class="flex flex-col gap-4 mb-4">
+        <app-button id="vault-import-btn" variant="primary" style="width: 100%;">
+          <ui-icon name="upload"></ui-icon> IMPORT .LABEL
+        </app-button>
+      </div>
+
       <div class="flex flex-col gap-2">
         <button class="filter-btn text-left font-sans text-sm px-4 py-2.5 rounded-lg border transition-all duration-300 cursor-pointer ${this.filter === 'all' ? 'text-accent-primary bg-accent-primary/10 border-accent-primary/30 shadow-[0_0_15px_rgba(99,102,241,0.15)] scale-[1.02]' : 'text-text-muted border-transparent hover:text-text-main hover:bg-white/5 hover:translate-x-1'}" data-filter="all">
           <div class="flex items-center gap-2">
@@ -177,6 +183,12 @@ export class VaultGallery extends HTMLElement {
     return `
     <div class="group relative bg-surface-solid border border-border-ui rounded-2xl overflow-hidden shadow-panel transition-all duration-300 ease-spring hover:border-accent-primary hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(0,0,0,0.6),0_0_15px_rgba(99,102,241,0.2)]" data-id="${label.id}">
         
+        <!-- BOTÃO EXPORT INDIVIDUAL -->
+        <button class="absolute top-3 right-3 z-40 w-8 h-8 rounded-lg bg-black/60 border border-white/10 text-text-muted hover:text-accent-primary hover:border-accent-primary/40 flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 action-export-label" 
+                data-id="${label.id}" title="Exportar para arquivo .label">
+          <ui-icon name="download" style="--icon-size: 14px;"></ui-icon>
+        </button>
+
         <!-- O DISPLAY DO CARTUCHO -->
         <div class="bg-black w-full h-44 flex items-center justify-center p-6 relative border-b border-border-ui overflow-hidden shadow-inner">
           
@@ -243,6 +255,10 @@ export class VaultGallery extends HTMLElement {
   private attachEvents(signal: AbortSignal): void {
     const shadow = this.shadowRoot!;
 
+    shadow.getElementById('vault-import-btn')?.addEventListener('click', () => {
+      document.getElementById('global-import-input')?.click();
+    });
+
     shadow.querySelectorAll('.filter-btn').forEach((btn) => {
       btn.addEventListener('click', (e: any) => {
         const target = e.currentTarget as HTMLElement;
@@ -263,6 +279,16 @@ export class VaultGallery extends HTMLElement {
       const loadBtn = target.closest('.action-load');
       const dupBtn = target.closest('.action-duplicate');
       const delBtn = target.closest('.action-delete');
+      const exportBtn = target.closest('.action-export-label');
+
+      if (exportBtn) {
+        const id = (exportBtn as HTMLElement).dataset.id!;
+        const label = this.templates.find(t => t.id === id);
+        if (label) {
+          templateManager.exportToFile(label);
+          UISM.play(UISM.enumPresets.SUCCESS);
+        }
+      }
 
       if (loadBtn) {
         const id = (loadBtn as HTMLElement).dataset.id!;

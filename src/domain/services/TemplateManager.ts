@@ -87,6 +87,62 @@ export class TemplateManager {
   }
 
   /**
+   * Exporta uma etiqueta como um arquivo JSON (.label).
+   * Se não passar label, usa a atual do store.
+   */
+  async exportToFile(label?: Label): Promise<void> {
+    const targetLabel = label || store.getState().currentLabel;
+    if (!targetLabel) return;
+
+    const data = JSON.stringify(targetLabel, null, 2);
+    const blob = new Blob([data], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${targetLabel.name.replace(/\s+/g, '_')}.label`;
+    document.body.appendChild(a);
+    a.click();
+    
+    setTimeout(() => {
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 0);
+
+    logger.info('TemplateManager', 'Label exported to file:', targetLabel.name);
+  }
+
+  /**
+   * Importa uma etiqueta de um arquivo JSON.
+   */
+  async importFromFile(file: File): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        try {
+          const content = e.target?.result as string;
+          const label = JSON.parse(content) as Label;
+
+          // Validação básica de schema
+          if (!label.id || !label.config || !Array.isArray(label.elements)) {
+            throw new Error('Arquivo .label inválido ou corrompido.');
+          }
+
+          // Injeta no Store
+          store.loadLabel(label);
+          logger.info('TemplateManager', 'Label imported from file:', label.name);
+          resolve();
+        } catch (err) {
+          logger.error('TemplateManager', 'Failed to import file:', err);
+          reject(err);
+        }
+      };
+      reader.onerror = () => reject(new Error('Erro ao ler o arquivo.'));
+      reader.readAsText(file);
+    });
+  }
+
+  /**
    * Inicializa um novo projeto limpo usando DEFAULTS.
    */
   createNewProject(): void {

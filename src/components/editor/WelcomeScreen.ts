@@ -104,8 +104,17 @@ export class WelcomeScreen extends HTMLElement {
     });
 
     shadow.getElementById('action-import')?.addEventListener('click', () => {
-      // Por enquanto, apenas notifica, pois importação de JSON é Task 33
-      eventBus.emit('notify', { message: 'Importação de arquivos disponível em breve.', type: 'info' });
+      const input = document.getElementById('global-import-input') as HTMLInputElement;
+      if (input) {
+        input.click();
+        
+        // Listener temporário para fechar o welcome após importação bem sucedida
+        const onImport = () => {
+          this.closeWelcome();
+          eventBus.off('state:change', onImport);
+        };
+        eventBus.on('state:change', onImport);
+      }
       UISM.play(UISM.enumPresets.TAP);
     });
   }

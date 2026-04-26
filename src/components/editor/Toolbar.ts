@@ -4,6 +4,7 @@ import { store, AppState } from '../../core/Store';
 import { UISM } from '../../core/UISoundManager';
 import { UnitConverter } from '../../utils/units';
 import { ElementFactory } from '../../domain/models/elements/ElementFactory';
+import { templateManager } from '../../domain/services/TemplateManager';
 import '../common/AppButton';
 import '../common/icon';
 import '../common/tooltip';
@@ -214,6 +215,20 @@ export class EditorToolbar extends HTMLElement {
           </p>
         </div>
       </ui-tooltip>
+
+      <ui-tooltip placement="bottom" delay="300">
+        <app-button slot="target" id="open-project-modal" variant="secondary" style="margin-left: 4px;">
+          <ui-icon name="folder"></ui-icon>
+        </app-button>
+        <div slot="content" class="tooltip-rich-panel">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-text-main text-[12px] font-semibold tracking-wide">Projeto</span>
+          </div>
+          <p class="text-text-muted text-[10px] leading-relaxed">
+            Importar ou exportar arquivos de design (.label) para backup ou compartilhamento.
+          </p>
+        </div>
+      </ui-tooltip>
       
       <ui-tooltip placement="bottom" delay="300">
         <app-button slot="target" id="open-batch" variant="success" style="margin-left: 4px;">
@@ -302,6 +317,37 @@ export class EditorToolbar extends HTMLElement {
       const modal = document.getElementById('batch-modal') as any;
       if (modal) modal.setAttribute('open', '');
       UISM.play(UISM.enumPresets.OPEN);
+    });
+
+    shadow.getElementById('open-project-modal')?.addEventListener('click', () => {
+      const modal = document.getElementById('project-modal') as any;
+      if (modal) modal.setAttribute('open', '');
+      UISM.play(UISM.enumPresets.OPEN);
+    });
+
+    // Listeners Globais para o Modal de Projeto (que reside no body)
+    document.getElementById('btn-export-file')?.addEventListener('click', async () => {
+      await templateManager.exportToFile();
+      UISM.play(UISM.enumPresets.SUCCESS);
+    });
+
+    document.getElementById('btn-import-trigger')?.addEventListener('click', () => {
+      document.getElementById('global-import-input')?.click();
+    });
+
+    document.getElementById('global-import-input')?.addEventListener('change', async (e: any) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      
+      try {
+        await templateManager.importFromFile(file);
+        const modal = document.getElementById('project-modal') as any;
+        if (modal) modal.removeAttribute('open');
+        UISM.play(UISM.enumPresets.SUCCESS);
+        eventBus.emit('notify', { message: 'Projeto importado com sucesso!', type: 'success' });
+      } catch (err) {
+        eventBus.emit('notify', { message: 'Erro ao importar: ' + (err as Error).message, type: 'error' });
+      }
     });
   }
 }

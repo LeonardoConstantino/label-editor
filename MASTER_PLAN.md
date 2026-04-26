@@ -32,7 +32,7 @@ Este Master Plan coordena a fase final de desenvolvimento, focando em estabilida
 | ID | Task | Pri | Status | Deps | Branch |
 |----|------|-----|--------|------|--------|
 | **36** | [Retomada Automática & Tela Inicial](./tasks/36_work_resumption.md) | 08 | [/] | 35 | `task/36-boot-welcome` |
-| **33** | [Importação/Exportação de JSON (.label)](./tasks/33_json_import_export.md) | 07 | [ ] | 07 | `task/33-json-io` |
+| **33** | [Importação/Exportação de JSON (.label)](./tasks/33_json_import_export.md) | 07 | [x] | 07 | `task/33-json-io` |
 | **46** | [Refatoração Profunda ElementInspector](./tasks/46_inspector_refactor.md) | 07 | [ ] | 29 | `task/46-inspector-refactor` |
 | **41** | [Modelos Unificados (Sync Inventory)](./tasks/41_unified_models.md) | 07 | [ ] | 02 | `task/41-models-sync` |
 | **64** | [Controle Global de Áudio](./tasks/64_ui_sound_toggle.md) | 05 | [ ] | — | `task/64-ui-sound-toggle` |
