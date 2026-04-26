@@ -124,6 +124,11 @@ class ShortcutService {
       logger.debug('ShortcutService', 'Atalho de ajuda acionado');
       eventBus.emit('ui:open:help'); // Preparado para Task 36
     }, { description: 'Mostrar Atalhos', category: 'Ajuda', preventDefault: true });
+
+    this.manager.registerSequence(['t', 'e', 's', 't', 'e'], () => {
+      logger.debug('ShortcutService', 'Sequência de teste ativada!');
+      eventBus.emit('notify', { message: 'Sequência secreta ativada!', type: 'success' });
+    }, { description: 'Sequência de Teste', category: 'Easter Egg' });
   }
 
   private registerMovementShortcuts(): void {

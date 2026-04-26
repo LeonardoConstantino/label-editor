@@ -1,62 +1,93 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
-  <title>Label Editor | Tactile Prism</title>
-</head>
-<body>
-  <div class="layout-container">
-    <!-- O Canvas ocupa o fundo total -->
-    <editor-canvas class="canvas-workspace"></editor-canvas>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+    <title>Label Editor | Tactile Prism</title>
+  </head>
+  <body>
+    <div class="layout-container">
+      <!-- O Canvas ocupa o fundo total -->
+      <editor-canvas class="canvas-workspace"></editor-canvas>
 
-    <!-- UI Flutuante -->
-    <editor-toolbar class="toolbar-pill"></editor-toolbar>
+      <!-- UI Flutuante -->
+      <editor-toolbar class="toolbar-pill"></editor-toolbar>
 
-    <aside class="panel-glass">
-      <element-inspector></element-inspector>
-    </aside>
-  </div>
+      <aside class="panel-glass">
+        <element-inspector></element-inspector>
+      </aside>
 
-  <!-- Modais de Takeover -->
-  <ui-modal id="batch-modal" heading="Production Cockpit (Batch & A4)" size="fullscreen">
-    <data-source-input></data-source-input>
-  </ui-modal>
-
-  <ui-modal id="vault-modal" heading="Storage Vault: Asset Library" size="fullscreen">
-    <vault-gallery></vault-gallery>
-  </ui-modal>
-
-  <ui-modal id="welcome-modal" heading="Welcome" size="xl">
-    <ui-welcome-screen></ui-welcome-screen>
-  </ui-modal>
-
-  <ui-modal id="help-center-modal" heading="Help Center" size="xl">
-    <ui-help-center></ui-help-center>
-  </ui-modal>
-
-  <ui-modal id="project-modal" heading="Project Management" size="lg">
-    <div class="flex flex-col gap-6 p-2">
-      <div class="card-module">
-        <h3 class="label-prism">Transfer design</h3>
-        <p class="text-text-muted text-xs mb-4">Mova seus designs entre diferentes dispositivos ou faça um backup de segurança.</p>
-        <div class="flex gap-4">
-          <app-button id="btn-export-file" variant="secondary" style="flex: 1;">
-            <ui-icon name="download"></ui-icon> EXPORT .LABEL
-          </app-button>
-          <app-button id="btn-import-trigger" variant="primary" style="flex: 1;">
-            <ui-icon name="upload"></ui-icon> IMPORT .LABEL
-          </app-button>
-        </div>
+      <!-- Position Fixed, Bottom-6 centralizado horizontalmente -->
+      <div
+        class="fixed bottom-8 left-1/2 -translate-x-1/2 z-40 pointer-events-auto"
+      >
+        <ui-hud-tips id="global-tips"></ui-hud-tips>
       </div>
     </div>
-  </ui-modal>
 
-  <input type="file" id="global-import-input" accept=".label,.json" style="display: none;" />
+    <!-- Modais de Takeover -->
+    <ui-modal
+      id="batch-modal"
+      heading="Production Cockpit (Batch & A4)"
+      size="fullscreen"
+    >
+      <data-source-input></data-source-input>
+    </ui-modal>
 
-  <ui-tooltip-manager></ui-tooltip-manager>
-  <script src="https://unpkg.com/canvas-txt@4.1.1"></script>
-  <script type="module" src="/src/main.ts"></script>
-</body>
+    <ui-modal
+      id="vault-modal"
+      heading="Storage Vault: Asset Library"
+      size="fullscreen"
+    >
+      <vault-gallery></vault-gallery>
+    </ui-modal>
+
+    <ui-modal id="welcome-modal" heading="Welcome" size="xl">
+      <ui-welcome-screen></ui-welcome-screen>
+    </ui-modal>
+
+    <ui-modal id="help-center-modal" heading="Help Center" size="xl">
+      <ui-help-center></ui-help-center>
+    </ui-modal>
+
+    <ui-modal id="project-modal" heading="Project Management" size="lg">
+      <div class="flex flex-col gap-6 p-2">
+        <div class="card-module">
+          <h3 class="label-prism">Transfer design</h3>
+          <p class="text-text-muted text-xs mb-4">
+            Mova seus designs entre diferentes dispositivos ou faça um backup de
+            segurança.
+          </p>
+          <div class="flex gap-4">
+            <app-button
+              id="btn-export-file"
+              variant="secondary"
+              style="flex: 1"
+            >
+              <ui-icon name="download"></ui-icon> EXPORT .LABEL
+            </app-button>
+            <app-button
+              id="btn-import-trigger"
+              variant="primary"
+              style="flex: 1"
+            >
+              <ui-icon name="upload"></ui-icon> IMPORT .LABEL
+            </app-button>
+          </div>
+        </div>
+      </div>
+    </ui-modal>
+
+    <input
+      type="file"
+      id="global-import-input"
+      accept=".label,.json"
+      style="display: none"
+    />
+
+    <ui-tooltip-manager></ui-tooltip-manager>
+    <script src="https://unpkg.com/canvas-txt@4.1.1"></script>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
 </html>

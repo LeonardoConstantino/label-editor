@@ -40,19 +40,19 @@ const helpData = {
   proTips: [
     {
       icon: 'sparkles',
-      tip: 'Aperte Ctrl+/ para ver a lista completa de atalhos e acelerar seu fluxo de trabalho.',
+      tip: 'Aperte [Ctrl+/] para ver a lista completa de atalhos e acelerar seu fluxo de trabalho.',
     },
     {
       icon: 'move',
-      tip: 'Segure a tecla Alt enquanto arrasta com as setas para mover elementos com precisão de 0.1mm.',
+      tip: 'Segure a tecla [Alt] enquanto arrasta com as setas para mover elementos com precisão de 0.1mm.',
     },
     {
       icon: 'copy',
-      tip: 'Use Ctrl+Alt+C e Ctrl+Alt+V para copiar estilos de uma camada para outra instantaneamente.',
+      tip: 'Use [Ctrl+Alt+C] e [Ctrl+Alt+V] para copiar estilos de uma camada para outra instantaneamente.',
     },
     {
       icon: 'layers',
-      tip: 'Mantenha camadas importantes bloqueadas (Ctrl+L) para evitar movimentos acidentais durante o design.',
+      tip: 'Mantenha camadas importantes bloqueadas [Ctrl+L] para evitar movimentos acidentais durante o design.',
     },
   ],
 };

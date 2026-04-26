@@ -22,6 +22,8 @@ import './components/common/modal';
 import './components/preview/DataSourceInput';
 import './components/common/UINumberScrubber';
 import './components/common/tooltip';
+import './components/common/ui-hud-tips';
+import helpData from './assets/data/helpData';
 
 // Global Notification Listener
 eventBus.on('notify', (options: any) => {
@@ -68,6 +70,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   await templateManager.init();
   shortcutService.init(isMac);
+
+  document.querySelector('ui-hud-tips')?.setTips([
+    ...shortcutService.listShortcuts().map(i => `[${i.key||i.sequence}] - ${i.description}`),
+    ...helpData.proTips.map(i => i.tip),
+    'Dica: Use Ctrl+Z para desfazer ações.',
+    'Dica: Use as setas do teclado para mover elementos selecionados.',
+  ]);
 
   // BIOS: Boot Sequence
   const lastProjectId = localStorage.getItem('last_active_project');
