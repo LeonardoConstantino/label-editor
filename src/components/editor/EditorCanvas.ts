@@ -121,9 +121,17 @@ export class EditorCanvas extends HTMLElement {
 
     const { config, elements } = label;
     const zoom = config.previewScale;
+    
+    // ✅ Escala base: converte mm para px no DPI da etiqueta
     const scale = UnitConverter.mmToPx(1, config.dpi);
+    
+    // ✅ DPI da tela (normalmente 96, mas pode variar)
+    const screenDPI = window.devicePixelRatio * 96;
+    
+    // ✅ Fator de correção: ajusta DPI de impressão para DPI de tela
+    const dpiCorrection = screenDPI / config.dpi;
 
-    // 1. Atualiza as dimensões REAIS da artboard (1:1 com DPI)
+    // 1. Dimensões reais da artboard (em pixels de impressão)
     const wPx = UnitConverter.mmToPx(label.config.widthMM, config.dpi);
     const hPx = UnitConverter.mmToPx(label.config.heightMM, config.dpi);
     
@@ -131,22 +139,20 @@ export class EditorCanvas extends HTMLElement {
     this.artboard.style.height = `${hPx}px`;
     this.artboard.style.backgroundColor = config.backgroundColor || '#ffffff';
     
-    // 2. Aplica o Zoom Visual (mantendo a centralização no scaler)
-    this.artboard.style.transform = `translate(-50%, -50%) scale(${zoom})`;
+    // 2. ✅ Aplica zoom E correção de DPI
+    const finalZoom = zoom * dpiCorrection;
+    this.artboard.style.transform = `translate(-50%, -50%) scale(${finalZoom})`;
 
-    // 3. ATUALIZA O SCALER (A chave para o Gutter funcionar em etiquetas pequenas)
-    // O scaler ocupa o espaço visual total que a etiqueta toma com o zoom.
+    // 3. Atualiza o scaler
     const scaler = this.shadowRoot?.getElementById('scaler');
     if (scaler) {
-      scaler.style.width = `${wPx * zoom}px`;
-      scaler.style.height = `${hPx * zoom}px`;
+      scaler.style.width = `${wPx * finalZoom}px`;
+      scaler.style.height = `${hPx * finalZoom}px`;
     }
 
-    // Ajusta o tamanho do canvas (em pixels reais baseados no DPI)
+    // Canvas mantém dimensões em pixels de impressão
     this.canvas.width = wPx;
     this.canvas.height = hPx;
-    
-    // Sincroniza o tamanho visual do canvas com a artboard
     this.canvas.style.width = '100%';
     this.canvas.style.height = '100%';
 
@@ -160,7 +166,7 @@ export class EditorCanvas extends HTMLElement {
       .forEach(element => {
         canvasRenderer.render(element, { 
           ctx: this.ctx, 
-          scale, 
+          scale,  // ✅ Mantém a escala de impressão no canvas
           dpi: config.dpi 
         });
         
