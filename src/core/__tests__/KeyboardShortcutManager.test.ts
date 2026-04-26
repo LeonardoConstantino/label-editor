@@ -14,7 +14,7 @@ describe('KeyboardShortcutManager - Focus Protection (Task 51)', () => {
     document.body.innerHTML = '<input id="test-input" /><div id="other"></div>';
   });
 
-  const simulateKeyDown = (key: string, target: Element = document.body, modifiers = {}) => {
+  const simulateKeyDown = (key: string, modifiers = {}) => {
     const event = new KeyboardEvent('keydown', {
       key,
       bubbles: true,
@@ -24,6 +24,9 @@ describe('KeyboardShortcutManager - Focus Protection (Task 51)', () => {
     // Vi não dispara eventos nativos no jsdom facilmente, então chamamos o handler diretamente
     // mas o manager escuta o document. 
     // No jsdom, document.activeElement funciona.
+
+    // Precisamos garantir que o manager veja o target correto como activeElement
+    // Object.defineProperty(document, 'activeElement', { value: target, configurable: true });
     
     // Precisamos simular o comportamento de handleKeyDown do manager
     manager.handleKeyDown(event);
@@ -35,7 +38,7 @@ describe('KeyboardShortcutManager - Focus Protection (Task 51)', () => {
     const input = document.getElementById('test-input')!;
     input.focus();
     
-    simulateKeyDown('t', input);
+    simulateKeyDown('t');
     
     expect(handler).not.toHaveBeenCalled();
   });
@@ -46,7 +49,7 @@ describe('KeyboardShortcutManager - Focus Protection (Task 51)', () => {
     const input = document.getElementById('test-input')!;
     input.focus();
     
-    simulateKeyDown('s', input, { ctrlKey: true });
+    simulateKeyDown('s', { ctrlKey: true });
     
     expect(handler).toHaveBeenCalled();
   });
@@ -57,7 +60,7 @@ describe('KeyboardShortcutManager - Focus Protection (Task 51)', () => {
     const other = document.getElementById('other')!;
     other.focus();
     
-    simulateKeyDown('t', other);
+    simulateKeyDown('t');
     
     expect(handler).toHaveBeenCalled();
   });

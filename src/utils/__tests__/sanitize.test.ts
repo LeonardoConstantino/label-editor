@@ -11,7 +11,6 @@ describe('Sanitize Utils', () => {
 
     it('should escape quotes and ampersands', () => {
       const input = 'Click & "Buy" \'now\'';
-      const expected = 'Click &amp; "Buy" \'now\'';
       // Note: textContent in jsdom might not escape quotes depending on implementation
       // but usually it escapes < > &
       const result = escapeHTML(input);

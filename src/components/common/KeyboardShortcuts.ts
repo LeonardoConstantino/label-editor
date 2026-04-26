@@ -2,8 +2,9 @@ import { sharedSheet } from "../../utils/shared-styles";
 import { escapeHTML } from "../../utils/sanitize";
 
 export interface ShortcutItem {
-  type: 'shortcut' | 'longpress';
+  type: 'shortcut' | 'longpress' | "sequence";
   key: string;
+  sequence?: string; // Para atalhos do tipo "sequence"
   description: string;
   context: string;
   priority: number;
@@ -62,8 +63,8 @@ export class UIKeyboardShortcuts extends HTMLElement {
   // ==========================================
   // PARSER E TRADUTOR VISUAL
   // ==========================================
-  private formatKey(keyStr: string, type: 'shortcut' | 'longpress'): string {
-    const parts = keyStr.split('+');
+  private formatKey(keyStr: string, type: 'shortcut' | 'longpress' | "sequence"): string {
+    const parts = type === "sequence" ? keyStr.split(' → ') : keyStr.split('+');
 
     // Dicionário visual para teclas feias/especiais
     const visualMap: Record<string, string> = {
@@ -92,6 +93,12 @@ export class UIKeyboardShortcuts extends HTMLElement {
 
     if (type === 'longpress') {
       return `${kbds[0]} <span class="font-mono text-[8px] text-accent-primary uppercase tracking-widest ml-1.5 opacity-80 border border-accent-primary/30 px-1 py-px rounded bg-accent-primary/10">Segure</span>`;
+    }
+
+    if (type === 'sequence') {
+      return kbds.join(
+        '<span class="text-text-muted/50 mx-1 text-[10px]">→</span>',
+      );
     }
 
     // Une as teclas com um '+' sutil
@@ -206,7 +213,7 @@ export class UIKeyboardShortcuts extends HTMLElement {
         .map(
           (s) => `
         <div class="flex items-center gap-3 p-1.5 hover:bg-white/5 rounded transition-colors">
-          <div class="min-w-15 flex justify-end">${this.formatKey(s.key, s.type)}</div>
+          <div class="min-w-15 flex justify-end">${this.formatKey(s.sequence || s.key, s.type)}</div>
           <span class="text-[11px] text-text-muted truncate">${escapeHTML(this.getDescription(s))}</span>
         </div>
       `,
@@ -247,7 +254,7 @@ export class UIKeyboardShortcuts extends HTMLElement {
               <div class="flex items-center text-[12px] group">
                 <span class="text-text-main group-hover:text-white transition-colors">${escapeHTML(this.getDescription(s))}</span>
                 <span class="dot-leader"></span>
-                <span class="shrink-0 flex items-center justify-end">${this.formatKey(s.key, s.type)}</span>
+                <span class="shrink-0 flex items-center justify-end">${this.formatKey(s.sequence || s.key, s.type)}</span>
               </div>
             `,
               )

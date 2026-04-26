@@ -19,6 +19,15 @@ import '../common/tooltip';
 import { debounce } from '../../utils/utils';
 import { sharedSheet } from '../../utils/shared-styles';
 
+export interface EventWarning {
+  id: string;
+  result: any; // ou defina um tipo mais específico
+}
+
+export interface EventWarningClear {
+  id: string;
+}
+
 const isText = (el: AnyElement): el is TextElement => el.type === ElementType.TEXT;
 const isRect = (el: AnyElement): el is RectangleElement => el.type === ElementType.RECTANGLE;
 const isImage = (el: AnyElement): el is ImageElement => el.type === ElementType.IMAGE;
@@ -65,11 +74,12 @@ export class ElementInspector extends HTMLElement {
     const { signal } = this.abortController;
 
     const offState = eventBus.on('state:change', (state: AppState) => this.handleStateChange(state));
-    const offWarn = eventBus.on('element:warning', ({ id, result }) => {
+    const offWarn = eventBus.on<EventWarning>('element:warning', ({ id, result }) => {
       this.overflowWarnings.set(id, result);
       this.updateWarningVisuals();
     });
-    const offClear = eventBus.on('element:warning:clear', ({ id }) => {
+
+    const offClear = eventBus.on<EventWarningClear>('element:warning:clear', ({ id }) => {
       this.overflowWarnings.delete(id);
       this.updateWarningVisuals();
     });

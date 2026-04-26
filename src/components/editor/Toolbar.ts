@@ -310,10 +310,10 @@ export class EditorToolbar extends HTMLElement {
 
     shadow
       .getElementById('undo')
-      ?.addEventListener('click', () => eventBus.emit('history:undo'));
+      ?.addEventListener('click', () => eventBus.emit('history:undo', { source: 'toolbar' }));
     shadow
       .getElementById('redo')
-      ?.addEventListener('click', () => eventBus.emit('history:redo'));
+      ?.addEventListener('click', () => eventBus.emit('history:redo', { source: 'toolbar' }));
 
     shadow.getElementById('save')?.addEventListener('click', async () => {
       const { templateManager } =

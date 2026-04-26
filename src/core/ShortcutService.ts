@@ -64,7 +64,7 @@ class ShortcutService {
   private registerDefaults(): void {
     // --- GESTÃO DE PROJETO (Prevenindo conflitos com browser) ---
     this.manager.register(`${this.metaKeyName}+s`, (_e) => {
-      eventBus.emit('template:save');
+      eventBus.emit('template:save', { source: 'shortcut' });
       UISM.play(UISM.enumPresets.SUCCESS);
       eventBus.emit('notify', { message: 'Etiqueta salva com sucesso!', type: 'success' });
     }, { description: 'Salvar Template', category: 'Projeto', preventDefault: true });
@@ -76,10 +76,10 @@ class ShortcutService {
     }, { description: 'Novo Projeto', category: 'Projeto', preventDefault: true });
 
     // --- HISTÓRICO ---
-    this.manager.register(`${this.metaKeyName}+z`, () => eventBus.emit('history:undo'), 
+    this.manager.register(`${this.metaKeyName}+z`, () => eventBus.emit('history:undo', { source: 'shortcut' }), 
       { description: 'Desfazer', category: 'Edição', preventDefault: true });
     
-    this.manager.register(`${this.metaKeyName}+shift+z`, () => eventBus.emit('history:redo'), 
+    this.manager.register(`${this.metaKeyName}+shift+z`, () => eventBus.emit('history:redo', { source: 'shortcut' }), 
       { description: 'Refazer', category: 'Edição', preventDefault: true });
 
     // --- MANIPULAÇÃO DE ELEMENTOS ---
@@ -122,7 +122,7 @@ class ShortcutService {
     // --- AJUDA ---
     this.manager.register(`${this.metaKeyName}+/`, () => {
       logger.debug('ShortcutService', 'Atalho de ajuda acionado');
-      eventBus.emit('ui:open:help'); // Preparado para Task 36
+      eventBus.emit('ui:open:help', { source: 'shortcut' }); // Preparado para Task 36
     }, { description: 'Mostrar Atalhos', category: 'Ajuda', preventDefault: true });
 
     this.manager.registerSequence(['t', 'e', 's', 't', 'e'], () => {
@@ -188,7 +188,7 @@ class ShortcutService {
     // I -> Imagem (Upload)
     this.manager.registerLongPress('i', () => {
       // Dispara evento que a Toolbar ou o main.ts ouça para abrir o input file
-      eventBus.emit('command:toolbar:upload-image');
+      eventBus.emit('command:toolbar:upload-image', { source: 'shortcut' });
     }, { description: 'Adicionar Imagem', category: 'Toolbar', duration: 300 });
 
     // B -> Border

@@ -122,12 +122,12 @@ describe('Store', () => {
     expect(store.getState().canUndo).toBe(true);
 
     // Undo volta para snapshot inicial (estado vazio)
-    eventBus.emit('history:undo');
+    eventBus.emit('history:undo', { source: 'test' });
     expect(store.getState().currentLabel?.elements).toHaveLength(0);
     expect(store.getState().canUndo).toBe(false);
 
     // Redo volta para snapshot com elemento
-    eventBus.emit('history:redo');
+    eventBus.emit('history:redo', { source: 'test' });
     expect(store.getState().currentLabel?.elements).toHaveLength(1);
     expect(store.getState().canRedo).toBe(false);
   });
