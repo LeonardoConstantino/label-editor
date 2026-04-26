@@ -41,6 +41,9 @@ export class TemplateManager {
     };
 
     await db.put(this.STORE_NAME, labelToSave);
+
+    eventBus.emit('template:saved', labelToSave);
+
     logger.debug('TemplateManager', 'Label saved to IndexedDB:', labelToSave.name);
   }
 

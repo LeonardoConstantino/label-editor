@@ -57,7 +57,7 @@ const balloonStyles = new CSSStyleSheet();
 balloonStyles.replaceSync(`
   :host {
     position: fixed;
-    z-index: 9999;
+    z-index: 10001;
     max-width: 320px;
     padding: 12px;
     border-radius: 8px;

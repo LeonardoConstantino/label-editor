@@ -78,7 +78,7 @@ export class Logger {
   log(namespace: string, msg: string, ...args: any[]): void {
     if (this.shouldLog(LogLevel.DEBUG)) {
       console.log(
-        `%c${this.format(namespace, msg)}`,
+        `%c🔍 ${this.format(namespace, msg)}`,
         'color: #50777E',
         ...args,
       );
