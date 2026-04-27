@@ -57,6 +57,14 @@ The project follows a modular, event-driven architecture:
 - **Typography:** `Inter`/`Geist` para UI, `JetBrains Mono`/`Geist Mono` para dados/code.
 - **Interactions:** Use spring physics for animations (`--ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1)`).
 
+### Arquivos de referencia
+- **Proposta inicial** [Proposta](./docs/proposta%20de%20arquitetura.md)
+- **Design** [Design System](./docs/Design_System.md)
+- **Layout** [Layout/Ux](./docs/Layout_UX_Guide.md), [Welcome](./docs/Feature_Boot_And_Help.md), [The vault](./docs/Feature_The_Vault.md)
+- **Elements** [Definição de elementos](./docs/definition_elements.md)
+- **Event docs** [EventMap](./docs/Event_System_Registry.md)
+- **Skill de planejamento** [Multi-Agent Project Planner](./docs/Multi-Agent%20Project%20Planner.md)
+
 ## Session Logs
 
 ### 2026-04-21: Major Feature Push & Production Readiness
@@ -78,3 +86,11 @@ The project follows a modular, event-driven architecture:
 - **Auditoria Geral:** Revisão dos critérios de aceite das Tasks 01 a 50. Sincronização do estado real do projeto com a documentação.
 - **Finalização Task 60:** Formalização das diretrizes de **Code Style** e **Pragmatic Excellence** no GEMINI.md.
 - **Restauração de Backlog:** Reativação das tasks de performance (Web Workers) e acabamento de PDF (Sangria/Corte).
+
+### 2026-04-26: Performance, Portabilidade & Refinamento de Core
+- **Task 51 (Focus Protection):** Implementada detecção recursiva de foco em Shadow DOM, protegendo inputs contra interferência de atalhos globais.
+- **Task 54 (Canvas Zoom):** Migração para zoom visual via CSS `transform: scale`, implementação de camada `artboard-scaler` para respiro (gutter) dinâmico e correção matemática do `hit-test`.
+- **Task 33 (JSON Portability):** Implementado ecossistema de importação/exportação de arquivos `.label` na Toolbar, Welcome Screen e Vault.
+- **Task 61 (DOM Optimization):** Refatoração do ciclo de vida da Toolbar, Canvas e Vault para atualizações incrementais (eliminando `innerHTML` em loops de estado).
+- **Task 68 (Asset Intelligence):** Adicionado contador de inventário no Vault com Tooltips Ricas e detalhamento por ícones de camadas.
+- **Task 71 (Event Registry):** Iniciada orquestração de eventos; criado `docs/Event_System_Registry.md` com mapeamento de 21 eventos e auditoria de órfãos.
