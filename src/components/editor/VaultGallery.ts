@@ -8,7 +8,7 @@ import '../common/AppButton';
 import '../common/icon';
 import '../common/tooltip';
 import { sharedSheet } from '../../utils/shared-styles';
-import EventBus from '../../core/EventBus';
+import eventBus from '../../core/EventBus';
 
 /**
  * VaultGallery: Interface de gerenciamento de templates (The Vault).
@@ -317,7 +317,7 @@ export class VaultGallery extends HTMLElement {
     this.abortController = new AbortController();
     const { signal } = this.abortController;
 
-    EventBus.on('template:saved', () => {
+    eventBus.on('template:saved', () => {
       setTimeout(() => {
         this.loadAndRender();
       }, 500);

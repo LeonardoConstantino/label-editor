@@ -27,6 +27,7 @@ Este Master Plan coordena a fase final de desenvolvimento, focando em estabilida
 | **54** | [Zoom Visual e Respiro do Canvas (Gutter)](./tasks/54_canvas_zoom_fix.md) | 09 | [x] | 21 | `task/54-canvas-zoom` |
 | **60** | [Definição de Code Style (GEMINI.md)](./tasks/60_code_style_definition.md) | 08 | [x] | — | `task/60-code-style` |
 | **70** | [Grande Auditoria de Integridade](./tasks/70_codebase_audit.md) | 09 | [ ] | 60 | `task/70-codebase-audit` |
+| **71** | [Mapeamento e Tipagem de Eventos (EventMap)](./tasks/71_event_orchestration.md) | 10 | [ ] | — | `task/71-event-mapping` |
 
 ### Fase B: Gestão de Projetos & UX (Retenção do Usuário)
 | ID | Task | Pri | Status | Deps | Branch |
