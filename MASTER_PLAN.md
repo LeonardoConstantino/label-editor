@@ -38,8 +38,8 @@ Este Master Plan coordena a fase final de desenvolvimento, focando em estabilida
 | **41** | [Modelos Unificados (Sync Inventory)](./tasks/41_unified_models.md) | 07 | [ ] | 02 | `task/41-models-sync` |
 | **64** | [Controle Global de Áudio](./tasks/64_ui_sound_toggle.md) | 05 | [ ] | — | `task/64-ui-sound-toggle` |
 | **65** | [Aba About & Compliance](./tasks/65_help_about_legal.md) | 04 | [ ] | — | `task/65-help-about-legal` |
-| **68** | [Contador de Elementos no Vault](./tasks/68_vault_element_count.md) | 04 | [ ] | — | `task/68-vault-element-count` |
-| **56** | [Ajuste de Espaçamento Inspector Header](./tasks/56_inspector_spacing_fix.md) | 04 | [ ] | — | `task/56-inspector-ui` |
+| **68** | [Contador de Elementos no Vault](./tasks/68_vault_element_count.md) | 04 | [x] | — | `task/68-vault-element-count` |
+| **56** | [Ajuste de Espaçamento Inspector Header](./tasks/56_inspector_spacing_fix.md) | 04 | [x] | — | `task/56-inspector-ui` |
 
 ### Fase C: Produtividade & Ferramentas de Design (O diferencial)
 | ID | Task | Pri | Status | Deps | Branch |
@@ -61,7 +61,7 @@ Este Master Plan coordena a fase final de desenvolvimento, focando em estabilida
 |----|------|--------|------|--------|--------|
 | **44** | [TextElement Pro (Overflow & Vertical)](./tasks/44_text_pro.md) | 04 | [ ] | 12 | `task/44-text-pro` |
 | **59** | [Otimização de Histórico (Snapshot Debounce)](./tasks/59_history_debounce.md) | 04 | [ ] | 11 | `task/59-history-debounce` |
-| **49** | [Unificação de Estilo KBD (3D Prism)](./tasks/49_kbd_style_unification.md) | 03 | [ ] | 22 | `task/49-kbd-style` |
+| **49** | [Unificação de Estilo KBD (3D Prism)](./tasks/49_kbd_style_unification.md) | 03 | [x] | 22 | `task/49-kbd-style` |
 | **38** | [Tipografia Avançada (Leading/Tracking)](./tasks/38_adv_typography.md) | 02 | [ ] | — | `task/38-typography` |
 | **39** | [Efeitos Prism (Sombras/Glow)](./tasks/39_prism_effects.md) | 02 | [ ] | — | `task/39-prism-effects` |
 

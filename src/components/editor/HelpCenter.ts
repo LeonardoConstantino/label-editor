@@ -2,7 +2,7 @@ import { UISM } from '../../core/UISoundManager';
 import helpData from '../../assets/data/helpData';
 import { shortcutService } from '../../core/ShortcutService';
 import '../common/icon';
-import '../common/KeyboardShortcuts';
+import { UIKeyboardShortcuts } from '../common/KeyboardShortcuts';
 import { sharedSheet } from '../../utils/shared-styles';
 
 /**
@@ -68,6 +68,13 @@ export class HelpCenter extends HTMLElement {
     this.setupEvents();
   }
 
+  private parseTipWithShortcuts(raw: string): string {
+    return raw.replace(/\[([^\]]+)\]/g, (_, keyOrId) => {
+      const rendered = UIKeyboardShortcuts.renderShortcut(keyOrId);
+      return rendered ? rendered.html : `<kbd class="kbd-prism">${keyOrId}</kbd>`;
+    });
+  }
+
   private renderGuide(): string {
     return `
       <!-- TUTORIAL SECTIONS (Z-Pattern) -->
@@ -115,7 +122,7 @@ export class HelpCenter extends HTMLElement {
                 <ui-icon name="${tip.icon}" size="sm" class="text-text-muted group-hover:text-accent-primary transition-colors"></ui-icon>
               </div>
               <p class="text-xs text-text-main leading-relaxed opacity-80 group-hover:opacity-100 transition-opacity">
-                ${tip.tip}
+                ${this.parseTipWithShortcuts(tip.tip)}
               </p>
             </div>
           `).join('')}

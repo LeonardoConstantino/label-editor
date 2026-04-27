@@ -377,4 +377,4 @@ export class Logger {
   }
 }
 // Instância única para o app
-export const logger = new Logger({ level: LogLevel.DEBUG, prefix: '[LabelEditor]', devMode: true });
+export const logger = new Logger({ level: LogLevel.DEBUG, prefix: '[LabelEditor]', devMode: false });

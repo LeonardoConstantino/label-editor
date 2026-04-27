@@ -365,7 +365,7 @@
    ========================================== */
 @layer components {
   .inspector-header {
-    @apply flex justify-between items-center mb-3;
+    @apply flex justify-between items-center mb-3 px-2;
   }
   .inspector-title-group {
     @apply flex items-center gap-2;
@@ -566,19 +566,27 @@
   .kbd-prism,
   kbd.kbd-prism {
     @apply inline-flex items-center justify-center font-mono text-[9px] font-bold text-text-muted uppercase tracking-wider select-none;
-    background-color: var(--color-canvas); /* Fundo mais escuro */
+    background-color: var(--color-surface-solid);
     border: 1px solid var(--color-border-ui);
     border-radius: 4px;
     padding: 2px 6px;
     /* O Juice: Sombras para dar efeito 3D (luz em cima, sombra embaixo) */
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.1),
-      0 2px 0 var(--color-border-ui),
-      0 3px 2px rgba(0, 0, 0, 0.4);
-    transform: translateY(-1px); /* Eleva a tecla levemente */
+      0 2px 0 #0a0c10,
+      0 3px 4px rgba(0, 0, 0, 0.5);
+    transform: translateY(-1px);
+    transition: all 0.2s var(--ease-spring);
   }
 
-  /* Variação da tecla quando clicada (Opcional, caso queira dar feedback) */
+  .kbd-prism:hover {
+    @apply text-accent-primary border-accent-primary/30;
+    box-shadow:
+      inset 0 1px 0 rgba(99, 102, 241, 0.2),
+      0 2px 0 #0a0c10,
+      0 4px 12px rgba(99, 102, 241, 0.2);
+  }
+
   .kbd-prism:active {
     transform: translateY(1px);
     box-shadow:

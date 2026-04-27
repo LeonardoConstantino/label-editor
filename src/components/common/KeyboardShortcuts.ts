@@ -3,17 +3,17 @@ import { escapeHTML } from "../../utils/sanitize";
 
 export interface ShortcutItem {
   type: 'shortcut' | 'longpress' | "sequence";
-  key: string;
+  key?: string;
   sequence?: string; // Para atalhos do tipo "sequence"
   description: string;
-  context: string;
-  priority: number;
+  context?: string | ((currentContext: string) => boolean);
+  priority?: number;
   category: string;
   duration?: number;
 }
 
 export class UIKeyboardShortcuts extends HTMLElement {
-  private shortcuts: ShortcutItem[] = [];
+  private static shortcutsData: ShortcutItem[] = [];
   private searchQuery: string = '';
 
   constructor() {
@@ -24,10 +24,36 @@ export class UIKeyboardShortcuts extends HTMLElement {
     }
   }
 
+  /**
+   * single source of truth: Renderiza um atalho formatado a partir do ID/Chave.
+   * Só funciona se os dados já foram injetados via UIKeyboardShortcuts.data = [...]
+   */
+  public static renderShortcut(keyOrId: string, _variant: string = 'default'): { html: string, description: string } | null {
+    if (!this.shortcutsData.length) return null;
+
+    const cleanKey = keyOrId.toLowerCase();
+    const item = this.shortcutsData.find(s => 
+      (s.key && s.key.toLowerCase() === cleanKey) || 
+      (s.sequence && s.sequence.toLowerCase() === cleanKey)
+    );
+
+    if (!item) return null;
+
+    const formatter = new UIKeyboardShortcuts();
+    return {
+      html: formatter.formatKey((item.sequence || item.key)!, item.type),
+      description: item.description
+    };
+  }
+
   // Permite injetar o array de atalhos via JS
   set data(shortcuts: ShortcutItem[]) {
-    this.shortcuts = shortcuts;
+    UIKeyboardShortcuts.shortcutsData = shortcuts;
     this.render();
+  }
+
+  get shortcuts(): ShortcutItem[] {
+    return UIKeyboardShortcuts.shortcutsData;
   }
 
   get variant() {
@@ -114,7 +140,7 @@ export class UIKeyboardShortcuts extends HTMLElement {
       delete: 'Excluir Seleção',
       backspace: 'Apagar Elemento',
     };
-    return fallbackMap[item.key.toLowerCase()] || 'Ação Desconhecida';
+    return fallbackMap[(item.key || item.sequence || '').toLowerCase()] || 'Ação Desconhecida';
   }
 
   // ==========================================
@@ -188,7 +214,7 @@ export class UIKeyboardShortcuts extends HTMLElement {
       filtered = filtered.filter(
         (s) =>
           this.getDescription(s).toLowerCase().includes(this.searchQuery) ||
-          s.key.toLowerCase().includes(this.searchQuery),
+          (s.key || s.sequence || '').toLowerCase().includes(this.searchQuery),
       );
     }
 
@@ -213,7 +239,7 @@ export class UIKeyboardShortcuts extends HTMLElement {
         .map(
           (s) => `
         <div class="flex items-center gap-3 p-1.5 hover:bg-white/5 rounded transition-colors">
-          <div class="min-w-15 flex justify-end">${this.formatKey(s.sequence || s.key, s.type)}</div>
+          <div class="min-w-15 flex justify-end">${this.formatKey((s.sequence || s.key)!, s.type)}</div>
           <span class="text-[11px] text-text-muted truncate">${escapeHTML(this.getDescription(s))}</span>
         </div>
       `,
@@ -254,7 +280,7 @@ export class UIKeyboardShortcuts extends HTMLElement {
               <div class="flex items-center text-[12px] group">
                 <span class="text-text-main group-hover:text-white transition-colors">${escapeHTML(this.getDescription(s))}</span>
                 <span class="dot-leader"></span>
-                <span class="shrink-0 flex items-center justify-end">${this.formatKey(s.sequence || s.key, s.type)}</span>
+                <span class="shrink-0 flex items-center justify-end">${this.formatKey((s.sequence || s.key)!, s.type)}</span>
               </div>
             `,
               )

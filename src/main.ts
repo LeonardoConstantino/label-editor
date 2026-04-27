@@ -71,8 +71,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   await templateManager.init();
   shortcutService.init(isMac);
 
+  const allShortcuts = shortcutService.listShortcuts();
+  // Injeta no SSoT de atalhos
+  const { UIKeyboardShortcuts } = await import('./components/common/KeyboardShortcuts');
+  const tempShortcuts = new UIKeyboardShortcuts();
+  tempShortcuts.data = allShortcuts;
+
   document.querySelector('ui-hud-tips')?.setTips([
-    ...shortcutService.listShortcuts().map(i => `[${i.key||i.sequence}] - ${i.description}`),
+    ...allShortcuts.map(i => `[${i.key||i.sequence}] - ${i.description}`),
     ...helpData.proTips.map(i => i.tip),
     'Dica: Use Ctrl+Z para desfazer ações.',
     'Dica: Use as setas do teclado para mover elementos selecionados.',

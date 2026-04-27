@@ -39,6 +39,7 @@
  */
 
 import { sharedSheet } from '../../utils/shared-styles.js';
+import { UIKeyboardShortcuts } from './KeyboardShortcuts';
 
 // ─────────────────────────────────────────────
 // Constructable Stylesheet exclusiva do componente
@@ -169,44 +170,6 @@ hudSheet.replaceSync(`
     opacity: 1;
   }
 
-  /* ── KBD Inline ── */
-  .kbd-hud {
-    display:        inline-flex;
-    align-items:    center;
-    justify-content: center;
-    font-family:    var(--font-mono, 'JetBrains Mono', monospace);
-    font-size:      10px;
-    font-weight:    600;
-    line-height:    1;
-    padding:        1px 4px;
-    border-radius:  3px;
-    background:     rgba(99, 102, 241, 0.12);
-    border:         1px solid rgba(99, 102, 241, 0.35);
-    border-bottom:  2px solid rgba(99, 102, 241, 0.5);
-    color:          var(--color-accent-primary, #6366f1);
-    vertical-align: middle;
-    white-space:    nowrap;
-    flex-shrink:    0;
-    box-shadow:     0 1px 0 rgba(0,0,0,0.4);
-  }
-
-  /* KBD para tecla única (pressionamento longo) — destaque diferente */
-  .kbd-hud[data-type="single"] {
-    background:  rgba(245, 158, 11, 0.10);
-    border-color: rgba(245, 158, 11, 0.35);
-    border-bottom-color: rgba(245, 158, 11, 0.55);
-    color:       var(--color-accent-warning, #f59e0b);
-  }
-
-  /* Separador de combinação (+) e sequência (→) */
-  .kbd-sep {
-    font-size:   9px;
-    opacity:     0.4;
-    margin:      0 1px;
-    color:       var(--color-text-muted, #94a3b8);
-    flex-shrink: 0;
-  }
-
   /* Grupo de teclas (combinação ou sequência) */
   .kbd-group {
     display:     inline-flex;
@@ -223,61 +186,68 @@ hudSheet.replaceSync(`
     width:           18px;
     height:          18px;
     border-radius:   50%;
-    border:          none;
-    background:      transparent;
-    color:           var(--color-text-muted, #94a3b8);
-    cursor:          pointer;
-    margin-left:     4px;
-    flex-shrink:     0;
-    opacity:         0;
-    transform:       scale(0.7);
+    border: none;
+    background: transparent;
+    color: var(--color-text-muted, #94a3b8);
+    cursor: pointer;
+    margin-left: 4px;
+    flex-shrink: 0;
+    opacity: 0;
+    transform: scale(0.7);
     transition:
-      opacity   0.25s ease,
+      opacity 0.25s ease,
       transform 0.25s var(--ease-spring, cubic-bezier(0.34, 1.56, 0.64, 1)),
       background 0.2s ease,
-      color      0.2s ease;
+      color 0.2s ease;
     /* Garante que seja focável mesmo invisível para a/11y */
     pointer-events: none;
   }
 
   .hud-banner:hover .btn-close,
   .hud-banner:focus-within .btn-close {
-    opacity:        1;
-    transform:      scale(1);
+    opacity: 1;
+    transform: scale(1);
     pointer-events: auto;
   }
 
   .btn-close:hover {
     background: rgba(255, 255, 255, 0.1);
-    color:      var(--color-text-main, #e2e8f0);
-    transform:  scale(1.15) rotate(90deg);
+    color: var(--color-text-main, #e2e8f0);
+    transform: scale(1.15) rotate(90deg);
   }
 
   .btn-close:focus-visible {
-    outline:        2px solid var(--color-accent-primary, #6366f1);
+    outline: 2px solid var(--color-accent-primary, #6366f1);
     outline-offset: 2px;
   }
 
   /* ── Dot pulsante de "ao vivo" ── */
   .live-dot {
-    width:         5px;
-    height:        5px;
+    width: 5px;
+    height: 5px;
     border-radius: 50%;
-    background:    var(--color-accent-primary, #6366f1);
-    opacity:       0.4;
-    flex-shrink:   0;
-    animation:     hud-pulse 3s ease-in-out infinite;
+    background: var(--color-accent-primary, #6366f1);
+    opacity: 0.4;
+    flex-shrink: 0;
+    animation: hud-pulse 3s ease-in-out infinite;
   }
 
   @keyframes hud-pulse {
-    0%, 100% { opacity: 0.4; transform: scale(1); }
-    50%       { opacity: 0.9; transform: scale(1.4); }
+    0%,
+    100% {
+      opacity: 0.4;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.9;
+      transform: scale(1.4);
+    }
   }
 
   /* Pausa a pulsação quando não há dicas */
   :host([data-empty]) .live-dot {
     animation: none;
-    opacity:   0.15;
+    opacity: 0.15;
   }
 `);
 
@@ -349,20 +319,6 @@ TEMPLATE.innerHTML = `
 // ─────────────────────────────────────────────
 
 /**
- * Cria um nó <span class="kbd-hud"> para uma tecla.
- * @param {string} key  - Nome da tecla (ex: "Ctrl", "S", "t")
- * @param {"combo"|"single"|"seq"} type
- * @returns {string} HTML string
- */
-function kbdHtml(
-  key: string,
-  type: 'combo' | 'single' | 'seq' = 'combo',
-): string {
-  const dataType = type === 'single' ? 'data-type="single"' : '';
-  return `<kbd class="kbd-hud" ${dataType}>${escapeHtml(key.trim())}</kbd>`;
-}
-
-/**
  * Escapa HTML para evitar XSS nos nomes de teclas.
  * @param {string} str - String a ser escapada
  * @returns {string} String escapada
@@ -376,75 +332,36 @@ function escapeHtml(str: string): string {
 }
 
 /**
- * Parseia um bloco de teclas e retorna HTML.
- *
- * Formatos suportados:
- *   [Ctrl+S]          → combinação  (sep: +)
- *   [t]               → tecla única (pressionamento longo)
- *   [t → e → s → t]  → sequência   (sep: →)
- *
- * @param {string} inner - Conteúdo entre colchetes
- * @returns {string} HTML
- */
-function parseKeyBlock(inner: string): string {
-  const trimmed = inner.trim();
-
-  // Sequência: contém " → " (espaços obrigatórios para distinguir de seta no texto)
-  if (trimmed.includes(' → ')) {
-    const keys = trimmed.split(' → ');
-    const parts = keys.map((k, i) => {
-      const sep =
-        i < keys.length - 1
-          ? `<span class="kbd-sep" aria-hidden="true">→</span>`
-          : '';
-      return `${kbdHtml(k, 'combo')}${sep}`;
-    });
-    return `<span class="kbd-group" aria-label="Sequência: ${escapeHtml(trimmed)}">${parts.join('')}</span>`;
-  }
-
-  // Combinação: contém "+"
-  if (trimmed.includes('+')) {
-    const keys = trimmed.split('+');
-    const parts = keys.map((k, i) => {
-      const sep =
-        i < keys.length - 1
-          ? `<span class="kbd-sep" aria-hidden="true">+</span>`
-          : '';
-      return `${kbdHtml(k, 'combo')}${sep}`;
-    });
-    return `<span class="kbd-group" aria-label="Atalho: ${escapeHtml(trimmed)}">${parts.join('')}</span>`;
-  }
-
-  // Tecla única (pressionamento longo)
-  return `<span class="kbd-group" aria-label="Tecla: ${escapeHtml(trimmed)}">${kbdHtml(trimmed, 'single')}</span>`;
-}
-
-/**
  * Converte uma string de dica em HTML seguro,
- * substituindo [padrões] por <kbd> estilizados.
+ * substituindo [padrões] por <kbd> estilizados vindos do UIKeyboardShortcuts.
  *
  * @param {string} raw - Texto bruto da dica
  * @returns {string} HTML parseado
  */
 function parseTip(raw: string): string {
-  // Escapa o texto base (exceto os blocos de teclas que processamos separadamente)
-  // Divide o texto em segmentos: texto livre e blocos [...]
   const segments = [];
   let last = 0;
   const RE = /\[([^\]]+)\]/g;
   let match;
 
   while ((match = RE.exec(raw)) !== null) {
-    // Texto livre antes do bloco
     if (match.index > last) {
       segments.push(`<span>${escapeHtml(raw.slice(last, match.index))}</span>`);
     }
-    // Bloco de tecla(s)
-    segments.push(parseKeyBlock(match[1]));
+
+    const keyOrId = match[1];
+    const rendered = UIKeyboardShortcuts.renderShortcut(keyOrId);
+
+    if (rendered) {
+      segments.push(`<span class="kbd-group" aria-label="Atalho: ${escapeHtml(rendered.description)}">${rendered.html}</span>`);
+    } else {
+      // Fallback para atalhos não registrados (ex: pro-tips genéricas)
+      segments.push(`<kbd class="kbd-prism">${escapeHtml(keyOrId)}</kbd>`);
+    }
+    
     last = RE.lastIndex;
   }
 
-  // Texto livre restante
   if (last < raw.length) {
     segments.push(`<span>${escapeHtml(raw.slice(last))}</span>`);
   }
@@ -454,16 +371,14 @@ function parseTip(raw: string): string {
 
 /**
  * Extrai o texto puro de uma dica (para aria / leitores de tela).
- * Remove colchetes, mantém nomes das teclas legíveis.
  *
  * @param {string} raw
  * @returns {string}
  */
 function plainText(raw: string): string {
   return raw.replace(/\[([^\]]+)\]/g, (_, inner) => {
-    if (inner.includes(' → ')) return `Sequência: ${inner}`;
-    if (inner.includes('+')) return `Atalho ${inner}`;
-    return `Tecla ${inner}`;
+    const rendered = UIKeyboardShortcuts.renderShortcut(inner);
+    return rendered ? rendered.description : inner;
   });
 }
 

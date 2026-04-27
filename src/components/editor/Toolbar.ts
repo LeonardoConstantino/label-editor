@@ -9,6 +9,7 @@ import '../common/AppButton';
 import '../common/icon';
 import '../common/tooltip';
 import { sharedSheet } from '../../utils/shared-styles';
+import { UIKeyboardShortcuts } from '../common/KeyboardShortcuts';
 
 /**
  * EditorToolbar: A "Pílula de Controle" flutuante do Cockpit.
@@ -58,6 +59,11 @@ export class EditorToolbar extends HTMLElement {
     if (redoBtn) redoBtn.toggleAttribute('disabled', !state.canRedo);
   }
 
+  private getShortcutHTML(keyOrId: string): string {
+    const rendered = UIKeyboardShortcuts.renderShortcut(keyOrId);
+    return rendered ? rendered.html : `<kbd class="kbd-prism">${keyOrId}</kbd>`;
+  }
+
   private render(): void {
     if (!this.shadowRoot || this.shadowRoot.querySelector('#add-text')) return;
 
@@ -101,7 +107,7 @@ export class EditorToolbar extends HTMLElement {
         <div slot="content" class="tooltip-rich-panel">
           <div class="flex items-center justify-between mb-1.5">
             <span class="text-text-main text-[12px] font-semibold tracking-wide">Texto</span>
-            <kbd class="kbd-prism">T</kbd>
+            ${this.getShortcutHTML('t')}
           </div>
           <p class="text-text-muted text-[10px] leading-relaxed">
             Adiciona uma nova camada de texto dinâmico ou estático.
@@ -116,10 +122,10 @@ export class EditorToolbar extends HTMLElement {
         <div slot="content" class="tooltip-rich-panel">
           <div class="flex items-center justify-between mb-1.5">
             <span class="text-text-main text-[12px] font-semibold tracking-wide">Retângulo</span>
-            <kbd class="kbd-prism">R</kbd>
+            ${this.getShortcutHTML('r')}
           </div>
           <p class="text-text-muted text-[10px] leading-relaxed">
-            Desenha um retângulo no canvas. Segure <kbd class="kbd-prism text-[8px] px-1 py-0 shadow-none">Shift</kbd> para quadrado.
+            Desenha um retângulo no canvas. Segure ${this.getShortcutHTML('shift+r')} para quadrado.
           </p>
         </div>
       </ui-tooltip>
@@ -131,7 +137,7 @@ export class EditorToolbar extends HTMLElement {
         <div slot="content" class="tooltip-rich-panel">
           <div class="flex items-center justify-between mb-1.5">
             <span class="text-text-main text-[12px] font-semibold tracking-wide">Imagem</span>
-            <kbd class="kbd-prism">I</kbd>
+            ${this.getShortcutHTML('i')}
           </div>
           <p class="text-text-muted text-[10px] leading-relaxed">
             Importa um arquivo local de imagem ou logotipo para a etiqueta.
@@ -141,20 +147,18 @@ export class EditorToolbar extends HTMLElement {
 
       <ui-tooltip placement="bottom" delay="300">
         <app-button slot="target" id="add-border" variant="secondary">
-          <ui-icon name="rect" style="transform: scale(1.2); opacity:
-          0.7;"></ui-icon>
+          <ui-icon name="rect" style="transform: scale(1.2); opacity: 0.7;"></ui-icon>
         </app-button>
         <div slot="content" class="tooltip-rich-panel">
           <div class="flex items-center justify-between mb-1.5">
-            <span class="text-text-main text-[12px] font-semibold
-          tracking-wide">Moldura</span>
-            <kbd class="kbd-prism">B</kbd>
+            <span class="text-text-main text-[12px] font-semibold tracking-wide">Moldura</span>
+            ${this.getShortcutHTML('b')}
           </div>
           <p class="text-text-muted text-[10px] leading-relaxed">
             Adiciona uma borda decorativa ao redor de toda a etiqueta.
           </p>
         </div>
-      </ui-tooltip
+      </ui-tooltip>
       
       <div class="divider"></div>
       
@@ -166,9 +170,7 @@ export class EditorToolbar extends HTMLElement {
         <div slot="content" class="tooltip-rich-panel">
           <div class="flex items-center justify-between mb-1.5">
             <span class="text-text-main text-[12px] font-semibold tracking-wide">Desfazer</span>
-            <div class="flex gap-1">
-              <kbd class="kbd-prism">Ctrl</kbd><span class="text-text-muted">+</span><kbd class="kbd-prism">Z</kbd>
-            </div>
+            ${this.getShortcutHTML('ctrl+z')}
           </div>
           <p class="text-text-muted text-[10px] leading-relaxed">
             Reverte a última modificação realizada no design.
@@ -183,9 +185,7 @@ export class EditorToolbar extends HTMLElement {
         <div slot="content" class="tooltip-rich-panel">
           <div class="flex items-center justify-between mb-1.5">
             <span class="text-text-main text-[12px] font-semibold tracking-wide">Refazer</span>
-            <div class="flex gap-1">
-              <kbd class="kbd-prism">Ctrl</kbd><span class="text-text-muted">+</span><kbd class="kbd-prism">Shift</kbd><span class="text-text-muted">+</span><kbd class="kbd-prism">Z</kbd>
-            </div>
+            ${this.getShortcutHTML('ctrl+shift+z')}
           </div>
           <p class="text-text-muted text-[10px] leading-relaxed">
             Restaura a ação que foi desfeita anteriormente.
@@ -203,7 +203,7 @@ export class EditorToolbar extends HTMLElement {
         <div slot="content" class="tooltip-rich-panel">
           <div class="flex items-center justify-between mb-1.5">
             <span class="text-text-main text-[12px] font-semibold tracking-wide">Guia & Atalhos</span>
-            <kbd class="kbd-prism">Ctrl</kbd><span class="text-text-muted">+</span><kbd class="kbd-prism">/</kbd>
+            ${this.getShortcutHTML('ctrl+/')}
           </div>
           <p class="text-text-muted text-[10px] leading-relaxed">
             Acesse o centro de ajuda, tutoriais rápidos e mapa de atalhos.
@@ -218,9 +218,7 @@ export class EditorToolbar extends HTMLElement {
         <div slot="content" class="tooltip-rich-panel">
           <div class="flex items-center justify-between mb-1.5">
             <span class="text-text-main text-[12px] font-semibold tracking-wide">Salvar</span>
-            <div class="flex gap-1">
-              <kbd class="kbd-prism">Ctrl</kbd><span class="text-text-muted">+</span><kbd class="kbd-prism">S</kbd>
-            </div>
+            ${this.getShortcutHTML('ctrl+s')}
           </div>
           <p class="text-text-muted text-[10px] leading-relaxed">
             Persiste o design atual no banco de dados local do navegador.
@@ -249,9 +247,7 @@ export class EditorToolbar extends HTMLElement {
         <div slot="content" class="tooltip-rich-panel">
           <div class="flex items-center justify-between mb-1.5">
             <span class="text-text-main text-[12px] font-semibold tracking-wide">Gerar Lote</span>
-            <div class="flex gap-1">
-              <kbd class="kbd-prism">P</kbd>
-            </div>
+            ${this.getShortcutHTML('p')}
           </div>
           <p class="text-text-muted text-[10px] leading-relaxed">
             Renderiza múltiplas etiquetas em alta qualidade para impressão.

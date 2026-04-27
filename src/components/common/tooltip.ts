@@ -166,14 +166,6 @@ balloonStyles.replaceSync(`
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 2px 6px;
-    font-family: var(--font-mono, 'JetBrains Mono', monospace);
-    font-size: 9px;
-    background: rgba(99, 102, 241, 0.15);
-    border: 1px solid rgba(99, 102, 241, 0.3);
-    border-radius: 4px;
-    color: var(--color-text-main);
-    min-width: 48px;
   }
 
   [part="content"] .control-desc {

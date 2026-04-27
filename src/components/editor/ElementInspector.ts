@@ -139,12 +139,12 @@ export class ElementInspector extends HTMLElement {
     this.shadowRoot.innerHTML = `
       <style>
         :host { display: flex; flex-direction: column; height: 100%; gap: 16px; padding: 20px; box-sizing: border-box; color: var(--color-text-main); font-family: var(--font-sans); overflow-y: scroll; }
-        #panel-content { display: flex; flex-direction: column; gap: 12px; flex: 1; padding-right: 8px; }
+        #panel-content { display: flex; flex-direction: column; gap: 12px; flex: 1; padding: 0 8px; }
         .row-ui { display: flex; gap: 10px; margin-bottom: 4px; align-items: flex-end; }
         .row-ui > * { flex: 1; min-width: 0; }
         .row-ui > .fixed-small { flex: none; width: 100px; }
         .tooltip-content { padding: 8px; max-width: 220px; }
-        .action-icon { pointer-events: auto !important; transition: all 0.2s var(--ease-spring);
+        .action-icon { pointer-events: auto !important; transition: all 0.2s var(--ease-spring); }
         .action-icon:hover { transform: scale(1.2); color: var(--color-accent-primary); }
         .action-icon.active { color: var(--color-accent-primary); }
         @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
