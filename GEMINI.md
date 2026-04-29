@@ -104,5 +104,6 @@ The project follows a modular, event-driven architecture:
 ### 2026-04-28: Persistência de Preferências & Compliance
 - **Task 64 (Global Audio):** Implementado controle de áudio persistente no ElementInspector. Refatoração da sequência de boot (main.ts) para carregar preferências e aplicar o estado do `UISoundManager` antes da primeira interação.
 - **Task 65 (About & Compliance):** Criada a aba "About" no Help Center com créditos, links sociais e transparência jurídica (Privacidade Local-Only e Termos).
+- **Task 26 (Print Excellence):** Finalizada implementação de sangria (bleed) e marcas de corte profissionais. O Live Preview do Cockpit de Produção agora reflete visualmente essas configurações em tempo real.
 - **Core (Boot Logic):** Otimização do ciclo de vida de inicialização para evitar carregamento redundante de labels e garantir sincronia entre Store e PreferenceManager.
 - **UI Architecture:** Implementado sistema de estilos globais `.prism-details` para componentes de colapso (details/summary) e expansão do catálogo de ícones.
