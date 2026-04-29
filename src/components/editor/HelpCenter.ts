@@ -7,10 +7,10 @@ import { sharedSheet } from '../../utils/shared-styles';
 
 /**
  * HelpCenter: Hub de conhecimento dinâmico.
- * Integra Quick Start Guide e Keyboard Shortcuts em abas.
+ * Integra Quick Start Guide, Keyboard Shortcuts e About em abas.
  */
 export class HelpCenter extends HTMLElement {
-  private activeTab: 'guide' | 'shortcuts' = 'guide';
+  private activeTab: 'guide' | 'shortcuts' | 'about' = 'guide';
 
   constructor() {
     super();
@@ -24,7 +24,7 @@ export class HelpCenter extends HTMLElement {
     this.render();
   }
 
-  public setTab(tab: 'guide' | 'shortcuts'): void {
+  public setTab(tab: 'guide' | 'shortcuts' | 'about'): void {
     this.activeTab = tab;
     this.render();
   }
@@ -47,10 +47,13 @@ export class HelpCenter extends HTMLElement {
         <!-- TABS -->
         <nav class="flex items-center gap-8 px-8 border-b border-border-ui bg-surface-solid/40 backdrop-blur-md">
           <button class="font-mono text-[11px] uppercase tracking-[0.2em] pb-4 pt-6 border-b-2 transition-all duration-300 cursor-pointer ${this.activeTab === 'guide' ? 'border-accent-primary text-text-main font-bold' : 'border-transparent text-text-muted hover:text-text-main'}" data-tab="guide">
-            Quick Start Guide
+            Guide
           </button>
           <button class="font-mono text-[11px] uppercase tracking-[0.2em] pb-4 pt-6 border-b-2 transition-all duration-300 cursor-pointer ${this.activeTab === 'shortcuts' ? 'border-accent-primary text-text-main font-bold' : 'border-transparent text-text-muted hover:text-text-main'}" data-tab="shortcuts">
-            Keyboard Shortcuts
+            Shortcuts
+          </button>
+          <button class="font-mono text-[11px] uppercase tracking-[0.2em] pb-4 pt-6 border-b-2 transition-all duration-300 cursor-pointer ${this.activeTab === 'about' ? 'border-accent-primary text-text-main font-bold' : 'border-transparent text-text-muted hover:text-text-main'}" data-tab="about">
+            About
           </button>
         </nav>
 
@@ -59,13 +62,22 @@ export class HelpCenter extends HTMLElement {
           <div class="absolute inset-0 pointer-events-none opacity-10" style="background-image: radial-gradient(var(--color-border-ui) 1px, transparent 0); background-size: 32px 32px;"></div>
           
           <div class="relative z-10 max-w-4xl mx-auto">
-            ${this.activeTab === 'guide' ? this.renderGuide() : this.renderShortcuts()}
+            ${this.renderContent()}
           </div>
         </main>
       </div>
     `;
 
     this.setupEvents();
+  }
+
+  private renderContent(): string {
+    switch (this.activeTab) {
+      case 'guide': return this.renderGuide();
+      case 'shortcuts': return this.renderShortcuts();
+      case 'about': return this.renderAbout();
+      default: return '';
+    }
   }
 
   private parseTipWithShortcuts(raw: string): string {
@@ -157,6 +169,75 @@ export class HelpCenter extends HTMLElement {
     return `
       <div class="animate-in fade-in slide-in-from-bottom-4 duration-500">
         <ui-keyboard-shortcuts id="shortcut-viewer" enable-search="true"></ui-keyboard-shortcuts>
+      </div>
+    `;
+  }
+
+  private renderAbout(): string {
+    const about = helpData.aboutSection;
+    return `
+      <div class="max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <!-- BRANDING -->
+        <div class="flex flex-col items-center text-center mb-12">
+          <div class="w-20 h-20 bg-accent-primary/10 border border-accent-primary/30 rounded-2xl flex items-center justify-center mb-6 shadow-neon-primary relative group overflow-hidden">
+            <div class="absolute inset-0 bg-accent-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <ui-icon name="package" size="xl" class="text-accent-primary relative z-10"></ui-icon>
+          </div>
+          <h2 class="text-3xl font-bold text-text-main tracking-tighter mb-2">Label Editor <span class="text-accent-primary">v4.0</span></h2>
+          <p class="font-mono text-[10px] text-text-muted uppercase tracking-[0.4em] mb-6 opacity-60">Tactile Design Engine</p>
+          <p class="text-sm text-text-muted leading-relaxed max-w-md">
+            ${about.mission}
+          </p>
+        </div>
+
+        <!-- SOCIALS -->
+        <div class="grid grid-cols-2 gap-4 mb-12">
+          ${about.socials.map(social => `
+            <a href="${social.url}" target="_blank" rel="noopener" class="flex items-center gap-4 p-4 bg-surface-solid/50 border border-border-ui rounded-xl hover:border-accent-primary/40 hover:bg-accent-primary/5 transition-all group">
+              <div class="p-2 bg-black/40 rounded-lg border border-white/5 group-hover:border-accent-primary/20">
+                <ui-icon name="${social.icon}" size="sm" class="text-text-muted group-hover:text-accent-primary transition-colors"></ui-icon>
+              </div>
+              <div class="flex flex-col">
+                <span class="text-[10px] font-mono text-text-muted uppercase tracking-wider group-hover:text-accent-primary transition-colors">${social.name}</span>
+                <span class="text-[9px] text-text-muted opacity-40">Visit Profile</span>
+              </div>
+              <ui-icon name="external-link" size="xs" class="ml-auto opacity-0 group-hover:opacity-40 transition-opacity"></ui-icon>
+            </a>
+          `).join('')}
+        </div>
+
+        <!-- COMPLIANCE ACCORDION -->
+        <div class="space-y-3">
+          <details class="prism-details group">
+            <summary>
+              ${about.privacy.title}
+              <ui-icon name="chevron-down" size="xs" class="group-open:rotate-180 transition-transform"></ui-icon>
+            </summary>
+            <div class="details-content">
+              ${about.privacy.content}
+              <div class="mt-4 p-3 bg-accent-success/5 border border-accent-success/20 rounded-lg flex gap-3 items-start">
+                <ui-icon name="check-circle" size="xs" class="text-accent-success mt-0.5"></ui-icon>
+                <p class="text-[11px] text-accent-success/90 italic">Verified: 100% Local Processing.</p>
+              </div>
+            </div>
+          </details>
+
+          <details class="prism-details group">
+            <summary>
+              ${about.terms.title}
+              <ui-icon name="chevron-down" size="xs" class="group-open:rotate-180 transition-transform"></ui-icon>
+            </summary>
+            <div class="details-content">
+              ${about.terms.content}
+            </div>
+          </details>
+        </div>
+
+        <div class="mt-12 pt-8 border-t border-white/5 text-center">
+          <p class="text-[9px] font-mono text-text-muted opacity-40 uppercase tracking-widest">
+            Handcrafted with precision &bull; 2026 Label Forge OS
+          </p>
+        </div>
       </div>
     `;
   }

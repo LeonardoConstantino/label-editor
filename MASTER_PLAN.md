@@ -37,7 +37,7 @@ Este Master Plan coordena a fase final de desenvolvimento, focando em estabilida
 | **46** | [Refatoração Profunda ElementInspector](./tasks/46_inspector_refactor.md) | 07 | [ ] | 29 | `task/46-inspector-refactor` |
 | **41** | [Modelos Unificados (Sync Inventory)](./tasks/41_unified_models.md) | 07 | [ ] | 02 | `task/41-models-sync` |
 | **64** | [Controle Global de Áudio](./tasks/64_ui_sound_toggle.md) | 05 | [x] | — | `task/64-ui-sound-toggle` |
-| **65** | [Aba About & Compliance](./tasks/65_help_about_legal.md) | 04 | [ ] | — | `task/65-help-about-legal` |
+| **65** | [Aba About & Compliance](./tasks/65_help_about_legal.md) | 04 | [x] | — | `task/65-help-about-legal` |
 | **68** | [Contador de Elementos no Vault](./tasks/68_vault_element_count.md) | 04 | [x] | — | `task/68-vault-element-count` |
 | **56** | [Ajuste de Espaçamento Inspector Header](./tasks/56_inspector_spacing_fix.md) | 04 | [x] | — | `task/56-inspector-ui` |
 

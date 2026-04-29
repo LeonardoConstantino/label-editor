@@ -55,6 +55,22 @@ const helpData = {
       tip: 'Mantenha camadas importantes bloqueadas [Ctrl+L] para evitar movimentos acidentais durante o design.',
     },
   ],
+  aboutSection: {
+    version: '4.0.0-Alpha',
+    mission: 'Empoderar designers e produtores com ferramentas de alta precisão que respeitam a privacidade e operam localmente.',
+    socials: [
+      { name: 'GitHub', url: 'https://github.com/leohconstantino', icon: 'github' },
+      { name: 'Portfolio', url: 'https://leonardoconstantino.dev', icon: 'globe' }
+    ],
+    privacy: {
+      title: 'Privacy Policy (Local-Only)',
+      content: 'O Label Editor v4.0 é uma aplicação "Privacy-First". Todos os seus designs, dados importados e imagens são processados e armazenados exclusivamente no seu dispositivo através do IndexedDB. Não há telemetria, cookies de rastreamento ou upload de dados para servidores externos.'
+    },
+    terms: {
+      title: 'Terms of Use',
+      content: 'Esta é uma ferramenta de código aberto fornecida "como está", sem garantias de qualquer tipo. O usuário é responsável pela legalidade dos dados inseridos e pelo uso final dos arquivos gerados. O uso comercial é permitido conforme a licença MIT.'
+    }
+  }
 };
 
 export default helpData;

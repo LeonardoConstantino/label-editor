@@ -18,7 +18,7 @@ Criar a aba "About" no Help Center para fornecer créditos, links sociais e tran
    - Indicação de versão do App (v4.0 Alpha).
 
 ## Critérios de Aceite
-- [ ] Navegação fluida entre as abas do Help Center.
-- [ ] Textos jurídicos acessíveis e bem formatados no estilo Prism.
-- [ ] Links externos seguros (rel="noopener").
-- [ ] O usuário é informado claramente que seus dados permanecem privados no dispositivo.
+- [x] Navegação fluida entre as abas do Help Center.
+- [x] Textos jurídicos acessíveis e bem formatados no estilo Prism.
+- [x] Links externos seguros (rel="noopener").
+- [x] O usuário é informado claramente que seus dados permanecem privados no dispositivo.
