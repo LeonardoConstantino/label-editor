@@ -94,3 +94,13 @@ The project follows a modular, event-driven architecture:
 - **Task 61 (DOM Optimization):** Refatoração do ciclo de vida da Toolbar, Canvas e Vault para atualizações incrementais (eliminando `innerHTML` em loops de estado).
 - **Task 68 (Asset Intelligence):** Adicionado contador de inventário no Vault com Tooltips Ricas e detalhamento por ícones de camadas.
 - **Task 71 (Event Registry):** Iniciada orquestração de eventos; criado `docs/Event_System_Registry.md` com mapeamento de 21 eventos e auditoria de órfãos.
+
+### 2026-04-27: Polimento de UX & Unificação de Design
+- **Task 56 (Inspector Layout):** Ajuste de padding no cabeçalho do Inspector para consistência visual em resoluções menores.
+- **Task 49 (KBD Unification):** Centralização da lógica de renderização de atalhos no `UIKeyboardShortcuts` (SSoT). Refatoração de `Toolbar`, `HelpCenter` e `UiHudTips` para utilizar o motor unificado.
+- **Design System:** Implementado estilo "3D Prism" para elementos `<kbd>` globalmente, adicionando profundidade visual e feedback tátil via CSS.
+- **Integridade:** Sincronização de interfaces de atalhos e correção de tipos TS para garantir build estável.
+
+### 2026-04-28: Persistência de Preferências & Controle de Áudio
+- **Task 64 (Global Audio):** Implementado controle de áudio persistente no ElementInspector. Refatoração da sequência de boot (main.ts) para carregar preferências e aplicar o estado do `UISoundManager` antes da primeira interação.
+- **Core (Boot Logic):** Otimização do ciclo de vida de inicialização para evitar carregamento redundante de labels e garantir sincronia entre Store e PreferenceManager.

@@ -12,7 +12,7 @@ Implementar um sistema de ativação/desativação de áudio da interface, permi
 6. **Atalho:** Registrar `Ctrl+M` para alternar o mute rapidamente via `ShortcutService`.
 
 ## Critérios de Aceite
-- [ ] O usuário pode silenciar todos os sons com um único clique na interface.
-- [ ] O estado do áudio é salvo automaticamente e restaurado ao abrir o app.
-- [ ] O ícone visual reflete o estado atual (Muted/Unmuted).
-- [ ] O `UISoundManager` silencia imediatamente todas as chamadas de áudio ao ser desativado.
+- [x] O usuário pode silenciar todos os sons com um único clique na interface.
+- [x] O estado do áudio é salvo automaticamente e restaurado ao abrir o app.
+- [x] O ícone visual reflete o estado atual (Muted/Unmuted). foi usado um checkbox custumizado
+- [x] O `UISoundManager` silencia imediatamente todas as chamadas de áudio ao ser desativado.

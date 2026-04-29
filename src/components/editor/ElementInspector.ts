@@ -256,6 +256,10 @@ export class ElementInspector extends HTMLElement {
       <span class="label-prism" style="margin-top: 12px;">Preferences</span>
       <div class="card-module" style="padding: 12px; display: flex; flex-direction: column; gap: 10px;">
         <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-family: var(--font-mono); font-size: 11px; color: var(--color-text-muted);">AUDIO ENABLED</span>
+          <input type="checkbox" data-pref="audioEnabled" ${prefs.audioEnabled ? 'checked' : ''}>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
           <span style="font-family: var(--font-mono); font-size: 11px; color: var(--color-text-muted);">SHOW GRID</span>
           <input type="checkbox" data-pref="showGrid" ${prefs.showGrid ? 'checked' : ''}>
         </div>
@@ -587,6 +591,7 @@ export class ElementInspector extends HTMLElement {
       setVal(shadow, '[data-doc-prop="backgroundColor"]', config.backgroundColor, false);
       
       const p = store.getState().preferences;
+      setVal(shadow, '[data-pref="audioEnabled"]', p.audioEnabled, false);
       setVal(shadow, '[data-pref="showGrid"]', p.showGrid, false);
       setVal(shadow, '[data-pref="gridSizeMM"]', p.gridSizeMM);
       setVal(shadow, '[data-pref="gridColor"]', p.gridColor, false);

@@ -16,7 +16,7 @@ Padronizar visualmente todas as representações de teclas (`<kbd>`) no sistema 
 5. **Auditoria Visual:** Garantir que o Help Center e as Tooltips usem o mesmo motor de renderização.
 
 ## Critérios de Aceite
-- [ ] Todas as teclas no app seguem o mesmo padrão visual "Tactile Prism".
-- [ ] Tooltips da Toolbar exibem atalhos atualizados automaticamente se o `ShortcutService` for modificado.
-- [ ] O componente `UIKeyboardShortcuts` é reutilizável para casos de "atalho único" (chips).
-- [ ] Suporte a ícones de setas e modificadores (Ctrl/Shift/Alt) em todas as visualizações.
+- [x] Todas as teclas no app seguem o mesmo padrão visual "Tactile Prism".
+- [x] Tooltips da Toolbar exibem atalhos atualizados automaticamente se o `ShortcutService` for modificado.
+- [x] O componente `UIKeyboardShortcuts` é reutilizável para casos de "atalho único" (chips).
+- [x] Suporte a ícones de setas e modificadores (Ctrl/Shift/Alt) em todas as visualizações.

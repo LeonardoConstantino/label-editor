@@ -57,16 +57,29 @@ const defaultLabel: Label = {
 
 document.addEventListener('DOMContentLoaded', async () => {
   const { isMac } = getOSInfo(); // Detecta o sistema operacional e ajusta variáveis globais
-  // Inicializa o som e contorna autoplay-block
-  UISM.toggle(true);
+
+  // 1. Carrega preferências do usuário imediatamente
+  const { preferenceManager } = await import('./domain/services/PreferenceManager');
+  const prefs = await preferenceManager.getPreferences();
+
+  // 2. Inicializa o som com base na preferência e contorna autoplay-block
+  UISM.toggle(prefs.audioEnabled);
 
   const playTestSound = () => {
-    UISM.play(UISM.enumPresets.TAP);
-    document.removeEventListener('click', playTestSound);
-    document.removeEventListener('keydown', playTestSound);
+    if (UISM.play(UISM.enumPresets.TAP)) {
+      document.removeEventListener('click', playTestSound);
+      document.removeEventListener('keydown', playTestSound);
+    }
   };
   document.addEventListener('click', playTestSound, { once: true });
   document.addEventListener('keydown', playTestSound, { once: true });
+
+  // 3. Reage a mudanças de preferências de som em tempo real
+  eventBus.on('preferences:change', (updatedPrefs: any) => {
+    if (updatedPrefs.audioEnabled !== undefined) {
+      UISM.toggle(updatedPrefs.audioEnabled);
+    }
+  });
 
   await templateManager.init();
   shortcutService.init(isMac);
@@ -110,11 +123,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (!loadedFromSession && !hasSeenGuide) {
     const welcomeModal = document.getElementById('welcome-modal') as any;
     if (welcomeModal) welcomeModal.setAttribute('open', '');
+    store.loadLabel(defaultLabel);
   } else if (!loadedFromSession) {
     // Se já viu o guia mas não tem sessão, apenas carrega a etiqueta padrão
     store.loadLabel(defaultLabel);
     logger.info('Main', `Standard session initialized: ${defaultLabel.id}`);
   }
+
+  // Notifica Store sobre preferências carregadas (para sincronizar UI)
+  eventBus.emit('preferences:update', prefs);
 
   // Monitora mudança de projeto para salvar última sessão
   eventBus.on('state:change', (state: any) => {
@@ -123,14 +140,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  // Carrega preferências do usuário
-  const { preferenceManager } =
-    await import('./domain/services/PreferenceManager');
-  const prefs = await preferenceManager.getPreferences();
-  eventBus.emit('preferences:update', prefs);
-
-  store.loadLabel(defaultLabel);
-  logger.info('Main', `Application Initialized with Label: ${defaultLabel.id}`);
+  logger.info('Main', 'Application Initialized');
 
   eventBus.emit('notify', {
     type: 'info',

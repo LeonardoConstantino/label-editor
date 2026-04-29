@@ -7,6 +7,7 @@ export interface UserPreferences {
   unit: 'mm' | 'px' | 'pt';
   lastUsedDpi: number;
   theme: 'dark' | 'light' | 'system';
+  audioEnabled: boolean;
 }
 
 export const DEFAULT_PREFERENCES: UserPreferences = {
@@ -17,5 +18,6 @@ export const DEFAULT_PREFERENCES: UserPreferences = {
   gridOpacity: 0.3,
   unit: 'mm',
   lastUsedDpi: 300,
-  theme: 'dark'
+  theme: 'dark',
+  audioEnabled: true
 };
