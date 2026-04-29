@@ -17,6 +17,7 @@ interface A4Config {
   gapMM: number;
   columns: number;
   showCropMarks: boolean;
+  bleedMM: number;
   zoom: number;
 }
 
@@ -35,6 +36,7 @@ export class DataSourceInput extends HTMLElement {
     gapMM: 5,
     columns: 2,
     showCropMarks: true,
+    bleedMM: 2,
     zoom: 0.45,
   };
 
@@ -60,10 +62,7 @@ export class DataSourceInput extends HTMLElement {
     if (!label) return;
 
     const vars = new Set<string>();
-    // Regex atualizado para bater com o do DataSourceParser.interpolate
-    // Captura 1: nome da variável
-    const regex =
-      /\{\{\s*([\w\s."'-]+)(?::([\w,()\s.:-]+))?(?:\|\|([^}]+))?\s*\}\}/g;
+    const regex = /\{\{\s*([\w\s."'-]+)(?::([\w,()\s.:-]+))?(?:\|\|([^}]+))?\s*\}\}/g;
 
     label.elements.forEach((el) => {
       if (el.type === ElementType.TEXT && (el as any).content) {
@@ -80,7 +79,6 @@ export class DataSourceInput extends HTMLElement {
   private render(): void {
     if (!this.shadowRoot) return;
 
-    // Atualiza placeholders sempre antes de renderizar para refletir mudanças no editor
     this.refreshLabelPlaceholders();
 
     const dropZoneClass = this.isDragging ? 'drop-zone dragging' : 'drop-zone';
@@ -88,6 +86,29 @@ export class DataSourceInput extends HTMLElement {
     this.shadowRoot.innerHTML = `
       <style>
         :host { display: block; height: 100%; }
+        
+        /* Visualização da Sangria no Preview */
+        .bleed-preview-box {
+          position: absolute;
+          inset: calc(var(--bleed) * -1mm);
+          border: 1px dashed rgba(99, 102, 241, 0.3);
+          pointer-events: none;
+          z-index: 1;
+        }
+
+        /* Marcas de Corte no Preview */
+        .crop-mark {
+          position: absolute;
+          width: 4mm;
+          height: 4mm;
+          border: 0.1mm solid rgba(16, 185, 129, 0.4);
+          pointer-events: none;
+          z-index: 2;
+        }
+        .mark-tl { top: -5mm; left: -5mm; border-right: none; border-bottom: none; }
+        .mark-tr { top: -5mm; right: -5mm; border-left: none; border-bottom: none; }
+        .mark-bl { bottom: -5mm; left: -5mm; border-right: none; border-top: none; }
+        .mark-br { bottom: -5mm; right: -5mm; border-left: none; border-top: none; }
       </style>
 
       <div class="studio-container">
@@ -98,7 +119,6 @@ export class DataSourceInput extends HTMLElement {
             <div class="flex flex-col gap-3">
               <h4 class="font-mono text-[10px] text-text-muted uppercase tracking-[0.2em] mb-1">1. Data Source</h4>
               
-              <!-- Upload Zone or File Info -->
               <div id="upload-container">
                 ${
                   this.currentFileName
@@ -129,7 +149,6 @@ export class DataSourceInput extends HTMLElement {
                 }
               </div>
 
-              <!-- Available Data Fields (from uploaded file) -->
               ${
                 this.dataFields.length > 0
                   ? `
@@ -150,7 +169,6 @@ export class DataSourceInput extends HTMLElement {
                   : ''
               }
 
-              <!-- Placeholders needed by Label -->
               ${
                 this.labelPlaceholders.length > 0
                   ? `
@@ -178,10 +196,13 @@ export class DataSourceInput extends HTMLElement {
                 <ui-number-scrubber id="cfg-cols" label="COL" value="${this.a4Config.columns}" min="1" max="10" step="1.0" unit="Col"></ui-number-scrubber>
                 <ui-number-scrubber id="cfg-gap" label="GAP" value="${this.a4Config.gapMM}" min="0" max="50" step="1.0" unit="mm"></ui-number-scrubber>
                 <ui-number-scrubber id="cfg-margin" label="MAR" value="${this.a4Config.marginMM}" min="0" max="50" step="1.0" unit="mm"></ui-number-scrubber>
+                <ui-number-scrubber id="cfg-bleed" label="BLD" value="${this.a4Config.bleedMM}" min="0" max="10" step="0.5" unit="mm"></ui-number-scrubber>
                 
-                <div class="flex flex-col justify-center items-center bg-black/20 rounded-lg p-2 border border-border-ui/50">
-                   <span class="label-prism" style="margin-bottom: 4px; font-size: 8px;">Crop Marks</span>
-                   <input type="checkbox" id="cfg-crop" ${this.a4Config.showCropMarks ? 'checked' : ''}>
+                <div class="flex flex-col justify-center items-center bg-black/20 rounded-lg p-2 border border-border-ui/50 col-span-2">
+                   <div class="flex items-center justify-between w-full px-4">
+                     <span class="label-prism" style="margin-bottom: 0; font-size: 10px;">Show Crop Marks</span>
+                     <input type="checkbox" id="cfg-crop" ${this.a4Config.showCropMarks ? 'checked' : ''}>
+                   </div>
                 </div>
               </div>
             </div>
@@ -216,7 +237,7 @@ export class DataSourceInput extends HTMLElement {
              <div class="status-badge" id="batch-summary">
                ${this.dataList.length > 0 ? `BATCH SIZE: ${this.dataList.length} UNITS` : 'READY TO PROCESS'}
              </div>
-             ${this.dataList.length > 0 ? `<div class="status-badge" style="color: var(--color-accent-primary)">ESTIMATED PAGES: ${Math.ceil(this.dataList.length / 12)}</div>` : ''}
+             ${this.dataList.length > 0 ? `<div class="status-badge" style="color: var(--color-accent-primary)" id="pages-est">ESTIMATED PAGES: ${Math.ceil(this.dataList.length / 12)}</div>` : ''}
           </div>
           <div style="display: flex; gap: 12px;">
             <app-button id="btn-close" variant="secondary">CLOSE STUDIO</app-button>
@@ -238,14 +259,12 @@ export class DataSourceInput extends HTMLElement {
   private attachEvents(): void {
     const shadow = this.shadowRoot!;
 
-    // Upload & Remove
     const dropZone = shadow.getElementById('drop-zone');
     const fileInput = shadow.getElementById('file-input') as HTMLInputElement;
     const btnRemove = shadow.getElementById('btn-remove-file');
 
     if (dropZone) {
       dropZone.addEventListener('click', () => fileInput.click());
-
       dropZone.addEventListener('dragover', (e) => {
         e.preventDefault();
         if (!this.isDragging) {
@@ -253,13 +272,11 @@ export class DataSourceInput extends HTMLElement {
           dropZone.classList.add('dragging');
         }
       });
-
       dropZone.addEventListener('dragleave', (e) => {
         e.preventDefault();
         this.isDragging = false;
         dropZone.classList.remove('dragging');
       });
-
       dropZone.addEventListener('drop', (e) => {
         e.preventDefault();
         this.isDragging = false;
@@ -290,10 +307,10 @@ export class DataSourceInput extends HTMLElement {
 
     shadow.getElementById('cfg-crop')?.addEventListener('change', (e: any) => {
       this.a4Config.showCropMarks = e.target.checked;
+      UISM.play(UISM.enumPresets.TAP);
       this.updatePreview();
     });
 
-    // Close & Generate
     shadow.getElementById('btn-close')?.addEventListener('click', () => {
       const modal = document.getElementById('batch-modal') as any;
       if (modal) modal.removeAttribute('open');
@@ -303,16 +320,11 @@ export class DataSourceInput extends HTMLElement {
       .getElementById('btn-generate')
       ?.addEventListener('click', async () => {
         if (this.dataList.length === 0) {
-          eventBus.emit('notify', {
-            type: 'warning',
-            message: 'Upload a data source first.',
-          });
+          eventBus.emit('notify', { type: 'warning', message: 'Upload a data source first.' });
           return;
         }
 
-        const missing = this.labelPlaceholders.filter(
-          (p) => !this.dataFields.includes(p),
-        );
+        const missing = this.labelPlaceholders.filter((p) => !this.dataFields.includes(p));
         if (missing.length > 0) {
           eventBus.emit('notify', {
             type: 'warning',
@@ -320,16 +332,11 @@ export class DataSourceInput extends HTMLElement {
           });
         }
 
-        const { pdfGenerator } =
-          await import('../../domain/services/PDFGenerator');
+        const { pdfGenerator } = await import('../../domain/services/PDFGenerator');
         const label = store.getState().currentLabel;
         if (label) {
           UISM.play(UISM.enumPresets.SUCCESS);
-          await pdfGenerator.generateLotePDF(
-            label,
-            this.dataList,
-            this.a4Config,
-          );
+          await pdfGenerator.generateLotePDF(label, this.dataList, this.a4Config);
         }
       });
   }
@@ -348,6 +355,10 @@ export class DataSourceInput extends HTMLElement {
         this.a4Config.marginMM = value || 0;
         this.updatePreview();
       },
+      'cfg-bleed': (value) => {
+        this.a4Config.bleedMM = value || 0;
+        this.updatePreview();
+      },
       'cfg-zoom': (value) => {
         this.a4Config.zoom = (value || 45) / 100;
         const sheet = shadow.getElementById('a4-sheet')!;
@@ -358,9 +369,7 @@ export class DataSourceInput extends HTMLElement {
     Object.entries(configHandlers).forEach(([id, handler]) => {
       const element = shadow.getElementById(id);
       if (!element) return;
-
       const listener = (e: any) => handler(e.detail.value);
-
       element.addEventListener('change', listener);
       element.addEventListener('input', listener);
     });
@@ -392,15 +401,11 @@ export class DataSourceInput extends HTMLElement {
     }
   }
 
-  private async parseFileByExtension(
-    file: File,
-  ): Promise<Record<string, any>[]> {
+  private async parseFileByExtension(file: File): Promise<Record<string, any>[]> {
     const extension = file.name.slice(file.name.lastIndexOf('.')).toLowerCase();
-
     if (extension === '.csv') return dataSourceParser.parseCSV(file);
     if (extension === '.json') return dataSourceParser.parseJSON(file);
     if (extension === '.txt') return dataSourceParser.parseTXT(file);
-
     throw new Error(`Unsupported format: ${extension}`);
   }
 
@@ -409,7 +414,7 @@ export class DataSourceInput extends HTMLElement {
     if (!this.dataList.length) return;
 
     const headers = Object.keys(this.dataList[0]);
-    const displayHeaders = headers.slice(0, 4); // Limita colunas no preview para não quebrar UI
+    const displayHeaders = headers.slice(0, 4);
 
     box.innerHTML = `
       <div class="flex flex-col gap-3 animate-in fade-in duration-500">
@@ -439,7 +444,8 @@ export class DataSourceInput extends HTMLElement {
   }
 
   private updatePreview(): void {
-    const sheet = this.shadowRoot!.getElementById('a4-sheet')!;
+    const shadow = this.shadowRoot!;
+    const sheet = shadow.getElementById('a4-sheet')!;
     const label = store.getState().currentLabel;
 
     sheet.style.setProperty('--a4-margin', `${this.a4Config.marginMM}mm`);
@@ -458,29 +464,24 @@ export class DataSourceInput extends HTMLElement {
 
     sheet.innerHTML = '';
 
-    // Cálculo Dinâmico de etiquetas por folha A4
     const PAGE_WIDTH = 210;
     const PAGE_HEIGHT = 297;
     const availableWidth = PAGE_WIDTH - this.a4Config.marginMM * 2;
     const availableHeight = PAGE_HEIGHT - this.a4Config.marginMM * 2;
 
-    // Quantas colunas cabem de fato considerando o GAP?
     const colWidth = label.config.widthMM;
     const rowHeight = label.config.heightMM;
 
-    const maxCols = Math.floor(
-      (availableWidth + this.a4Config.gapMM) / (colWidth + this.a4Config.gapMM),
-    );
-    const maxRows = Math.floor(
-      (availableHeight + this.a4Config.gapMM) /
-        (rowHeight + this.a4Config.gapMM),
-    );
+    const maxCols = Math.floor((availableWidth + this.a4Config.gapMM) / (colWidth + this.a4Config.gapMM));
+    const maxRows = Math.floor((availableHeight + this.a4Config.gapMM) / (rowHeight + this.a4Config.gapMM));
 
-    // O usuário pode ter configurado mais colunas do que cabem. Respeitamos o menor valor.
     const effectiveCols = Math.min(this.a4Config.columns, maxCols || 1);
     const labelsPerPage = effectiveCols * (maxRows || 1);
 
-    // Limitamos o preview a apenas uma folha
+    const estPages = Math.ceil(this.dataList.length / labelsPerPage);
+    const estEl = shadow.getElementById('pages-est');
+    if (estEl) estEl.textContent = `ESTIMATED PAGES: ${estPages}`;
+
     const toRender = this.dataList.slice(0, labelsPerPage);
 
     toRender.forEach((data) => {
@@ -490,6 +491,19 @@ export class DataSourceInput extends HTMLElement {
       container.style.height = `${label.config.heightMM}mm`;
       container.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
       container.style.border = '1px solid rgba(0,0,0,0.05)';
+      container.style.position = 'relative';
+      container.style.overflow = 'visible'; // Permite ver a sangria se quisermos
+
+      if (this.a4Config.bleedMM > 0) {
+        const bleedBox = document.createElement('div');
+        bleedBox.className = 'bleed-preview-box';
+        bleedBox.style.setProperty('--bleed', this.a4Config.bleedMM.toString());
+        container.appendChild(bleedBox);
+      }
+
+      if (this.a4Config.showCropMarks) {
+        this.addVisualCropMarks(container);
+      }
 
       const canvas = document.createElement('canvas');
       container.appendChild(canvas);
@@ -499,29 +513,29 @@ export class DataSourceInput extends HTMLElement {
     });
   }
 
-  private renderLabelThumb(
-    canvas: HTMLCanvasElement,
-    label: any,
-    data: any,
-  ): void {
+  private addVisualCropMarks(container: HTMLElement): void {
+    const positions = ['tl', 'tr', 'bl', 'br'];
+    positions.forEach(pos => {
+      const mark = document.createElement('div');
+      mark.className = `crop-mark mark-${pos}`;
+      container.appendChild(mark);
+    });
+  }
+
+  private renderLabelThumb(canvas: HTMLCanvasElement, label: any, data: any): void {
     const ctx = canvas.getContext('2d')!;
-    const scale = 1.2;
     const currentDpi = label.config.dpi || DEFAULTS.CANVAS.dpi;
 
-    canvas.width = label.config.widthMM * (currentDpi / 25.4) * (scale / 4); // Thumb low-res para performance
-    canvas.height = label.config.heightMM * (currentDpi / 25.4) * (scale / 4);
-
-    canvas.width = label.config.widthMM * 2; // Fixed resolution for thumb
-    canvas.height = label.config.heightMM * 2;
+    // Aumentamos a resolução interna do canvas do thumb para não ficar tão embaçado
+    const renderScale = 4; // 4x o tamanho em mm
+    canvas.width = label.config.widthMM * renderScale;
+    canvas.height = label.config.heightMM * renderScale;
 
     canvas.style.width = '100%';
     canvas.style.height = '100%';
 
-    ctx.fillStyle =
-      label.config.backgroundColor || DEFAULTS.CANVAS.backgroundColor;
+    ctx.fillStyle = label.config.backgroundColor || DEFAULTS.CANVAS.backgroundColor;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    const renderScale = canvas.width / label.config.widthMM;
 
     label.elements.forEach((el: any) => {
       canvasRenderer.render(el, {

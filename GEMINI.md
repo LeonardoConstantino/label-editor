@@ -101,6 +101,8 @@ The project follows a modular, event-driven architecture:
 - **Design System:** Implementado estilo "3D Prism" para elementos `<kbd>` globalmente, adicionando profundidade visual e feedback tátil via CSS.
 - **Integridade:** Sincronização de interfaces de atalhos e correção de tipos TS para garantir build estável.
 
-### 2026-04-28: Persistência de Preferências & Controle de Áudio
+### 2026-04-28: Persistência de Preferências & Compliance
 - **Task 64 (Global Audio):** Implementado controle de áudio persistente no ElementInspector. Refatoração da sequência de boot (main.ts) para carregar preferências e aplicar o estado do `UISoundManager` antes da primeira interação.
+- **Task 65 (About & Compliance):** Criada a aba "About" no Help Center com créditos, links sociais e transparência jurídica (Privacidade Local-Only e Termos).
 - **Core (Boot Logic):** Otimização do ciclo de vida de inicialização para evitar carregamento redundante de labels e garantir sincronia entre Store e PreferenceManager.
+- **UI Architecture:** Implementado sistema de estilos globais `.prism-details` para componentes de colapso (details/summary) e expansão do catálogo de ícones.

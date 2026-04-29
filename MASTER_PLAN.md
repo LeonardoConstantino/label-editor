@@ -49,7 +49,7 @@ Este Master Plan coordena a fase final de desenvolvimento, focando em estabilida
 | **69** | [Componente UI Select & Presets](./tasks/69_ui_select_presets.md) | 06 | [ ] | — | `task/69-ui-select-presets` |
 | **62** | [Ferramentas de Alinhamento e Distribuição](./tasks/62_power_layout.md) | 06 | [ ] | 41 | `task/62-power-layout` |
 | **63** | [Smart Snapping & Guias Magnéticas](./tasks/63_smart_snapping.md) | 06 | [ ] | 04 | `task/63-smart-snapping` |
-| **26** | [Sangria e Marcas de Corte (PDF)](./tasks/26_a4_printing.md) | 06 | [/] | 10 | `task/26-a4-printing` |
+| **26** | [Sangria e Marcas de Corte (PDF)](./tasks/26_a4_printing.md) | 06 | [x] | 10 | `task/26-a4-printing` |
 | **52** | [Action Icon de Lock nos Cards de Camada](./tasks/52_ui_layer_lock.md) | 05 | [ ] | 41 | `task/52-ui-layer-lock` |
 | **58** | [Elemento de Código (QR Code / Barcode)](./tasks/58_element_code.md) | 05 | [ ] | 41 | `task/58-element-code` |
 | **42** | [BorderElement (Standalone Moldura)](./tasks/42_border_element.md) | 05 | [ ] | 41 | `task/42-border-element` |
