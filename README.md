@@ -38,7 +38,7 @@ O Label Editor é uma aplicação web completa para criação e edição de etiq
 
 ```bash
 # Clone o repositório
-git clone <repository-url>
+git clone https://github.com/LeonardoConstantino/label-editor.git
 
 # Instale as dependências
 npm install

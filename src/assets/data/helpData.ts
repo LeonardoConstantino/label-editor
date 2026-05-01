@@ -59,8 +59,8 @@ const helpData = {
     version: '4.0.0-Alpha',
     mission: 'Empoderar designers e produtores com ferramentas de alta precisão que respeitam a privacidade e operam localmente.',
     socials: [
-      { name: 'GitHub', url: 'https://github.com/leohconstantino', icon: 'github' },
-      { name: 'Portfolio', url: 'https://leonardoconstantino.dev', icon: 'globe' }
+      { name: 'GitHub', url: 'https://github.com/LeonardoConstantino', icon: 'github' },
+      { name: 'Portfolio', url: 'https://github.com/LeonardoConstantino?tab=repositories', icon: 'globe' }
     ],
     privacy: {
       title: 'Privacy Policy (Local-Only)',

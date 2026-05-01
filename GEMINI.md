@@ -105,15 +105,18 @@ The project follows a modular, event-driven architecture:
   - **Interface:** Adicionado botão de `link` tátil com linhas conectoras dinâmicas no painel de Transformação.
   - **Lógica Proporcional:** Cálculo em tempo real do fator de escala ao alterar uma dimensão, mantendo a integridade visual do elemento.
   - **Arquitetura:** Atualizado `InspectorLayerCard` para suportar sincronização instantânea de seções via atributos DOM.
+### 2026-05-01: Consolidação de Modelos & Unificação de UI
+- **Task 69 (UI Select):** Criado o componente `AppSelect` com visual Tactile Prism e glassmorphism.
+  - **Presets:** Implementado seletor de tamanhos de etiqueta (Small, Medium, A4, etc) no Document Setup.
+  - **UX:** Sincronia bi-direcional entre presets e inputs manuais (Auto-Custom).
+- **Task 55 (Aspect Ratio Lock):** Implementado vínculo de proporção entre Largura e Altura.
+  - **Interface:** Adicionado botão de `link` tátil com linhas conectoras dinâmicas no painel de Transformação.
+  - **Lógica Proporcional:** Cálculo em tempo real do fator de escala ao alterar uma dimensão.
 - **Task 41 (Unified Models):** Sincronização completa do domínio com o Inventário v1.1.
-...
-  - **Atributos Universais:** Integrados `rotation`, `opacity`, `locked` e `name` em todos os elementos via `BaseElement`.
-  - **Motor Gráfico:** `CanvasRenderer` centraliza transformações espaciais (rotação/opacidade), mantendo os renderers específicos simplificados.
-  - **Matemática de Seleção:** Implementado cálculo de ponto rotacionado no `hitTest` para seleção precisa de camadas inclinadas.
-- **Task 52 (Layer Lock):** Implementado sistema de congelamento de edição.
-  - **Inspector UI:** Novo ícone de cadeado tátil com feedback visual diferenciado quando ativo.
-  - **UX Guard:** Bloqueio impede interações diretas no Inspector e desabilita movimentação/deleção/reordenação via atalhos globais.
-- **Integridade:** Refinamento da tipagem no `Store` e `ElementValidator`, eliminando disparidades entre modelos teóricos e implementação.
+  - **Atributos Universais:** Integrados `rotation`, `opacity`, `locked` e `name` em todos os elementos.
+  - **Motor Gráfico:** `CanvasRenderer` centraliza transformações espaciais e hit-test rotacionado.
+- **Task 52 (Layer Lock):** Implementado sistema de congelamento de edição com proteção de UX em atalhos globais.
+- **Planejamento:** Criada Task 73 para adoção universal do `AppSelect` em todo o ecossistema.
 
 ### 2026-04-30: Arquitetura de Componentes & Integridade de UI
 - **Task 46 (Deep Refactor):** Finalizada refatoração profunda do `ElementInspector`.
