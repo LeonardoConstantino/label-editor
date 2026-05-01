@@ -207,6 +207,15 @@ class KeyboardShortcutManager {
   }
 
   /**
+   * Configura o modo debug
+   */
+  setDebug(enabled: boolean): KeyboardShortcutManager {
+    this.options.debug = enabled;
+    return this;
+  }
+
+
+  /**
    * Remove os event listeners e limpa todos os recursos
    * @returns {KeyboardShortcutManager} Retorna this para consistência
    */

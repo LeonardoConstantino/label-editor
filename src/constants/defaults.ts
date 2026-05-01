@@ -1,6 +1,27 @@
 import { ElementType, BorderStyle, TextOverflow, ImageFit } from '../domain/models/elements/BaseElement';
 
 /**
+ * DEBUG: Flag global para ativar/desativar logs de debug detalhados.
+ * Deve ser false em produção para evitar poluição de logs e impacto de performance.
+ * Pode ser sobrescrito por instâncias específicas do EventBus ou Logger.
+ * Sincronizado com definition_elements.md
+ */
+const debug = {
+  state: false,
+};
+
+/**
+ * setDebug: Função para alterar o valor da flag de debug em tempo de execução.
+ * Útil para ativar logs detalhados durante desenvolvimento ou troubleshooting sem precisar recompilar.
+ * Exemplo de uso: setDebug(true) para ativar, setDebug(false) para desativar.
+ */
+export const setDebug = (value: boolean) => {
+  debug.state = value;
+};
+
+export const getDebug = () => debug.state;
+
+/**
  * DEFAULTS: Valores padrão para criação de novos elementos.
  * Sincronizado com definition_elements.md
  */

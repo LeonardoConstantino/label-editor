@@ -6,6 +6,8 @@ import { logger } from './Logger';
 import { templateManager } from '../domain/services/TemplateManager';
 import { AnyElement, ElementType } from '../domain/models/Label';
 import { ElementFactory } from '../domain/models/elements/ElementFactory';
+import { getDebug } from '../constants/defaults';
+import { setDebug } from './../constants/defaults';
 
 /**
  * PropClipboard: Armazena propriedades copiadas de um elemento.
@@ -28,7 +30,7 @@ class ShortcutService {
 
   constructor() {
     this.manager = new KeyboardShortcutManager({
-      debug: true,
+      debug: getDebug(),
       enableSequences: true,
       enableLongPress: true,
       debounceDelay: 50,
@@ -125,9 +127,20 @@ class ShortcutService {
       eventBus.emit('ui:open:help', { source: 'shortcut' }); // Preparado para Task 36
     }, { description: 'Mostrar Atalhos', category: 'Ajuda', preventDefault: true });
 
+    // this.manager.registerSequence(['d', 'e', 'b', 'u', 'g'], () => {
+    //   setDebug(!getDebug());
+
+    //   logger.debug('ShortcutService', `Modo debug ${getDebug() ? 'ativado' : 'desativado'}!`);
+    //   eventBus.emit('notify', { message: `Modo debug ${getDebug() ? 'ativado' : 'desativado'}! Ver console para detalhes.`, type: 'warning', duration: 5000 });
+
+    //   logger.setDeveloperMode(getDebug());
+    //   eventBus.setLog(getDebug());
+    //   this.manager.setDebug(getDebug());
+    // }, { description: 'Ativar Modo Debug', category: 'Easter Egg' });
+
     this.manager.registerSequence(['t', 'e', 's', 't', 'e'], () => {
       logger.debug('ShortcutService', 'Sequência de teste ativada!');
-      eventBus.emit('notify', { message: 'Sequência secreta ativada!', type: 'success' });
+      eventBus.emit('notify', { message: 'Sequência secreta ativada!', type: 'success', duration: 5000 });
     }, { description: 'Sequência de Teste', category: 'Easter Egg' });
   }
 

@@ -2,6 +2,8 @@
  * @fileoverview Sistema de logging centralizado com níveis, namespaces, grupos, persistência e exportação
  */
 
+import { getDebug } from "../constants/defaults";
+
 /**
  * Níveis de log disponíveis
  */
@@ -120,6 +122,16 @@ export class Logger {
    */
   setLevel(level: LogLevelType): void {
     this.level = level;
+  }
+
+  /**
+   * Ativa ou desativa o modo desenvolvedor para capturar stack traces detalhados
+   * Útil para debugging avançado, mas pode impactar performance se usado em produção.
+   * @param enabled - true para ativar, false para desativar o modo desenvolvedor
+   * @returns void
+   */
+  setDeveloperMode(enabled: boolean): void {
+    this.devMode = enabled;
   }
 
   /**
@@ -377,4 +389,4 @@ export class Logger {
   }
 }
 // Instância única para o app
-export const logger = new Logger({ level: LogLevel.DEBUG, prefix: '[LabelEditor]', devMode: false });
+export const logger = new Logger({ level:getDebug() ? LogLevel.DEBUG : LogLevel.INFO, prefix: '[LabelEditor]', devMode: getDebug() });

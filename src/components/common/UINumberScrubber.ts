@@ -17,6 +17,7 @@ export class UINumberScrubber extends HTMLElement {
   #startX = 0;
   #startValue = 0;
   #sensitivity = 5;
+  #initialValue: number = 0;
 
   static observedAttributes = ['value', 'min', 'max', 'step', 'label', 'unit'];
 
@@ -27,12 +28,16 @@ export class UINumberScrubber extends HTMLElement {
   }
 
   get value(): number {
+    if (!this.#input) return this.#initialValue;
     return parseFloat(this.#input.value) || 0;
   }
 
   set value(v: number | string) {
     const num = typeof v === 'string' ? parseFloat(v) : v;
-    this.#updateValue(num, false);
+    this.#initialValue = num;
+    if (this.#input) {
+      this.#updateValue(num, false);
+    }
   }
 
   get min(): number {

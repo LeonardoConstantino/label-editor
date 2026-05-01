@@ -1,4 +1,6 @@
-# Task 46: Refatoração Profunda ElementInspector
+# Task 46: Refatoração Profunda 
+
+## Resumo da tarefa
 
 ## Objetivo
 Decompor o `ElementInspector` em uma arquitetura de sub-componentes especialistas (Nível 1-2-3), resolvendo a violação do SRP, eliminando o acoplamento excessivo no `innerHTML` e adotando Data Binding via propriedades JS (Opção B).
@@ -32,7 +34,9 @@ Decompor o `ElementInspector` em uma arquitetura de sub-componentes especialista
 - **Isolamento:** Sub-componentes **não** chamam `eventBus` nem `store` diretamente.
 
 ## Critérios de Aceite
-- [ ] O arquivo `ElementInspector.ts` principal tem menos de 200 linhas.
-- [ ] Cada sub-componente é testável e utilizável de forma isolada.
-- [ ] Zero regressão nos comportamentos: guard de re-seleção, filtro de ruído nativo e hash estrutural sem 'name'.
-- [ ] Zero uso de `as any` em todo o sub-módulo de inspeção.
+- [x] O arquivo `ElementInspector.ts` principal tem menos de 200 linhas.
+- [x] Cada sub-componente é testável e utilizável de forma isolada.
+- [x] Zero regressão nos comportamentos: guard de re-seleção, filtro de ruído nativo e hash estrutural sem 'name'.
+- [x] Zero uso de `as any` em todo o sub-módulo de inspeção.
+
+## Mais detalhes no [plano](./46_inspector_refactor/MASTER_PLAN.md)

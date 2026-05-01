@@ -1,3 +1,4 @@
+import { getDebug } from '../constants/defaults';
 import { logger } from './Logger';
 
 /**
@@ -12,6 +13,20 @@ interface EventBusOptions {
   maxListeners?: number;
   debug?: boolean;
   logger?: typeof logger;
+}
+
+/**
+ * Opções para registro de eventos
+ */
+interface EventOptions {
+  signal?: AbortSignal;
+}
+
+/**
+ * Opções para emissão assíncrona
+ */
+interface EmitAsyncOptions {
+  signal?: AbortSignal;
 }
 
 /**
@@ -71,7 +86,11 @@ class EventBus {
   /**
    * Registra um listener para um evento
    */
-  on<T = unknown>(event: string, callback: EventCallback<T>): UnsubscribeFn {
+  on<T = unknown>(
+    event: string, 
+    callback: EventCallback<T>, 
+    options?: EventOptions
+  ): UnsubscribeFn {
     this._validateCallback(callback);
 
     if (!this.events.has(event)) {
@@ -83,10 +102,8 @@ class EventBus {
     // Aviso de possível memory leak
     if (listeners.size >= this.maxListeners) {
       if (this.debug) {
-        this.logger.warn(
-          'EventBus',
-          'Possible memory leak detected: ',
-          `${listeners.size} listeners for "${event}"`,
+        console.warn(
+          `[EventBus] Possible memory leak detected: ${listeners.size} listeners for "${event}"`
         );
       }
     }
@@ -94,14 +111,31 @@ class EventBus {
     listeners.add(callback as EventCallback);
     this._log('Registered', event, { listenerCount: listeners.size });
 
-    // Retorna função para cleanup
-    return () => this.off(event, callback);
+    // Cleanup automático com AbortSignal
+    const unsubscribe = () => this.off(event, callback);
+
+    if (options?.signal) {
+      // Se o signal já foi abortado, remove imediatamente
+      if (options.signal.aborted) {
+        unsubscribe();
+        return () => {}; // Retorna função vazia (já foi removido)
+      }
+
+      // Registra listener para remoção automática
+      options.signal.addEventListener('abort', unsubscribe, { once: true });
+    }
+
+    return unsubscribe;
   }
 
   /**
    * Registra um listener que executa apenas uma vez
    */
-  once<T = unknown>(event: string, callback: EventCallback<T>): UnsubscribeFn {
+  once<T = unknown>(
+    event: string, 
+    callback: EventCallback<T>, 
+    options?: EventOptions
+  ): UnsubscribeFn {
     this._validateCallback(callback);
 
     const onceWrapper: EventCallback<T> = (data) => {
@@ -109,7 +143,7 @@ class EventBus {
       this.off(event, onceWrapper);
     };
 
-    return this.on(event, onceWrapper);
+    return this.on(event, onceWrapper, options);
   }
 
   /**
@@ -158,21 +192,36 @@ class EventBus {
   /**
    * Emite um evento de forma assíncrona
    */
-  async emitAsync<T = unknown>(event: string, data: T): Promise<void> {
+  async emitAsync<T = unknown>(
+    event: string, 
+    data: T, 
+    options?: EmitAsyncOptions
+  ): Promise<void> {
     if (!this.events.has(event)) return;
+
+    // Verifica se já foi abortado antes de começar
+    if (options?.signal?.aborted) {
+      this._log('EmitAsync aborted (before start)', event, data);
+      return;
+    }
 
     this._log('EmitAsync', event, data);
     const listeners = this.events.get(event)!;
 
-    // Executa callbacks em paralelo
+    // Executa callbacks em paralelo com suporte a cancelamento
     const promises = Array.from(listeners).map(async (callback) => {
       try {
+        // Verifica cancelamento antes de cada callback
+        if (options?.signal?.aborted) {
+          this._log('EmitAsync callback skipped (aborted)', event);
+          return;
+        }
+
         await callback(data);
       } catch (error) {
-        this.logger.error(
-          'EventBus',
-          `Error in async listener for "${event}":`,
-          error,
+        console.error(
+          `[EventBus] Error in async listener for "${event}":`,
+          error
         );
       }
     });
@@ -213,4 +262,4 @@ export const createEventBus = (options?: EventBusOptions): EventBus =>
   new EventBus(options);
 
 // Exporta instância global padrão
-export default new EventBus({ debug: true, logger });
+export default new EventBus({ debug: getDebug(), logger });

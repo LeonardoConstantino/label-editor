@@ -29,6 +29,7 @@ import helpData from './assets/data/helpData';
 eventBus.on('notify', (options: any) => {
   ToastManager.show(options);
 });
+
 // Help Center Listener
 eventBus.on('ui:open:help', (options: any = {}) => {
   localStorage.setItem('has_seen_guide', 'true');
