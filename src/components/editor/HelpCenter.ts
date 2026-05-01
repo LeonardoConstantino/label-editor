@@ -176,56 +176,80 @@ export class HelpCenter extends HTMLElement {
   private renderAbout(): string {
     const about = helpData.aboutSection;
     return `
-      <div class="max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
-        <!-- BRANDING -->
-        <div class="flex flex-col items-center text-center mb-12">
-          <div class="w-20 h-20 bg-accent-primary/10 border border-accent-primary/30 rounded-2xl flex items-center justify-center mb-6 shadow-neon-primary relative group overflow-hidden">
-            <div class="absolute inset-0 bg-accent-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-            <ui-icon name="package" size="xl" class="text-accent-primary relative z-10"></ui-icon>
+      <div class="max-w-2xl mx-auto py-4">
+        
+        <!-- BRANDING (System Info Vibe) -->
+        <div class="flex flex-col items-center text-center mb-10 relative">
+          <!-- Glow de fundo -->
+          <div class="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-32 bg-accent-primary/10 blur-[60px] pointer-events-none rounded-full"></div>
+          
+          <div class="w-20 h-20 bg-[#050608] border border-accent-primary/40 rounded-3xl flex items-center justify-center mb-6 shadow-[inset_0_2px_10px_rgba(0,0,0,0.8),0_0_15px_rgba(99,102,241,0.2)] relative group overflow-hidden">
+            <!-- Brilho que passa por cima no hover (Wipe effect) -->
+            <div class="absolute inset-0 bg-linear-to-tr from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_ease-in-out] pointer-events-none"></div>
+            <ui-icon name="layers" size="xl" class="text-accent-primary relative z-10 drop-shadow-[0_0_8px_rgba(99,102,241,0.8)]"></ui-icon>
           </div>
-          <h2 class="text-3xl font-bold text-text-main tracking-tighter mb-2">Label Editor <span class="text-accent-primary">v4.0</span></h2>
-          <p class="font-mono text-[10px] text-text-muted uppercase tracking-[0.4em] mb-6 opacity-60">Tactile Design Engine</p>
-          <p class="text-sm text-text-muted leading-relaxed max-w-md">
+          
+          <h2 class="text-3xl font-bold tracking-tight mb-1 text-transparent bg-clip-text bg-linear-to-b from-white to-white/60">
+            Label Forge OS <span class="text-accent-primary font-mono text-xl ml-1">v4.0</span>
+          </h2>
+          <p class="font-mono text-[10px] text-accent-primary uppercase tracking-[0.4em] mb-6 drop-shadow-[0_0_5px_rgba(99,102,241,0.4)]">Tactile Design Engine</p>
+          
+          <p class="text-sm text-text-muted leading-relaxed max-w-md mb-6">
             ${about.mission}
           </p>
+
+          <!-- System Specs (Mockup Técnico para imersão) -->
+          <div class="flex items-center gap-4 px-6 py-3 bg-black/40 border border-white/5 rounded-xl shadow-inner font-mono text-[9px] uppercase tracking-wider text-text-muted">
+            <div class="flex items-center gap-1.5"><ui-icon name="cpu" class="w-3 h-3 text-accent-primary"></ui-icon> Web Components</div>
+            <div class="w-1 h-1 rounded-full bg-border-ui"></div>
+            <div class="flex items-center gap-1.5"><ui-icon name="database" class="w-3 h-3 text-accent-primary"></ui-icon> IndexedDB</div>
+            <div class="w-1 h-1 rounded-full bg-border-ui"></div>
+            <div class="flex items-center gap-1.5 text-accent-success"><ui-icon name="wifi-off" class="w-3 h-3"></ui-icon> Offline Ready</div>
+          </div>
         </div>
 
-        <!-- SOCIALS -->
-        <div class="grid grid-cols-2 gap-4 mb-12">
+        <!-- SOCIALS (Data Links) -->
+        <div class="grid grid-cols-2 gap-4 mb-10">
           ${about.socials.map(social => `
-            <a href="${social.url}" target="_blank" rel="noopener" class="flex items-center gap-4 p-4 bg-surface-solid/50 border border-border-ui rounded-xl hover:border-accent-primary/40 hover:bg-accent-primary/5 transition-all group">
-              <div class="p-2 bg-black/40 rounded-lg border border-white/5 group-hover:border-accent-primary/20">
+            <a href="${social.url}" target="_blank" rel="noopener" class="flex items-center gap-4 p-4 bg-surface-solid/50 border border-border-ui rounded-xl hover:border-accent-primary/40 hover:bg-accent-primary/5 hover:-translate-y-0.5 hover:shadow-[0_5px_15px_rgba(0,0,0,0.3)] transition-all duration-300 group">
+              <div class="p-2 bg-[#0a0c10] rounded-lg border border-white/5 group-hover:border-accent-primary/30 group-hover:scale-110 transition-all duration-300 shadow-inner">
                 <ui-icon name="${social.icon}" size="sm" class="text-text-muted group-hover:text-accent-primary transition-colors"></ui-icon>
               </div>
               <div class="flex flex-col">
-                <span class="text-[10px] font-mono text-text-muted uppercase tracking-wider group-hover:text-accent-primary transition-colors">${social.name}</span>
-                <span class="text-[9px] text-text-muted opacity-40">Visit Profile</span>
+                <span class="text-[11px] font-mono font-bold text-text-main uppercase tracking-wider group-hover:text-accent-primary transition-colors">${social.name}</span>
+                <span class="text-[9px] text-text-muted opacity-60">Establish Connection</span>
               </div>
-              <ui-icon name="external-link" size="xs" class="ml-auto opacity-0 group-hover:opacity-40 transition-opacity"></ui-icon>
+              <ui-icon name="external-link" size="xs" class="ml-auto opacity-0 -translate-x-2 group-hover:opacity-60 group-hover:translate-x-0 transition-all duration-300"></ui-icon>
             </a>
           `).join('')}
         </div>
 
         <!-- COMPLIANCE ACCORDION -->
-        <div class="space-y-3">
+        <div class="flex flex-col gap-3">
           <details class="prism-details group">
             <summary>
-              ${about.privacy.title}
-              <ui-icon name="chevron-down" size="xs" class="group-open:rotate-180 transition-transform"></ui-icon>
+              <div class="flex items-center gap-3">
+                <ui-icon name="shield" class="w-4 h-4 text-text-muted group-hover:text-text-main transition-colors"></ui-icon>
+                ${about.privacy.title}
+              </div>
+              <ui-icon name="chevron-down" size="xs" class="text-text-muted group-open:rotate-180 transition-transform"></ui-icon>
             </summary>
             <div class="details-content">
               ${about.privacy.content}
-              <div class="mt-4 p-3 bg-accent-success/5 border border-accent-success/20 rounded-lg flex gap-3 items-start">
-                <ui-icon name="check-circle" size="xs" class="text-accent-success mt-0.5"></ui-icon>
-                <p class="text-[11px] text-accent-success/90 italic">Verified: 100% Local Processing.</p>
+              <div class="mt-4 p-3 bg-accent-success/10 border border-accent-success/30 rounded-lg flex gap-3 items-start shadow-[inset_0_0_15px_rgba(16,185,129,0.05)]">
+                <ui-icon name="check-circle" size="xs" class="text-accent-success mt-0.5 shrink-0"></ui-icon>
+                <p class="text-[11px] text-accent-success/90 uppercase tracking-wide font-mono mt-0.5">Verified: 100% Local Processing. No cloud telemetry detected.</p>
               </div>
             </div>
           </details>
 
           <details class="prism-details group">
             <summary>
-              ${about.terms.title}
-              <ui-icon name="chevron-down" size="xs" class="group-open:rotate-180 transition-transform"></ui-icon>
+              <div class="flex items-center gap-3">
+                <ui-icon name="text" class="w-4 h-4 text-text-muted group-hover:text-text-main transition-colors"></ui-icon>
+                ${about.terms.title}
+              </div>
+              <ui-icon name="chevron-down" size="xs" class="text-text-muted group-open:rotate-180 transition-transform"></ui-icon>
             </summary>
             <div class="details-content">
               ${about.terms.content}
@@ -233,11 +257,17 @@ export class HelpCenter extends HTMLElement {
           </details>
         </div>
 
-        <div class="mt-12 pt-8 border-t border-white/5 text-center">
-          <p class="text-[9px] font-mono text-text-muted opacity-40 uppercase tracking-widest">
-            Handcrafted with precision &bull; 2026 Label Forge OS
+        <!-- FOOTER -->
+        <div class="mt-12 pt-8 border-t border-white/5 text-center flex flex-col items-center justify-center">
+          <ui-icon name="code" class="w-4 h-4 text-border-ui mb-3"></ui-icon>
+          <p class="text-[9px] font-mono text-text-muted opacity-40 uppercase tracking-[0.2em]">
+            Engineered with precision <br> &copy; ${new Date().getFullYear()} Label Forge OS
+          </p>
+          <p class="text-[9px] font-mono text-text-muted opacity-40 uppercase tracking-[0.2em]">
+            Powered by leo
           </p>
         </div>
+        
       </div>
     `;
   }
