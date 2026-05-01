@@ -21,7 +21,7 @@ Implementar um mecanismo para vincular a largura e a altura de um elemento, mant
    - Integrar `UISM.play('toggle')` ao ativar/desativar o vínculo.
 
 ## Critérios de Aceite
-- [ ] O ícone de vínculo aparece de forma sutil entre os inputs W e H.
-- [ ] Alterar a largura com o vínculo ativo atualiza a altura proporcionalmente (e vice-versa).
-- [ ] O estado de vínculo é mantido individualmente por elemento.
-- [ ] A precisão decimal (mm) é mantida sem erros de arredondamento cumulativos.
+- [x] O ícone de vínculo aparece de forma sutil entre os inputs W e H.
+- [x] Alterar a largura com o vínculo ativo atualiza a altura proporcionalmente (e vice-versa).
+- [x] O estado de vínculo é mantido individualmente por elemento.
+- [x] A precisão decimal (mm) é mantida sem erros de arredondamento cumulativos.

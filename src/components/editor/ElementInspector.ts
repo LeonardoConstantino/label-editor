@@ -1,6 +1,6 @@
 import eventBus from '../../core/EventBus';
 import { store, AppState } from '../../core/Store';
-import { Label } from '../../domain/models/Label';
+import { Label, AnyElement } from '../../domain/models/Label';
 import { OverflowResult } from '../../domain/services/OverflowValidator';
 import { UISM } from '../../core/UISoundManager';
 import { debounce } from '../../utils/utils';
@@ -242,13 +242,13 @@ export class ElementInspector extends HTMLElement {
     }
   }
 
-  private emitElementUpdate(id: string, prop: string, value: string | number | boolean | null): void {
-    const updates: Record<string, any> = {};
+  private emitElementUpdate(id: string, prop: string, value: unknown): void {
+    const updates: Partial<AnyElement> = {};
     if (prop.includes('.')) {
       const [parent, child] = prop.split('.');
-      updates[parent] = { [child]: value };
+      (updates as any)[parent] = { ...((updates as any)[parent] || {}), [child]: value };
     } else {
-      updates[prop] = value;
+      (updates as any)[prop] = value;
     }
     eventBus.emit('element:update', { id, updates });
   }

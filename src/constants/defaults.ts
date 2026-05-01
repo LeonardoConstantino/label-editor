@@ -26,10 +26,6 @@ export const DEFAULTS = {
     backgroundColor: '#ffffff'
   },
 
-  /**
-   * LIMITS: Restrições técnicas para garantir estabilidade e performance.
-   * Evita estouro de memória RAM ao renderizar em 300 DPI.
-   */
   LIMITS: {
     MAX_WIDTH_MM: 500,
     MAX_HEIGHT_MM: 500,
@@ -47,7 +43,8 @@ export const DEFAULTS = {
     rotation: 0,
     opacity: 1,
     locked: false,
-    visible: true
+    visible: true,
+    keepRatio: false
   },
 
   [ElementType.TEXT]: {
@@ -77,7 +74,8 @@ export const DEFAULTS = {
     src: '',
     fit: ImageFit.CONTAIN,
     smoothing: true,
-    compositeOperation: 'source-over'
+    compositeOperation: 'source-over',
+    keepRatio: true // Imagens mantêm proporção por padrão
   },
 
   [ElementType.BORDER]: {

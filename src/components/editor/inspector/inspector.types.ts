@@ -10,8 +10,8 @@ export interface InspectorChangeDetail {
    * Se começar com 'pref.', refere-se às preferências do usuário.
    */
   prop: string;
-  /** Novo valor (string, number, boolean, etc) */
-  value: string | number | boolean | null;
+  /** Novo valor (string, number, boolean, object, etc) */
+  value: unknown;
 }
 
 /**
@@ -32,12 +32,8 @@ export interface InspectorActionDetail {
 }
 
 /**
- * Interfaces para os sub-componentes
+ * Interfaces para os sub-componentes especialistas.
  */
 export interface InspectorSection extends HTMLElement {
-  element: AnyElement;
-}
-
-export interface InspectorSectionProps {
   element: AnyElement;
 }

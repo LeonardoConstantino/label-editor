@@ -2,7 +2,7 @@ import { AnyElement, ElementType } from '../../../domain/models/Label';
 import { sharedSheet } from '../../../utils/shared-styles';
 import { dispatchInspectorAction, dispatchInspectorChange } from './inspector-events';
 import { escapeHTML } from '../../../utils/sanitize';
-import { InspectorSection } from './inspector.types';
+import { InspectorSection, InspectorActionType } from './inspector.types';
 
 // Garantir registros
 import '../../common/icon';
@@ -149,7 +149,7 @@ export class InspectorLayerCard extends HTMLElement {
       const container = root.getElementById('sections-container')!;
       
       container.addEventListener('app-input', (e: Event) => {
-        if (this._element?.locked) return; // Proteção extra
+        if (this._element?.locked) return;
         const target = e.target as HTMLElement;
         const prop = target.getAttribute('data-prop');
         if (prop === 'name') {
@@ -162,10 +162,10 @@ export class InspectorLayerCard extends HTMLElement {
       });
 
       container.addEventListener('click', (e) => {
-        if (this._element?.locked) return; // Proteção extra
+        if (this._element?.locked) return;
         const btn = (e.target as HTMLElement).closest('[data-card-action]');
         if (btn) {
-          const action = btn.getAttribute('data-card-action') as any;
+          const action = btn.getAttribute('data-card-action') as InspectorActionType;
           dispatchInspectorAction(this, { action, id });
         }
       });
@@ -187,26 +187,24 @@ export class InspectorLayerCard extends HTMLElement {
     `;
     container.appendChild(idSection);
 
-    const transform = document.createElement('inspector-section-transform') as InspectorSection;
-    transform.element = el;
-    container.appendChild(transform);
+    // Helper para criar seções com a marcação necessária para o sync
+    const createSection = (tagName: string): InspectorSection => {
+      const sec = document.createElement(tagName) as InspectorSection;
+      sec.setAttribute('data-inspector-section', ''); // Marcação para o querySelector
+      sec.element = el;
+      return sec;
+    };
+
+    container.appendChild(createSection('inspector-section-transform'));
 
     if (el.type === ElementType.TEXT) {
-      const section = document.createElement('inspector-section-text') as InspectorSection;
-      section.element = el;
-      container.appendChild(section);
+      container.appendChild(createSection('inspector-section-text'));
     } else if (el.type === ElementType.RECTANGLE) {
-      const section = document.createElement('inspector-section-rect') as InspectorSection;
-      section.element = el;
-      container.appendChild(section);
+      container.appendChild(createSection('inspector-section-rect'));
     } else if (el.type === ElementType.IMAGE) {
-      const section = document.createElement('inspector-section-image') as InspectorSection;
-      section.element = el;
-      container.appendChild(section);
+      container.appendChild(createSection('inspector-section-image'));
     } else if (el.type === ElementType.BORDER) {
-      const section = document.createElement('inspector-section-border') as InspectorSection;
-      section.element = el;
-      container.appendChild(section);
+      container.appendChild(createSection('inspector-section-border'));
     }
 
     const footer = document.createElement('div');
@@ -274,7 +272,8 @@ export class InspectorLayerCard extends HTMLElement {
       nameInput.setAttribute('value', el.name || '');
     }
 
-    shadow.querySelectorAll<InspectorSection>('[element]').forEach(section => {
+    // Agora o seletor encontra as seções corretamente
+    shadow.querySelectorAll<InspectorSection>('[data-inspector-section]').forEach(section => {
       section.element = el;
     });
   }

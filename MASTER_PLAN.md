@@ -35,7 +35,7 @@ Este Master Plan coordena a fase final de desenvolvimento, focando em estabilida
 | **36** | [Retomada Automática & Tela Inicial](./tasks/36_work_resumption.md) | 08 | [/] | 35 | `task/36-boot-welcome` |
 | **33** | [Importação/Exportação de JSON (.label)](./tasks/33_json_import_export.md) | 07 | [x] | 07 | `task/33-json-io` |
 | **46** | [Refatoração Profunda ElementInspector](./tasks/46_inspector_refactor.md) | 07 | [x] | 29 | `task/46-inspector-refactor` |
-| **41** | [Modelos Unificados (Sync Inventory)](./tasks/41_unified_models.md) | 07 | [ ] | 02 | `task/41-models-sync` |
+| **41** | [Modelos Unificados (Sync Inventory)](./tasks/41_unified_models.md) | 07 | [x] | 02 | `task/41-models-sync` |
 | **64** | [Controle Global de Áudio](./tasks/64_ui_sound_toggle.md) | 05 | [x] | — | `task/64-ui-sound-toggle` |
 | **65** | [Aba About & Compliance](./tasks/65_help_about_legal.md) | 04 | [x] | — | `task/65-help-about-legal` |
 | **68** | [Contador de Elementos no Vault](./tasks/68_vault_element_count.md) | 04 | [x] | — | `task/68-vault-element-count` |
@@ -44,7 +44,7 @@ Este Master Plan coordena a fase final de desenvolvimento, focando em estabilida
 ### Fase C: Produtividade & Ferramentas de Design (O diferencial)
 | ID | Task | Pri | Status | Deps | Branch |
 |----|------|--------|------|--------|--------|
-| **55** | [Bloqueio de Proporção (Aspect Ratio Link)](./tasks/55_aspect_ratio_lock.md) | 06 | [ ] | 41 | `task/55-ratio-lock` |
+| **55** | [Bloqueio de Proporção (Aspect Ratio Link)](./tasks/55_aspect_ratio_lock.md) | 06 | [x] | 41 | `task/55-ratio-lock` |
 | **67** | [Impressão Dinâmica (Orientation/Format)](./tasks/67_dynamic_printing_layout.md) | 06 | [ ] | 10 | `task/67-dynamic-pdf` |
 | **69** | [Componente UI Select & Presets](./tasks/69_ui_select_presets.md) | 06 | [ ] | — | `task/69-ui-select-presets` |
 | **62** | [Ferramentas de Alinhamento e Distribuição](./tasks/62_power_layout.md) | 06 | [ ] | 41 | `task/62-power-layout` |

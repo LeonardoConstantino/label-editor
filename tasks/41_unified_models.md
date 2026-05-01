@@ -13,5 +13,5 @@ Atualizar as interfaces TypeScript do domínio para refletir o `definition_eleme
 - **Store Sync:** Garantir que o `Store` consiga processar atualizações para essas novas propriedades universais.
 
 ## Critérios de Aceite
-- [ ] Interfaces TypeScript sem erros de compilação.
-- [ ] Todo elemento novo criado já possui os novos campos por padrão (mesmo que nulos/vazios).
+- [x] Interfaces TypeScript sem erros de compilação.
+- [x] Todo elemento novo criado já possui os novos campos por padrão (mesmo que nulos/vazios).

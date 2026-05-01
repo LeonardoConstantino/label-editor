@@ -100,9 +100,13 @@ The project follows a modular, event-driven architecture:
 - **Task 49 (KBD Unification):** Centralização da lógica de renderização de atalhos no `UIKeyboardShortcuts` (SSoT). Refatoração de `Toolbar`, `HelpCenter` e `UiHudTips` para utilizar o motor unificado.
 - **Design System:** Implementado estilo "3D Prism" para elementos `<kbd>` globalmente, adicionando profundidade visual e feedback tátil via CSS.
 - **Integridade:** Sincronização de interfaces de atalhos e correção de tipos TS para garantir build estável.
-
 ### 2026-05-01: Consolidação de Modelos & Proteção de Camadas
+- **Task 55 (Aspect Ratio Lock):** Implementado vínculo de proporção entre Largura e Altura.
+  - **Interface:** Adicionado botão de `link` tátil com linhas conectoras dinâmicas no painel de Transformação.
+  - **Lógica Proporcional:** Cálculo em tempo real do fator de escala ao alterar uma dimensão, mantendo a integridade visual do elemento.
+  - **Arquitetura:** Atualizado `InspectorLayerCard` para suportar sincronização instantânea de seções via atributos DOM.
 - **Task 41 (Unified Models):** Sincronização completa do domínio com o Inventário v1.1.
+...
   - **Atributos Universais:** Integrados `rotation`, `opacity`, `locked` e `name` em todos os elementos via `BaseElement`.
   - **Motor Gráfico:** `CanvasRenderer` centraliza transformações espaciais (rotação/opacidade), mantendo os renderers específicos simplificados.
   - **Matemática de Seleção:** Implementado cálculo de ponto rotacionado no `hitTest` para seleção precisa de camadas inclinadas.

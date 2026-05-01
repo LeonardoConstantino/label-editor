@@ -38,7 +38,7 @@ export interface Dimensions {
 
 /**
  * BaseElement: Propriedades universais de todo elemento.
- * Sincronizado com definition_elements.md (v1.1)
+ * Sincronizado com definition_elements.md (v1.1) + Task 55
  */
 export interface BaseElement {
   id: string;
@@ -50,4 +50,5 @@ export interface BaseElement {
   opacity: number;  // 0-1
   locked: boolean;
   visible: boolean;
+  keepRatio: boolean; // Task 55: Vínculo de proporção
 }
