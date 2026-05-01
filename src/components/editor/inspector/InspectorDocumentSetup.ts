@@ -3,10 +3,12 @@ import { UserPreferences } from '../../../domain/models/UserPreferences';
 import { sharedSheet } from '../../../utils/shared-styles';
 import { dispatchInspectorChange, dispatchInspectorAction, resolveInspectorValue } from './inspector-events';
 import { escapeHTML } from '../../../utils/sanitize';
+import { LABEL_PRESETS } from '../../../constants/defaults';
 
 // Garantir registros
 import '../../common/AppInput';
 import '../../common/UINumberScrubber';
+import '../../common/AppSelect';
 
 interface InputWithMetadata extends HTMLElement {
   value: string | number;
@@ -120,6 +122,11 @@ export class InspectorDocumentSetup extends HTMLElement {
       </div>
       
       <span class="label-prism">Canvas Setup</span>
+      
+      <div class="row-ui">
+        <app-select id="select-preset" label="Dimensions Preset"></app-select>
+      </div>
+
       <div class="row-ui">
         <ui-number-scrubber label="W" data-prop="doc.widthMM" value="${widthMM}" unit="mm" step="1"></ui-number-scrubber>
         <ui-number-scrubber label="H" data-prop="doc.heightMM" value="${heightMM}" unit="mm" step="1"></ui-number-scrubber>
@@ -156,6 +163,12 @@ export class InspectorDocumentSetup extends HTMLElement {
         </div>
       </div>
     `;
+
+    // Injeta as opções no select
+    const select = this.shadowRoot.getElementById('select-preset') as any;
+    if (select) {
+      select.options = LABEL_PRESETS;
+    }
   }
 
   private setupListeners(): void {
@@ -164,6 +177,13 @@ export class InspectorDocumentSetup extends HTMLElement {
     const changeHandler = (e: Event) => {
       const target = e.target as HTMLElement;
       const prop = target.getAttribute('data-prop');
+      
+      // Se mudar W ou H manualmente, reseta o select para custom
+      if (prop === 'doc.widthMM' || prop === 'doc.heightMM') {
+         const select = root.getElementById('select-preset') as any;
+         if (select) select.value = 'custom';
+      }
+
       if (!prop) return;
 
       const value = resolveInspectorValue(e);
@@ -177,6 +197,18 @@ export class InspectorDocumentSetup extends HTMLElement {
     root.addEventListener('input', changeHandler);
     root.addEventListener('change', changeHandler);
 
+    // Listener para o Preset Select
+    root.getElementById('select-preset')?.addEventListener('app-select', (e: any) => {
+      const presetId = e.detail;
+      const preset = LABEL_PRESETS.find(p => p.value === presetId);
+      
+      if (preset && preset.value !== 'custom') {
+        // Dispara as mudanças de W e H simultaneamente
+        dispatchInspectorChange(this, { prop: 'doc.widthMM', value: preset.w });
+        dispatchInspectorChange(this, { prop: 'doc.heightMM', value: preset.h });
+      }
+    });
+
     root.getElementById('btn-open-vault')?.addEventListener('click', () => {
       dispatchInspectorAction(this, { action: 'open-vault' });
     });
@@ -189,6 +221,14 @@ export class InspectorDocumentSetup extends HTMLElement {
     const config = this._labelConfig;
     const prefs = this._preferences;
 
+    // Sincroniza o Select Preset
+    const select = shadow.getElementById('select-preset') as any;
+    if (select) {
+      const currentPreset = LABEL_PRESETS.find(p => p.w === config.widthMM && p.h === config.heightMM);
+      const val = currentPreset ? currentPreset.value : 'custom';
+      if (select.value !== val) select.value = val;
+    }
+
     const inputs = shadow.querySelectorAll<InputWithMetadata>('[data-prop]');
     inputs.forEach(input => {
       const prop = input.getAttribute('data-prop');
@@ -197,7 +237,6 @@ export class InspectorDocumentSetup extends HTMLElement {
       const isCheckbox = input instanceof HTMLInputElement && input.type === 'checkbox';
       const isFocused = shadow.activeElement === input || input.shadowRoot?.activeElement;
       
-      // Para checkboxes, ignoramos o foco para garantir que a UI reflita a Store imediatamente
       if (isFocused && !isCheckbox) return;
 
       if (prop === 'doc.widthMM') {

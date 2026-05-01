@@ -18,7 +18,7 @@ Criar um componente de seleção (`ui-select`) modular e utilizá-lo para implem
    - Detecção Automática: Se o usuário editar as dimensões manualmente, o select deve mudar para "Custom".
 
 ## Critérios de Aceite
-- [ ] O componente `ui-select` funciona corretamente e é acessível via teclado.
-- [ ] O layout do Inspector permanece coeso com a adição do novo campo.
-- [ ] Escolher um preset atualiza o Canvas e o PDFGenerator instantaneamente.
-- [ ] O componente é extensível para futuros usos (ex: seleção de fontes ou unidades).
+- [x] O componente `ui-select` funciona corretamente e é acessível via teclado.
+- [x] O layout do Inspector permanece coeso com a adição do novo campo.
+- [x] Escolher um preset atualiza o Canvas e o PDFGenerator instantaneamente.
+- [x] O componente é extensível para futuros usos (mapeado e pronto para expansão).

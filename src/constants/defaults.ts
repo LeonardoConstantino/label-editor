@@ -14,6 +14,19 @@ export const setDebug = (value: boolean) => {
 export const getDebug = () => debug.state;
 
 /**
+ * LABEL_PRESETS: Dimensões comuns de etiquetas do mercado.
+ */
+export const LABEL_PRESETS = [
+  { value: 'custom', label: 'Custom Size', sublabel: 'Manual Dimensions' },
+  { value: 'small', label: 'Small Address', sublabel: '30 x 20 mm', w: 30, h: 20 },
+  { value: 'medium', label: 'Standard Product', sublabel: '50 x 30 mm', w: 50, h: 30 },
+  { value: 'large', label: 'Large Asset', sublabel: '100 x 50 mm', w: 100, h: 50 },
+  { value: 'shipping', label: 'Shipping Label', sublabel: '100 x 150 mm', w: 100, h: 150 },
+  { value: 'a4', label: 'A4 Full Sheet', sublabel: '210 x 297 mm', w: 210, h: 297 },
+  { value: 'business-card', label: 'Business Card', sublabel: '85 x 55 mm', w: 85, h: 55 }
+];
+
+/**
  * DEFAULTS: Valores padrão para criação de novos elementos e configuração do canvas.
  * Sincronizado com definition_elements.md (v1.1)
  */
@@ -75,7 +88,7 @@ export const DEFAULTS = {
     fit: ImageFit.CONTAIN,
     smoothing: true,
     compositeOperation: 'source-over',
-    keepRatio: true // Imagens mantêm proporção por padrão
+    keepRatio: true
   },
 
   [ElementType.BORDER]: {
