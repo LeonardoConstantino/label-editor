@@ -41,6 +41,7 @@ export class InspectorLayerCard extends HTMLElement {
 
   set element(el: AnyElement) {
     const prevId = this._element?.id;
+    const prevLocked = this._element?.locked;
     this._element = el;
     
     if (prevId !== el.id) {
@@ -48,6 +49,9 @@ export class InspectorLayerCard extends HTMLElement {
     } else {
       this.updateHeader();
       this.syncSections();
+      if (prevLocked !== el.locked) {
+        this.updateLockState();
+      }
     }
   }
 
@@ -77,25 +81,33 @@ export class InspectorLayerCard extends HTMLElement {
     const el = this._element;
     const id = escapeHTML(el.id);
     const isSelected = this._selected;
+    const isLocked = el.locked === true;
 
     this.shadowRoot.innerHTML = `
       <style>
         :host { display: block; margin-bottom: 8px; }
         .card-content { display: ${isSelected ? 'flex' : 'none'}; flex-direction: column; gap: 12px; padding: 12px 8px; }
+        .is-locked #sections-container { pointer-events: none; opacity: 0.6; filter: grayscale(0.5); }
+        .action-btn { background: transparent; border: none; cursor: pointer; padding: 4px; border-radius: 4px; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
+        .action-btn:hover { background: rgba(255, 255, 255, 0.1); }
+        .action-btn.active ui-icon { color: var(--color-accent-primary); opacity: 1 !important; }
+        .action-btn.warning ui-icon { color: var(--color-accent-warning); opacity: 1 !important; }
       </style>
 
-      <div class="element-card ${isSelected ? 'selected' : ''}" data-id="${id}">
+      <div class="element-card ${isSelected ? 'selected' : ''} ${isLocked ? 'is-locked' : ''}" data-id="${id}">
         <div class="card-header" id="header-select" style="cursor: pointer;">
           <span class="type-tag">${escapeHTML(el.type)}</span>
           <span class="layer-name" id="label-name">${escapeHTML(el.name || el.type)}</span>
           <span class="warning-tag" id="warning-tag" style="display: ${this._hasOverflow ? 'inline' : 'none'}; color: var(--color-accent-warning)">⚠</span>
           
-          <button id="btn-toggle-vis" class="p-1 hover:bg-white/10 rounded transition-colors" style="margin-left: auto; background: transparent; border: none; cursor: pointer;">
-            <ui-icon name="${el.visible !== false ? 'eye-off' : 'eye'}" 
-              class="action-icon ${el.visible !== false ? 'active' : ''}" 
-              style="--icon-size: 14px; opacity: ${el.visible !== false ? '1' : '0.3'};">
-            </ui-icon>
-          </button>
+          <div class="flex items-center gap-1" style="margin-left: auto;">
+            <button id="btn-toggle-lock" class="action-btn ${isLocked ? 'warning active' : ''}" title="${isLocked ? 'Unlock Layer' : 'Lock Layer'}">
+              <ui-icon name="${isLocked ? 'lock' : 'unlock'}" style="--icon-size: 14px; opacity: ${isLocked ? '1' : '0.4'};"></ui-icon>
+            </button>
+            <button id="btn-toggle-vis" class="action-btn ${el.visible !== false ? 'active' : ''}" title="Toggle Visibility">
+              <ui-icon name="${el.visible !== false ? 'eye-off' : 'eye'}" style="--icon-size: 14px; opacity: ${el.visible !== false ? '1' : '0.4'};"></ui-icon>
+            </button>
+          </div>
         </div>
 
         <div class="card-content" id="sections-container">
@@ -117,7 +129,7 @@ export class InspectorLayerCard extends HTMLElement {
 
     // Seleção de Card
     root.getElementById('header-select')?.addEventListener('click', (e) => {
-      if ((e.target as HTMLElement).closest('#btn-toggle-vis')) return;
+      if ((e.target as HTMLElement).closest('.action-btn')) return;
       dispatchInspectorAction(this, { action: 'select', id });
     });
 
@@ -127,11 +139,17 @@ export class InspectorLayerCard extends HTMLElement {
       dispatchInspectorAction(this, { action: 'toggle-vis', id });
     });
 
+    // Toggle Lock
+    root.getElementById('btn-toggle-lock')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      dispatchInspectorAction(this, { action: 'toggle-lock', id });
+    });
+
     if (this._selected) {
       const container = root.getElementById('sections-container')!;
       
-      // Captura mudanças no campo Identification (name)
       container.addEventListener('app-input', (e: Event) => {
+        if (this._element?.locked) return; // Proteção extra
         const target = e.target as HTMLElement;
         const prop = target.getAttribute('data-prop');
         if (prop === 'name') {
@@ -143,8 +161,8 @@ export class InspectorLayerCard extends HTMLElement {
         }
       });
 
-      // Delegar ações de rodapé (UP/DEL)
       container.addEventListener('click', (e) => {
+        if (this._element?.locked) return; // Proteção extra
         const btn = (e.target as HTMLElement).closest('[data-card-action]');
         if (btn) {
           const action = btn.getAttribute('data-card-action') as any;
@@ -211,14 +229,32 @@ export class InspectorLayerCard extends HTMLElement {
     const labelName = this.shadowRoot.getElementById('label-name');
     if (labelName) labelName.textContent = el.name || el.type;
 
-    const visIcon = this.shadowRoot.querySelector('#btn-toggle-vis ui-icon') as ActionIcon;
+    const visBtn = this.shadowRoot.getElementById('btn-toggle-vis');
+    const visIcon = visBtn?.querySelector('ui-icon') as ActionIcon;
     if (visIcon) {
       visIcon.setAttribute('name', el.visible !== false ? 'eye-off' : 'eye');
-      visIcon.style.opacity = el.visible !== false ? '1' : '0.3';
-      visIcon.classList.toggle('active', el.visible !== false);
+      visIcon.style.opacity = el.visible !== false ? '1' : '0.4';
+      visBtn?.classList.toggle('active', el.visible !== false);
+    }
+
+    const lockBtn = this.shadowRoot.getElementById('btn-toggle-lock');
+    const lockIcon = lockBtn?.querySelector('ui-icon') as ActionIcon;
+    const isLocked = el.locked === true;
+    if (lockIcon) {
+      lockIcon.setAttribute('name', isLocked ? 'lock' : 'unlock');
+      lockIcon.style.opacity = isLocked ? '1' : '0.4';
+      lockBtn?.classList.toggle('active', isLocked);
+      lockBtn?.classList.toggle('warning', isLocked);
     }
     
     this.updateWarningTag();
+  }
+
+  private updateLockState(): void {
+    if (!this.shadowRoot || !this._element) return;
+    const isLocked = this._element.locked === true;
+    const card = this.shadowRoot.querySelector('.element-card');
+    card?.classList.toggle('is-locked', isLocked);
   }
 
   private updateWarningTag(): void {

@@ -101,6 +101,16 @@ The project follows a modular, event-driven architecture:
 - **Design System:** Implementado estilo "3D Prism" para elementos `<kbd>` globalmente, adicionando profundidade visual e feedback tátil via CSS.
 - **Integridade:** Sincronização de interfaces de atalhos e correção de tipos TS para garantir build estável.
 
+### 2026-05-01: Consolidação de Modelos & Proteção de Camadas
+- **Task 41 (Unified Models):** Sincronização completa do domínio com o Inventário v1.1.
+  - **Atributos Universais:** Integrados `rotation`, `opacity`, `locked` e `name` em todos os elementos via `BaseElement`.
+  - **Motor Gráfico:** `CanvasRenderer` centraliza transformações espaciais (rotação/opacidade), mantendo os renderers específicos simplificados.
+  - **Matemática de Seleção:** Implementado cálculo de ponto rotacionado no `hitTest` para seleção precisa de camadas inclinadas.
+- **Task 52 (Layer Lock):** Implementado sistema de congelamento de edição.
+  - **Inspector UI:** Novo ícone de cadeado tátil com feedback visual diferenciado quando ativo.
+  - **UX Guard:** Bloqueio impede interações diretas no Inspector e desabilita movimentação/deleção/reordenação via atalhos globais.
+- **Integridade:** Refinamento da tipagem no `Store` e `ElementValidator`, eliminando disparidades entre modelos teóricos e implementação.
+
 ### 2026-04-30: Arquitetura de Componentes & Integridade de UI
 - **Task 46 (Deep Refactor):** Finalizada refatoração profunda do `ElementInspector`.
   - **Decomposição em 3 Níveis:** Orquestrador (N1), Containers (N2) e Seções especialistas (N3).

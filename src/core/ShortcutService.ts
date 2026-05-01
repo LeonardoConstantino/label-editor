@@ -7,7 +7,6 @@ import { templateManager } from '../domain/services/TemplateManager';
 import { AnyElement, ElementType } from '../domain/models/Label';
 import { ElementFactory } from '../domain/models/elements/ElementFactory';
 import { getDebug } from '../constants/defaults';
-import { setDebug } from './../constants/defaults';
 
 /**
  * PropClipboard: Armazena propriedades copiadas de um elemento.
@@ -51,20 +50,17 @@ class ShortcutService {
   }
 
   private setupModalListeners(): void {
-    // Usando EventBus em vez de DOM events para garantir captura
     eventBus.on('ui:modal:open', () => {
-      logger.debug('ShortcutService', 'Contexto alterado para: MODAL');
       this.pushContext('modal');
     });
 
     eventBus.on('ui:modal:close', () => {
-      logger.debug('ShortcutService', 'Contexto restaurado para: GLOBAL');
       this.popContext();
     });
   }
 
   private registerDefaults(): void {
-    // --- GESTÃO DE PROJETO (Prevenindo conflitos com browser) ---
+    // --- GESTÃO DE PROJETO ---
     this.manager.register(`${this.metaKeyName}+s`, (_e) => {
       eventBus.emit('template:save', { source: 'shortcut' });
       UISM.play(UISM.enumPresets.SUCCESS);
@@ -97,7 +93,7 @@ class ShortcutService {
       if (id) eventBus.emit('element:duplicate', id);
     }, { description: 'Duplicar', category: 'Edição', context: 'no-input', preventDefault: true });
 
-    // --- PROP CLIPBOARD (Cópia de Propriedades) ---
+    // --- PROP CLIPBOARD ---
     this.manager.register(`${this.metaKeyName}+alt+c`, () => this.copyProperties(), 
       { description: 'Copiar Propriedades', category: 'Edição', context: 'no-input', preventDefault: true });
     
@@ -118,17 +114,13 @@ class ShortcutService {
     // --- MOVIMENTAÇÃO COM MULTIPLICADORES ---
     this.registerMovementShortcuts();
 
-    // --- TOOLBAR RÁPIDA (Single Key - Contexto no-input) ---
+    // --- TOOLBAR RÁPIDA ---
     this.registerToolbarShortcuts();
 
     // --- AJUDA ---
     this.manager.register(`${this.metaKeyName}+/`, () => {
-      logger.debug('ShortcutService', 'Atalho de ajuda acionado');
-      eventBus.emit('ui:open:help', { source: 'shortcut' }); // Preparado para Task 36
+      eventBus.emit('ui:open:help', { source: 'shortcut' });
     }, { description: 'Mostrar Atalhos', category: 'Ajuda', preventDefault: true });
-
-    // this.manager.registerSequence(['d', 'e', 'b', 'u', 'g'], () => {
-    //   setDebug(!getDebug());
 
     //   logger.debug('ShortcutService', `Modo debug ${getDebug() ? 'ativado' : 'desativado'}!`);
     //   eventBus.emit('notify', { message: `Modo debug ${getDebug() ? 'ativado' : 'desativado'}! Ver console para detalhes.`, type: 'warning', duration: 5000 });
@@ -159,7 +151,6 @@ class ShortcutService {
       arrowright: 'Mover para a direita'
     };
 
-
     keys.forEach(key => {
       // Registrar combinações para cada tecla de seta
       // Alt (0.1) | Normal (1.0) | Shift (10.0)
@@ -167,13 +158,10 @@ class ShortcutService {
         let multiplier = 1;
         if (e.shiftKey) multiplier = 10;
         if (e.altKey) multiplier = 0.1;
-        
         const d = deltas[key];
         this.moveSelectedElement(d.x * multiplier, d.y * multiplier);
       }, {description: descriptionMap[key], context: 'no-input', preventDefault: true });
 
-      // Garante que Alt+Seta e Shift+Seta funcionem mesmo que o manager 
-      // não capture a combinação exata no register (devido à normalização)
       this.manager.register(`shift+${key}`, (_e) => {
         const d = deltas[key];
         this.moveSelectedElement(d.x * 10, d.y * 10);
@@ -187,35 +175,28 @@ class ShortcutService {
   }
 
   private async registerToolbarShortcuts(): Promise<void> {
-    // T -> Texto
     this.manager.registerLongPress('t', () => this.addElement(ElementType.TEXT), 
       { description: 'Adicionar Texto', category: 'Toolbar', duration: 300 });
 
-    // R -> Retângulo | Shift+R -> Quadrado
     this.manager.registerLongPress('r', () => this.addElement(ElementType.RECTANGLE), 
       { description: 'Adicionar Retângulo', category: 'Toolbar', duration: 300 });
     
     this.manager.register('shift+r', () => this.addElement(ElementType.RECTANGLE, { dimensions: { width: 40, height: 40 } }), 
       { description: 'Adicionar Quadrado', category: 'Toolbar', context: 'no-input' });
 
-    // I -> Imagem (Upload)
     this.manager.registerLongPress('i', () => {
-      // Dispara evento que a Toolbar ou o main.ts ouça para abrir o input file
       eventBus.emit('command:toolbar:upload-image', { source: 'shortcut' });
     }, { description: 'Adicionar Imagem', category: 'Toolbar', duration: 300 });
 
-    // B -> Border
     this.manager.registerLongPress('b', () => this.addElement(ElementType.BORDER), 
       { description: 'Adicionar Moldura', category: 'Toolbar', duration: 300 });
 
-    // V -> Vault
     this.manager.registerLongPress('v', () => {
       const modal = document.getElementById('vault-modal') as any;
       if (modal) modal.setAttribute('open', '');
       UISM.play(UISM.enumPresets.OPEN);
     }, { description: 'Abrir Vault', category: 'Toolbar', duration: 300 });
 
-    // P -> Produção (Cockpit)
     this.manager.registerLongPress('p', () => {
       const modal = document.getElementById('batch-modal') as any;
       if (modal) modal.setAttribute('open', '');
@@ -254,7 +235,6 @@ class ShortcutService {
     const el = state.currentLabel?.elements.find(e => e.id === id);
     if (!el) return;
 
-    // Captura apenas propriedades seguras e comuns
     this.propClipboard = {
       type: el.type,
       position: { ...el.position },
@@ -272,6 +252,13 @@ class ShortcutService {
     const id = state.selectedElementIds[0];
     if (!id) return;
 
+    const el = state.currentLabel?.elements.find(e => e.id === id);
+    if (el?.locked) {
+      UISM.play(UISM.enumPresets.WARNING);
+      eventBus.emit('notify', { message: 'Elemento bloqueado', type: 'warning' });
+      return;
+    }
+
     const updates: any = {
       position: this.propClipboard.position,
     };
@@ -280,7 +267,6 @@ class ShortcutService {
       updates.dimensions = this.propClipboard.dimensions;
     }
 
-    // Mescla estilos compatíveis
     Object.assign(updates, this.propClipboard.styles);
 
     eventBus.emit('element:update', { id, updates });
@@ -310,16 +296,33 @@ class ShortcutService {
   }
 
   private reorder(direction: 'up' | 'down'): void {
-    const id = store.getState().selectedElementIds[0];
-    if (id) eventBus.emit('element:reorder', { id, direction });
+    const state = store.getState();
+    const id = state.selectedElementIds[0];
+    if (!id) return;
+
+    const el = state.currentLabel?.elements.find(e => e.id === id);
+    if (el?.locked) {
+      UISM.play(UISM.enumPresets.WARNING);
+      return;
+    }
+
+    eventBus.emit('element:reorder', { id, direction });
   }
 
   private handleDelete(): void {
-    const id = store.getState().selectedElementIds[0];
-    if (id) {
-      eventBus.emit('element:delete', id);
-      UISM.play(UISM.enumPresets.DELETE);
+    const state = store.getState();
+    const id = state.selectedElementIds[0];
+    if (!id) return;
+
+    const el = state.currentLabel?.elements.find(e => e.id === id);
+    if (el?.locked) {
+      UISM.play(UISM.enumPresets.WARNING);
+      eventBus.emit('notify', { message: 'Impossível excluir camada bloqueada', type: 'warning' });
+      return;
     }
+
+    eventBus.emit('element:delete', id);
+    UISM.play(UISM.enumPresets.DELETE);
   }
 
   listShortcuts(){

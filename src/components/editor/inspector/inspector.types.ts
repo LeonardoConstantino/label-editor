@@ -20,6 +20,7 @@ export interface InspectorChangeDetail {
 export type InspectorActionType = 
   | 'select' 
   | 'toggle-vis' 
+  | 'toggle-lock'
   | 'up' 
   | 'del' 
   | 'open-vault';

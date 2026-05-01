@@ -22,7 +22,7 @@ Implementar um controle visual de bloqueio (`lock`) nos cards de camada do Inspe
    - Garantir que, quando um elemento estiver bloqueado, os inputs de propriedades (X, Y, W, H, etc.) fiquem visualmente desabilitados ou exibam um aviso de bloqueio.
 
 ## Critérios de Aceite
-- [ ] Ícone de cadeado funcional presente em todos os cards de camada.
-- [ ] O clique alterna o estado de bloqueio e atualiza o Store instantaneamente.
-- [ ] Elementos bloqueados no Inspector não podem ser movidos via atalhos de seta (validação de regressão).
-- [ ] O visual do card reflete o estado bloqueado (ex: ícone aceso quando bloqueado).
+- [x] Ícone de cadeado funcional presente em todos os cards de camada.
+- [x] O clique alterna o estado de bloqueio e atualiza o Store instantaneamente.
+- [x] Elementos bloqueados no Inspector não podem ser movidos via atalhos de seta (validação de regressão).
+- [x] O visual do card reflete o estado bloqueado (ex: ícone aceso quando bloqueado).

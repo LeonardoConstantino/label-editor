@@ -220,9 +220,16 @@ export class ElementInspector extends HTMLElement {
         }
         break;
       case 'toggle-vis':
-        const el = store.getState().currentLabel?.elements.find(item => item.id === id);
-        if (el) {
-          eventBus.emit('element:update', { id, updates: { visible: el.visible === false } });
+        const elVis = store.getState().currentLabel?.elements.find(item => item.id === id);
+        if (elVis) {
+          eventBus.emit('element:update', { id, updates: { visible: elVis.visible === false } });
+        }
+        UISM.play(UISM.enumPresets.TOGGLE);
+        break;
+      case 'toggle-lock':
+        const elLock = store.getState().currentLabel?.elements.find(item => item.id === id);
+        if (elLock) {
+          eventBus.emit('element:update', { id, updates: { locked: !elLock.locked } });
         }
         UISM.play(UISM.enumPresets.TOGGLE);
         break;
