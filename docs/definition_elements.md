@@ -39,4 +39,4 @@ Aplicável a `Rectangle`, `Text` e `Image`.
 ## 4️⃣ ImageElement
 - **Especificidades:** `src` (dataURL), `fit` (cover, contain, fill), `smoothing`, `compositeOperation`.
 
-**Mais detalhes em [definition_elements.md](./definition_elements_details.md)**
+**Mais detalhes em [definition_elements_details.md](./definition_elements_details.md)**

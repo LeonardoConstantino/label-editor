@@ -1,5 +1,8 @@
 import { BaseElement, Dimensions, BorderStyle, TextOverflow, ImageFit } from './BaseElement';
 
+export type TextAlign = 'left' | 'center' | 'right';
+export type VerticalAlign = 'top' | 'middle' | 'bottom';
+
 export interface TextElement extends BaseElement {
   dimensions: Dimensions;
   content: string;
@@ -8,8 +11,8 @@ export interface TextElement extends BaseElement {
   fontWeight: number | string;
   fontStyle: string;
   color: string;
-  textAlign: 'left' | 'center' | 'right';
-  verticalAlign: 'top' | 'middle' | 'bottom';
+  textAlign: TextAlign;
+  verticalAlign: VerticalAlign;
   overflow: TextOverflow;
   lineHeight: number;
 }

@@ -2,19 +2,11 @@ import { ElementType, BorderStyle, TextOverflow, ImageFit } from '../domain/mode
 
 /**
  * DEBUG: Flag global para ativar/desativar logs de debug detalhados.
- * Deve ser false em produção para evitar poluição de logs e impacto de performance.
- * Pode ser sobrescrito por instâncias específicas do EventBus ou Logger.
- * Sincronizado com definition_elements.md
  */
 const debug = {
-  state: false,
+  state: true,
 };
 
-/**
- * setDebug: Função para alterar o valor da flag de debug em tempo de execução.
- * Útil para ativar logs detalhados durante desenvolvimento ou troubleshooting sem precisar recompilar.
- * Exemplo de uso: setDebug(true) para ativar, setDebug(false) para desativar.
- */
 export const setDebug = (value: boolean) => {
   debug.state = value;
 };
@@ -22,8 +14,8 @@ export const setDebug = (value: boolean) => {
 export const getDebug = () => debug.state;
 
 /**
- * DEFAULTS: Valores padrão para criação de novos elementos.
- * Sincronizado com definition_elements.md
+ * DEFAULTS: Valores padrão para criação de novos elementos e configuração do canvas.
+ * Sincronizado com definition_elements.md (v1.1)
  */
 export const DEFAULTS = {
   CANVAS: {
@@ -39,13 +31,16 @@ export const DEFAULTS = {
    * Evita estouro de memória RAM ao renderizar em 300 DPI.
    */
   LIMITS: {
-    MAX_WIDTH_MM: 500,  // 0.5 metro
+    MAX_WIDTH_MM: 500,
     MAX_HEIGHT_MM: 500,
     MIN_DIMENSION_MM: 5,
     MAX_DPI: 600,
     MIN_DPI: 72
   },
   
+  /**
+   * COMMON: Propriedades universais de todo elemento (BaseElement).
+   */
   COMMON: {
     position: { x: 10, y: 10 },
     zIndex: 0,
@@ -63,8 +58,8 @@ export const DEFAULTS = {
     fontWeight: 400,
     fontStyle: 'normal',
     color: '#000000',
-    textAlign: 'center',
-    verticalAlign: 'middle',
+    textAlign: 'center' as const,
+    verticalAlign: 'middle' as const,
     overflow: TextOverflow.CLIP,
     lineHeight: 1.2
   },

@@ -1,6 +1,3 @@
-```markdown
----
-
 ## 💡 Ideias de Elementos Futuros
 
 Esta seção documenta elementos propostos para evolução do Label Editor, organizados por prioridade de implementação e impacto no produto.
@@ -606,6 +603,5 @@ Elementos com suporte a variáveis `{{nome}}`:
 
 **Última Atualização:** 22/04/2026
 **Versão do Documento:** 1.0
-```
 
 ---

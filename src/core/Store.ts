@@ -48,13 +48,13 @@ export class Store {
       });
     });
 
-    eventBus.on('element:update', ({ id, updates }: { id: string; updates: any }) => {
+    eventBus.on('element:update', ({ id, updates }: { id: string; updates: Partial<AnyElement> }) => {
       if (!this.state.currentLabel) return;
       const index = this.state.currentLabel.elements.findIndex(el => el.id === id);
       if (index === -1) return;
 
       const current = this.state.currentLabel.elements[index];
-      const newElement = this.mergeUpdates(current, updates);
+      const newElement = this.mergeUpdates(current, updates as any);
 
       const validation = elementValidator.validate(newElement);
       if (!validation.isValid) {

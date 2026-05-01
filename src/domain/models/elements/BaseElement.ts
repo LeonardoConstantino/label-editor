@@ -8,7 +8,8 @@ export enum ElementType {
 export enum BorderStyle {
   SOLID = 'solid',
   DASHED = 'dashed',
-  DOTTED = 'dotted'
+  DOTTED = 'dotted',
+  DOUBLE = 'double'
 }
 
 export enum TextOverflow {
@@ -21,7 +22,8 @@ export enum TextOverflow {
 export enum ImageFit {
   COVER = 'cover',
   CONTAIN = 'contain',
-  FILL = 'fill'
+  FILL = 'fill',
+  NONE = 'none'
 }
 
 export interface Position {
@@ -36,6 +38,7 @@ export interface Dimensions {
 
 /**
  * BaseElement: Propriedades universais de todo elemento.
+ * Sincronizado com definition_elements.md (v1.1)
  */
 export interface BaseElement {
   id: string;
@@ -43,8 +46,8 @@ export interface BaseElement {
   name: string;
   position: Position;
   zIndex: number;
-  rotation: number;
-  opacity: number;
+  rotation: number; // 0-360
+  opacity: number;  // 0-1
   locked: boolean;
   visible: boolean;
 }

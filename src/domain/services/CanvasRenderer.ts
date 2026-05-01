@@ -38,38 +38,81 @@ export class CanvasRenderer {
   }
 
   /**
-   * Renderiza um elemento individual delegando para o renderer específico.
+   * Renderiza um elemento individual aplicando transformações universais (rotação, opacidade).
    */
   public render(element: AnyElement, context: RenderContext): void {
     const renderer = this.renderers.get(element.type);
-    if (renderer) {
-      renderer.render(element, context);
+    if (!renderer) return;
+
+    const { ctx, scale } = context;
+
+    ctx.save();
+
+    // 1. Aplica Opacidade Universal
+    ctx.globalAlpha = element.opacity ?? 1;
+
+    // 2. Aplica Rotação Universal
+    // Para rotacionar ao redor do centro do elemento, precisamos saber as dimensões
+    const x = element.position.x * scale;
+    const y = element.position.y * scale;
+
+    if (element.rotation && element.rotation !== 0) {
+      let centerX = x;
+      let centerY = y;
+
+      if ('dimensions' in element) {
+        centerX = x + (element.dimensions.width * scale) / 2;
+        centerY = y + (element.dimensions.height * scale) / 2;
+      }
+
+      ctx.translate(centerX, centerY);
+      ctx.rotate((element.rotation * Math.PI) / 180);
+      ctx.translate(-centerX, -centerY);
     }
+
+    // 3. Renderização Específica
+    renderer.render(element, context);
+
+    ctx.restore();
   }
 
   /**
    * Verifica se um ponto (px) está dentro de um elemento (hit test).
+   * Suporta elementos rotacionados.
    */
   public hitTest(element: AnyElement, pxX: number, pxY: number, config: CanvasConfig): boolean {
-    // Escala: Apenas DPI (mm -> px internos). 
-    // O previewScale não entra aqui pois o zoom é visual (CSS transform).
     const scale = UnitConverter.mmToPx(1, config.dpi);
     
-    const elX = element.position.x * scale;
-    const elY = element.position.y * scale;
+    const x = element.position.x * scale;
+    const y = element.position.y * scale;
 
-    if ('dimensions' in element) {
-      const elW = (element as any).dimensions.width * scale;
-      const elH = (element as any).dimensions.height * scale;
-      return pxX >= elX && pxX <= elX + elW && pxY >= elY && pxY <= elY + elH;
+    let targetX = pxX;
+    let targetY = pxY;
+
+    // Se houver rotação, precisamos rotacionar o ponto do mouse inversamente 
+    // ao redor do centro do elemento para testar contra o retângulo alinhado aos eixos.
+    if (element.rotation && element.rotation !== 0 && 'dimensions' in element) {
+      const centerX = x + (element.dimensions.width * scale) / 2;
+      const centerY = y + (element.dimensions.height * scale) / 2;
+      
+      const angle = (-element.rotation * Math.PI) / 180;
+      const dx = pxX - centerX;
+      const dy = pxY - centerY;
+      
+      targetX = centerX + (dx * Math.cos(angle) - dy * Math.sin(angle));
+      targetY = centerY + (dx * Math.sin(angle) + dy * Math.cos(angle));
     }
 
-    // BorderElement não tem dimensions, mas podemos fazer hit test na borda
+    if ('dimensions' in element) {
+      const w = element.dimensions.width * scale;
+      const h = element.dimensions.height * scale;
+      return targetX >= x && targetX <= x + w && targetY >= y && targetY <= y + h;
+    }
+
     if (element.type === ElementType.BORDER) {
       const canvasW = UnitConverter.mmToPx(config.widthMM, config.dpi);
       const canvasH = UnitConverter.mmToPx(config.heightMM, config.dpi);
       const margin = element.position.x * scale;
-      // Hit test simples para borda (clique próximo à moldura)
       const isNearEdge = (
         (Math.abs(pxX - margin) < 10 || Math.abs(pxX - (canvasW - margin)) < 10) && pxY >= margin && pxY <= canvasH - margin
       ) || (
