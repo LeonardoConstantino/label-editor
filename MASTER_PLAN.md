@@ -62,6 +62,7 @@ Este Master Plan coordena a fase final de desenvolvimento, focando em estabilida
 | **44** | [TextElement Pro (Overflow & Vertical)](./tasks/44_text_pro.md) | 04 | [ ] | 12 | `task/44-text-pro` |
 | **59** | [Otimização de Histórico (Snapshot Debounce)](./tasks/59_history_debounce.md) | 04 | [ ] | 11 | `task/59-history-debounce` |
 | **49** | [Unificação de Estilo KBD (3D Prism)](./tasks/49_kbd_style_unification.md) | 03 | [x] | 22 | `task/49-kbd-style` |
+| **72** | [Padronização de Tooltips de Ajuda](./tasks/72_help_tooltips_standardization.md) | 03 | [ ] | 46 | `task/72-help-tooltips` |
 | **38** | [Tipografia Avançada (Leading/Tracking)](./tasks/38_adv_typography.md) | 02 | [ ] | — | `task/38-typography` |
 | **39** | [Efeitos Prism (Sombras/Glow)](./tasks/39_prism_effects.md) | 02 | [ ] | — | `task/39-prism-effects` |
 

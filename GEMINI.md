@@ -101,9 +101,12 @@ The project follows a modular, event-driven architecture:
 - **Design System:** Implementado estilo "3D Prism" para elementos `<kbd>` globalmente, adicionando profundidade visual e feedback tátil via CSS.
 - **Integridade:** Sincronização de interfaces de atalhos e correção de tipos TS para garantir build estável.
 
-### 2026-04-28: Persistência de Preferências & Compliance
-- **Task 64 (Global Audio):** Implementado controle de áudio persistente no ElementInspector. Refatoração da sequência de boot (main.ts) para carregar preferências e aplicar o estado do `UISoundManager` antes da primeira interação.
-- **Task 65 (About & Compliance):** Criada a aba "About" no Help Center com créditos, links sociais e transparência jurídica (Privacidade Local-Only e Termos).
-- **Task 26 (Print Excellence):** Finalizada implementação de sangria (bleed) e marcas de corte profissionais. O Live Preview do Cockpit de Produção agora reflete visualmente essas configurações em tempo real.
-- **Core (Boot Logic):** Otimização do ciclo de vida de inicialização para evitar carregamento redundante de labels e garantir sincronia entre Store e PreferenceManager.
-- **UI Architecture:** Implementado sistema de estilos globais `.prism-details` para componentes de colapso (details/summary) e expansão do catálogo de ícones.
+### 2026-04-30: Arquitetura de Componentes & Integridade de UI
+- **Task 46 (Deep Refactor):** Finalizada refatoração profunda do `ElementInspector`.
+  - **Decomposição em 3 Níveis:** Orquestrador (N1), Containers (N2) e Seções especialistas (N3).
+  - **Filtragem por Identidade:** Implementada lógica rigorosa no `resolveInspectorValue` para eliminar ruído de eventos nativos (`InputEvent` com `detail: 0`) que corrompiam a Store.
+  - **Tipagem Estrita:** Eliminação total de `any` no submódulo de inspeção; adoção de interfaces para sub-componentes.
+  - **Estabilidade:** Sincronização de inputs agora utiliza atributos (`setAttribute`) e propriedades, com detecção recursiva de foco para evitar perda de cursor.
+  - **Regressão:** Adição de testes de fumaça abrangentes (UI Smoke Tests) com mocks de `fake-indexeddb` e Shadow DOM.
+  - **Preservação:** Código original preservado em `ElementInspector.legacy.ts` para consulta técnica.
+- **Core:** Correção de race condition no `UINumberScrubber` durante inicialização assíncrona.
