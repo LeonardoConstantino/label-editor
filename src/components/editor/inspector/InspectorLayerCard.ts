@@ -85,7 +85,8 @@ export class InspectorLayerCard extends HTMLElement {
 
     this.shadowRoot.innerHTML = `
       <style>
-        :host { display: block; margin-bottom: 8px; }
+        :host { display: block; margin-bottom: 8px; position: relative; }
+        :host(.elevated) { z-index: 100; }
         .card-content { display: ${isSelected ? 'flex' : 'none'}; flex-direction: column; gap: 12px; padding: 12px 8px; }
         .is-locked #sections-container { pointer-events: none; opacity: 0.6; filter: grayscale(0.5); }
         .action-btn { background: transparent; border: none; cursor: pointer; padding: 4px; border-radius: 4px; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
@@ -145,6 +146,14 @@ export class InspectorLayerCard extends HTMLElement {
       dispatchInspectorAction(this, { action: 'toggle-lock', id });
     });
 
+    // Gerenciamento de Z-Index para Selects (Task 44/69 Fix)
+    root.addEventListener('ui-select:open', () => {
+      this.classList.add('elevated');
+    });
+    root.addEventListener('ui-select:close', () => {
+      this.classList.remove('elevated');
+    });
+
     if (this._selected) {
       const container = root.getElementById('sections-container')!;
       
@@ -187,10 +196,9 @@ export class InspectorLayerCard extends HTMLElement {
     `;
     container.appendChild(idSection);
 
-    // Helper para criar seções com a marcação necessária para o sync
     const createSection = (tagName: string): InspectorSection => {
       const sec = document.createElement(tagName) as InspectorSection;
-      sec.setAttribute('data-inspector-section', ''); // Marcação para o querySelector
+      sec.setAttribute('data-inspector-section', ''); 
       sec.element = el;
       return sec;
     };
@@ -272,7 +280,6 @@ export class InspectorLayerCard extends HTMLElement {
       nameInput.setAttribute('value', el.name || '');
     }
 
-    // Agora o seletor encontra as seções corretamente
     shadow.querySelectorAll<InspectorSection>('[data-inspector-section]').forEach(section => {
       section.element = el;
     });

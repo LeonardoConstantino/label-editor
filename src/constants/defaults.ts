@@ -70,8 +70,9 @@ export const DEFAULTS = {
     color: '#000000',
     textAlign: 'center' as const,
     verticalAlign: 'middle' as const,
-    overflow: TextOverflow.CLIP,
-    lineHeight: 1.2
+    overflow: TextOverflow.WRAP,
+    lineHeight: 1.2,
+    justify: false
   },
 
   [ElementType.RECTANGLE]: {

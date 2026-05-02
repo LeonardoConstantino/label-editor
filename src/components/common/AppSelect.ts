@@ -8,6 +8,7 @@ export interface SelectOption {
 
 /**
  * AppSelect: Componente de seleção customizado com visual Tactile Prism.
+ * Versão robusta usando posicionamento absoluto e z-index controlado pelo pai.
  */
 export class AppSelect extends HTMLElement {
   private _options: SelectOption[] = [];
@@ -28,9 +29,14 @@ export class AppSelect extends HTMLElement {
   }
 
   attributeChangedCallback(name: string, _oldValue: string, newValue: string) {
-    if (name === 'value') this._value = newValue;
-    if (name === 'label') this._label = newValue;
-    this.render();
+    if (name === 'value') {
+      this._value = newValue;
+      this.updateSelectionVisuals();
+    }
+    if (name === 'label') {
+      this._label = newValue;
+      this.render();
+    }
   }
 
   set options(opts: SelectOption[]) {
@@ -43,8 +49,10 @@ export class AppSelect extends HTMLElement {
   }
 
   set value(val: string) {
-    this._value = val;
-    this.render();
+    if (this._value !== val) {
+      this._value = val;
+      this.render();
+    }
   }
 
   get value(): string {
@@ -58,29 +66,45 @@ export class AppSelect extends HTMLElement {
 
   private toggle() {
     this._isOpen = !this._isOpen;
-    this.render();
-    if (this._isOpen) {
-      this.dispatchEvent(new CustomEvent('ui-select:open', { bubbles: true, composed: true }));
+    const dropdown = this.shadowRoot?.querySelector('.select-dropdown') as HTMLElement;
+    const trigger = this.shadowRoot?.querySelector('.select-trigger') as HTMLElement;
+    
+    if (dropdown && trigger) {
+      dropdown.style.display = this._isOpen ? 'block' : 'none';
+      trigger.classList.toggle('open', this._isOpen);
+      
+      if (this._isOpen) {
+        this.dispatchEvent(new CustomEvent('ui-select:open', { bubbles: true, composed: true }));
+      } else {
+        this.dispatchEvent(new CustomEvent('ui-select:close', { bubbles: true, composed: true }));
+      }
     }
   }
 
   private close() {
     if (this._isOpen) {
       this._isOpen = false;
-      this.render();
+      const dropdown = this.shadowRoot?.querySelector('.select-dropdown') as HTMLElement;
+      const trigger = this.shadowRoot?.querySelector('.select-trigger') as HTMLElement;
+      if (dropdown) dropdown.style.display = 'none';
+      if (trigger) trigger.classList.remove('open');
+      this.dispatchEvent(new CustomEvent('ui-select:close', { bubbles: true, composed: true }));
     }
   }
 
   private selectOption(val: string) {
     this._value = val;
-    this._isOpen = false;
-    this.render();
+    this.close();
+    this.render(); // Redesenha para atualizar o label do trigger
+    
+    // Evento específico para o componente
     this.dispatchEvent(new CustomEvent('app-select', { 
       detail: val,
       bubbles: true, 
       composed: true 
     }));
-    // Sincronia com o protocolo do Inspector (Task 71)
+    
+    // Evento padrão de mudança para o orquestrador
     this.dispatchEvent(new CustomEvent('change', { 
       detail: { value: val },
       bubbles: true,
@@ -108,8 +132,28 @@ export class AppSelect extends HTMLElement {
       }
     });
 
-    // Fechar ao clicar fora
-    document.addEventListener('click', () => this.close());
+    // Fechar ao clicar fora (no documento)
+    const handleOutsideClick = (e: MouseEvent) => {
+      if (!this.contains(e.target as Node)) {
+        this.close();
+      }
+    };
+    document.addEventListener('click', handleOutsideClick);
+  }
+
+  private updateSelectionVisuals() {
+    const shadow = this.shadowRoot;
+    if (!shadow) return;
+    
+    // Atualiza o label do trigger sem re-renderizar tudo se possível
+    const selectedOption = this._options.find(o => o.value === this._value);
+    const labelSpan = shadow.querySelector('.select-trigger span');
+    if (labelSpan) labelSpan.textContent = selectedOption ? selectedOption.label : 'Select...';
+    
+    // Atualiza classes das opções
+    shadow.querySelectorAll('.select-option').forEach(opt => {
+      opt.classList.toggle('selected', opt.getAttribute('data-value') === this._value);
+    });
   }
 
   private render() {
@@ -149,7 +193,7 @@ export class AppSelect extends HTMLElement {
 
         .select-trigger:hover {
           border-color: var(--color-accent-primary);
-          background: var(--color-surface-glass);
+          background: var(--color-surface-solid);
         }
 
         .select-trigger.open {
@@ -157,40 +201,30 @@ export class AppSelect extends HTMLElement {
           box-shadow: 0 0 15px rgba(99, 102, 241, 0.2);
         }
 
-        .arrow {
-          font-size: 8px;
-          opacity: 0.5;
-          transition: transform 0.3s;
-        }
+        .arrow { font-size: 8px; opacity: 0.5; transition: transform 0.3s; }
         .open .arrow { transform: rotate(180deg); }
 
         .select-dropdown {
           position: absolute;
           top: calc(100% + 4px);
           left: 0;
-          right: 0;
-          background: rgba(22, 25, 32, 0.95);
-          backdrop-filter: blur(12px);
+          width: 100%;
+          min-width: 160px;
+          background: #1a1d24; /* Solid para evitar problemas de transparência em camadas */
           border: 1px solid var(--color-border-ui);
           border-radius: 8px;
-          z-index: 1000;
-          max-height: 240px;
+          z-index: 10000;
+          max-height: 200px;
           overflow-y: auto;
-          display: ${this._isOpen ? 'block' : 'none'};
-          box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-          animation: slideIn 0.2s var(--ease-spring);
-        }
-
-        @keyframes slideIn {
-          from { opacity: 0; transform: translateY(-10px); }
-          to { opacity: 1; transform: translateY(0); }
+          display: none;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
         }
 
         .select-option {
           padding: 8px 12px;
           font-size: 11px;
           cursor: pointer;
-          transition: all 0.2s;
+          transition: all 0.15s;
           display: flex;
           flex-direction: column;
           gap: 2px;
@@ -207,24 +241,17 @@ export class AppSelect extends HTMLElement {
           background: rgba(99, 102, 241, 0.1);
         }
 
-        .select-option.selected:hover {
-           color: white;
-           background: var(--color-accent-primary);
-        }
+        .select-option.selected:hover { color: white; background: var(--color-accent-primary); }
 
-        .sublabel {
-          font-size: 9px;
-          opacity: 0.6;
-        }
+        .sublabel { font-size: 9px; opacity: 0.6; }
 
-        /* Scrollbar thin */
         .select-dropdown::-webkit-scrollbar { width: 4px; }
         .select-dropdown::-webkit-scrollbar-thumb { background: var(--color-border-ui); border-radius: 2px; }
       </style>
 
       ${this._label ? `<span class="select-label">${this._label}</span>` : ''}
       
-      <div class="select-trigger ${this._isOpen ? 'open' : ''}">
+      <div class="select-trigger">
         <span>${displayLabel}</span>
         <span class="arrow">▼</span>
       </div>

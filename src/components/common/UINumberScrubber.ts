@@ -19,7 +19,7 @@ export class UINumberScrubber extends HTMLElement {
   #sensitivity = 5;
   #initialValue: number = 0;
 
-  static observedAttributes = ['value', 'min', 'max', 'step', 'label', 'unit'];
+  static observedAttributes = ['value', 'min', 'max', 'step', 'label', 'unit', 'disabled'];
 
   constructor() {
     super();
@@ -40,6 +40,15 @@ export class UINumberScrubber extends HTMLElement {
     }
   }
 
+  get disabled(): boolean {
+    return this.hasAttribute('disabled');
+  }
+
+  set disabled(val: boolean) {
+    if (val) this.setAttribute('disabled', '');
+    else this.removeAttribute('disabled');
+  }
+
   get min(): number {
     return parseFloat(this.getAttribute('min') || '-Infinity');
   }
@@ -54,6 +63,7 @@ export class UINumberScrubber extends HTMLElement {
     this.#render();
     this.#setupEventListeners();
     this.#updateProgress();
+    this.#syncDisabled();
   }
 
   disconnectedCallback() {
@@ -65,6 +75,14 @@ export class UINumberScrubber extends HTMLElement {
     if (name === 'value') this.#updateValue(parseFloat(newVal), false);
     if (name === 'label') this.#shadow.querySelector('.label-text')!.textContent = newVal;
     if (name === 'unit') this.#shadow.querySelector('.scrubber-unit')!.textContent = newVal;
+    if (name === 'disabled') this.#syncDisabled();
+  }
+
+  #syncDisabled() {
+    if (!this.#input) return;
+    const isDisabled = this.disabled;
+    this.#input.disabled = isDisabled;
+    this.#wrapper.classList.toggle('is-disabled', isDisabled);
   }
 
   #setupEventListeners() {
@@ -82,6 +100,7 @@ export class UINumberScrubber extends HTMLElement {
   }
 
   #onPointerDown(e: PointerEvent) {
+    if (this.disabled) return;
     const target = e.currentTarget as HTMLElement;
     this.#isDragging = true;
     this.#startX = e.clientX;
@@ -91,7 +110,7 @@ export class UINumberScrubber extends HTMLElement {
     this.#input.style.cursor = 'ew-resize';
     target.setPointerCapture(e.pointerId);
 
-    UISM.play(UISM.enumPresets.TAP); // Feedback de início de arraste
+    UISM.play(UISM.enumPresets.TAP);
 
     const onPointerMove = (moveEvent: PointerEvent) => {
       if (!this.#isDragging) return;
@@ -100,7 +119,6 @@ export class UINumberScrubber extends HTMLElement {
       const change = (deltaX / this.#sensitivity) * this.step * multiplier;
       const newVal = this.#startValue + change;
       
-      // Feedback sonoro de "tick" sutil a cada mudança significativa
       if (Math.abs(newVal - this.value) >= this.step) {
         UISM.play(UISM.enumPresets.TAP);
       }
@@ -125,6 +143,7 @@ export class UINumberScrubber extends HTMLElement {
   }
 
   #onKeyDown(e: KeyboardEvent) {
+    if (this.disabled) return;
     let multiplier = 1;
     if (e.shiftKey) multiplier = 10;
     if (e.altKey) multiplier = 0.1;
@@ -201,6 +220,13 @@ export class UINumberScrubber extends HTMLElement {
           overflow: hidden;
           transition: all 0.2s var(--ease-spring);
         }
+
+        .scrubber-wrapper.is-disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+          filter: grayscale(1);
+          pointer-events: none;
+        }
         
         .scrubber-wrapper::before {
           content: '';
@@ -213,9 +239,9 @@ export class UINumberScrubber extends HTMLElement {
           z-index: 0;
         }
 
-        .scrubber-wrapper:hover { border-color: rgba(255, 255, 255, 0.2); }
+        .scrubber-wrapper:not(.is-disabled):hover { border-color: rgba(255, 255, 255, 0.2); }
         
-        .scrubber-wrapper:focus-within {
+        .scrubber-wrapper:focus-within:not(.is-disabled) {
           border-color: var(--color-accent-primary);
           box-shadow: var(--shadow-neon-primary);
         }

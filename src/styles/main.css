@@ -397,7 +397,7 @@
   }
 
   .element-card {
-    @apply bg-surface-solid border border-border-ui rounded-xl overflow-hidden transition-all duration-400 mb-2;
+    @apply bg-surface-solid border border-border-ui rounded-xl transition-all duration-400 mb-2;
     transition-timing-function: var(--ease-spring);
   }
   .element-card.selected {

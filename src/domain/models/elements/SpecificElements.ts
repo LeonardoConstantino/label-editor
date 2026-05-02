@@ -15,6 +15,7 @@ export interface TextElement extends BaseElement {
   verticalAlign: VerticalAlign;
   overflow: TextOverflow;
   lineHeight: number;
+  justify: boolean;
 }
 
 export interface RectangleElement extends BaseElement {

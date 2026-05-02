@@ -1,20 +1,19 @@
 import { TextElement } from '../../../../domain/models/elements/SpecificElements';
+import { TextOverflow } from '../../../../domain/models/elements/BaseElement';
 import { sharedSheet } from '../../../../utils/shared-styles';
 import { dispatchInspectorChange, resolveInspectorValue } from '../inspector-events';
 import { escapeHTML } from '../../../../utils/sanitize';
 
 // Garantir registros
 import '../../../common/AppInput';
+import '../../../common/AppSelect';
 import '../../../common/UINumberScrubber';
 import '../../../common/tooltip';
 import '../../../common/icon';
 
-interface InputWithMetadata extends HTMLElement {
-  value: string | number;
-}
-
 /**
  * InspectorSectionText: Propriedades de Tipografia e Conteúdo.
+ * Implementa alinhamentos e overflow profissionais (Task 44) usando AppSelect.
  */
 export class InspectorSectionText extends HTMLElement {
   private _element: TextElement | null = null;
@@ -42,13 +41,16 @@ export class InspectorSectionText extends HTMLElement {
     if (!this.shadowRoot || !this._element) return;
 
     const el = this._element;
+    const isScaleMode = el.overflow === TextOverflow.SCALE;
 
     this.shadowRoot.innerHTML = `
       <style>
-        :host { display: flex; flex-direction: column; gap: 8px; }
+        :host { display: flex; flex-direction: column; gap: 8px; padding-bottom: 16px; }
         .row-ui { display: flex; gap: 10px; align-items: flex-end; }
         .row-ui > * { flex: 1; min-width: 0; }
         .fixed-small { flex: none; width: 100px; }
+        .divider { height: 1px; background: var(--color-border-ui); margin: 4px 0; opacity: 0.3; }
+        .checkbox-row { display: flex; items-center justify-between; padding: 4px 0; }
       </style>
       
       <div class="flex items-center justify-between mb-1">
@@ -61,20 +63,14 @@ export class InspectorSectionText extends HTMLElement {
             <div class="tooltip-rich-header mb-2 pb-1.5 border-b border-white/10 flex items-center gap-1.5">
               <ui-icon name="brackets" class="w-3.5 h-3.5 text-accent-primary"></ui-icon>
               <span class="font-mono text-[10px] text-text-main font-semibold uppercase tracking-wider">
-                Dynamic Interpolation
+                Technical Guide
               </span>
             </div>
             <div class="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1.5 items-center text-[10px] mb-1">
-              <code class="font-mono text-accent-primary bg-accent-primary/10 px-1 py-0.5 rounded border border-accent-primary/20">:upper</code> 
-              <span class="text-text-muted">MAIÚSCULAS</span>
-              <code class="font-mono text-accent-primary bg-accent-primary/10 px-1 py-0.5 rounded border border-accent-primary/20">:currency</code> 
-              <span class="text-text-muted">R$ 1.250,00</span>
-              <code class="font-mono text-accent-primary bg-accent-primary/10 px-1 py-0.5 rounded border border-accent-primary/20">:date</code> 
-              <span class="text-text-muted">19/04/2026</span>
-              <code class="font-mono text-accent-primary bg-accent-primary/10 px-1 py-0.5 rounded border border-accent-primary/20">:trunc(N)</code> 
-              <span class="text-text-muted">Limita a N chars</span>
-              <code class="font-mono text-accent-warning bg-accent-warning/10 px-1 py-0.5 rounded border border-accent-warning/20">||Default</code> 
-              <span class="text-text-muted">Valor reserva</span>
+              <code class="font-mono text-accent-primary bg-accent-primary/10 px-1 py-0.5 rounded border border-accent-primary/20">Scale</code> 
+              <span class="text-text-muted">Auto-shrinks font to fit</span>
+              <code class="font-mono text-accent-primary bg-accent-primary/10 px-1 py-0.5 rounded border border-accent-primary/20">Justify</code> 
+              <span class="text-text-muted">Aligns to both edges</span>
             </div>
           </div>
         </ui-tooltip>
@@ -83,15 +79,106 @@ export class InspectorSectionText extends HTMLElement {
       <div class="row-ui">
         <app-input label="Content" data-prop="content" value="${escapeHTML(el.content)}" style="flex:1"></app-input>
       </div>
+
       <div class="row-ui">
-        <ui-number-scrubber label="Size" data-prop="fontSize" value="${el.fontSize}" min="1" max="200" step="1" unit="pt"></ui-number-scrubber>
+        <app-select id="font-family" label="Font Family" data-prop="fontFamily" value="${el.fontFamily}"></app-select>
+      </div>
+
+      <div class="row-ui">
+        <app-select id="font-weight" label="Weight" data-prop="fontWeight" value="${el.fontWeight}"></app-select>
+        <app-select id="font-style" label="Style" data-prop="fontStyle" value="${el.fontStyle}"></app-select>
+      </div>
+
+      <div class="row-ui">
+        <ui-number-scrubber id="font-size-scrubber" label="Size" data-prop="fontSize" value="${el.fontSize}" min="1" max="200" step="1" unit="pt" ${isScaleMode ? 'disabled' : ''}></ui-number-scrubber>
         <app-input label="Color" type="color" data-prop="color" value="${escapeHTML(el.color)}" class="fixed-small"></app-input>
       </div>
+
       <div class="row-ui">
         <ui-number-scrubber label="Lead" data-prop="lineHeight" value="${el.lineHeight || 1.2}" min="0.5" max="3" step="0.1" unit="lh"></ui-number-scrubber>
-        <app-input label="Weight" data-prop="fontWeight" value="${escapeHTML(String(el.fontWeight))}" class="fixed-small"></app-input>
+        <div class="flex flex-col gap-1 justify-end items-center pb-1">
+           <span class="font-mono text-[9px] text-text-muted uppercase">Justify</span>
+           <input type="checkbox" data-prop="justify" ${el.justify ? 'checked' : ''}>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="row-ui">
+        <app-select id="text-align" label="Horizontal" data-prop="textAlign" value="${el.textAlign}"></app-select>
+        <app-select id="vertical-align" label="Vertical" data-prop="verticalAlign" value="${el.verticalAlign}"></app-select>
+      </div>
+
+      <div class="row-ui">
+        <app-select id="text-overflow" label="Overflow Strategy" data-prop="overflow" value="${el.overflow}"></app-select>
       </div>
     `;
+
+    this.setupSelects();
+  }
+
+  private setupSelects() {
+    const shadow = this.shadowRoot!;
+    
+    const fontSelect = shadow.getElementById('font-family') as any;
+    if (fontSelect) {
+      fontSelect.options = [
+        { value: 'Inter', label: 'Inter', sublabel: 'Sans-Serif (Default)' },
+        { value: 'JetBrains Mono', label: 'JetBrains Mono', sublabel: 'Monospace (Data)' },
+        { value: 'Arial', label: 'Arial', sublabel: 'System' },
+        { value: 'Times New Roman', label: 'Times New Roman', sublabel: 'Serif' },
+        { value: 'Geist', label: 'Geist', sublabel: 'Modern Sans' }
+      ];
+    }
+
+    const weightSelect = shadow.getElementById('font-weight') as any;
+    if (weightSelect) {
+      weightSelect.options = [
+        { value: '100', label: 'Thin' },
+        { value: '300', label: 'Light' },
+        { value: '400', label: 'Normal' },
+        { value: '500', label: 'Medium' },
+        { value: '600', label: 'Semi Bold' },
+        { value: '700', label: 'Bold' },
+        { value: '900', label: 'Black' }
+      ];
+    }
+
+    const styleSelect = shadow.getElementById('font-style') as any;
+    if (styleSelect) {
+      styleSelect.options = [
+        { value: 'normal', label: 'Normal' },
+        { value: 'italic', label: 'Italic' }
+      ];
+    }
+
+    const hAlign = shadow.getElementById('text-align') as any;
+    if (hAlign) {
+      hAlign.options = [
+        { value: 'left', label: 'Left', sublabel: 'Flush start' },
+        { value: 'center', label: 'Center', sublabel: 'Middle alignment' },
+        { value: 'right', label: 'Right', sublabel: 'Flush end' }
+      ];
+    }
+
+    const vAlign = shadow.getElementById('vertical-align') as any;
+    if (vAlign) {
+      vAlign.options = [
+        { value: 'top', label: 'Top', sublabel: 'Anchor ceiling' },
+        { value: 'middle', label: 'Middle', sublabel: 'Anchor center' },
+        { value: 'bottom', label: 'Bottom', sublabel: 'Anchor floor' }
+      ];
+    }
+
+    const overflow = shadow.getElementById('text-overflow') as any;
+    if (overflow) {
+      overflow.options = [
+        { value: TextOverflow.WRAP, label: 'Wrap', sublabel: 'Multi-line break' },
+        { value: TextOverflow.CLIP, label: 'Clip', sublabel: 'Hard cut content' },
+        { value: TextOverflow.ELLIPSIS, label: 'Ellipsis', sublabel: 'Add "..." at end' },
+        { value: TextOverflow.SCALE, label: 'Scale to Fit', sublabel: 'Auto-shrink font' }
+      ];
+    }
   }
 
   private setupListeners(): void {
@@ -110,6 +197,7 @@ export class InspectorSectionText extends HTMLElement {
     };
 
     root.addEventListener('app-input', handler);
+    root.addEventListener('app-select', handler);
     root.addEventListener('input', handler);
     root.addEventListener('change', handler);
   }
@@ -119,7 +207,14 @@ export class InspectorSectionText extends HTMLElement {
     const el = this._element;
     const shadow = this.shadowRoot;
 
-    const inputs = shadow.querySelectorAll<InputWithMetadata>('[data-prop]');
+    const isScaleMode = el.overflow === TextOverflow.SCALE;
+    const sizeScrubber = shadow.getElementById('font-size-scrubber') as any;
+    if (sizeScrubber) {
+      if (isScaleMode) sizeScrubber.setAttribute('disabled', '');
+      else sizeScrubber.removeAttribute('disabled');
+    }
+
+    const inputs = shadow.querySelectorAll<HTMLElement & { value?: any, checked?: boolean }>('[data-prop]');
     inputs.forEach(input => {
       const prop = input.getAttribute('data-prop');
       if (!prop) return;
@@ -127,18 +222,27 @@ export class InspectorSectionText extends HTMLElement {
       const isFocused = shadow.activeElement === input || input.shadowRoot?.activeElement;
       if (isFocused) return;
 
-      let val: string | number | undefined;
+      let val: any;
       if (prop === 'content') val = el.content;
       else if (prop === 'fontSize') val = el.fontSize;
       else if (prop === 'lineHeight') val = el.lineHeight;
       else if (prop === 'color') val = el.color;
-      else if (prop === 'fontWeight') val = el.fontWeight;
+      else if (prop === 'fontWeight') val = String(el.fontWeight);
+      else if (prop === 'fontStyle') val = el.fontStyle;
+      else if (prop === 'justify') val = el.justify;
+      else if (prop === 'fontFamily') val = el.fontFamily;
+      else if (prop === 'textAlign') val = el.textAlign;
+      else if (prop === 'verticalAlign') val = el.verticalAlign;
+      else if (prop === 'overflow') val = el.overflow;
 
-      const currentVal = input.value !== undefined ? input.value : input.getAttribute('value');
-
-      if (val !== undefined && currentVal != val) {
-        input.value = val;
-        input.setAttribute('value', String(val));
+      if (input instanceof HTMLInputElement && input.type === 'checkbox') {
+        if (input.checked !== !!val) input.checked = !!val;
+      } else {
+        const currentVal = input.value !== undefined ? input.value : input.getAttribute('value');
+        if (val !== undefined && String(currentVal) !== String(val)) {
+          input.value = val;
+          input.setAttribute('value', String(val));
+        }
       }
     });
   }

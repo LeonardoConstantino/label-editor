@@ -37,7 +37,8 @@ describe('TemplateManager', () => {
         textAlign: 'center',
         verticalAlign: 'middle',
         overflow: TextOverflow.CLIP,
-        lineHeight: 1.2
+        lineHeight: 1.2,
+        keepRatio: false
       }
     ],
     createdAt: Date.now(),
