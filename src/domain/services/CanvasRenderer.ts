@@ -52,7 +52,6 @@ export class CanvasRenderer {
     ctx.globalAlpha = element.opacity ?? 1;
 
     // 2. Aplica Rotação Universal
-    // Para rotacionar ao redor do centro do elemento, precisamos saber as dimensões
     const x = element.position.x * scale;
     const y = element.position.y * scale;
 
@@ -63,6 +62,10 @@ export class CanvasRenderer {
       if ('dimensions' in element) {
         centerX = x + (element.dimensions.width * scale) / 2;
         centerY = y + (element.dimensions.height * scale) / 2;
+      } else if (element.type === ElementType.BORDER) {
+        // Border rotaciona no centro do canvas (já que ela ocupa o canvas todo menos inset)
+        centerX = ctx.canvas.width / 2;
+        centerY = ctx.canvas.height / 2;
       }
 
       ctx.translate(centerX, centerY);
@@ -90,10 +93,17 @@ export class CanvasRenderer {
     let targetY = pxY;
 
     // Se houver rotação, precisamos rotacionar o ponto do mouse inversamente 
-    // ao redor do centro do elemento para testar contra o retângulo alinhado aos eixos.
-    if (element.rotation && element.rotation !== 0 && 'dimensions' in element) {
-      const centerX = x + (element.dimensions.width * scale) / 2;
-      const centerY = y + (element.dimensions.height * scale) / 2;
+    if (element.rotation && element.rotation !== 0) {
+      let centerX = x;
+      let centerY = y;
+
+      if ('dimensions' in element) {
+        centerX = x + (element.dimensions.width * scale) / 2;
+        centerY = y + (element.dimensions.height * scale) / 2;
+      } else if (element.type === ElementType.BORDER) {
+        centerX = UnitConverter.mmToPx(config.widthMM, config.dpi) / 2;
+        centerY = UnitConverter.mmToPx(config.heightMM, config.dpi) / 2;
+      }
       
       const angle = (-element.rotation * Math.PI) / 180;
       const dx = pxX - centerX;
@@ -113,10 +123,12 @@ export class CanvasRenderer {
       const canvasW = UnitConverter.mmToPx(config.widthMM, config.dpi);
       const canvasH = UnitConverter.mmToPx(config.heightMM, config.dpi);
       const margin = element.position.x * scale;
+      
+      // Testamos contra o ponto já des-rotacionado
       const isNearEdge = (
-        (Math.abs(pxX - margin) < 10 || Math.abs(pxX - (canvasW - margin)) < 10) && pxY >= margin && pxY <= canvasH - margin
+        (Math.abs(targetX - margin) < 10 || Math.abs(targetX - (canvasW - margin)) < 10) && targetY >= margin && targetY <= canvasH - margin
       ) || (
-        (Math.abs(pxY - margin) < 10 || Math.abs(pxY - (canvasH - margin)) < 10) && pxX >= margin && pxX <= canvasW - margin
+        (Math.abs(targetY - margin) < 10 || Math.abs(targetY - (canvasH - margin)) < 10) && targetX >= margin && targetX <= canvasW - margin
       );
       return isNearEdge;
     }

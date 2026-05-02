@@ -93,6 +93,7 @@ export const DEFAULTS = {
   },
 
   [ElementType.BORDER]: {
+    position: { x: 5, y: 5 }, // Override para margem de 5mm por padrão
     style: BorderStyle.SOLID,
     width: 1,
     color: '#000000',
