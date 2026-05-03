@@ -13,6 +13,7 @@ Refatorar os renderizadores de Retângulo e Imagem para suportar as novas propri
 - **Rotação:** Aplicar `ctx.rotate()` em todos os renderers, garantindo que o desenho ocorra a partir do centro (translate para o centro, rotate, desenha, restore).
 
 ## Critérios de Aceite
-- [ ] Imagens podem ser mescladas com o fundo via Blending Modes.
-- [ ] Rotação não desloca o elemento de sua posição X,Y esperada.
-- [ ] Opacidade funciona individualmente por elemento.
+- [x] Imagens podem ser mescladas com o fundo via Blending Modes (12 modos).
+- [x] Rotação não desloca o elemento de sua posição X,Y esperada.
+- [x] Opacidade funciona individualmente por elemento.
+- [x] Retângulos suportam borderRadius real.

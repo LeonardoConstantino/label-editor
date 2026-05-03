@@ -14,5 +14,6 @@ Implementar o `BorderElement` como uma entidade independente para decoração de
 - **Renderização:** Suporte a `radius` para molduras arredondadas.
 
 ## Critérios de Aceite
-- [ ] Borda é renderizada respeitando a espessura (`width`) em mm.
-- [ ] Troca de cor e estilo funciona em tempo real.
+- [x] Borda é renderizada respeitando a espessura (`width`) em mm.
+- [x] Troca de cor e estilo funciona em tempo real.
+- [x] Suporte ao estilo DOUBLE concêntrico implementado.

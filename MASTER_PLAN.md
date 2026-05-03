@@ -53,14 +53,14 @@ Este Master Plan coordena a fase final de desenvolvimento, focando em estabilida
 | **73** | [Adoção Universal do AppSelect](./tasks/73_universal_select_adoption.md) | 06 | [ ] | 69 | `task/73-select-adoption` |
 | **52** | [Action Icon de Lock nos Cards de Camada](./tasks/52_ui_layer_lock.md) | 05 | [x] | 41 | `task/52-ui-layer-lock` |
 | **58** | [Elemento de Código (QR Code / Barcode)](./tasks/58_element_code.md) | 05 | [ ] | 41 | `task/58-element-code` |
-| **42** | [BorderElement (Standalone Moldura)](./tasks/42_border_element.md) | 05 | [ ] | 41 | `task/42-border-element` |
-| **43** | [Renderers Avançados (Shapes & Blending)](./tasks/43_adv_renderers.md) | 05 | [ ] | 12 | `task/43-adv-renderers` |
+| **42** | [BorderElement (Standalone Moldura)](./tasks/42_border_element.md) | 05 | [x] | 41 | `task/42-border-element` |
+| **43** | [Renderers Avançados (Shapes & Blending)](./tasks/43_adv_renderers.md) | 05 | [x] | 12 | `task/43-adv-renderers` |
 | **50** | [Metadados e Cálculos no Interpolador](./tasks/50_interpolator_metadata_math.md) | 05 | [ ] | 34 | `task/50-interpolator-meta` |
 
 ### Fase D: Refinamentos Avançados & Estética
 | ID | Task | Pri | Status | Deps | Branch |
 |----|------|--------|------|--------|--------|
-| **44** | [TextElement Pro (Overflow & Vertical)](./tasks/44_text_pro.md) | 04 | [ ] | 12 | `task/44-text-pro` |
+| **44** | [TextElement Pro (Overflow & Vertical)](./tasks/44_text_pro.md) | 04 | [x] | 12 | `task/44-text-pro` |
 | **59** | [Otimização de Histórico (Snapshot Debounce)](./tasks/59_history_debounce.md) | 04 | [ ] | 11 | `task/59-history-debounce` |
 | **49** | [Unificação de Estilo KBD (3D Prism)](./tasks/49_kbd_style_unification.md) | 03 | [x] | 22 | `task/49-kbd-style` |
 | **72** | [Padronização de Tooltips de Ajuda](./tasks/72_help_tooltips_standardization.md) | 03 | [ ] | 46 | `task/72-help-tooltips` |

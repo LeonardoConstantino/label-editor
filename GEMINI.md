@@ -67,63 +67,23 @@ The project follows a modular, event-driven architecture:
 
 ## Session Logs
 
-### 2026-04-21: Major Feature Push & Production Readiness
-- **The Vault:** Galeria glassmorphic com Digital Twin.
-- **ShortcutService:** Sistema de atalhos contextuais e Prop Clipboard.
-- **BIOS Boot:** Lógica de restauração de sessão e Welcome Screen.
-
-### 2026-04-22: Planejamento de Consolidação & Performance
-- **Backlog v4.0:** Criação das tasks 49-63 focadas em polimento e estabilidade.
-- **Master Plan:** Reorganização por impacto e introdução de prioridades (0-10).
-- **Decisão Técnica:** Adoção de `adoptedStyleSheets` e renderização incremental.
-
-### 2026-04-23: Expansão Tática & Planejamento de Produção
-- **UX & Comfort:** Controle global de áudio e presets de tamanho de etiqueta.
-- **Compliance:** Definição da aba "About" com Termos e Privacidade local-only.
-- **Larga Escala:** Suporte para etiquetas de até 500mm e impressão em A3/Paisagem.
-
-### 2026-04-24: Auditoria de Progresso & Consolidação de Regras
-- **Auditoria Geral:** Revisão dos critérios de aceite das Tasks 01 a 50. Sincronização do estado real do projeto com a documentação.
-- **Finalização Task 60:** Formalização das diretrizes de **Code Style** e **Pragmatic Excellence** no GEMINI.md.
-- **Restauração de Backlog:** Reativação das tasks de performance (Web Workers) e acabamento de PDF (Sangria/Corte).
-
-### 2026-04-26: Performance, Portabilidade & Refinamento de Core
-- **Task 51 (Focus Protection):** Implementada detecção recursiva de foco em Shadow DOM, protegendo inputs contra interferência de atalhos globais.
-- **Task 54 (Canvas Zoom):** Migração para zoom visual via CSS `transform: scale`, implementação de camada `artboard-scaler` para respiro (gutter) dinâmico e correção matemática do `hit-test`.
-- **Task 33 (JSON Portability):** Implementado ecossistema de importação/exportação de arquivos `.label` na Toolbar, Welcome Screen e Vault.
-- **Task 61 (DOM Optimization):** Refatoração do ciclo de vida da Toolbar, Canvas e Vault para atualizações incrementais (eliminando `innerHTML` em loops de estado).
-- **Task 68 (Asset Intelligence):** Adicionado contador de inventário no Vault com Tooltips Ricas e detalhamento por ícones de camadas.
-- **Task 71 (Event Registry):** Iniciada orquestração de eventos; criado `docs/Event_System_Registry.md` com mapeamento de 21 eventos e auditoria de órfãos.
-
-### 2026-04-27: Polimento de UX & Unificação de Design
-- **Task 56 (Inspector Layout):** Ajuste de padding no cabeçalho do Inspector para consistência visual em resoluções menores.
-- **Task 49 (KBD Unification):** Centralização da lógica de renderização de atalhos no `UIKeyboardShortcuts` (SSoT). Refatoração de `Toolbar`, `HelpCenter` e `UiHudTips` para utilizar o motor unificado.
-- **Design System:** Implementado estilo "3D Prism" para elementos `<kbd>` globalmente, adicionando profundidade visual e feedback tátil via CSS.
-- **Integridade:** Sincronização de interfaces de atalhos e correção de tipos TS para garantir build estável.
-### 2026-05-01: Consolidação de Modelos & Proteção de Camadas
-- **Task 55 (Aspect Ratio Lock):** Implementado vínculo de proporção entre Largura e Altura.
-  - **Interface:** Adicionado botão de `link` tátil com linhas conectoras dinâmicas no painel de Transformação.
-  - **Lógica Proporcional:** Cálculo em tempo real do fator de escala ao alterar uma dimensão, mantendo a integridade visual do elemento.
-  - **Arquitetura:** Atualizado `InspectorLayerCard` para suportar sincronização instantânea de seções via atributos DOM.
-### 2026-05-01: Consolidação de Modelos & Unificação de UI
+### 2026-05-02: Maturidade de Renderização & Unificação de UI
+- **Task 44 (Text Pro):** Renderização profissional com alinhamento vertical, justificado e overflow complexo. Implementada busca binária para SCALE robusto e truncamento ELLIPSIS manual.
+- **Task 43 (Adv Renderers):** Suporte a Blending Modes (12 tipos), borderRadius real em retângulos e suavização controlada de imagem.
+- **Task 42 (Border Element):** Molduras decorativas com suporte a estilo DOUBLE concêntrico matemático e tracejados customizáveis.
 - **Task 69 (UI Select):** Criado o componente `AppSelect` com visual Tactile Prism e glassmorphism.
-  - **Presets:** Implementado seletor de tamanhos de etiqueta (Small, Medium, A4, etc) no Document Setup.
-  - **UX:** Sincronia bi-direcional entre presets e inputs manuais (Auto-Custom).
-- **Task 55 (Aspect Ratio Lock):** Implementado vínculo de proporção entre Largura e Altura.
-  - **Interface:** Adicionado botão de `link` tátil com linhas conectoras dinâmicas no painel de Transformação.
-  - **Lógica Proporcional:** Cálculo em tempo real do fator de escala ao alterar uma dimensão.
-- **Task 41 (Unified Models):** Sincronização completa do domínio com o Inventário v1.1.
-  - **Atributos Universais:** Integrados `rotation`, `opacity`, `locked` e `name` em todos os elementos.
-  - **Motor Gráfico:** `CanvasRenderer` centraliza transformações espaciais e hit-test rotacionado.
-- **Task 52 (Layer Lock):** Implementado sistema de congelamento de edição com proteção de UX em atalhos globais.
-- **Planejamento:** Criada Task 73 para adoção universal do `AppSelect` em todo o ecossistema.
+  - **Presets:** Implementado seletor de tamanhos de etiqueta (A4, Shipping, Business Card, etc) no Document Setup.
+  - **UX:** Sincronia bi-direcional entre presets e inputs manuais.
+- **Task 55 (Aspect Ratio Lock):** Implementado vínculo de proporção entre Largura e Altura com feedback visual de "conexão" tátil.
+- **Task 41 (Unified Models):** Sincronização completa do domínio com o Inventário v1.1. Atributos Universais (`rotation`, `opacity`) agora funcionam em todos os elementos de forma centralizada.
+- **Task 52 (Layer Lock):** Sistema de congelamento de edição com proteção de UX em atalhos globais e bloqueio de inputs no Inspector.
 
 ### 2026-04-30: Arquitetura de Componentes & Integridade de UI
 - **Task 46 (Deep Refactor):** Finalizada refatoração profunda do `ElementInspector`.
   - **Decomposição em 3 Níveis:** Orquestrador (N1), Containers (N2) e Seções especialistas (N3).
-  - **Filtragem por Identidade:** Implementada lógica rigorosa no `resolveInspectorValue` para eliminar ruído de eventos nativos (`InputEvent` com `detail: 0`) que corrompiam a Store.
-  - **Tipagem Estrita:** Eliminação total de `any` no submódulo de inspeção; adoção de interfaces para sub-componentes.
-  - **Estabilidade:** Sincronização de inputs agora utiliza atributos (`setAttribute`) e propriedades, com detecção recursiva de foco para evitar perda de cursor.
-  - **Regressão:** Adição de testes de fumaça abrangentes (UI Smoke Tests) com mocks de `fake-indexeddb` e Shadow DOM.
-  - **Preservação:** Código original preservado em `ElementInspector.legacy.ts` para consulta técnica.
-- **Core:** Correção de race condition no `UINumberScrubber` durante inicialização assíncrona.
+  - **Filtragem por Identidade:** Eliminação de ruído de eventos nativos.
+  - **Regressão:** Adição de testes de fumaça abrangentes (UI Smoke Tests).
+
+### 2026-04-27: Polimento de UX & Unificação de Design
+- **Task 49 (KBD Unification):** Centralização da lógica de renderização de atalhos no `UIKeyboardShortcuts`.
+- **Design System:** Implementado estilo "3D Prism" para elementos `<kbd>` globalmente.

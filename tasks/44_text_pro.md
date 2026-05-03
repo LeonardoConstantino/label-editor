@@ -17,5 +17,6 @@ Elevar o `TextRenderer` ao nível profissional, suportando alinhamentos complexo
 - **Rotação & Opacidade:** Integrar com a lógica de transformação global do Renderer.
 
 ## Critérios de Aceite
-- [ ] Textos longos respeitam o modo de overflow selecionado.
-- [ ] O alinhamento vertical posiciona o texto corretamente dentro da área definida pelas dimensões.
+- [x] Textos longos respeitam o modo de overflow selecionado (Scale, Ellipsis, Wrap, Clip).
+- [x] O alinhamento vertical posiciona o texto corretamente dentro da área definida pelas dimensões.
+- [x] Implementação de busca binária para SCALE robusto sem poluir o canvas.
