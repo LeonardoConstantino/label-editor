@@ -26,6 +26,24 @@ export enum ImageFit {
   NONE = 'none'
 }
 
+/**
+ * CompositeOperation: Modos de mesclagem (Blending Modes) do Canvas.
+ */
+export enum CompositeOperation {
+  SOURCE_OVER = 'source-over',
+  MULTIPLY = 'multiply',
+  SCREEN = 'screen',
+  OVERLAY = 'overlay',
+  DARKEN = 'darken',
+  LIGHTEN = 'lighten',
+  COLOR_DODGE = 'color-dodge',
+  COLOR_BURN = 'color-burn',
+  HARD_LIGHT = 'hard-light',
+  SOFT_LIGHT = 'soft-light',
+  DIFFERENCE = 'difference',
+  EXCLUSION = 'exclusion'
+}
+
 export interface Position {
   x: number; // em mm
   y: number; // em mm

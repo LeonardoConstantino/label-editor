@@ -3,7 +3,7 @@ import { ImageElement } from '../../models/elements/SpecificElements';
 import { RenderContext } from '../CanvasRenderer';
 
 /**
- * ImageRenderer: Renderiza imagens otimizadas no canvas.
+ * ImageRenderer: Renderiza imagens otimizadas no canvas com suporte a Blending e Fit.
  */
 export class ImageRenderer implements IRenderer {
   private imageCache: Map<string, HTMLImageElement> = new Map();
@@ -26,11 +26,24 @@ export class ImageRenderer implements IRenderer {
     }
 
     if (img.complete) {
+      ctx.save();
+      
+      // 1. Aplica Blending Mode (Task 43)
+      if (element.compositeOperation) {
+        ctx.globalCompositeOperation = element.compositeOperation as GlobalCompositeOperation;
+      }
+
+      // 2. Aplica Suavização (Task 43)
+      ctx.imageSmoothingEnabled = element.smoothing !== false;
+      ctx.imageSmoothingQuality = 'high';
+
+      // 3. Desenha com Fit
       this.drawImageScaled(ctx, img, x, y, w, h, element.fit);
+
+      ctx.restore();
     } else {
       img.onload = () => {
-        // Força um redraw global quando a imagem carregar
-        context.ctx.drawImage(img!, x, y, w, h);
+        // Redraw ocorrerá no próximo frame da Store
       };
     }
   }
@@ -41,8 +54,16 @@ export class ImageRenderer implements IRenderer {
     x: number, y: number, w: number, h: number, 
     fit: string
   ): void {
+    // Limpa a região onde a imagem será desenhada
+    ctx.clearRect(x, y, w, h);
+
     if (fit === 'fill') {
       ctx.drawImage(img, x, y, w, h);
+      return;
+    }
+
+    if (fit === 'none') {
+      ctx.drawImage(img, x, y);
       return;
     }
 
@@ -61,6 +82,22 @@ export class ImageRenderer implements IRenderer {
         renderW = h * imgRatio;
         offsetX = (w - renderW) / 2;
       }
+    } else if (fit === 'cover') {
+      // No modo cover, recortamos a imagem para preencher a área sem distorcer
+      let sw, sh, sx, sy;
+      if (imgRatio > containerRatio) {
+        sh = img.height;
+        sw = img.height * containerRatio;
+        sx = (img.width - sw) / 2;
+        sy = 0;
+      } else {
+        sw = img.width;
+        sh = img.width / containerRatio;
+        sx = 0;
+        sy = (img.height - sh) / 2;
+      }
+      ctx.drawImage(img, sx, sy, sw, sh, x, y, w, h);
+      return;
     }
 
     ctx.drawImage(img, x + offsetX, y + offsetY, renderW, renderH);

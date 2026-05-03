@@ -1,19 +1,20 @@
 import { ImageElement } from '../../../../domain/models/elements/SpecificElements';
+import { ImageFit, CompositeOperation } from '../../../../domain/models/elements/BaseElement';
 import { sharedSheet } from '../../../../utils/shared-styles';
 import { dispatchInspectorChange, resolveInspectorValue } from '../inspector-events';
 import { escapeHTML } from '../../../../utils/sanitize';
 
 // Garantir registros
 import '../../../common/AppInput';
+import '../../../common/AppSelect';
 
 interface InputWithMetadata extends HTMLElement {
   value: string | number;
   checked?: boolean;
-  type?: string;
 }
 
 /**
- * InspectorSectionImage: Propriedades de Imagem.
+ * InspectorSectionImage: Propriedades de Imagem com suporte a Blending e Fit (Task 43).
  */
 export class InspectorSectionImage extends HTMLElement {
   private _element: ImageElement | null = null;
@@ -44,20 +45,66 @@ export class InspectorSectionImage extends HTMLElement {
 
     this.shadowRoot.innerHTML = `
       <style>
-        :host { display: flex; flex-direction: column; gap: 8px; }
-        .row-ui { display: flex; gap: 10px; align-items: center; }
+        :host { display: flex; flex-direction: column; gap: 8px; padding-bottom: 16px; }
+        .row-ui { display: flex; gap: 10px; align-items: flex-end; }
         .row-ui > * { flex: 1; min-width: 0; }
+        
+        .switch-row { 
+          display: flex; justify-content: space-between; align-items: center;
+          padding: 8px 12px; background: var(--color-surface-elevated);
+          border: 1px solid var(--color-border-ui); border-radius: 8px;
+        }
       </style>
       
-      <span class="label-prism">Image Settings</span>
+      <span class="label-prism">Image Configuration</span>
+      
       <div class="row-ui">
-        <app-input label="Fit Mode" data-prop="fit" value="${escapeHTML(el.fit)}" style="flex:1"></app-input>
+        <app-select id="fit-mode" label="Fit Strategy" data-prop="fit" value="${el.fit}"></app-select>
       </div>
-      <div class="row-ui" style="margin-top: 4px;">
-        <span style="font-family: var(--font-mono); font-size: 10px; color: var(--color-text-muted); text-transform: uppercase;">Smoothing</span>
-        <input type="checkbox" data-prop="smoothing" ${el.smoothing !== false ? 'checked' : ''} style="width: auto; flex: none;">
+
+      <div class="row-ui">
+        <app-select id="blend-mode" label="Blending" data-prop="compositeOperation" value="${el.compositeOperation || CompositeOperation.SOURCE_OVER}"></app-select>
+      </div>
+
+      <div class="switch-row">
+        <span class="font-mono text-[10px] text-text-muted uppercase">Smoothing</span>
+        <input type="checkbox" data-prop="smoothing" ${el.smoothing !== false ? 'checked' : ''} style="width: 18px; height: 18px; cursor: pointer;">
       </div>
     `;
+
+    this.setupSelects();
+  }
+
+  private setupSelects() {
+    const shadow = this.shadowRoot!;
+    
+    const fitSelect = shadow.getElementById('fit-mode') as any;
+    if (fitSelect) {
+      fitSelect.options = [
+        { value: ImageFit.CONTAIN, label: 'Contain', sublabel: 'Fit inside box' },
+        { value: ImageFit.COVER, label: 'Cover', sublabel: 'Fill and crop' },
+        { value: ImageFit.FILL, label: 'Stretch', sublabel: 'Distort to fill' },
+        { value: ImageFit.NONE, label: 'Original', sublabel: 'No scaling' }
+      ];
+    }
+
+    const blendSelect = shadow.getElementById('blend-mode') as any;
+    if (blendSelect) {
+      blendSelect.options = [
+        { value: CompositeOperation.SOURCE_OVER, label: 'Normal', sublabel: 'Standard overlay' },
+        { value: CompositeOperation.MULTIPLY, label: 'Multiply', sublabel: 'Darken interaction' },
+        { value: CompositeOperation.SCREEN, label: 'Screen', sublabel: 'Lighten interaction' },
+        { value: CompositeOperation.OVERLAY, label: 'Overlay', sublabel: 'High contrast' },
+        { value: CompositeOperation.DARKEN, label: 'Darken', sublabel: 'Keep darkest pixels' },
+        { value: CompositeOperation.LIGHTEN, label: 'Lighten', sublabel: 'Keep lightest pixels' },
+        { value: CompositeOperation.COLOR_DODGE, label: 'Color Dodge', sublabel: 'Brighten pixels' },
+        { value: CompositeOperation.COLOR_BURN, label: 'Color Burn', sublabel: 'Darken with contrast' },
+        { value: CompositeOperation.HARD_LIGHT, label: 'Hard Light', sublabel: 'Sharp contrast' },
+        { value: CompositeOperation.SOFT_LIGHT, label: 'Soft Light', sublabel: 'Subtle contrast' },
+        { value: CompositeOperation.DIFFERENCE, label: 'Difference', sublabel: 'Invert differences' },
+        { value: CompositeOperation.EXCLUSION, label: 'Exclusion', sublabel: 'Lower contrast diff' }
+      ];
+    }
   }
 
   private setupListeners(): void {
@@ -76,6 +123,7 @@ export class InspectorSectionImage extends HTMLElement {
     };
 
     root.addEventListener('app-input', handler);
+    root.addEventListener('app-select', handler);
     root.addEventListener('input', handler);
     root.addEventListener('change', handler);
   }
@@ -93,15 +141,19 @@ export class InspectorSectionImage extends HTMLElement {
       const isFocused = shadow.activeElement === input || input.shadowRoot?.activeElement;
       if (isFocused) return;
 
-      if (prop === 'fit') {
-        const currentVal = input.value !== undefined ? input.value : input.getAttribute('value');
-        if (currentVal != el.fit) {
-          input.value = el.fit;
-          input.setAttribute('value', el.fit);
+      let val: any;
+      if (prop === 'fit') val = el.fit;
+      else if (prop === 'compositeOperation') val = el.compositeOperation || CompositeOperation.SOURCE_OVER;
+      else if (prop === 'smoothing') val = el.smoothing !== false;
+
+      if (input instanceof HTMLInputElement && input.type === 'checkbox') {
+        if (input.checked !== !!val) input.checked = !!val;
+      } else {
+        const currentVal = (input as any).value !== undefined ? (input as any).value : input.getAttribute('value');
+        if (val !== undefined && String(currentVal) !== String(val)) {
+          (input as any).value = val;
+          input.setAttribute('value', String(val));
         }
-      } else if (prop === 'smoothing') {
-        const val = el.smoothing !== false;
-        if (input.checked !== val) input.checked = val;
       }
     });
   }

@@ -1,4 +1,4 @@
-import { BaseElement, Dimensions, BorderStyle, TextOverflow, ImageFit } from './BaseElement';
+import { BaseElement, Dimensions, BorderStyle, TextOverflow, ImageFit, CompositeOperation } from './BaseElement';
 
 export type TextAlign = 'left' | 'center' | 'right';
 export type VerticalAlign = 'top' | 'middle' | 'bottom';
@@ -31,7 +31,7 @@ export interface ImageElement extends BaseElement {
   src: string;
   fit: ImageFit;
   smoothing: boolean;
-  compositeOperation: string;
+  compositeOperation: CompositeOperation;
 }
 
 export interface BorderElement extends BaseElement {
