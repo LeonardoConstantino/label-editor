@@ -26,7 +26,7 @@ export class EditorCanvas extends HTMLElement {
     this.workspace = document.createElement('div');
     this.artboard = document.createElement('div');
     this.canvas = document.createElement('canvas');
-    this.ctx = this.canvas.getContext('2d', { willReadFrequently: true })!;
+    this.ctx = this.canvas.getContext('2d', { willReadFrequently: true, alpha: true })!;
   }
 
   connectedCallback(): void {

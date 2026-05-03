@@ -39,7 +39,7 @@ export class PDFGenerator {
 
     // Canvas oculto para renderização em alta resolução (incluindo sangria)
     const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d')!;
+    const ctx = canvas.getContext('2d', { alpha: true })!;
     const dpi = label.config.dpi || DEFAULTS.CANVAS.dpi;
     const scale = UnitConverter.mmToPx(1, dpi);
 
@@ -90,8 +90,8 @@ export class PDFGenerator {
       const pdfX = currentX - bleed;
       const pdfY = currentY - bleed;
       
-      const imgData = canvas.toDataURL('image/jpeg', 0.95);
-      pdf.addImage(imgData, 'JPEG', pdfX, pdfY, renderWidthMM, renderHeightMM);
+      const imgData = canvas.toDataURL('image/png');
+      pdf.addImage(imgData, 'PNG', pdfX, pdfY, renderWidthMM, renderHeightMM);
 
       // Marcas de corte profissionais (L-marks)
       if (layout.showCropMarks) {

@@ -114,7 +114,7 @@ export class TextRenderer implements IRenderer {
     if (!TextRenderer.offscreenCanvas) {
       TextRenderer.offscreenCanvas = document.createElement('canvas');
     }
-    return TextRenderer.offscreenCanvas.getContext('2d', { willReadFrequently: true })!;
+    return TextRenderer.offscreenCanvas.getContext('2d', { willReadFrequently: true, alpha: true })!;
   }
 
   /**

@@ -2,7 +2,6 @@ import { ImageElement } from '../../../../domain/models/elements/SpecificElement
 import { ImageFit, CompositeOperation } from '../../../../domain/models/elements/BaseElement';
 import { sharedSheet } from '../../../../utils/shared-styles';
 import { dispatchInspectorChange, resolveInspectorValue } from '../inspector-events';
-import { escapeHTML } from '../../../../utils/sanitize';
 
 // Garantir registros
 import '../../../common/AppInput';
@@ -68,7 +67,7 @@ export class InspectorSectionImage extends HTMLElement {
 
       <div class="switch-row">
         <span class="font-mono text-[10px] text-text-muted uppercase">Smoothing</span>
-        <input type="checkbox" data-prop="smoothing" ${el.smoothing !== false ? 'checked' : ''} style="width: 18px; height: 18px; cursor: pointer;">
+        <input type="checkbox" data-prop="smoothing" ${el.smoothing !== false ? 'checked' : ''}>
       </div>
     `;
 

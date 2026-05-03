@@ -523,7 +523,7 @@ export class DataSourceInput extends HTMLElement {
   }
 
   private renderLabelThumb(canvas: HTMLCanvasElement, label: any, data: any): void {
-    const ctx = canvas.getContext('2d')!;
+    const ctx = canvas.getContext('2d', { alpha: true })!;
     const currentDpi = label.config.dpi || DEFAULTS.CANVAS.dpi;
 
     // Aumentamos a resolução interna do canvas do thumb para não ficar tão embaçado

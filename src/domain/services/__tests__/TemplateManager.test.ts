@@ -35,9 +35,10 @@ describe('TemplateManager', () => {
         fontWeight: 400,
         fontStyle: 'normal',
         textAlign: 'center',
-        verticalAlign: 'middle',
+        verticalAlign: 'top',
         overflow: TextOverflow.CLIP,
         lineHeight: 1.2,
+        justify: false,
         keepRatio: false
       }
     ],

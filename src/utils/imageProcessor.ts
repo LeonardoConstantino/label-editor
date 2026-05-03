@@ -41,13 +41,13 @@ export const imageProcessor = {
           canvas.width = width;
           canvas.height = height;
 
-          const ctx = canvas.getContext('2d');
+          const ctx = canvas.getContext('2d', { alpha: true });
           if (!ctx) return reject('Falha ao obter contexto Canvas');
 
           ctx.drawImage(img, 0, 0, width, height);
 
-          // Exporta como JPEG para melhor compressão em fotos
-          const base64 = canvas.toDataURL('image/jpeg', quality);
+          // Exporta como WebP para manter transparência e melhor compressão
+          const base64 = canvas.toDataURL('image/webp', quality);
 
           logger.debug('Image', `Otimizada: ${(base64.length / 1024).toFixed(1)} KB`);
           

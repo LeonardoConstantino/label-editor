@@ -170,7 +170,7 @@ export class TemplateManager {
   public async captureThumbnail(label: Label): Promise<string> {
     return new Promise((resolve) => {
       const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
+      const ctx = canvas.getContext('2d', { alpha: true });
       if (!ctx) {
         resolve('');
         return;

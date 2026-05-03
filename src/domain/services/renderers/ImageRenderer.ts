@@ -54,9 +54,6 @@ export class ImageRenderer implements IRenderer {
     x: number, y: number, w: number, h: number, 
     fit: string
   ): void {
-    // Limpa a região onde a imagem será desenhada
-    ctx.clearRect(x, y, w, h);
-
     if (fit === 'fill') {
       ctx.drawImage(img, x, y, w, h);
       return;
