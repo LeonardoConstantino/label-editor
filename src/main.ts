@@ -24,6 +24,7 @@ import './components/common/UINumberScrubber';
 import './components/common/tooltip';
 import './components/common/ui-hud-tips';
 import helpData from './assets/data/helpData';
+import { InspectorHelpData } from './utils/HelpContentProvider';
 
 // Global Notification Listener
 eventBus.on('notify', (options: any) => {
@@ -91,10 +92,16 @@ document.addEventListener('DOMContentLoaded', async () => {
   const tempShortcuts = new UIKeyboardShortcuts();
   tempShortcuts.data = allShortcuts;
 
+  const inspectorTips = Object.values(InspectorHelpData).flatMap(section => [
+    ...section.commands.map(cmd => `${section.title}: ${cmd.key ? `[${cmd.key}] ` : ''}${cmd.label} - ${cmd.desc}`),
+    ...(section.proTip ? [section.proTip.text.replace(/<[^>]*>/g, '')] : [])
+  ]);
+
   document.querySelector('ui-hud-tips')?.setTips([
     ...allShortcuts.map(i => `[${i.key||i.sequence}] - ${i.description}`),
     ...helpData.proTips.map(i => i.tip),
-    'Dica: Use Ctrl+Z para desfazer ações.',
+    ...inspectorTips,
+    'Dica: Use [Ctrl+Z] para desfazer ações.',
     'Dica: Use as setas do teclado para mover elementos selecionados.',
   ]);
 

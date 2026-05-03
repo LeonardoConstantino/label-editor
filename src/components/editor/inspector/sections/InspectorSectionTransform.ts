@@ -7,6 +7,8 @@ import { UISM } from '../../../../core/UISoundManager';
 import '../../../common/UINumberScrubber';
 import '../../../common/icon';
 
+import { HelpContentProvider } from '../../../../utils/HelpContentProvider';
+
 interface InputWithMetadata extends HTMLElement {
   value: string | number;
   classList: DOMTokenList;
@@ -83,7 +85,10 @@ export class InspectorSectionTransform extends HTMLElement {
         .active .link-line { opacity: 0.5; color: var(--color-accent-primary); }
       </style>
       
-      <span class="label-prism">Transform</span>
+      <div class="flex items-center justify-between mb-1">
+        <span class="label-prism" style="margin:0">Transform</span>
+        ${HelpContentProvider.buildTooltip('transform')}
+      </div>
       <div class="row-ui">
         <ui-number-scrubber label="X" data-prop="position.x" value="${el.position.x}" step="0.1" unit="mm"></ui-number-scrubber>
         <ui-number-scrubber label="Y" data-prop="position.y" value="${el.position.y}" step="0.1" unit="mm"></ui-number-scrubber>

@@ -19,11 +19,16 @@ Padronizar a experiência de ajuda rápida no Inspector, adicionando tooltips ri
 5. **Integração no Inspector:**
    - Injetar a chamada da função nos cabeçalhos das seções (`<div class="section-header">`) dentro do `ElementInspector.ts`.
 
+## Status
+- [ ] **Pendente:** Aprofundar a documentação dos formatadores do interpolador dinâmico (`DataSourceParser.ts`) nas tooltips de texto e nas HUD Tips.
+
 ## Critérios de Aceite
-- [ ] O componente Inspector não possui HTML cru de tooltips (tudo via Provider).
-- [ ] Todas as seções possuem o ícone `[?]` com comportamento de `delay="200"`.
-- [ ] A formatação visual (Teclas 3D, Dicas com ícone, Header) é idêntica em todos os painéis.
-- [ ] Zero impacto de performance (apenas interpolação de strings no render).
+- [x] O componente Inspector não possui HTML cru de tooltips (tudo via Provider).
+- [x] Todas as seções possuem o ícone `[?]` com comportamento de `delay="200"`.
+- [x] A formatação visual (Teclas 3D, Dicas com ícone, Header) é idêntica em todos os painéis.
+- [x] Zero impacto de performance (apenas interpolação de strings no render).
+- [x] Integração do `InspectorHelpData` com o console de dicas `ui-hud-tips`.
+- [ ] Documentação exaustiva de todos os formatadores (currency, date, truncate, etc).
 
 ---
 

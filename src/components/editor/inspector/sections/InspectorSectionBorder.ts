@@ -3,6 +3,7 @@ import { BorderStyle } from '../../../../domain/models/elements/BaseElement';
 import { sharedSheet } from '../../../../utils/shared-styles';
 import { dispatchInspectorChange, resolveInspectorValue } from '../inspector-events';
 import { escapeHTML } from '../../../../utils/sanitize';
+import { HelpContentProvider } from '../../../../utils/HelpContentProvider';
 
 // Garantir registros
 import '../../../common/AppInput';
@@ -51,7 +52,10 @@ export class InspectorSectionBorder extends HTMLElement {
         .fixed-small { flex: none; width: 100px; }
       </style>
       
-      <span class="label-prism">Border Frame</span>
+      <div class="flex items-center justify-between mb-1">
+        <span class="label-prism" style="margin:0">Border Frame</span>
+        ${HelpContentProvider.buildTooltip('border')}
+      </div>
       
       <div class="row-ui">
         <app-select id="border-style" label="Line Style" data-prop="style" value="${el.style}"></app-select>

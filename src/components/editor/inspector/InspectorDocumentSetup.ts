@@ -4,6 +4,7 @@ import { sharedSheet } from '../../../utils/shared-styles';
 import { dispatchInspectorChange, dispatchInspectorAction, resolveInspectorValue } from './inspector-events';
 import { escapeHTML } from '../../../utils/sanitize';
 import { LABEL_PRESETS } from '../../../constants/defaults';
+import { HelpContentProvider } from '../../../utils/HelpContentProvider';
 
 // Garantir registros
 import '../../common/AppInput';
@@ -121,7 +122,10 @@ export class InspectorDocumentSetup extends HTMLElement {
         <div class="cota-badge" style="right: 8px; writing-mode: vertical-rl;">${heightMM}mm</div>
       </div>
       
-      <span class="label-prism">Canvas Setup</span>
+      <div class="flex items-center justify-between mb-1">
+        <span class="label-prism" style="margin:0">Canvas Setup</span>
+        ${HelpContentProvider.buildTooltip('setup')}
+      </div>
       
       <div class="row-ui">
         <app-select id="select-preset" label="Dimensions Preset"></app-select>

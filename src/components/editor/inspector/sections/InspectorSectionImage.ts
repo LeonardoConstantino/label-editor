@@ -2,6 +2,7 @@ import { ImageElement } from '../../../../domain/models/elements/SpecificElement
 import { ImageFit, CompositeOperation } from '../../../../domain/models/elements/BaseElement';
 import { sharedSheet } from '../../../../utils/shared-styles';
 import { dispatchInspectorChange, resolveInspectorValue } from '../inspector-events';
+import { HelpContentProvider } from '../../../../utils/HelpContentProvider';
 
 // Garantir registros
 import '../../../common/AppInput';
@@ -55,7 +56,10 @@ export class InspectorSectionImage extends HTMLElement {
         }
       </style>
       
-      <span class="label-prism">Image Configuration</span>
+      <div class="flex items-center justify-between mb-1">
+        <span class="label-prism" style="margin:0">Image Configuration</span>
+        ${HelpContentProvider.buildTooltip('image')}
+      </div>
       
       <div class="row-ui">
         <app-select id="fit-mode" label="Fit Strategy" data-prop="fit" value="${el.fit}"></app-select>

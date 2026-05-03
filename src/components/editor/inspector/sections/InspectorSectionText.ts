@@ -3,6 +3,7 @@ import { TextOverflow } from '../../../../domain/models/elements/BaseElement';
 import { sharedSheet } from '../../../../utils/shared-styles';
 import { dispatchInspectorChange, resolveInspectorValue } from '../inspector-events';
 import { escapeHTML } from '../../../../utils/sanitize';
+import { HelpContentProvider } from '../../../../utils/HelpContentProvider';
 
 // Garantir registros
 import '../../../common/AppInput';
@@ -55,25 +56,7 @@ export class InspectorSectionText extends HTMLElement {
       
       <div class="flex items-center justify-between mb-1">
         <span class="label-prism" style="margin:0">Typography</span>
-        <ui-tooltip placement="left" offset="12">
-          <button slot="target" class="help-btn cursor-help opacity-50" aria-label="Manual Técnico">
-            <ui-icon name="help" size="sm"></ui-icon>
-          </button>
-          <div slot="content" class="tooltip-rich-panel w-60">
-            <div class="tooltip-rich-header mb-2 pb-1.5 border-b border-white/10 flex items-center gap-1.5">
-              <ui-icon name="brackets" class="w-3.5 h-3.5 text-accent-primary"></ui-icon>
-              <span class="font-mono text-[10px] text-text-main font-semibold uppercase tracking-wider">
-                Technical Guide
-              </span>
-            </div>
-            <div class="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1.5 items-center text-[10px] mb-1">
-              <code class="font-mono text-accent-primary bg-accent-primary/10 px-1 py-0.5 rounded border border-accent-primary/20">Scale</code> 
-              <span class="text-text-muted">Auto-shrinks font to fit</span>
-              <code class="font-mono text-accent-primary bg-accent-primary/10 px-1 py-0.5 rounded border border-accent-primary/20">Justify</code> 
-              <span class="text-text-muted">Aligns to both edges</span>
-            </div>
-          </div>
-        </ui-tooltip>
+        ${HelpContentProvider.buildTooltip('text')}
       </div>
 
       <div class="row-ui">

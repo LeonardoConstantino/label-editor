@@ -54,6 +54,26 @@ const helpData = {
       icon: 'layers',
       tip: 'Mantenha camadas importantes bloqueadas [Ctrl+L] para evitar movimentos acidentais durante o design.',
     },
+    {
+      icon: 'brackets',
+      tip: 'Use {{var||Valor}} para definir um fallback caso o dado esteja vazio.',
+    },
+    {
+      icon: 'lightning',
+      tip: 'Formatadores: {{preco:currency}} gera R$ 1.250,00 automaticamente.',
+    },
+    {
+      icon: 'calendar',
+      tip: 'Formatadores: {{data:date}} formata datas para o padrão nacional.',
+    },
+    {
+      icon: 'text',
+      tip: 'Use {{texto:upper}} para forçar caixa alta em nomes de produtos.',
+    },
+    {
+      icon: 'pencil-ruler',
+      tip: 'Você pode encadear formatadores: {{texto:trim:capitalize}}.',
+    },
   ],
   aboutSection: {
     version: '4.0.0-Alpha',

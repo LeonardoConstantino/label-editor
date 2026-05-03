@@ -2,6 +2,7 @@ import { RectangleElement } from '../../../../domain/models/elements/SpecificEle
 import { sharedSheet } from '../../../../utils/shared-styles';
 import { dispatchInspectorChange, resolveInspectorValue } from '../inspector-events';
 import { escapeHTML } from '../../../../utils/sanitize';
+import { HelpContentProvider } from '../../../../utils/HelpContentProvider';
 
 // Garantir registros
 import '../../../common/AppInput';
@@ -48,7 +49,10 @@ export class InspectorSectionRect extends HTMLElement {
         .row-ui > * { flex: 1; min-width: 0; }
       </style>
       
-      <span class="label-prism">Appearance</span>
+      <div class="flex items-center justify-between mb-1">
+        <span class="label-prism" style="margin:0">Appearance</span>
+        ${HelpContentProvider.buildTooltip('rect')}
+      </div>
       <div class="row-ui">
         <app-input label="Fill" type="color" data-prop="fillColor" value="${escapeHTML(el.fillColor)}" style="flex:1"></app-input>
         <app-input label="Stroke" type="color" data-prop="strokeColor" value="${escapeHTML(el.strokeColor)}" style="flex:1"></app-input>

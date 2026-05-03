@@ -5,6 +5,7 @@ import { OverflowResult } from '../../domain/services/OverflowValidator';
 import { UISM } from '../../core/UISoundManager';
 import { debounce } from '../../utils/utils';
 import { sharedSheet } from '../../utils/shared-styles';
+import { HelpContentProvider } from '../../utils/HelpContentProvider';
 
 // Imports dos Componentes de UI básicos
 import '../common/AppInput';
@@ -114,19 +115,11 @@ export class ElementInspector extends HTMLElement {
           <span id="panel-title" class="inspector-title">LAYERS</span>
           <span id="unit-count" class="inspector-badge">0 UNITS</span>
         </div>
-        <ui-tooltip placement="bottom" offset="8">
-          <button slot="target" class="help-btn" aria-label="Manual Técnico"><ui-icon name="help" size="md"></ui-icon></button>
-          <div slot="content" class="tooltip-content p-2 text-[10px] leading-relaxed">
-             <strong class="text-accent-primary uppercase">Manual Técnico</strong><br/>
-             Arraste os números para ajustar (Shift: ±10 | Alt: ±0.1)<br/>
-             Suporta fórmulas: <code class="text-white">100/2 + 5</code>
-          </div>
-        </ui-tooltip>
+        ${HelpContentProvider.buildTooltip('global', 'bottom')}
       </div>
       <div id="panel-content"></div>
     `;
   }
-
   private rebuildPanel(label: Label, state: AppState): void {
     const container = this.shadowRoot?.getElementById('panel-content');
     const title = this.shadowRoot?.getElementById('panel-title');
