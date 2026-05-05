@@ -109,7 +109,7 @@ export class HelpContentProvider {
           <ui-icon name="help-circle" class="w-3.5 h-3.5"></ui-icon>
         </button>
         
-        <div slot="content" class="tooltip-rich-panel w-[260px]">
+        <div slot="content" class="tooltip-rich-panel w-65">
           <div class="tooltip-rich-header mb-2 pb-1.5 border-b border-white/10 flex items-center gap-1.5">
             <ui-icon name="${config.icon}" class="w-3.5 h-3.5 text-accent-primary"></ui-icon>
             <span class="font-bold">${config.title}</span>
