@@ -6,6 +6,7 @@ import { RectangleRenderer } from './renderers/RectangleRenderer';
 import { ImageRenderer } from './renderers/ImageRenderer';
 import { BorderRenderer } from './renderers/BorderRenderer';
 import { UnitConverter } from '../../utils/units';
+import eventBus from '../../core/EventBus';
 
 export interface RenderContext {
   ctx: CanvasRenderingContext2D;
@@ -31,10 +32,15 @@ export class CanvasRenderer {
    * Renderiza todos os elementos visíveis de uma etiqueta.
    */
   public renderAll(elements: AnyElement[], context: RenderContext): void {
+    const startTime = performance.now();
+
     elements
       .filter(el => el.visible !== false)
       .sort((a, b) => a.zIndex - b.zIndex)
       .forEach(element => this.render(element, context));
+
+    const duration = performance.now() - startTime;
+    eventBus.emit('perf:render', { duration });
   }
 
   /**

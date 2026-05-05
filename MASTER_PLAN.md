@@ -28,6 +28,7 @@ Este Master Plan coordena a fase final de desenvolvimento, focando em estabilida
 | **60** | [Definição de Code Style (GEMINI.md)](./tasks/60_code_style_definition.md) | 08 | [x] | — | `task/60-code-style` |
 | **70** | [Grande Auditoria de Integridade](./tasks/70_codebase_audit.md) | 09 | [ ] | 60 | `task/70-codebase-audit` |
 | **71** | [Mapeamento e Tipagem de Eventos (EventMap)](./tasks/71_event_orchestration.md) | 10 | [ ] | — | `task/71-event-mapping` |
+| **74** | [System Status Bar (Telemetry & Dev Console)](./tasks/74-status-bar.md) | 07 | [ ] | 46 | `task/74-status-bar` |
 
 ### Fase B: Gestão de Projetos & UX (Retenção do Usuário)
 | ID | Task | Pri | Status | Deps | Branch |

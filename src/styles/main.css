@@ -91,6 +91,19 @@
   ::-webkit-scrollbar-corner {
     background: transparent;
   }
+
+  @keyframes pulse-led {
+    0%, 100% { opacity: 1; filter: brightness(1); }
+    50%       { opacity: 0.4; filter: brightness(0.7); }
+  }
+
+  @keyframes pulse-led-magenta {
+    0%, 100% { opacity: 1; transform: scale(1.2); }
+    50%       { opacity: 0.6; transform: scale(1); }
+  }
+
+  .animate-pulse-led         { animation: pulse-led 2s infinite; }
+  .animate-pulse-led-magenta { animation: pulse-led-magenta 1s infinite; }
 }
 
 /* ==========================================

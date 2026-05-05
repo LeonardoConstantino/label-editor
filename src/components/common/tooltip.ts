@@ -580,14 +580,13 @@ class TooltipInstance {
     document.body.appendChild(this.#balloon);
 
     // Posiciona após render (aguarda próximo frame para garantir dimensões corretas)
+    // DEPOIS — dois frames: frame 1 = layout do shadow, frame 2 = dimensões estáveis
     requestAnimationFrame(() => {
-      const rect = this.#target.getBoundingClientRect();
-      this.#balloon!.position(
-        rect,
-        this.#config.placement,
-        this.#config.offset,
-      );
-      this.#balloon!.show();
+      requestAnimationFrame(() => {
+        const rect = this.#target.getBoundingClientRect();
+        this.#balloon!.position(rect, this.#config.placement, this.#config.offset);
+        this.#balloon!.show();
+      });
     });
   }
 
@@ -605,7 +604,13 @@ class TooltipInstance {
     }
 
     if (this.#config.templateRef) {
-      const tpl = document.getElementById(this.#config.templateRef);
+      // Busca no documento global primeiro, depois no shadow root do target
+      const root = this.#target.getRootNode() as Document | ShadowRoot;
+      const tpl =
+        (root.getElementById?.(this.#config.templateRef) ??
+        root.querySelector?.(`#${this.#config.templateRef}`)) as HTMLTemplateElement | null
+        ?? document.getElementById(this.#config.templateRef) as HTMLTemplateElement | null;
+
       if (tpl instanceof HTMLTemplateElement) {
         return tpl.content.cloneNode(true) as DocumentFragment;
       }
@@ -651,10 +656,19 @@ class TooltipInstance {
     Object.assign(this.#config, newConfig);
 
     // Se está aberto, atualiza conteúdo dinamicamente
+    // DEPOIS — reposiciona após dois frames (dimensões do novo conteúdo)
     if (this.#isOpen && this.#balloon) {
       const content = this.#resolveContent();
       if (content) {
         this.#balloon.setContent(content);
+
+        const balloon = this.#balloon;
+        const rect = this.#target.getBoundingClientRect();
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            balloon.position(rect, this.#config.placement, this.#config.offset);
+          });
+        });
       }
 
       if (newConfig.variant !== undefined) {

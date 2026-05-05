@@ -12,6 +12,7 @@ import { UISM } from './core/UISoundManager';
 import { shortcutService } from './core/ShortcutService';
 import { ToastManager } from './components/common/toast';
 import { getOSInfo } from './utils/os-detection';
+import { StatusBar } from './components/editor/StatusBar';
 import './components/editor/EditorCanvas';
 import './components/editor/Toolbar';
 import './components/editor/ElementInspector';
@@ -104,6 +105,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     'Dica: Use [Ctrl+Z] para desfazer ações.',
     'Dica: Use as setas do teclado para mover elementos selecionados.',
   ]);
+
+  const statusBar = new StatusBar();
+  statusBar.init();
 
   // BIOS: Boot Sequence
   const lastProjectId = localStorage.getItem('last_active_project');

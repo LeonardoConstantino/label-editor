@@ -134,7 +134,7 @@ export class ElementInspector extends HTMLElement {
     if (!this.shadowRoot) return;
     this.shadowRoot.innerHTML = `
       <style>
-        :host { display: flex; flex-direction: column; height: 100%; gap: 16px; padding: 20px; box-sizing: border-box; color: var(--color-text-main); font-family: var(--font-sans); overflow-y: scroll; }
+        :host { display: flex; flex-direction: column; flex: 1; min-height: 0; gap: 16px; padding: 20px; box-sizing: border-box; color: var(--color-text-main); font-family: var(--font-sans); overflow-y: scroll; }
         #panel-content { display: flex; flex-direction: column; gap: 12px; flex: 1; padding: 0 8px 120px 8px; }
       </style>
       <div class="inspector-header">

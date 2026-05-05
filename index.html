@@ -16,6 +16,52 @@
 
       <aside class="panel-glass">
         <element-inspector></element-inspector>
+        <ui-tooltip
+          tooltip-ref="telemetric-balloon"
+          placement="top"
+          variant="primary"
+          delay="100"
+        >
+          <div
+            slot="target"
+            class="flex items-center justify-between px-3 h-6 font-mono text-[9px] uppercase tracking-[0.05em] text-text-muted tabular-nums w-full mt-auto border-t border-border-ui bg-[#050608] shrink-0 select-none"
+          >
+            <div class="flex items-center gap-2">
+              <span
+                id="sys-led"
+                class="inline-block w-1.5 h-1.5 rounded-full bg-accent-success shadow-[0_0_8px_var(--color-accent-success)] animate-pulse-led cursor-crosshair transition-[background-color,box-shadow] duration-300"
+                title="Developer Mode: Click 5 times"
+              ></span>
+              <span>SYS OK</span>
+            </div>
+
+            <div class="flex items-center gap-3">
+              <span
+                >MS:<span
+                  id="render-time"
+                  class="text-accent-primary font-bold ml-0.5 tabular-nums"
+                  >0.00MS</span
+                ></span
+              >
+              <span class="w-px h-2.5 bg-border-ui mx-1 opacity-50"></span>
+              <span
+                >EL:<span
+                  id="el-count"
+                  class="text-text-main font-bold ml-0.5 tabular-nums"
+                  >00</span
+                ></span
+              >
+              <span class="w-px h-2.5 bg-border-ui mx-1 opacity-50"></span>
+              <span
+                >Z:<span
+                  id="zoom-lvl"
+                  class="text-text-main font-bold ml-0.5 tabular-nums"
+                  >100</span
+                >%</span
+              >
+            </div>
+          </div>
+        </ui-tooltip>
       </aside>
 
       <!-- Position Fixed, Bottom-6 centralizado horizontalmente -->
@@ -78,6 +124,57 @@
         </div>
       </div>
     </ui-modal>
+
+    <template id="telemetric-balloon">
+      <div class="w-80">
+        <div class="flex justify-between mb-2 pb-1 border-b border-white/10">
+          <span class="flex items-center gap-1.5 text-accent-primary">
+            <ui-icon name="command-line" style="--icon-size: 12px"></ui-icon>
+            Telemetry Dashboard
+          </span>
+          <span class="text-accent-success animate-pulse font-mono text-[9px]"
+            >ACTIVE</span
+          >
+        </div>
+
+        <div
+          class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 text-[10px] text-text-muted mt-2 font-mono"
+        >
+          <span class="opacity-50 uppercase">Performance:</span>
+          <span class="text-text-main">
+            <span id="fps-lvl">0 FPS</span>
+            <span class="opacity-30 mx-1">|</span>
+            Render: <span id="render-time-tip">0ms</span>
+          </span>
+
+          <span class="opacity-50 uppercase">Resolution:</span>
+          <span class="text-text-main" id="canvas-res">0x0 PX</span>
+
+          <span class="opacity-50 uppercase">Breakdown:</span>
+          <span class="text-text-main" id="breakdown">...</span>
+
+          <span class="opacity-50 uppercase">History:</span>
+          <span class="text-text-main" id="hist-nodes">0 / 50 Nodes</span>
+
+          <span class="opacity-50 uppercase">Environment:</span>
+          <span class="text-text-main" id="os-info">Detecting...</span>
+        </div>
+
+        <div
+          class="mt-3 pt-2 border-t border-white/5 flex gap-2 items-start text-[9px] text-accent-primary/80"
+        >
+          <ui-icon
+            name="cpu"
+            style="--icon-size: 10px"
+            class="shrink-0 mt-0.5"
+          ></ui-icon>
+          <span class="leading-relaxed"
+            >Engine: Tactile Render v4.0.</br>Hardware acceleration enabled via 2D
+            Canvas context.</br>Persistence via IndexedDB Storage.</span
+          >
+        </div>
+      </div>
+    </template>
 
     <input
       type="file"

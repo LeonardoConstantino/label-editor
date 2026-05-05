@@ -69,6 +69,14 @@ export class HistoryManager {
     return this.currentIndex < this.history.length - 1;
   }
 
+  public getStackSize(): number {
+    return this.history.length;
+  }
+
+  public getMaxSize(): number {
+    return this.maxSnapshots;
+  }
+
   public clear(): void {
     this.history = [];
     this.currentIndex = -1;
