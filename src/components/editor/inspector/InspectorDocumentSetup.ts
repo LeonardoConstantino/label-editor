@@ -155,7 +155,15 @@ export class InspectorDocumentSetup extends HTMLElement {
         </div>
         <div class="flex justify-between items-center">
           <span class="font-mono text-[11px] text-text-muted">GRID SIZE</span>
-          <ui-number-scrubber data-prop="pref.gridSizeMM" value="${prefs.gridSizeMM}" min="1" max="50" step="1" unit="mm" style="width: 80px; flex: none;"></ui-number-scrubber>
+          <ui-number-scrubber data-prop="pref.gridSizeMM" value="${prefs.gridSizeMM}" min="1" max="50" step="1" unit="mm" class="w-1/2 flex-none"></ui-number-scrubber>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="font-mono text-[11px] text-text-muted">GRID COLOR</span>
+          <app-input type="color" data-prop="pref.gridColor" value="${prefs.gridColor || '#6366f1'}" class="w-1/2 flex-none"></app-input>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="font-mono text-[11px] text-text-muted">GRID OPACITY</span>
+          <ui-number-scrubber data-prop="pref.gridOpacity" value="${prefs.gridOpacity ?? 0.3}" min="0" max="1" step="0.05" unit="α" class="w-1/2 flex-none"></ui-number-scrubber>
         </div>
         <div class="flex justify-between items-center">
           <span class="font-mono text-[11px] text-text-muted">UNIT</span>
@@ -267,6 +275,13 @@ export class InspectorDocumentSetup extends HTMLElement {
       }
       else if (prop === 'pref.gridSizeMM') {
          if (input.value != prefs.gridSizeMM) input.value = prefs.gridSizeMM;
+      }
+      else if (prop === 'pref.gridColor') {
+        const color = prefs.gridColor || '#6366f1';
+        if (input.value != color) input.value = color;
+      }
+      else if (prop === 'pref.gridOpacity') {
+        if (input.value != prefs.gridOpacity) input.value = prefs.gridOpacity;
       }
       else if (prop === 'pref.unit' && input instanceof HTMLSelectElement) {
          if (input.value !== prefs.unit) input.value = prefs.unit;

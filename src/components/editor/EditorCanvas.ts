@@ -212,12 +212,13 @@ export class EditorCanvas extends HTMLElement {
   private drawSelectionOutline(el: any, scale: number, dpi: number): void {
     if (!el.dimensions) return;
     this.ctx.save();
-    this.ctx.strokeStyle = '#6366f1';
+    // this.ctx.strokeStyle = '#6366f1';
+    this.ctx.strokeStyle = '#f43f5e'; // vermelho para melhor contraste
     
     // Borda de seleção técnica: 1.5pt de espessura convertida para pixels
     this.ctx.lineWidth = UnitConverter.ptToPx(this.selectionOutlineBorderWidth, dpi) * (scale / UnitConverter.mmToPx(1, dpi)); 
     
-    this.ctx.setLineDash([5, 5]);
+    this.ctx.setLineDash([8, 5]);
     this.ctx.strokeRect(
       el.position.x * scale, 
       el.position.y * scale, 
