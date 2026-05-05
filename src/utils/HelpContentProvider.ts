@@ -16,12 +16,13 @@ export const InspectorHelpData: Record<string, HelpTooltipConfig> = {
     title: 'Transform Settings',
     icon: 'maximize',
     commands: [
-      { key: 'Shift', label: 'Drag', desc: 'Salto rápido (±10mm)' },
-      { key: 'Alt', label: 'Drag', desc: 'Ajuste fino (±0.1mm)' }
+      { label: 'Position', desc: 'Define as coordenadas X e Y.' },
+      { label: 'Scale', desc: 'Define largura (W) e altura (H).' },
+      { label: 'Rotation', desc: 'Gira o elemento em graus.' }
     ],
     proTip: {
-      icon: 'calculator',
-      text: 'Inputs aceitam matemática.</br>Ex: <code class="text-accent-primary/80">100/2 + 15</code>',
+      icon: 'link',
+      text: 'Use o ícone de corrente para manter a proporção original.',
       isSuccess: false
     }
   },
@@ -94,17 +95,31 @@ export const InspectorHelpData: Record<string, HelpTooltipConfig> = {
       isSuccess: false
     }
   },
+  layout: {
+    title: 'Power Layout',
+    icon: 'move',
+    commands: [
+      { label: 'Align', desc: 'Alinha elementos pelas bordas ou centro.' },
+      { label: 'Distribute', desc: 'Equaliza o espaço entre 3+ elementos.' },
+      { label: 'Canvas', desc: 'Usa as bordas da etiqueta como âncora.' }
+    ],
+    proTip: {
+      icon: 'layers',
+      text: 'Alinhamentos funcionam melhor com elementos de dimensões similares.',
+      isSuccess: false
+    }
+  },
   global: {
     title: 'Technical Guide',
     icon: 'cpu',
     commands: [
-      { key: 'Shift', label: 'Drag', desc: 'Salto rápido (±10mm)' },
-      { key: 'Alt', label: 'Drag', desc: 'Ajuste fino (±0.1mm)' },
-      { label: 'Math', desc: 'Aceita fórmulas (ex: 100/2 + 5)' }
+      { key: 'Shift', label: 'Click', desc: 'Seleciona múltiplos elementos.' },
+      { key: 'Shift', label: 'Setas', desc: 'Ajuste rápido (±10mm)' },
+      { key: 'Alt', label: 'Setas', desc: 'Ajuste fino (±0.1mm)' }
     ],
     proTip: {
       icon: 'keyboard',
-      text: 'Pressione <kbd class="kbd-prism">Ctrl</kbd>+<kbd class="kbd-prism">/</kbd> para ver todos os atalhos.',
+      text: 'Inputs aceitam fórmulas matemáticas. Pressione <kbd class="kbd-prism">Ctrl</kbd>+<kbd class="kbd-prism">/</kbd> para atalhos.',
       isSuccess: false
     }
   }
@@ -134,7 +149,7 @@ export class HelpContentProvider {
     const tipColorClass = config.proTip?.isSuccess ? 'text-accent-success' : 'text-accent-primary';
     const proTipHtml = config.proTip ? `
       <div class="mt-3 pt-2 border-t border-white/5 flex gap-2 items-start text-[10px]">
-        <ui-icon name="${config.proTip.icon}" class="w-3.5 h-3.5 ${tipColorClass} shrink-0 mt-0.5"></ui-icon>
+        <ui-icon name="${config.proTip.icon}" size="sm" class="${tipColorClass} shrink-0 mt-0.5"></ui-icon>
         <span class="text-text-muted">${config.proTip.text}</span>
       </div>
     ` : '';
@@ -143,12 +158,12 @@ export class HelpContentProvider {
     return `
       <ui-tooltip placement="${placement}" delay="200">
         <button slot="target" class="text-text-muted hover:text-accent-primary hover:bg-accent-primary/10 w-5 h-5 flex items-center justify-center rounded transition-colors cursor-help" aria-label="Quick Help">
-          <ui-icon name="help-circle" class="w-3.5 h-3.5"></ui-icon>
+          <ui-icon name="help-circle" size="sm"></ui-icon>
         </button>
         
         <div slot="content" class="tooltip-rich-panel w-65">
           <div class="tooltip-rich-header">
-            <ui-icon name="${config.icon}" class="w-3.5 h-3.5 text-accent-primary cursor-help"></ui-icon>
+            <ui-icon name="${config.icon}" size="sm" class="text-accent-primary cursor-help"></ui-icon>
             <span class="font-bold">${config.title}</span>
           </div>
           

@@ -40,7 +40,7 @@ The project follows a modular, event-driven architecture:
 - **Domain Isolation:** Lógica de negócio, cálculos matemáticos e manipulação de dados devem residir em `Services` ou `Models` no Domain Layer, mantendo a UI como uma View Layer pura.
 
 #### 4. Performance & Otimização
-- ❌ **Evitar:** `innerHTML` em loops de renderização ou atualizações de estado de alta frequência.
+- ❌ **Evitar:** `innerHTML` in loops de renderização ou atualizações de estado de alta frequência.
 - ✅ **Incremental Updates:** Utilizar referências diretas a elementos do DOM para atualizar apenas valores específicos (`textContent`, `value`) em vez de reconstruir o componente.
 - ✅ **Batching:** Usar `DocumentFragment` para inserções em massa no DOM.
 - ✅ **Flow Control:** Aplicar *Debounce* ou *Throttle* em eventos de alto volume (input, resize, scroll).
@@ -67,23 +67,23 @@ The project follows a modular, event-driven architecture:
 
 ## Session Logs
 
+### 2026-05-04: Ferramentas de Produtividade & Layout
+- **Task 62 (Power Layout):** Implementadas ferramentas de alinhamento e distribuição profissional.
+  - **Lógica:** Novo `LayoutService` centraliza cálculos matemáticos de Bounding Box e Gaps.
+  - **Recursos:** Suporte a alinhamento relativo à seleção ou ao Canvas ("Align to Canvas").
+  - **Multi-seleção:** Habilitada seleção múltipla no canvas via tecla `Shift`.
+  - **UX:** Integração do componente `ui-align-cluster` no Inspector com feedback sonoro e visual.
+- **Refinamento de Ajuda:** `InspectorHelpData` atualizado para incluir instruções de multi-seleção e guia técnico unificado.
+
+### 2026-05-03: Refinamento de UX & Suporte a Transparência
+- **Task 72 (Help Tooltips):** Padronização da experiência de ajuda contextual via `HelpContentProvider`.
+- **Hotfix (Transparency):** Corrigido bug de fundo preto em imagens transparentes (Migração para WebP + Alpha Canvas).
+
 ### 2026-05-02: Maturidade de Renderização & Unificação de UI
-- **Task 44 (Text Pro):** Renderização profissional com alinhamento vertical, justificado e overflow complexo. Implementada busca binária para SCALE robusto e truncamento ELLIPSIS manual.
-- **Task 43 (Adv Renderers):** Suporte a Blending Modes (12 tipos), borderRadius real em retângulos e suavização controlada de imagem.
-- **Task 42 (Border Element):** Molduras decorativas com suporte a estilo DOUBLE concêntrico matemático e tracejados customizáveis.
-- **Task 69 (UI Select):** Criado o componente `AppSelect` com visual Tactile Prism e glassmorphism.
-  - **Presets:** Implementado seletor de tamanhos de etiqueta (A4, Shipping, Business Card, etc) no Document Setup.
-  - **UX:** Sincronia bi-direcional entre presets e inputs manuais.
-- **Task 55 (Aspect Ratio Lock):** Implementado vínculo de proporção entre Largura e Altura com feedback visual de "conexão" tátil.
-- **Task 41 (Unified Models):** Sincronização completa do domínio com o Inventário v1.1. Atributos Universais (`rotation`, `opacity`) agora funcionam em todos os elementos de forma centralizada.
-- **Task 52 (Layer Lock):** Sistema de congelamento de edição com proteção de UX em atalhos globais e bloqueio de inputs no Inspector.
+- **Task 44 (Text Pro):** Renderização profissional com alinhamento vertical e overflow inteligente.
+- **Task 43 (Adv Renderers):** Blending Modes e borderRadius real.
+- **Task 42 (Border Element):** Estilo DOUBLE concêntrico matemático.
+- **Task 69 (UI Select):** Criado o componente `AppSelect` com visual glassmorphic.
 
 ### 2026-04-30: Arquitetura de Componentes & Integridade de UI
-- **Task 46 (Deep Refactor):** Finalizada refatoração profunda do `ElementInspector`.
-  - **Decomposição em 3 Níveis:** Orquestrador (N1), Containers (N2) e Seções especialistas (N3).
-  - **Filtragem por Identidade:** Eliminação de ruído de eventos nativos.
-  - **Regressão:** Adição de testes de fumaça abrangentes (UI Smoke Tests).
-
-### 2026-04-27: Polimento de UX & Unificação de Design
-- **Task 49 (KBD Unification):** Centralização da lógica de renderização de atalhos no `UIKeyboardShortcuts`.
-- **Design System:** Implementado estilo "3D Prism" para elementos `<kbd>` globalmente.
+- **Task 46 (Deep Refactor):** Modularização do `ElementInspector` em 3 níveis especialistas.

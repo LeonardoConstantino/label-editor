@@ -23,7 +23,9 @@ Implementar um conjunto de ferramentas para alinhar e distribuir múltiplos elem
    - Avaliar a inclusão de atalhos como `Alt + A` (Align Left), etc., via `ShortcutService`.
 
 ## Critérios de Aceite
-- [ ] O usuário consegue alinhar 2 ou mais elementos com um único clique.
-- [ ] A distribuição horizontal/vertical posiciona os elementos com espaçamentos idênticos.
-- [ ] Todas as mudanças de layout em lote são tratadas como uma única ação no Undo/Redo.
-- [ ] O visual dos botões de alinhamento segue o padrão de micro-interações do sistema.
+- [x] O usuário consegue alinhar 2 ou mais elementos com um único clique.
+- [x] A distribuição horizontal/vertical posiciona os elementos com espaçamentos idênticos.
+- [x] Todas as mudanças de layout em lote são tratadas como uma única ação no Undo/Redo.
+- [x] O visual dos botões de alinhamento segue o padrão de micro-interações do sistema.
+- [x] Suporte a alinhamento relativo ao Canvas implementado via checkbox.
+- [x] Integração com HelpContentProvider para documentação in-app.

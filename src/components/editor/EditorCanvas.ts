@@ -247,10 +247,20 @@ export class EditorCanvas extends HTMLElement {
     );
 
     if (clickedElement) {
-      eventBus.emit('element:select', clickedElement.id);
+      if (e.shiftKey) {
+        const currentIds = state.selectedElementIds;
+        const newIds = currentIds.includes(clickedElement.id)
+          ? currentIds.filter(id => id !== clickedElement.id)
+          : [...currentIds, clickedElement.id];
+        eventBus.emit('element:select', newIds);
+      } else {
+        eventBus.emit('element:select', clickedElement.id);
+      }
       UISM.play(UISM.enumPresets.SELECT);
     } else {
-      eventBus.emit('element:select', []);
+      if (!e.shiftKey) {
+        eventBus.emit('element:select', []);
+      }
     }
   }
 }

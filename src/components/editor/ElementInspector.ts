@@ -21,6 +21,10 @@ import { INSPECTOR_CHANGE, INSPECTOR_ACTION } from './inspector/inspector-events
 import { InspectorChangeDetail, InspectorActionDetail } from './inspector/inspector.types';
 import { InspectorDocumentSetup } from './inspector/InspectorDocumentSetup';
 import { InspectorLayerCard } from './inspector/InspectorLayerCard';
+import { layoutService, AlignAction } from '../../domain/services/LayoutService';
+
+// Import do cluster de alinhamento
+import '../common/UiAlignCluster';
 
 interface EventWarning { id: string; result: OverflowResult; }
 interface EventWarningClear { id: string; }
@@ -81,6 +85,25 @@ export class ElementInspector extends HTMLElement {
     const root = this.shadowRoot!;
     root.addEventListener(INSPECTOR_CHANGE, (e) => this.onInspectorChange(e as CustomEvent<InspectorChangeDetail>), { signal });
     root.addEventListener(INSPECTOR_ACTION, (e) => this.onInspectorAction(e as CustomEvent<InspectorActionDetail>), { signal });
+    root.addEventListener('layout-action', (e: any) => this.onLayoutAction(e.detail.action, e.detail.toCanvas), { signal });
+  }
+
+  private onLayoutAction(action: AlignAction, toCanvas: boolean): void {
+    const state = store.getState();
+    const selectedElements = state.currentLabel?.elements.filter(el => state.selectedElementIds.includes(el.id)) || [];
+    
+    if (selectedElements.length > 0) {
+      const updates = layoutService.calculateNewPositions(
+        selectedElements, 
+        action, 
+        toCanvas, 
+        state.currentLabel?.config
+      );
+      if (updates.length > 0) {
+        eventBus.emit('elements:update', updates);
+        UISM.play(UISM.enumPresets.REPLACE);
+      }
+    }
   }
 
   private handleStateChange(state: AppState): void {
@@ -88,9 +111,13 @@ export class ElementInspector extends HTMLElement {
     if (!label) return;
 
     const elements = label.elements;
-    const selectedId = state.selectedElementIds[0] || null;
+    const selectedIds = state.selectedElementIds;
+    const selectedId = selectedIds[0] || null;
 
-    const elementsStructureJson = JSON.stringify(elements.map(e => ({ id: e.id, v: e.visible })));
+    const elementsStructureJson = JSON.stringify([
+      ...elements.map(e => ({ id: e.id, v: e.visible })),
+      selectedIds.length // Inclui contagem de seleção para rebuild se mudar de 1 para multi
+    ]);
     const hasStructureChanged = elementsStructureJson !== this.currentElementsJson || selectedId !== this.currentSelectedId;
 
     if (hasStructureChanged) {
@@ -127,9 +154,10 @@ export class ElementInspector extends HTMLElement {
     if (!container) return;
 
     container.innerHTML = '';
-    const selectedId = this.currentSelectedId;
+    const selectedIds = state.selectedElementIds;
+    const selectedId = selectedIds[0] || null;
 
-    if (!selectedId) {
+    if (selectedIds.length === 0) {
       if (title) title.textContent = 'LABEL SETUP';
       if (countLabel) countLabel.textContent = 'BLUEPRINT';
       
@@ -138,6 +166,24 @@ export class ElementInspector extends HTMLElement {
       docSetup.preferences = state.preferences;
       docSetup.thumbnailUrl = this.currentThumbnail;
       container.appendChild(docSetup);
+    } else if (selectedIds.length >= 2) {
+      if (title) title.textContent = 'MULTI-SELECTION';
+      if (countLabel) countLabel.textContent = `${selectedIds.length} UNITS`;
+
+      const alignCluster = document.createElement('ui-align-cluster');
+      container.appendChild(alignCluster);
+
+      // Também mostramos os cards das camadas selecionadas para ações rápidas (lock/vis/del)
+      [...label.elements]
+        .filter(el => selectedIds.includes(el.id))
+        .sort((a, b) => b.zIndex - a.zIndex)
+        .forEach(el => {
+          const card = document.createElement('inspector-layer-card') as InspectorLayerCard;
+          card.element = el;
+          card.selected = true; // Forçamos visual de selecionado
+          card.hasOverflow = this.overflowWarnings.has(el.id);
+          container.appendChild(card);
+        });
     } else {
       if (title) title.textContent = 'PROPERTIES';
       if (countLabel) countLabel.textContent = `${label.elements.length} UNITS`;

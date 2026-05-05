@@ -156,3 +156,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     duration: 5000,
   });
 });
+
+// Listener para solicitações de som de componentes customizados
+document.addEventListener('sound-request', (e: any) => {
+  const detail = e.detail;
+  if (detail.preset) {
+    UISM.play(detail.preset);
+  } else {
+    UISM.playCustom(detail);
+  }
+});
