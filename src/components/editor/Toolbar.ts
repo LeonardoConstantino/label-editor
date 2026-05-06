@@ -212,6 +212,21 @@ export class EditorToolbar extends HTMLElement {
       </ui-tooltip>
 
       <ui-tooltip placement="bottom" delay="300">
+        <app-button slot="target" id="open-settings" variant="secondary" style="margin-left: 4px;">
+          <ui-icon name="settings"></ui-icon>
+        </app-button>
+        <div slot="content" class="tooltip-rich-panel">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-text-main text-[12px] font-semibold tracking-wide">Configurações</span>
+            ${this.getShortcutHTML('ctrl+,')}
+          </div>
+          <p class="text-text-muted text-[10px] leading-relaxed">
+            Calibre o motor de grid, snapping e preferências globais do sistema.
+          </p>
+        </div>
+      </ui-tooltip>
+
+      <ui-tooltip placement="bottom" delay="300">
         <app-button slot="target" id="save" variant="secondary">
           <ui-icon name="save"></ui-icon>
         </app-button>
@@ -302,6 +317,12 @@ export class EditorToolbar extends HTMLElement {
       eventBus.emit('ui:open:help', { tab: 'guide' });
       const btn = shadow.getElementById('open-help');
       if (btn) btn.classList.remove('pulse-help');
+    });
+
+    shadow.getElementById('open-settings')?.addEventListener('click', () => {
+      const modal = document.getElementById('settings-modal') as any;
+      if (modal) modal.setAttribute('open', '');
+      UISM.play(UISM.enumPresets.OPEN);
     });
 
     shadow

@@ -12,13 +12,14 @@ import { UISM } from './core/UISoundManager';
 import { shortcutService } from './core/ShortcutService';
 import { ToastManager } from './components/common/toast';
 import { getOSInfo } from './utils/os-detection';
-import { StatusBar } from './components/editor/StatusBar';
 import './components/editor/EditorCanvas';
 import './components/editor/Toolbar';
 import './components/editor/ElementInspector';
+import './components/editor/StatusBar';
 import './components/editor/VaultGallery';
 import './components/editor/WelcomeScreen';
 import './components/editor/HelpCenter';
+import './components/preferences/PreferencesModal';
 import './components/common/modal';
 import './components/preview/DataSourceInput';
 import './components/common/UINumberScrubber';
@@ -26,6 +27,7 @@ import './components/common/tooltip';
 import './components/common/ui-hud-tips';
 import helpData from './assets/data/helpData';
 import { InspectorHelpData } from './utils/HelpContentProvider';
+import { StatusBar } from './components/editor/StatusBar';
 
 // Global Notification Listener
 eventBus.on('notify', (options: any) => {

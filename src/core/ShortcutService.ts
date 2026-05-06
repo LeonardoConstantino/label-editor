@@ -122,6 +122,12 @@ class ShortcutService {
       eventBus.emit('ui:open:help', { source: 'shortcut' });
     }, { description: 'Mostrar Atalhos', category: 'Ajuda', preventDefault: true });
 
+    this.manager.register(`${this.metaKeyName}+,`, () => {
+      const modal = document.getElementById('settings-modal') as any;
+      if (modal) modal.setAttribute('open', '');
+      UISM.play(UISM.enumPresets.OPEN);
+    }, { description: 'Configurações', category: 'Ajuda', preventDefault: true });
+
     //   logger.debug('ShortcutService', `Modo debug ${getDebug() ? 'ativado' : 'desativado'}!`);
     //   eventBus.emit('notify', { message: `Modo debug ${getDebug() ? 'ativado' : 'desativado'}! Ver console para detalhes.`, type: 'warning', duration: 5000 });
 
