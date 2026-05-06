@@ -18,13 +18,13 @@
         <element-inspector></element-inspector>
         <ui-tooltip
           tooltip-ref="telemetric-balloon"
-          placement="top"
+          placement="left"
           variant="primary"
           delay="100"
         >
           <div
             slot="target"
-            class="flex items-center justify-between px-3 h-6 font-mono text-[9px] uppercase tracking-[0.05em] text-text-muted tabular-nums w-full mt-auto border-t border-border-ui bg-[#050608] shrink-0 select-none"
+            class="flex items-center justify-between pl-3 pr-5 h-6 font-mono text-[9px] uppercase tracking-[0.05em] text-text-muted tabular-nums w-full mt-auto shrink-0 select-none"
           >
             <div class="flex items-center gap-2">
               <span
@@ -126,7 +126,7 @@
     </ui-modal>
 
     <template id="telemetric-balloon">
-      <div class="w-80">
+      <div>
         <div class="flex justify-between mb-2 pb-1 border-b border-white/10">
           <span class="flex items-center gap-1.5 text-accent-primary">
             <ui-icon name="command-line" style="--icon-size: 12px"></ui-icon>
@@ -142,22 +142,22 @@
         >
           <span class="opacity-50 uppercase">Performance:</span>
           <span class="text-text-main">
-            <span id="fps-lvl">0 FPS</span>
+            <span id="fps-lvl" class="tabular-nums">0 FPS</span>
             <span class="opacity-30 mx-1">|</span>
-            Render: <span id="render-time-tip">0ms</span>
+            Render: <span id="render-time-tip" class="tabular-nums">0ms</span>
           </span>
 
           <span class="opacity-50 uppercase">Resolution:</span>
-          <span class="text-text-main" id="canvas-res">0x0 PX</span>
+          <span class="text-text-main tabular-nums" id="canvas-res">0x0 PX</span>
 
           <span class="opacity-50 uppercase">Breakdown:</span>
-          <span class="text-text-main" id="breakdown">...</span>
+          <span class="text-text-main tabular-nums" id="breakdown">...</span>
 
           <span class="opacity-50 uppercase">History:</span>
-          <span class="text-text-main" id="hist-nodes">0 / 50 Nodes</span>
+          <span class="text-text-main tabular-nums" id="hist-nodes">0 / 50 Nodes</span>
 
           <span class="opacity-50 uppercase">Environment:</span>
-          <span class="text-text-main" id="os-info">Detecting...</span>
+          <span class="text-text-main tabular-nums" id="os-info">Detecting...</span>
         </div>
 
         <div

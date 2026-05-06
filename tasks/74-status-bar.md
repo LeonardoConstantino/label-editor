@@ -34,10 +34,10 @@ Criar um componente de rodapé para o painel lateral (Inspector) que atua como u
 - Emite um som secreto (ex: `sound.play('notify')`) e dispara um `console.table()` com o estado bruto do `Store`, além de acender o LED de verde para **Roxo (Magenta)**.
 
 ## Critérios de Aceite
-- [ ] A barra fica permanentemente fixada no fundo do painel lateral.
-- [ ] Atualizações no Store (adicionar/remover elemento, mudar zoom) refletem instantaneamente nos números da barra.
-- [ ] O uso de `tabular-nums` impede o layout shift horizontal.
-- [ ] O Tooltip rico abre perfeitamente para cima, sem ser cortado pela tela.
+- [x] A barra fica permanentemente fixada no fundo do painel lateral.
+- [x] Atualizações no Store (adicionar/remover elemento, mudar zoom) refletem instantaneamente nos números da barra.
+- [x] O uso de `tabular-nums` impede o layout shift horizontal.
+- [x] O Tooltip rico abre perfeitamente para cima, sem ser cortado pela tela.
 
 ---
 
