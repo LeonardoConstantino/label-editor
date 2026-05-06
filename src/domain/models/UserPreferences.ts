@@ -8,6 +8,10 @@ export interface UserPreferences {
   lastUsedDpi: number;
   theme: 'dark' | 'light' | 'system';
   audioEnabled: boolean;
+  snapToGrid: boolean;
+  snapToObjects: boolean;
+  snapToCanvas: boolean;
+  snapThresholdMM: number;
 }
 
 export const DEFAULT_PREFERENCES: UserPreferences = {
@@ -19,5 +23,9 @@ export const DEFAULT_PREFERENCES: UserPreferences = {
   unit: 'mm',
   lastUsedDpi: 300,
   theme: 'dark',
-  audioEnabled: true
+  audioEnabled: true,
+  snapToGrid: true,
+  snapToObjects: true,
+  snapToCanvas: true,
+  snapThresholdMM: 2.0
 };

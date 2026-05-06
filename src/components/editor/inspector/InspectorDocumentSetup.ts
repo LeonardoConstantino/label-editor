@@ -173,6 +173,25 @@ export class InspectorDocumentSetup extends HTMLElement {
             <option value="pt" ${prefs.unit === 'pt' ? 'selected' : ''}>PT</option>
           </select>
         </div>
+        
+        <div class="divider border-t border-white/5 my-1"></div>
+        
+        <div class="flex justify-between items-center">
+          <span class="font-mono text-[11px] text-text-muted">SNAP TO GRID</span>
+          <input type="checkbox" data-prop="pref.snapToGrid" ${prefs.snapToGrid ? 'checked' : ''}>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="font-mono text-[11px] text-text-muted">SNAP TO OBJECTS</span>
+          <input type="checkbox" data-prop="pref.snapToObjects" ${prefs.snapToObjects ? 'checked' : ''}>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="font-mono text-[11px] text-text-muted">SNAP TO CANVAS</span>
+          <input type="checkbox" data-prop="pref.snapToCanvas" ${prefs.snapToCanvas ? 'checked' : ''}>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="font-mono text-[11px] text-text-muted">SNAP THRESHOLD</span>
+          <ui-number-scrubber data-prop="pref.snapThresholdMM" value="${prefs.snapThresholdMM}" min="0.5" max="10" step="0.5" unit="mm" class="w-1/2 flex-none"></ui-number-scrubber>
+        </div>
       </div>
     `;
 
@@ -285,6 +304,18 @@ export class InspectorDocumentSetup extends HTMLElement {
       }
       else if (prop === 'pref.unit' && input instanceof HTMLSelectElement) {
          if (input.value !== prefs.unit) input.value = prefs.unit;
+      }
+      else if (prop === 'pref.snapToGrid') {
+        if (input.checked !== prefs.snapToGrid) input.checked = prefs.snapToGrid;
+      }
+      else if (prop === 'pref.snapToObjects') {
+        if (input.checked !== prefs.snapToObjects) input.checked = prefs.snapToObjects;
+      }
+      else if (prop === 'pref.snapToCanvas') {
+        if (input.checked !== prefs.snapToCanvas) input.checked = prefs.snapToCanvas;
+      }
+      else if (prop === 'pref.snapThresholdMM') {
+        if (input.value != prefs.snapThresholdMM) input.value = prefs.snapThresholdMM;
       }
     });
   }

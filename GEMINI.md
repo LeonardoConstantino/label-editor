@@ -24,7 +24,7 @@ The project follows a modular, event-driven architecture:
 
 #### 1. TypeScript & Tipagem Estrita
 - ❌ **Proibido:** Uso de `any` em qualquer contexto.
-- ✅ **Permitido:** `unknown` combinado com *type guards* quando o tipo for realmente imprevisível.
+- ✅ **Permitido:** `unknown` combinado with *type guards* quando o tipo for realmente imprevisível.
 - ✅ **Obrigatório:** Modificadores de acesso explícitos (`private`, `protected`, `public`) em todos os membros de classe.
 - ✅ **Obrigatório:** Tipagem explícita de retorno em todas as funções e métodos públicos.
 
@@ -67,23 +67,28 @@ The project follows a modular, event-driven architecture:
 
 ## Session Logs
 
-### 2026-05-04: Ferramentas de Produtividade & Layout
-- **Task 62 (Power Layout):** Implementadas ferramentas de alinhamento e distribuição profissional.
-  - **Lógica:** Novo `LayoutService` centraliza cálculos matemáticos de Bounding Box e Gaps.
-  - **Recursos:** Suporte a alinhamento relativo à seleção ou ao Canvas ("Align to Canvas").
-  - **Multi-seleção:** Habilitada seleção múltipla no canvas via tecla `Shift`.
-  - **UX:** Integração do componente `ui-align-cluster` no Inspector com feedback sonoro e visual.
-- **Refinamento de Ajuda:** `InspectorHelpData` atualizado para incluir instruções de multi-seleção e guia técnico unificado.
-
-### 2026-05-03: Refinamento de UX & Suporte a Transparência
-- **Task 72 (Help Tooltips):** Padronização da experiência de ajuda contextual via `HelpContentProvider`.
-- **Hotfix (Transparency):** Corrigido bug de fundo preto em imagens transparentes (Migração para WebP + Alpha Canvas).
+### 2026-05-06: Inteligência de Layout, Telemetria & Ajuda Contextual
+- **Task 63 (Smart Snapping):** Implementada atração magnética inteligente durante o arraste de elementos.
+  - **Motor:** Novo `SnapService` calcula alinhamentos ao Grid, Canvas (Bordas/Centro) e Outros Objetos em tempo real.
+  - **Feedback:** Guias magnéticas magenta neon e feedback sonoro de "grude".
+  - **Preferências:** Novos controles no Document Setup para configurar limiar (threshold) e tipos de snap.
+- **Task 74 (Status Bar):** Implementada central de telemetria profissional no rodapé do Inspector.
+  - **Métricas:** FPS, tempo de renderização do canvas (MS), contagem de elementos e resolução real em pixels.
+  - **Dev Mode:** Easter egg para inspeção bruta do Store via Console.
+- **Task 62 (Power Layout):** Ferramentas de alinhamento e distribuição em lote com suporte a multi-seleção via `Shift`.
+  - **Lógica:** Novo `LayoutService` para cálculos de Bounding Box e distribuição uniforme.
+- **Task 72 (Help Tooltips):** Padronização da experiência de ajuda contextual.
+  - **Arquitetura:** Criado `HelpContentProvider` (Content + Builder) para eliminar HTML cru nos componentes.
+  - **Integração:** Adicionadas tooltips ricas em todas as seções do Inspector e no Document Setup.
+- **Hotfix (Transparency):** Corrigido bug onde imagens transparentes ficavam com fundo preto.
+  - **Otimização:** Migração de JPEG para **WebP** no processamento de upload.
+  - **Engine:** Ativação explícita de `{ alpha: true }` em todos os contextos de canvas.
 
 ### 2026-05-02: Maturidade de Renderização & Unificação de UI
-- **Task 44 (Text Pro):** Renderização profissional com alinhamento vertical e overflow inteligente.
-- **Task 43 (Adv Renderers):** Blending Modes e borderRadius real.
-- **Task 42 (Border Element):** Estilo DOUBLE concêntrico matemático.
-- **Task 69 (UI Select):** Criado o componente `AppSelect` com visual glassmorphic.
+- **Task 44 (Text Pro):** Renderização profissional com alinhamento vertical, justificado e overflow complexo.
+- **Task 43 (Adv Renderers):** Suporte a Blending Modes (12 tipos), borderRadius real em retângulos e suavização controlada de imagem.
+- **Task 42 (Border Element):** Molduras decorativas com suporte a estilo DOUBLE concêntrico matemático.
+- **Task 69 (UI Select):** Criado o componente `AppSelect` com visual Tactile Prism e glassmorphism.
 
 ### 2026-04-30: Arquitetura de Componentes & Integridade de UI
-- **Task 46 (Deep Refactor):** Modularização do `ElementInspector` em 3 níveis especialistas.
+- **Task 46 (Deep Refactor):** Finalizada refatoração profunda do `ElementInspector` em 3 níveis.

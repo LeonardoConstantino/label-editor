@@ -49,7 +49,7 @@ Este Master Plan coordena a fase final de desenvolvimento, focando em estabilida
 | **67** | [Impressão Dinâmica (Orientation/Format)](./tasks/67_dynamic_printing_layout.md) | 06 | [ ] | 10 | `task/67-dynamic-pdf` |
 | **69** | [Componente UI Select & Presets](./tasks/69_ui_select_presets.md) | 06 | [x] | — | `task/69-ui-select-presets` |
 | **62** | [Ferramentas de Alinhamento e Distribuição](./tasks/62_power_layout.md) | 06 | [x] | 41 | `task/62-power-layout` |
-| **63** | [Smart Snapping & Guias Magnéticas](./tasks/63_smart_snapping.md) | 06 | [ ] | 04 | `task/63-smart-snapping` |
+| **63** | [Smart Snapping & Guias Magnéticas](./tasks/63_smart_snapping.md) | 06 | [x] | 04 | `task/63-smart-snapping` |
 | **26** | [Sangria e Marcas de Corte (PDF)](./tasks/26_a4_printing.md) | 06 | [x] | 10 | `task/26-a4-printing` |
 | **73** | [Adoção Universal do AppSelect](./tasks/73_universal_select_adoption.md) | 06 | [ ] | 69 | `task/73-select-adoption` |
 | **52** | [Action Icon de Lock nos Cards de Camada](./tasks/52_ui_layer_lock.md) | 05 | [x] | 41 | `task/52-ui-layer-lock` |

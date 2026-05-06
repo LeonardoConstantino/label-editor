@@ -23,7 +23,7 @@ Implementar um sistema de "atração magnética" (snapping) que ajude o usuário
    - Implementar a função `getSnappedCoordinates(element, rawX, rawY)`.
 
 ## Critérios de Aceite
-- [ ] Elementos "grudam" nas linhas do grid quando aproximados.
-- [ ] Linhas de guia aparecem para indicar alinhamento com outros elementos.
-- [ ] O movimento é fluido e o snapping parece "orgânico", não travado.
-- [ ] O usuário pode desativar o snapping nas preferências ou via atalho.
+- [x] Elementos "grudam" nas linhas do grid quando aproximados.
+- [x] Linhas de guia aparecem para indicar alinhamento com outros elementos.
+- [x] O movimento é fluido e o snapping parece "orgânico", não travado.
+- [x] O usuário pode desativar o snapping nas preferências ou via atalho.
