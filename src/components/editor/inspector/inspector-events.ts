@@ -40,17 +40,12 @@ export function resolveInspectorValue(e: Event): string | number | boolean | nul
   const tagName = target.tagName.toLowerCase();
   const detail = (e as CustomEvent).detail;
 
-  // 1. Caso APP-INPUT: Aceita apenas o evento customizado, ignora o ruído 'input'/'change'
-  if (tagName === 'app-input') {
-    return e.type === 'app-input' ? detail : undefined;
-  }
-
-  // 2. Caso SCRUBBER: Extrai obrigatoriamente do contrato detail.value
-  if (tagName === 'ui-number-scrubber') {
+  // 1. Caso COMPONENTES (AppInput, AppSelect, Scrubber): Extrai do contrato detail.value
+  if (tagName === 'app-input' || tagName === 'app-select' || tagName === 'ui-number-scrubber') {
     return (detail && typeof detail === 'object' && 'value' in detail) ? detail.value : undefined;
   }
 
-  // 3. Caso NATIVO (Checkbox, Select ou Input real fora do shadow DOM)
+  // 2. Caso NATIVO (Checkbox, Select ou Input real fora do shadow DOM)
   if (e.type === 'change' || e.type === 'input') {
     // Checkbox deve ser verificado ANTES de 'value' pois ele também possui a propriedade 'value'
     if (target instanceof HTMLInputElement && target.type === 'checkbox') {

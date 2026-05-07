@@ -24,7 +24,7 @@ The project follows a modular, event-driven architecture:
 
 #### 1. TypeScript & Tipagem Estrita
 - ❌ **Proibido:** Uso de `any` em qualquer contexto.
-- ✅ **Permitido:** `unknown` combinado with *type guards* quando o tipo for realmente imprevisível.
+- ✅ **Permitido:** `unknown` combinado com *type guards* quando o tipo for realmente imprevisível.
 - ✅ **Obrigatório:** Modificadores de acesso explícitos (`private`, `protected`, `public`) em todos os membros de classe.
 - ✅ **Obrigatório:** Tipagem explícita de retorno em todas as funções e métodos públicos.
 
@@ -33,23 +33,6 @@ The project follows a modular, event-driven architecture:
 - ✅ **Estilização:** Preferir `adoptedStyleSheets` para carregar CSS compartilhado (evitar injeção de `<style>` no `innerHTML`).
 - ✅ **Nomenclatura:** Prefixos semânticos `ui-` (reutilizáveis), `app-` (layout/funcional), `editor-` (domínio específico).
 - ✅ **Lifecycles:** `connectedCallback` e `disconnectedCallback` devem ser usados apenas para inicializar/limpar a UI e listeners, nunca para lógica de negócio pesada.
-
-#### 3. Arquitetura & Comunicação
-- **Decoupling:** Componentes nunca devem ter referências diretas entre si. Toda comunicação ocorre via `EventBus`.
-- **Namespacing:** Eventos seguem o padrão `categoria:acao` (ex: `element:update`, `ui:modal:open`).
-- **Domain Isolation:** Lógica de negócio, cálculos matemáticos e manipulação de dados devem residir em `Services` ou `Models` no Domain Layer, mantendo a UI como uma View Layer pura.
-
-#### 4. Performance & Otimização
-- ❌ **Evitar:** `innerHTML` in loops de renderização ou atualizações de estado de alta frequência.
-- ✅ **Incremental Updates:** Utilizar referências diretas a elementos do DOM para atualizar apenas valores específicos (`textContent`, `value`) em vez de reconstruir o componente.
-- ✅ **Batching:** Usar `DocumentFragment` para inserções em massa no DOM.
-- ✅ **Flow Control:** Aplicar *Debounce* ou *Throttle* em eventos de alto volume (input, resize, scroll).
-
-#### 5. Filosofia de Qualidade
-> "O código deve ser óbvio antes de ser elegante."
-- **Clareza > Elegância:** Se a lógica não puder ser entendida em menos de 2 minutos, ela precisa ser simplificada ou comentada.
-- **Refatoração Incremental:** Priorizar melhorias graduais e cirúrgicas sobre reescritas completas ("Rewrites").
-- **Encapsulamento:** Baixo acoplamento é o objetivo principal para garantir testabilidade.
 
 ### Design System (Tactile Prism)
 - **Theme:** Native Dark Mode.
@@ -67,28 +50,28 @@ The project follows a modular, event-driven architecture:
 
 ## Session Logs
 
+### 2026-05-07: Orquestração Técnica & Padronização de Eventos
+- **Task 71 (EventMap):** Formalização de todo o sistema de comunicação do aplicativo.
+  - **Type Safety:** Implementada interface `EventMap` no `EventBus` para garantir tipagem estrita de payloads.
+  - **Standardization:** Padronizados eventos de Custom Elements (`app-input`, `app-select`, `ui-number-scrubber`) para usar o contrato `{ value: T }`.
+  - **Registry:** Atualizado `docs/Event_System_Registry.md` como SSoT para todos os eventos App-Level e DOM-Level.
+  - **Build Integrity:** Corrigidos mocks de testes e tipagem de snapshots de canvas no `Store`.
+
 ### 2026-05-06: Inteligência de Layout, Telemetria & Ajuda Contextual
-- **Task 63 (Smart Snapping):** Implementada atração magnética inteligente durante o arraste de elementos.
-  - **Motor:** Novo `SnapService` calcula alinhamentos ao Grid, Canvas (Bordas/Centro) e Outros Objetos em tempo real.
-  - **Feedback:** Guias magnéticas magenta neon e feedback sonoro de "grude".
-  - **Preferências:** Novos controles no Document Setup para configurar limiar (threshold) e tipos de snap.
-- **Task 74 (Status Bar):** Implementada central de telemetria profissional no rodapé do Inspector.
-  - **Métricas:** FPS, tempo de renderização do canvas (MS), contagem de elementos e resolução real em pixels.
-  - **Dev Mode:** Easter egg para inspeção bruta do Store via Console.
-- **Task 62 (Power Layout):** Ferramentas de alinhamento e distribuição em lote com suporte a multi-seleção via `Shift`.
-  - **Lógica:** Novo `LayoutService` para cálculos de Bounding Box e distribuição uniforme.
+- **Task 75 (Settings Modal):** Implementada "Calibration Matrix" para gerenciamento global de preferências.
+- **Task 63 (Smart Snapping):** Atração magnética inteligente com guias visuais neon.
+- **Task 74 (Status Bar):** Central de telemetria profissional (FPS, Render Time, Element Breakdown).
+- **Task 62 (Power Layout):** Ferramentas de alinhamento e distribuição em lote.
+
+### 2026-05-03: Refinamento de UX & Suporte a Transparência
 - **Task 72 (Help Tooltips):** Padronização da experiência de ajuda contextual.
-  - **Arquitetura:** Criado `HelpContentProvider` (Content + Builder) para eliminar HTML cru nos componentes.
-  - **Integração:** Adicionadas tooltips ricas em todas as seções do Inspector e no Document Setup.
 - **Hotfix (Transparency):** Corrigido bug onde imagens transparentes ficavam com fundo preto.
-  - **Otimização:** Migração de JPEG para **WebP** no processamento de upload.
-  - **Engine:** Ativação explícita de `{ alpha: true }` em todos os contextos de canvas.
 
 ### 2026-05-02: Maturidade de Renderização & Unificação de UI
-- **Task 44 (Text Pro):** Renderização profissional com alinhamento vertical, justificado e overflow complexo.
-- **Task 43 (Adv Renderers):** Suporte a Blending Modes (12 tipos), borderRadius real em retângulos e suavização controlada de imagem.
-- **Task 42 (Border Element):** Molduras decorativas com suporte a estilo DOUBLE concêntrico matemático.
-- **Task 69 (UI Select):** Criado o componente `AppSelect` com visual Tactile Prism e glassmorphism.
+- **Task 44 (Text Pro):** Renderização profissional com alinhamento vertical e overflow inteligente.
+- **Task 43 (Adv Renderers):** Blending Modes e borderRadius real.
+- **Task 42 (Border Element):** Estilo DOUBLE concêntrico matemático.
+- **Task 69 (UI Select):** Criado o componente `AppSelect` com visual glassmorphic.
 
 ### 2026-04-30: Arquitetura de Componentes & Integridade de UI
-- **Task 46 (Deep Refactor):** Finalizada refatoração profunda do `ElementInspector` em 3 níveis.
+- **Task 46 (Deep Refactor):** Modularização do `ElementInspector` em 3 níveis.

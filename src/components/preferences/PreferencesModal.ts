@@ -325,12 +325,12 @@ export class PreferencesModal extends HTMLElement {
     });
 
     root.addEventListener('app-select', (e: any) => {
-      this.updateStore(e.target.getAttribute('data-prop'), e.detail);
+      this.updateStore(e.target.getAttribute('data-prop'), e.detail.value);
       UISM.play(UISM.enumPresets.TAP);
     });
 
     root.addEventListener('app-input', (e: any) => {
-      this.updateStore(e.target.getAttribute('data-prop'), e.detail);
+      this.updateStore(e.target.getAttribute('data-prop'), e.detail.value);
     });
   }
 

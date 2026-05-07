@@ -230,7 +230,7 @@ export class InspectorDocumentSetup extends HTMLElement {
 
     // Listener para o Preset Select
     root.getElementById('select-preset')?.addEventListener('app-select', (e: any) => {
-      const presetId = e.detail;
+      const presetId = e.detail.value;
       const preset = LABEL_PRESETS.find(p => p.value === presetId);
       
       if (preset && preset.value !== 'custom') {

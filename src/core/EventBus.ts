@@ -1,10 +1,57 @@
 import { getDebug } from '../constants/defaults';
 import { logger } from './Logger';
 
+// Type-only imports para evitar ciclos de dependência em runtime
+import type { AppState } from './Store';
+import type { AnyElement, CanvasConfig, Label } from '../domain/models/Label';
+import type { UserPreferences } from '../domain/models/UserPreferences';
+import type { OverflowResult } from '../domain/services/OverflowValidator';
+
 /**
- * Sistema avançado de eventos (pub/sub) com recursos modernos
- * Permite comunicação desacoplada entre componentes
+ * EventMap: Definição rigorosa de todos os eventos do sistema e seus payloads.
+ * Atua como o contrato central de comunicação do Label Forge OS.
  */
+export interface EventMap {
+  // Store & State
+  'state:change': AppState;
+  'history:undo': { source?: string };
+  'history:redo': { source?: string };
+  'history:snapshot': { description?: string };
+
+  // UI & Feedback
+  'notify': { 
+    message: string; 
+    type: 'success' | 'error' | 'info' | 'warning'; 
+    duration?: number 
+  };
+  'perf:render': { duration: number };
+  'ui:modal:open': { id: string };
+  'ui:modal:close': { id: string };
+  'ui:open:help': { tab?: string; source?: string };
+
+  // Element Manipulation
+  'element:add': AnyElement;
+  'element:update': { id: string; updates: Partial<AnyElement>; silent?: boolean };
+  'elements:update': { id: string; updates: Partial<AnyElement> }[];
+  'element:delete': string;
+  'element:select': string | string[];
+  'element:reorder': { id: string; direction: 'up' | 'down' };
+  'element:duplicate': string;
+  'element:warning': { id: string; result: OverflowResult };
+  'element:warning:clear': { id: string };
+
+  // Document & Persistence
+  'label:config:update': CanvasConfig;
+  'preferences:update': Partial<UserPreferences>;
+  'preferences:change': UserPreferences;
+  'template:save': { source?: string };
+  'template:saved': Label;
+  
+  // Commands
+  'command:toolbar:upload-image': { source?: string };
+  'request:canvas:snapshot': (ctx: CanvasRenderingContext2D) => void;
+  'command:canvas:restore': ImageData;
+}
 
 /**
  * Tipos de configuração do EventBus
@@ -30,17 +77,21 @@ interface EmitAsyncOptions {
 }
 
 /**
- * Tipo genérico para callbacks de eventos
+ * Tipo genérico para callbacks de eventos baseado no EventMap
  */
-type EventCallback<T = unknown> = (data: T) => void | Promise<void>;
+type EventCallback<K extends keyof EventMap> = (data: EventMap[K]) => void | Promise<void>;
 
 /**
  * Função de cleanup para remover listeners
  */
 type UnsubscribeFn = () => void;
 
+/**
+ * EventBus: Orquestrador desacoplado e tipado.
+ * Implementa Type Safety para garantir que eventos e payloads estejam sincronizados.
+ */
 class EventBus {
-  private events: Map<string, Set<EventCallback>>;
+  private events: Map<keyof EventMap, Set<EventCallback<any>>>;
   private maxListeners: number;
   private debug: boolean;
   private logger: typeof logger;
@@ -57,7 +108,7 @@ class EventBus {
    */
   private _validateCallback(
     callback: unknown,
-  ): asserts callback is EventCallback {
+  ): asserts callback is EventCallback<any> {
     if (typeof callback !== 'function') {
       throw new TypeError('Callback must be a function');
     }
@@ -86,9 +137,9 @@ class EventBus {
   /**
    * Registra um listener para um evento
    */
-  on<T = unknown>(
-    event: string, 
-    callback: EventCallback<T>, 
+  on<K extends keyof EventMap>(
+    event: K, 
+    callback: EventCallback<K>, 
     options?: EventOptions
   ): UnsubscribeFn {
     this._validateCallback(callback);
@@ -108,20 +159,17 @@ class EventBus {
       }
     }
 
-    listeners.add(callback as EventCallback);
+    listeners.add(callback as EventCallback<any>);
     this._log('Registered', event, { listenerCount: listeners.size });
 
     // Cleanup automático com AbortSignal
     const unsubscribe = () => this.off(event, callback);
 
     if (options?.signal) {
-      // Se o signal já foi abortado, remove imediatamente
       if (options.signal.aborted) {
         unsubscribe();
-        return () => {}; // Retorna função vazia (já foi removido)
+        return () => {};
       }
-
-      // Registra listener para remoção automática
       options.signal.addEventListener('abort', unsubscribe, { once: true });
     }
 
@@ -131,14 +179,14 @@ class EventBus {
   /**
    * Registra um listener que executa apenas uma vez
    */
-  once<T = unknown>(
-    event: string, 
-    callback: EventCallback<T>, 
+  once<K extends keyof EventMap>(
+    event: K, 
+    callback: EventCallback<K>, 
     options?: EventOptions
   ): UnsubscribeFn {
     this._validateCallback(callback);
 
-    const onceWrapper: EventCallback<T> = (data) => {
+    const onceWrapper: EventCallback<K> = (data) => {
       callback(data);
       this.off(event, onceWrapper);
     };
@@ -149,13 +197,12 @@ class EventBus {
   /**
    * Remove um listener específico
    */
-  off<T = unknown>(event: string, callback: EventCallback<T>): void {
+  off<K extends keyof EventMap>(event: K, callback: EventCallback<K>): void {
     if (!this.events.has(event)) return;
 
     const listeners = this.events.get(event)!;
-    listeners.delete(callback as EventCallback);
+    listeners.delete(callback as EventCallback<any>);
 
-    // Remove entry vazia para economizar memória
     if (listeners.size === 0) {
       this.events.delete(event);
     }
@@ -166,7 +213,7 @@ class EventBus {
   /**
    * Emite um evento para todos os listeners (síncrono)
    */
-  emit<T = unknown>(event: string, data: T): void {
+  emit<K extends keyof EventMap>(event: K, data: EventMap[K]): void {
     if (!this.events.has(event)) {
       this._log('Emit (no listeners)', event, data);
       return;
@@ -175,7 +222,6 @@ class EventBus {
     this._log('Emit', event, data);
     const listeners = this.events.get(event)!;
 
-    // Usa for...of para melhor performance
     for (const callback of listeners) {
       try {
         callback(data);
@@ -192,14 +238,13 @@ class EventBus {
   /**
    * Emite um evento de forma assíncrona
    */
-  async emitAsync<T = unknown>(
-    event: string, 
-    data: T, 
+  async emitAsync<K extends keyof EventMap>(
+    event: K, 
+    data: EventMap[K], 
     options?: EmitAsyncOptions
   ): Promise<void> {
     if (!this.events.has(event)) return;
 
-    // Verifica se já foi abortado antes de começar
     if (options?.signal?.aborted) {
       this._log('EmitAsync aborted (before start)', event, data);
       return;
@@ -208,15 +253,12 @@ class EventBus {
     this._log('EmitAsync', event, data);
     const listeners = this.events.get(event)!;
 
-    // Executa callbacks em paralelo com suporte a cancelamento
     const promises = Array.from(listeners).map(async (callback) => {
       try {
-        // Verifica cancelamento antes de cada callback
         if (options?.signal?.aborted) {
           this._log('EmitAsync callback skipped (aborted)', event);
           return;
         }
-
         await callback(data);
       } catch (error) {
         console.error(
@@ -232,7 +274,7 @@ class EventBus {
   /**
    * Remove todos os listeners de um evento
    */
-  clear(event?: string): void {
+  clear(event?: keyof EventMap): void {
     if (event) {
       this.events.delete(event);
       this._log('Cleared', event);
@@ -245,7 +287,7 @@ class EventBus {
   /**
    * Retorna contagem de listeners para um evento
    */
-  listenerCount(event: string): number {
+  listenerCount(event: keyof EventMap): number {
     return this.events.has(event) ? this.events.get(event)!.size : 0;
   }
 
@@ -256,10 +298,6 @@ class EventBus {
     return Array.from(this.events.keys());
   }
 }
-
-// Exporta uma factory function em vez de instância única
-export const createEventBus = (options?: EventBusOptions): EventBus =>
-  new EventBus(options);
 
 // Exporta instância global padrão
 export default new EventBus({ debug: getDebug(), logger });

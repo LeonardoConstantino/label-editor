@@ -163,9 +163,8 @@ export class InspectorLayerCard extends HTMLElement {
         const prop = target.getAttribute('data-prop');
         if (prop === 'name') {
           const detail = (e as CustomEvent).detail;
-          const value = (detail !== null && typeof detail === 'object' && 'value' in detail) ? detail.value : detail;
-          if (value !== undefined) {
-            dispatchInspectorChange(this, { prop, value });
+          if (detail && typeof detail === 'object' && 'value' in detail) {
+            dispatchInspectorChange(this, { prop, value: detail.value });
           }
         }
       });

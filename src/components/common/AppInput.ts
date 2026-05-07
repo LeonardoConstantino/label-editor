@@ -77,7 +77,7 @@ export class AppInput extends HTMLElement {
     this.input.addEventListener('input', (e: any) => {
       UISM.play(UISM.enumPresets.TAP); // Som sutil de digitação
       this.dispatchEvent(new CustomEvent('app-input', {
-        detail: e.target.value,
+        detail: { value: e.target.value },
         bubbles: true,
         composed: true
       }));

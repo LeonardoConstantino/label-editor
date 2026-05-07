@@ -26,9 +26,6 @@ import { layoutService, AlignAction } from '../../domain/services/LayoutService'
 // Import do cluster de alinhamento
 import '../common/UiAlignCluster';
 
-interface EventWarning { id: string; result: OverflowResult; }
-interface EventWarningClear { id: string; }
-
 /**
  * ElementInspector: Orquestrador (Nível 1)
  * Atua como ponte entre a Store/EventBus e os sub-componentes especialistas.
@@ -70,14 +67,14 @@ export class ElementInspector extends HTMLElement {
     this.abortController = new AbortController();
     const { signal } = this.abortController;
 
-    eventBus.on('state:change', (state: AppState) => this.handleStateChange(state), { signal });
+    eventBus.on('state:change', (state) => this.handleStateChange(state), { signal });
     
-    eventBus.on<EventWarning>('element:warning', ({ id, result }) => {
+    eventBus.on('element:warning', ({ id, result }) => {
       this.overflowWarnings.set(id, result);
       this.syncOverflowStatus();
     }, { signal });
 
-    eventBus.on<EventWarningClear>('element:warning:clear', ({ id }) => {
+    eventBus.on('element:warning:clear', ({ id }) => {
       this.overflowWarnings.delete(id);
       this.syncOverflowStatus();
     }, { signal });

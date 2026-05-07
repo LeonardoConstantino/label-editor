@@ -73,15 +73,15 @@ export class ElementInspector extends HTMLElement {
     this.abortController = new AbortController();
     const { signal } = this.abortController;
 
-    const offState = eventBus.on('state:change', (state: AppState) => this.handleStateChange(state));
-    const offWarn = eventBus.on<EventWarning>('element:warning', ({ id, result }) => {
+    const offState = eventBus.on('state:change', (state) => this.handleStateChange(state));
+    const offWarn = eventBus.on('element:warning', ({ id, result }) => {
       this.overflowWarnings.set(id, result);
-      this.updateWarningVisuals();
+      // syncOverflowStatus removido na refatoração
     });
 
-    const offClear = eventBus.on<EventWarningClear>('element:warning:clear', ({ id }) => {
+    const offClear = eventBus.on('element:warning:clear', ({ id }) => {
       this.overflowWarnings.delete(id);
-      this.updateWarningVisuals();
+      // syncOverflowStatus removido na refatoração
     });
 
     signal.addEventListener('abort', () => {

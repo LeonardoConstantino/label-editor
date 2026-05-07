@@ -99,7 +99,7 @@ export class AppSelect extends HTMLElement {
     
     // Evento específico para o componente
     this.dispatchEvent(new CustomEvent('app-select', { 
-      detail: val,
+      detail: { value: val },
       bubbles: true, 
       composed: true 
     }));

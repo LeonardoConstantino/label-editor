@@ -15,7 +15,7 @@ describe('Store', () => {
 
   beforeAll(() => {
     // Mock do callback do canvas para snapshots funcionarem nos testes
-    eventBus.on('request:canvas:snapshot', (callback: (ctx: CanvasRenderingContext2D) => void) => {
+    eventBus.on('request:canvas:snapshot', (callback) => {
       // Mock ctx com getImageData retornando ImageData mockado
       const mockImageData = {
         data: new Uint8ClampedArray(4),
@@ -33,21 +33,34 @@ describe('Store', () => {
 
   beforeEach(() => {
     // Reset do store para cada teste (re-loading a base label)
-    store.loadLabel(JSON.parse(JSON.stringify(mockLabel)));
+    store.loadLabel(JSON.parse(JSON.stringify(mockLabel)) as any);
   });
 
   it('should add an element and push to history', () => {
     const newElement = {
       id: 'el1',
       type: ElementType.TEXT,
+      name: 'Text',
       position: { x: 10, y: 10 },
       zIndex: 1,
+      rotation: 0,
+      opacity: 1,
+      locked: false,
+      visible: true,
+      keepRatio: false,
       dimensions: { width: 50, height: 10 },
       content: 'Hello',
+      fontFamily: 'Inter',
       fontSize: 12,
+      fontWeight: 400,
+      fontStyle: 'normal',
       color: '#000000',
-      opacity: 1
-    };
+      textAlign: 'center',
+      verticalAlign: 'middle',
+      overflow: 'clip',
+      lineHeight: 1.2,
+      justify: false
+    } as any;
 
     eventBus.emit('element:add', newElement);
 
@@ -61,14 +74,27 @@ describe('Store', () => {
     const newElement = {
       id: 'el1',
       type: ElementType.TEXT,
+      name: 'Text',
       position: { x: 10, y: 10 },
       zIndex: 1,
+      rotation: 0,
+      opacity: 1,
+      locked: false,
+      visible: true,
+      keepRatio: false,
       dimensions: { width: 50, height: 10 },
       content: 'Hello',
+      fontFamily: 'Inter',
       fontSize: 12,
+      fontWeight: 400,
+      fontStyle: 'normal',
       color: '#000000',
-      opacity: 1
-    };
+      textAlign: 'center',
+      verticalAlign: 'middle',
+      overflow: 'clip',
+      lineHeight: 1.2,
+      justify: false
+    } as any;
     eventBus.emit('element:add', newElement);
 
     eventBus.emit('element:update', { id: 'el1', updates: { content: 'Updated' } });
@@ -81,14 +107,27 @@ describe('Store', () => {
     const newElement = {
       id: 'el1',
       type: ElementType.TEXT,
+      name: 'Text',
       position: { x: 10, y: 10 },
       zIndex: 1,
+      rotation: 0,
+      opacity: 1,
+      locked: false,
+      visible: true,
+      keepRatio: false,
       dimensions: { width: 50, height: 10 },
       content: 'Hello',
-      color: '#000000',
+      fontFamily: 'Inter',
       fontSize: 12,
-      opacity: 1
-    };
+      fontWeight: 400,
+      fontStyle: 'normal',
+      color: '#000000',
+      textAlign: 'center',
+      verticalAlign: 'middle',
+      overflow: 'clip',
+      lineHeight: 1.2,
+      justify: false
+    } as any;
     eventBus.emit('element:add', newElement);
 
     // Tentativa de update inválido (cor mal formatada)
@@ -106,14 +145,27 @@ describe('Store', () => {
     const newElement = {
       id: 'el1',
       type: ElementType.TEXT,
+      name: 'Text',
       position: { x: 10, y: 10 },
       zIndex: 1,
+      rotation: 0,
+      opacity: 1,
+      locked: false,
+      visible: true,
+      keepRatio: false,
       dimensions: { width: 50, height: 10 },
       content: 'Hello',
+      fontFamily: 'Inter',
       fontSize: 12,
+      fontWeight: 400,
+      fontStyle: 'normal',
       color: '#000000',
-      opacity: 1
-    };
+      textAlign: 'center',
+      verticalAlign: 'middle',
+      overflow: 'clip',
+      lineHeight: 1.2,
+      justify: false
+    } as any;
 
     // Após loadLabel, temos snapshot inicial (estado vazio)
     // Adicionar elemento cria snapshot 1
