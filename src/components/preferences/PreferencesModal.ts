@@ -431,7 +431,8 @@ export class PreferencesModal extends HTMLElement {
   }
 
   private renderSkeleton() {
-    if (!this.shadowRoot) return;
+    if (!this.shadowRoot || !this._preferences) return;
+    const {audioEnabled, showGrid, gridSizeMM, gridColor, gridOpacity, snapToGrid, snapToObjects, snapToCanvas, snapThresholdMM, unit} = this._preferences;
 
     this.shadowRoot.innerHTML = `
       <div class="settings-container">
@@ -475,7 +476,7 @@ export class PreferencesModal extends HTMLElement {
                 </div>
                 <div class="setting-control">
                   <label class="toggle-switch">
-                    <input type="checkbox" data-prop="audioEnabled">
+                    <input type="checkbox" data-prop="audioEnabled" ${audioEnabled ? 'checked' : ''}>
                     <span class="slider"></span>
                   </label>
                 </div>
@@ -486,7 +487,7 @@ export class PreferencesModal extends HTMLElement {
                   <span class="setting-desc">Default unit for all design calculations.</span>
                 </div>
                 <div class="setting-control">
-                  <app-select id="unit-select" data-prop="unit" style="width: 140px"></app-select>
+                  <app-select id="unit-select" data-prop="unit" value="${unit}" style="width: 140px"></app-select>
                 </div>
               </div>
               <div class="setting-row">
@@ -515,20 +516,20 @@ export class PreferencesModal extends HTMLElement {
                   <span class="setting-desc">Display a precise technical overlay on the canvas.</span>
                 </div>
                 <div class="setting-control">
-                  <label class="toggle-switch"><input type="checkbox" data-prop="showGrid"><span class="slider"></span></label>
+                  <label class="toggle-switch"><input type="checkbox" data-prop="showGrid" ${showGrid ? 'checked' : ''}><span class="slider"></span></label>
                 </div>
               </div>
               <div class="setting-row">
                 <div class="setting-info"><span class="setting-label">Grid Precision</span><span class="setting-desc">Distance between lines in mm.</span></div>
-                <div class="setting-control"><ui-number-scrubber data-prop="gridSizeMM" min="1" max="50" step="1" unit="mm" style="width: 120px"></ui-number-scrubber></div>
+                <div class="setting-control"><ui-number-scrubber data-prop="gridSizeMM" value="${gridSizeMM}" min="1" max="50" step="1" unit="mm" style="width: 120px"></ui-number-scrubber></div>
               </div>
               <div class="setting-row">
                 <div class="setting-info"><span class="setting-label">Grid Chromatics</span><span class="setting-desc">Pick a color for your grid.</span></div>
-                <div class="setting-control"><app-input type="color" data-prop="gridColor" style="width: 120px"></app-input></div>
+                <div class="setting-control"><app-input type="color" data-prop="gridColor" value="${gridColor}" style="width: 120px"></app-input></div>
               </div>
               <div class="setting-row">
                 <div class="setting-info"><span class="setting-label">Opacity</span><span class="setting-desc">Visibility intensity.</span></div>
-                <div class="setting-control"><input type="range" data-prop="gridOpacity" min="0.05" max="1" step="0.05" style="width: 120px"></div>
+                <div class="setting-control"><input type="range" data-prop="gridOpacity" value="${gridOpacity}" min="0.05" max="1" step="0.05" style="width: 120px"></div>
               </div>
             </div>
           </section>
@@ -542,19 +543,19 @@ export class PreferencesModal extends HTMLElement {
             <div class="card-module">
               <div class="setting-row">
                 <div class="setting-info"><span class="setting-label">Snap to Grid</span><span class="setting-desc">Attract elements to grid lines.</span></div>
-                <div class="setting-control"><label class="toggle-switch"><input type="checkbox" data-prop="snapToGrid"><span class="slider"></span></label></div>
+                <div class="setting-control"><label class="toggle-switch"><input type="checkbox" data-prop="snapToGrid" ${snapToGrid ? 'checked' : ''}><span class="slider"></span></label></div>
               </div>
               <div class="setting-row">
                 <div class="setting-info"><span class="setting-label">Snap to Objects</span><span class="setting-desc">Align with other layers.</span></div>
-                <div class="setting-control"><label class="toggle-switch"><input type="checkbox" data-prop="snapToObjects"><span class="slider"></span></label></div>
+                <div class="setting-control"><label class="toggle-switch"><input type="checkbox" data-prop="snapToObjects" ${snapToObjects ? 'checked' : ''}><span class="slider"></span></label></div>
               </div>
               <div class="setting-row">
                 <div class="setting-info"><span class="setting-label">Snap to Canvas</span><span class="setting-desc">Pull towards board borders.</span></div>
-                <div class="setting-control"><label class="toggle-switch"><input type="checkbox" data-prop="snapToCanvas"><span class="slider"></span></label></div>
+                <div class="setting-control"><label class="toggle-switch"><input type="checkbox" data-prop="snapToCanvas" ${snapToCanvas ? 'checked' : ''}><span class="slider"></span></label></div>
               </div>
               <div class="setting-row">
                 <div class="setting-info"><span class="setting-label">Threshold</span><span class="setting-desc">Magnetic pull distance (mm).</span></div>
-                <div class="setting-control"><ui-number-scrubber data-prop="snapThresholdMM" min="0.5" max="10" step="0.5" unit="mm" style="width: 120px"></ui-number-scrubber></div>
+                <div class="setting-control"><ui-number-scrubber data-prop="snapThresholdMM" value="${snapThresholdMM}" min="0.5" max="10" step="0.5" unit="mm" style="width: 120px"></ui-number-scrubber></div>
               </div>
             </div>
           </section>

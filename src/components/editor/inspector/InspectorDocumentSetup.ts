@@ -58,7 +58,7 @@ export class InspectorDocumentSetup extends HTMLElement {
     if (!this.shadowRoot || !this._labelConfig || !this._preferences) return;
 
     const { widthMM, heightMM, backgroundColor, dpi, previewScale } = this._labelConfig;
-    const prefs = this._preferences;
+    const {audioEnabled, showGrid, gridSizeMM, gridColor, gridOpacity, snapToGrid, snapToObjects, snapToCanvas, snapThresholdMM, unit} = this._preferences;
 
     this.shadowRoot.innerHTML = `
       <style>
@@ -147,30 +147,30 @@ export class InspectorDocumentSetup extends HTMLElement {
       <div class="card-module" style="padding: 12px; display: flex; flex-direction: column; gap: 10px;">
         <div class="flex justify-between items-center">
           <span class="font-mono text-[11px] text-text-muted">AUDIO ENABLED</span>
-          <input type="checkbox" data-prop="pref.audioEnabled" ${prefs.audioEnabled ? 'checked' : ''}>
+          <input type="checkbox" data-prop="pref.audioEnabled" ${audioEnabled ? 'checked' : ''}>
         </div>
         <div class="flex justify-between items-center">
           <span class="font-mono text-[11px] text-text-muted">SHOW GRID</span>
-          <input type="checkbox" data-prop="pref.showGrid" ${prefs.showGrid ? 'checked' : ''}>
+          <input type="checkbox" data-prop="pref.showGrid" ${showGrid ? 'checked' : ''}>
         </div>
         <div class="flex justify-between items-center">
           <span class="font-mono text-[11px] text-text-muted">GRID SIZE</span>
-          <ui-number-scrubber data-prop="pref.gridSizeMM" value="${prefs.gridSizeMM}" min="1" max="50" step="1" unit="mm" class="w-1/2 flex-none"></ui-number-scrubber>
+          <ui-number-scrubber data-prop="pref.gridSizeMM" value="${gridSizeMM}" min="1" max="50" step="1" unit="mm" class="w-1/2 flex-none"></ui-number-scrubber>
         </div>
         <div class="flex justify-between items-center">
           <span class="font-mono text-[11px] text-text-muted">GRID COLOR</span>
-          <app-input type="color" data-prop="pref.gridColor" value="${prefs.gridColor || '#6366f1'}" class="w-1/2 flex-none"></app-input>
+          <app-input type="color" data-prop="pref.gridColor" value="${gridColor || '#6366f1'}" class="w-1/2 flex-none"></app-input>
         </div>
         <div class="flex justify-between items-center">
           <span class="font-mono text-[11px] text-text-muted">GRID OPACITY</span>
-          <ui-number-scrubber data-prop="pref.gridOpacity" value="${prefs.gridOpacity ?? 0.3}" min="0" max="1" step="0.05" unit="α" class="w-1/2 flex-none"></ui-number-scrubber>
+          <ui-number-scrubber data-prop="pref.gridOpacity" value="${gridOpacity ?? 0.3}" min="0" max="1" step="0.05" unit="α" class="w-1/2 flex-none"></ui-number-scrubber>
         </div>
         <div class="flex justify-between items-center">
           <span class="font-mono text-[11px] text-text-muted">UNIT</span>
           <select data-prop="pref.unit" class="input-prism" style="width: 80px; padding: 2px 6px; height: 24px; font-size: 10px;">
-            <option value="mm" ${prefs.unit === 'mm' ? 'selected' : ''}>MM</option>
-            <option value="px" ${prefs.unit === 'px' ? 'selected' : ''}>PX</option>
-            <option value="pt" ${prefs.unit === 'pt' ? 'selected' : ''}>PT</option>
+            <option value="mm" ${unit === 'mm' ? 'selected' : ''}>MM</option>
+            <option value="px" ${unit === 'px' ? 'selected' : ''}>PX</option>
+            <option value="pt" ${unit === 'pt' ? 'selected' : ''}>PT</option>
           </select>
         </div>
         
@@ -178,19 +178,19 @@ export class InspectorDocumentSetup extends HTMLElement {
         
         <div class="flex justify-between items-center">
           <span class="font-mono text-[11px] text-text-muted">SNAP TO GRID</span>
-          <input type="checkbox" data-prop="pref.snapToGrid" ${prefs.snapToGrid ? 'checked' : ''}>
+          <input type="checkbox" data-prop="pref.snapToGrid" ${snapToGrid ? 'checked' : ''}>
         </div>
         <div class="flex justify-between items-center">
           <span class="font-mono text-[11px] text-text-muted">SNAP TO OBJECTS</span>
-          <input type="checkbox" data-prop="pref.snapToObjects" ${prefs.snapToObjects ? 'checked' : ''}>
+          <input type="checkbox" data-prop="pref.snapToObjects" ${snapToObjects ? 'checked' : ''}>
         </div>
         <div class="flex justify-between items-center">
           <span class="font-mono text-[11px] text-text-muted">SNAP TO CANVAS</span>
-          <input type="checkbox" data-prop="pref.snapToCanvas" ${prefs.snapToCanvas ? 'checked' : ''}>
+          <input type="checkbox" data-prop="pref.snapToCanvas" ${snapToCanvas ? 'checked' : ''}>
         </div>
         <div class="flex justify-between items-center">
           <span class="font-mono text-[11px] text-text-muted">SNAP THRESHOLD</span>
-          <ui-number-scrubber data-prop="pref.snapThresholdMM" value="${prefs.snapThresholdMM}" min="0.5" max="10" step="0.5" unit="mm" class="w-1/2 flex-none"></ui-number-scrubber>
+          <ui-number-scrubber data-prop="pref.snapThresholdMM" value="${snapThresholdMM}" min="0.5" max="10" step="0.5" unit="mm" class="w-1/2 flex-none"></ui-number-scrubber>
         </div>
       </div>
     `;
