@@ -87,8 +87,91 @@ export class InspectorLayerCard extends HTMLElement {
       <style>
         :host { display: block; margin-bottom: 8px; position: relative; }
         :host(.elevated) { z-index: 100; }
+        
         .card-content { display: ${isSelected ? 'flex' : 'none'}; flex-direction: column; gap: 12px; padding: 12px 8px; }
         .is-locked #sections-container { pointer-events: none; opacity: 0.6; filter: grayscale(0.5); }
+        
+        /* O Cabeçalho (Atualizado para Flexbox e Juice de Seleção) */
+        .card-header {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 6px 8px;
+          border-radius: 6px;
+          border: 1px solid transparent;
+          background: rgba(255, 255, 255, 0.02);
+          transition: all 0.2s var(--ease-spring);
+        }
+        
+        /* O Juice da Linha Selecionada */
+        :host(.selected) .card-header {
+          background: var(--color-accent-primary-alpha, rgba(99, 102, 241, 0.1));
+          border-color: var(--color-accent-primary-alpha, rgba(99, 102, 241, 0.2));
+          box-shadow: inset 2px 0 0 var(--color-accent-primary);
+        }
+
+        .card-header:hover { background: rgba(255, 255, 255, 0.05); }
+
+        /* ==========================================
+           MICRO-CHECKBOX DE PRECISÃO (The Juice)
+           ========================================== */
+        .precision-checkbox {
+          appearance: none;
+          -webkit-appearance: none;
+          width: 14px;
+          height: 14px;
+          margin: 0;
+          flex-shrink: 0;
+          border-radius: 3px;
+          background: rgba(0, 0, 0, 0.4);
+          border: 1px solid rgba(255, 255, 255, 0.15);
+          cursor: pointer;
+          position: relative;
+          display: grid;
+          place-items: center;
+          transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        /* Hover Tátil */
+        .precision-checkbox:hover {
+          border-color: var(--color-accent-primary);
+          background: rgba(99, 102, 241, 0.1);
+        }
+
+        /* Clique Mecânico */
+        .precision-checkbox:active {
+          transform: scale(0.85);
+        }
+
+        /* Estado Ligado (Preenchido com a cor de Ação) */
+        .precision-checkbox:checked {
+          background: var(--color-accent-primary);
+          border-color: var(--color-accent-primary);
+          box-shadow: 0 0 8px rgba(99, 102, 241, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+        }
+
+        /* A Mágica do Checkmark via CSS puro (Elástico) */
+        .precision-checkbox::after {
+          content: '';
+          width: 3.5px;
+          height: 6.5px;
+          border-right: 1.5px solid white;
+          border-bottom: 1.5px solid white;
+          transform: rotate(45deg) scale(0) translateY(-1px);
+          opacity: 0;
+          transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s ease;
+        }
+
+        .precision-checkbox:checked::after {
+          opacity: 1;
+          /* Faz o "V" dar um pulo sutil quando aparece */
+          transform: rotate(45deg) scale(1) translateY(-1px);
+        }
+        /* ========================================== */
+
+        .type-tag { font-family: var(--font-mono); font-size: 9px; padding: 2px 4px; background: rgba(0,0,0,0.3); border-radius: 4px; color: var(--color-text-muted); text-transform: uppercase; }
+        .layer-name { font-size: 11px; font-weight: 500; color: var(--color-text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; }
+        
         .action-btn { background: transparent; border: none; cursor: pointer; padding: 4px; border-radius: 4px; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
         .action-btn:hover { background: rgba(255, 255, 255, 0.1); }
         .action-btn.active ui-icon { color: var(--color-accent-primary); opacity: 1 !important; }
@@ -96,17 +179,24 @@ export class InspectorLayerCard extends HTMLElement {
       </style>
 
       <div class="element-card ${isSelected ? 'selected' : ''} ${isLocked ? 'is-locked' : ''}" data-id="${id}">
-        <div class="card-header" id="header-select" style="cursor: pointer;">
+        
+        <!-- CABEÇALHO DA CAMADA -->
+        <div class="card-header" id="header-select">
+          
+          <!-- NOVO: O Checkbox de Precisão para Multi-seleção -->
+          <input type="checkbox" class="precision-checkbox" id="chk-select" ${isSelected ? 'checked' : ''} title="Selecionar Camada">
+          
           <span class="type-tag">${escapeHTML(el.type)}</span>
           <span class="layer-name" id="label-name">${escapeHTML(el.name || el.type)}</span>
+          
           <span class="warning-tag" id="warning-tag" style="display: ${this._hasOverflow ? 'inline' : 'none'}; color: var(--color-accent-warning)">⚠</span>
           
-          <div class="flex items-center gap-1" style="margin-left: auto;">
+          <div class="flex items-center gap-1">
             <button id="btn-toggle-lock" class="action-btn ${isLocked ? 'warning active' : ''}" title="${isLocked ? 'Unlock Layer' : 'Lock Layer'}">
-              <ui-icon name="${isLocked ? 'lock' : 'unlock'}" style="--icon-size: 14px; opacity: ${isLocked ? '1' : '0.4'};"></ui-icon>
+              <ui-icon name="${isLocked ? 'lock' : 'unlock'}" style="--icon-size: 13px; opacity: ${isLocked ? '1' : '0.4'};"></ui-icon>
             </button>
             <button id="btn-toggle-vis" class="action-btn ${el.visible !== false ? 'active' : ''}" title="Toggle Visibility">
-              <ui-icon name="${el.visible !== false ? 'eye-off' : 'eye'}" style="--icon-size: 14px; opacity: ${el.visible !== false ? '1' : '0.4'};"></ui-icon>
+              <ui-icon name="${el.visible !== false ? 'eye-off' : 'eye'}" style="--icon-size: 13px; opacity: ${el.visible !== false ? '1' : '0.4'};"></ui-icon>
             </button>
           </div>
         </div>
