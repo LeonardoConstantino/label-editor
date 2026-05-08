@@ -109,7 +109,7 @@ export class InspectorSectionTransform extends HTMLElement {
       ` : ''}
 
       <div class="row-ui">
-        <ui-number-scrubber label="Rot" data-prop="rotation" value="${el.rotation || 0}" min="0" max="360" step="1" unit="°"></ui-number-scrubber>
+        <ui-number-scrubber label="Rot" data-prop="rotation" value="${el.rotation || 0}" min="-180" max="180" step="1" unit="°"></ui-number-scrubber>
         <ui-number-scrubber label="Op" data-prop="opacity" value="${el.opacity ?? 1}" min="0" max="1" step="0.05" unit="α"></ui-number-scrubber>
       </div>
     `;

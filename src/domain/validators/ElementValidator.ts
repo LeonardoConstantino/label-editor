@@ -26,8 +26,9 @@ export class ElementValidator {
       errors.push('Opacidade deve estar entre 0 e 1.');
     }
     
-    if (element.rotation < 0 || element.rotation > 360) {
-      errors.push('Rotação deve estar entre 0 e 360 graus.');
+    // Permitir rotações negativas para facilitar a edição, mas alertar se estiver fora do intervalo comum
+    if (element.rotation < -180 || element.rotation > 180) {
+      errors.push('Rotação deve estar entre -180 e 180 graus.');
     }
 
     if (!element.id) errors.push('Elemento deve possuir um ID único.');

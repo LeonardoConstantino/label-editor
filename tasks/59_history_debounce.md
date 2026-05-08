@@ -24,7 +24,7 @@ Implementar um mecanismo de debounce na criação de snapshots do histórico par
    - Garantir que o uso de `ImageData` no histórico não cause gargalos de memória ao lidar com muitos snapshots pendentes no debounce.
 
 ## Critérios de Aceite
-- [ ] Mudanças rápidas e repetitivas em uma propriedade (ex: arrastar largura) geram apenas um ponto de restauração no histórico.
-- [ ] Ações críticas (ex: deletar elemento) geram snapshot instantâneo sem aguardar o debounce.
-- [ ] O usuário consegue configurar a sensibilidade do histórico nas preferências do sistema.
-- [ ] Feedback sonoro de Undo/Redo permanece sincronizado com a restauração do estado.
+- [x] Mudanças rápidas e repetitivas em uma propriedade (ex: arrastar largura) geram apenas um ponto de restauração no histórico.
+- [x] Ações críticas (ex: deletar elemento) geram snapshot instantâneo sem aguardar o debounce.
+- [x] O usuário consegue configurar a sensibilidade do histórico nas preferências do sistema.
+- [x] Feedback sonoro de Undo/Redo permanece sincronizado com a restauração do estado.
