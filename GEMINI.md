@@ -50,16 +50,18 @@ The project follows a modular, event-driven architecture:
 
 ## Session Logs
 
+### 2026-05-08: Otimização de Performance & Histórico
+- **Task 59 (History Debounce):** Implementado mecanismo de debounce inteligente para snapshots de histórico.
+  - **Lógica:** Ações contínuas (drag, resize, typing) agora aguardam um tempo de inatividade antes de consolidar no Undo/Redo.
+  - **Atômico:** Ações como Adicionar/Deletar permanecem instantâneas.
+  - **Configuração:** Adicionada aba "Performance" no Modal de Preferências para ajustar a sensibilidade.
+- **Task 75 (Settings Modal):** Implementação finalizada e integrada com controle de histórico.
+
 ### 2026-05-07: Orquestração Técnica & Padronização de Eventos
-- **Task 71 (EventMap):** Formalização de todo o sistema de comunicação do aplicativo.
-  - **Type Safety:** Implementada interface `EventMap` no `EventBus` para garantir tipagem estrita de payloads.
-  - **Standardization:** Padronizados eventos de Custom Elements (`app-input`, `app-select`, `ui-number-scrubber`) para usar o contrato `{ value: T }`.
-  - **Registry:** Atualizado `docs/Event_System_Registry.md` como SSoT para todos os eventos App-Level e DOM-Level.
-  - **Build Integrity:** Corrigidos mocks de testes e tipagem de snapshots de canvas no `Store`.
+- **Task 71 (EventMap):** Formalização de todo o sistema de comunicação do aplicativo via EventBus tipado.
 
 ### 2026-05-06: Inteligência de Layout, Telemetria & Ajuda Contextual
-- **Task 75 (Settings Modal):** Implementada "Calibration Matrix" para gerenciamento global de preferências.
-- **Task 63 (Smart Snapping):** Atração magnética inteligente com guias visuais neon.
+- **Task 63 (Smart Snapping):** Atração magnética inteligente durante o arraste de elementos.
 - **Task 74 (Status Bar):** Central de telemetria profissional (FPS, Render Time, Element Breakdown).
 - **Task 62 (Power Layout):** Ferramentas de alinhamento e distribuição em lote.
 

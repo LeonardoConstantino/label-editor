@@ -16,8 +16,12 @@ export interface AppState {
   preferences: UserPreferences;
 }
 
+/**
+ * Store: Gerenciador de estado centralizado com suporte a Histórico Otimizado (Task 59).
+ */
 export class Store {
   private state: AppState;
+  private snapshotTimer: any = null;
 
   constructor() {
     this.state = {
@@ -45,10 +49,10 @@ export class Store {
         if (!this.state.currentLabel) return;
         this.state.currentLabel.elements.push(element);
         UISM.play(UISM.enumPresets.SWOOSHIN);
-      });
+      }, { immediate: true });
     });
 
-    eventBus.on('element:update', ({ id, updates }: { id: string; updates: Partial<AnyElement> }) => {
+    eventBus.on('element:update', ({ id, updates, silent }: { id: string; updates: Partial<AnyElement>, silent?: boolean }) => {
       if (!this.state.currentLabel) return;
       const index = this.state.currentLabel.elements.findIndex(el => el.id === id);
       if (index === -1) return;
@@ -73,7 +77,7 @@ export class Store {
         } else {
           eventBus.emit('element:warning:clear', { id });
         }
-      });
+      }, { immediate: false, silent });
     });
 
     eventBus.on('elements:update', (batch: { id: string; updates: Partial<AnyElement> }[]) => {
@@ -92,7 +96,7 @@ export class Store {
             this.state.currentLabel!.elements[index] = newElement;
           }
         });
-      });
+      }, { immediate: true });
     });
 
     eventBus.on('element:reorder', ({ id, direction }: { id: string, direction: 'up' | 'down' }) => {
@@ -102,7 +106,7 @@ export class Store {
         if (!el) return;
         el.zIndex += (direction === 'up' ? 1 : -1);
         UISM.play(UISM.enumPresets.SWOOSHIN);
-      });
+      }, { immediate: true });
     });
 
     eventBus.on('element:delete', (id: string) => {
@@ -111,7 +115,7 @@ export class Store {
         this.state.currentLabel.elements = this.state.currentLabel.elements.filter(el => id !== el.id);
         this.state.selectedElementIds = this.state.selectedElementIds.filter(elId => elId !== id);
         UISM.play(UISM.enumPresets.DELETE);
-      });
+      }, { immediate: true });
     });
 
     eventBus.on('element:duplicate', (id: string) => {
@@ -130,7 +134,7 @@ export class Store {
         this.state.currentLabel.elements.push(copy);
         this.state.selectedElementIds = [copy.id];
         UISM.play(UISM.enumPresets.COPY);
-      });
+      }, { immediate: true });
     });
 
     eventBus.on('element:select', (ids: string | string[]) => {
@@ -167,7 +171,7 @@ export class Store {
         if (hasClamped) {
           UISM.play(UISM.enumPresets.WARNING);
         }
-      });
+      }, { immediate: true });
     });
 
     eventBus.on('preferences:update', (prefs: Partial<UserPreferences>) => {
@@ -179,7 +183,7 @@ export class Store {
       });
     });
 
-    eventBus.on('history:snapshot', () => this.takeSnapshot());
+    eventBus.on('history:snapshot', () => this.takeSnapshot(true));
   }
 
   private mergeUpdates(current: AnyElement, updates: any): AnyElement {
@@ -194,15 +198,51 @@ export class Store {
     return newElement;
   }
 
-  private performAction(action: () => void): void {
+  private performAction(action: () => void, options: { immediate?: boolean; silent?: boolean } = {}): void {
     if (!this.state.currentLabel) return;
     action();
-    this.takeSnapshot();
+    
+    if (!options.silent) {
+      this.takeSnapshot(options.immediate ?? true);
+    }
+    
     this.state.currentLabel.updatedAt = Date.now();
     this.emit();
   }
 
-  private takeSnapshot(): void {
+  /**
+   * Captura o estado para o histórico.
+   * @param immediate Se true, grava agora. Se false, aplica debounce.
+   */
+  private takeSnapshot(immediate: boolean = true): void {
+    if (!this.state.currentLabel) return;
+
+    // Se for imediato, cancela qualquer timer pendente e executa
+    if (immediate) {
+      if (this.snapshotTimer) {
+        clearTimeout(this.snapshotTimer);
+        this.snapshotTimer = null;
+      }
+      this._doSnapshot();
+      return;
+    }
+
+    // Lógica de Debounce para ações contínuas
+    if (this.snapshotTimer) clearTimeout(this.snapshotTimer);
+    
+    const ms = this.state.preferences.historySensitivity ?? 400;
+    
+    if (ms <= 0) {
+      this._doSnapshot();
+    } else {
+      this.snapshotTimer = setTimeout(() => {
+        this._doSnapshot();
+        this.snapshotTimer = null;
+      }, ms);
+    }
+  }
+
+  private _doSnapshot(): void {
     if (!this.state.currentLabel) return;
     eventBus.emit('request:canvas:snapshot', (ctx: CanvasRenderingContext2D) => {
       historyManager.snapshot(ctx, this.state.currentLabel!.elements);
@@ -211,6 +251,12 @@ export class Store {
   }
 
   private undo(): void {
+    // Cancela snapshot pendente se o usuário desfazer
+    if (this.snapshotTimer) {
+      clearTimeout(this.snapshotTimer);
+      this.snapshotTimer = null;
+    }
+
     const snapshot = historyManager.undo();
     if (snapshot) {
       this.applySnapshot(snapshot);
@@ -251,7 +297,12 @@ export class Store {
     this.state.currentLabel = label;
     historyManager.clear();
     this.state.selectedElementIds = [];
-    this.takeSnapshot();
+    this.takeSnapshot(true);
+    this.emit();
+  }
+
+  public loadPreferences(prefs: UserPreferences): void {
+    this.state.preferences = { ...prefs };
     this.emit();
   }
 }

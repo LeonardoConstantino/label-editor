@@ -12,6 +12,7 @@ export interface UserPreferences {
   snapToObjects: boolean;
   snapToCanvas: boolean;
   snapThresholdMM: number;
+  historySensitivity: number; // ms
 }
 
 export const DEFAULT_PREFERENCES: UserPreferences = {
@@ -27,5 +28,6 @@ export const DEFAULT_PREFERENCES: UserPreferences = {
   snapToGrid: true,
   snapToObjects: true,
   snapToCanvas: true,
-  snapThresholdMM: 2.0
+  snapThresholdMM: 2.0,
+  historySensitivity: 400
 };

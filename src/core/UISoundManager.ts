@@ -800,6 +800,31 @@ export class UISoundManager {
   }
 
   /**
+   * Ativa ou desativa os sons.
+   */
+  setEnabled(enabled: boolean): boolean {
+    this.enabled = enabled;
+    this.logger!.debug(
+      'UISoundManager',
+      `Sons ${enabled ? 'habilitados' : 'desabilitados'}`,
+    );
+
+    if (!enabled) {
+      // Interrompe sons ativos imediatamente
+      this.activeSounds.forEach((soundNodes) => {
+        soundNodes.sources.forEach((source) => {
+          try {
+            source.stop();
+            source.disconnect();
+          } catch (e) {}
+        });
+      });
+    }
+
+    return this.enabled;
+  }
+
+  /**
    * Alterna estado de reprodução
    * @param force - Se fornecido, define estado explicitamente (true = habilitado, false = desabilitado)
    * @returns Novo estado (true = habilitado)

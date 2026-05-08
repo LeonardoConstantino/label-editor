@@ -28,14 +28,39 @@ export class AppInput extends HTMLElement {
     return ['label', 'type', 'value', 'placeholder'];
   }
 
+  get value(): string {
+    return this.input.value;
+  }
+
+  set value(val: string) {
+    if (this.input.value !== val) {
+      this.input.value = val;
+      this.setAttribute('value', val);
+    }
+  }
+
+  get type(): string {
+    return this.input.type;
+  }
+
+  set type(val: string) {
+    this.input.type = val;
+    this.setAttribute('type', val);
+  }
+
   connectedCallback(): void {
     this.setupBaseStyles();
     this.render();
     this.setupEvents();
   }
 
-  attributeChangedCallback(_name: string, oldVal: string, newVal: string): void {
+  attributeChangedCallback(name: string, oldVal: string, newVal: string): void {
     if (oldVal === newVal) return;
+    
+    if (name === 'value' && this.input && this.input.value !== newVal) {
+      this.input.value = newVal;
+    }
+    
     this.updateValues();
   }
 
@@ -68,7 +93,8 @@ export class AppInput extends HTMLElement {
     this.input.type = type;
     this.input.placeholder = placeholder;
     
-    if (this.input.value !== value) {
+    // Sincroniza apenas se não houver interação manual em andamento
+    if (document.activeElement !== this && this.input.value !== value) {
       this.input.value = value;
     }
   }

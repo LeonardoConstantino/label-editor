@@ -30,45 +30,50 @@ settingsSheet.replaceSync(`
   /* Sidebar Styles */
   .sidebar {
     width: 200px;
-    background-color: rgba(255, 255, 255, 0.02);
+    background-color: rgba(0, 0, 0, 0.4);
     border-right: 1px solid var(--color-border-ui);
     display: flex;
     flex-direction: column;
     padding: 20px 0;
+    backdrop-filter: blur(10px);
   }
 
   .sidebar-item {
-    padding: 12px 20px;
-    font-family: var(--font-sans);
-    font-size: 12px;
+    padding: 12px 24px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
     color: var(--color-text-muted);
     cursor: pointer;
-    transition: all 0.2s;
-    border-left: 3px solid transparent;
+    transition: all 0.2s var(--ease-spring);
+    border-left: 2px solid transparent;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     user-select: none;
   }
 
   .sidebar-item:hover {
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: rgba(99, 102, 241, 0.03);
     color: var(--color-text-main);
   }
 
   .sidebar-item.active {
-    background-color: rgba(99, 102, 241, 0.05);
+    background-color: rgba(99, 102, 241, 0.08);
     color: var(--color-accent-primary);
     border-left-color: var(--color-accent-primary);
-    font-weight: 600;
+    font-weight: 700;
+    text-shadow: 0 0 10px rgba(99, 102, 241, 0.3);
   }
 
   /* Content Area Styles */
   .content-area {
     flex: 1;
-    padding: 32px 40px;
+    padding: 40px 60px;
     overflow-y: auto;
     scroll-behavior: smooth;
+    background: radial-gradient(circle at top right, rgba(99, 102, 241, 0.05), transparent 40%);
   }
 
   /* Visibility Control */
@@ -102,11 +107,12 @@ settingsSheet.replaceSync(`
   }
 
   .card-module {
-    background-color: rgba(0, 0, 0, 0.2);
+    background-color: rgba(255, 255, 255, 0.02);
     border: 1px solid var(--color-border-ui);
     border-radius: 12px;
-    padding: 24px;
+    padding: 28px;
     margin-bottom: 24px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
   }
 
   .setting-row {
@@ -432,7 +438,7 @@ export class PreferencesModal extends HTMLElement {
 
   private renderSkeleton() {
     if (!this.shadowRoot || !this._preferences) return;
-    const {audioEnabled, showGrid, gridSizeMM, gridColor, gridOpacity, snapToGrid, snapToObjects, snapToCanvas, snapThresholdMM, unit} = this._preferences;
+    const {audioEnabled, showGrid, gridSizeMM, gridColor, gridOpacity, snapToGrid, snapToObjects, snapToCanvas, snapThresholdMM, unit, historySensitivity} = this._preferences;
 
     this.shadowRoot.innerHTML = `
       <div class="settings-container">
@@ -445,6 +451,9 @@ export class PreferencesModal extends HTMLElement {
           </div>
           <div class="sidebar-item" data-section="snapping">
             <ui-icon name="move" style="--icon-size: 14px"></ui-icon> Magnetic Snapping
+          </div>
+          <div class="sidebar-item" data-section="perf">
+            <ui-icon name="cpu" style="--icon-size: 14px"></ui-icon> Performance
           </div>
         </aside>
 
@@ -559,6 +568,25 @@ export class PreferencesModal extends HTMLElement {
               </div>
             </div>
           </section>
+
+          <!-- SECTION: PERFORMANCE -->
+          <section id="section-perf" class="settings-section">
+            <div class="section-header">
+              <ui-icon name="cpu" class="text-accent-primary" style="--icon-size: 24px"></ui-icon>
+              <h2 class="section-title">Engine & History</h2>
+            </div>
+            <div class="card-module">
+              <div class="setting-row">
+                <div class="setting-info">
+                  <span class="setting-label">History Sensitivity</span>
+                  <span class="setting-desc">Debounce time for continuous actions (Undo stack optimization).</span>
+                </div>
+                <div class="setting-control">
+                  <app-select id="history-sensitivity-select" data-prop="historySensitivity" value="${historySensitivity}" style="width: 160px"></app-select>
+                </div>
+              </div>
+            </div>
+          </section>
         </main>
       </div>
     `;
@@ -592,6 +620,16 @@ export class PreferencesModal extends HTMLElement {
         { value: '150', label: '150 DPI', sublabel: 'Draft Quality' },
         { value: '300', label: '300 DPI', sublabel: 'Print Quality' },
         { value: '600', label: '600 DPI', sublabel: 'Ultra High-Res' }
+      ];
+    }
+
+    const histSelect = root.getElementById('history-sensitivity-select') as any;
+    if (histSelect) {
+      histSelect.options = [
+        { value: '0', label: 'Instant', sublabel: 'No debounce (Raw)' },
+        { value: '400', label: 'Agile', sublabel: 'Default speed' },
+        { value: '800', label: 'Balanced', sublabel: 'Optimized stack' },
+        { value: '1500', label: 'Conservative', sublabel: 'Long delays' }
       ];
     }
   }

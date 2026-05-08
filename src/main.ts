@@ -66,6 +66,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 1. Carrega preferências do usuário imediatamente
   const { preferenceManager } = await import('./domain/services/PreferenceManager');
   const prefs = await preferenceManager.getPreferences();
+  store.loadPreferences(prefs);
 
   // 2. Inicializa o som com base na preferência e contorna autoplay-block
   UISM.toggle(prefs.audioEnabled);
