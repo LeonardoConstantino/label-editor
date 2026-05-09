@@ -3,7 +3,6 @@ import { store, AppState } from '../../core/Store';
 import { Label, AnyElement } from '../../domain/models/Label';
 import { OverflowResult } from '../../domain/services/OverflowValidator';
 import { UISM } from '../../core/UISoundManager';
-import { debounce } from '../../utils/utils';
 import { sharedSheet } from '../../utils/shared-styles';
 import { HelpContentProvider } from '../../utils/HelpContentProvider';
 
@@ -15,11 +14,9 @@ import '../common/UINumberScrubber';
 import '../common/tooltip';
 
 // Imports dos Componentes Nível 2
-import './inspector/InspectorDocumentSetup';
 import './inspector/InspectorLayerCard';
 import { INSPECTOR_CHANGE, INSPECTOR_ACTION } from './inspector/inspector-events';
 import { InspectorChangeDetail, InspectorActionDetail } from './inspector/inspector.types';
-import { InspectorDocumentSetup } from './inspector/InspectorDocumentSetup';
 import { InspectorLayerCard } from './inspector/InspectorLayerCard';
 import { layoutService, AlignAction } from '../../domain/services/LayoutService';
 
@@ -27,14 +24,13 @@ import { layoutService, AlignAction } from '../../domain/services/LayoutService'
 import '../common/UiAlignCluster';
 
 /**
- * ElementInspector: Orquestrador (Nível 1)
- * Atua como ponte entre a Store/EventBus e os sub-componentes especialistas.
+ * ElementInspector: Módulo de Gestão de Camadas (Nível 1)
+ * Especializado em exibir e editar propriedades de elementos e multi-seleção.
  */
 export class ElementInspector extends HTMLElement {
   private abortController: AbortController | null = null;
   private currentElementsJson: string = '';
   private currentSelectedId: string | null = null;
-  private currentThumbnail: string = '';
   private overflowWarnings: Map<string, OverflowResult> = new Map();
 
   constructor() {
@@ -113,7 +109,7 @@ export class ElementInspector extends HTMLElement {
 
     const elementsStructureJson = JSON.stringify([
       ...elements.map(e => ({ id: e.id, v: e.visible })),
-      selectedIds.length // Inclui contagem de seleção para rebuild se mudar de 1 para multi
+      selectedIds.length
     ]);
     const hasStructureChanged = elementsStructureJson !== this.currentElementsJson || selectedId !== this.currentSelectedId;
 
@@ -122,19 +118,22 @@ export class ElementInspector extends HTMLElement {
       this.currentSelectedId = selectedId;
       this.rebuildPanel(label, state);
     } else {
-      this.syncValues(label, state);
+      this.syncValues(label);
     }
-    this.updateDigitalTwin(label);
   }
 
   private renderSkeleton(): void {
     if (!this.shadowRoot) return;
     this.shadowRoot.innerHTML = `
       <style>
-        :host { display: flex; flex-direction: column; flex: 1; min-height: 0; gap: 16px; padding: 20px; box-sizing: border-box; color: var(--color-text-main); font-family: var(--font-sans); overflow-y: scroll; }
-        #panel-content { display: flex; flex-direction: column; gap: 12px; flex: 1; padding: 0 8px 120px 8px; }
+        :host { display: flex; flex-direction: column; flex: 1; min-height: 0; gap: 16px; padding: 0; box-sizing: border-box; color: var(--color-text-main); font-family: var(--font-sans); }
+        #panel-content { display: flex; flex-direction: column; gap: 12px; flex: 1; padding: 0 8px 120px 8px; overflow-y: scroll; }
+        .inspector-header-mini { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: rgba(0,0,0,0.2); border-bottom: 1px solid var(--color-border-ui); }
+        .inspector-title-group { display: flex; align-items: baseline; gap: 8px; }
+        .inspector-title { font-family: var(--font-mono); font-size: 10px; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.1em; }
+        .inspector-badge { font-family: var(--font-mono); font-size: 9px; color: var(--color-accent-primary); background: rgba(99, 102, 241, 0.1); padding: 1px 4px; border-radius: 4px; border: 1px solid rgba(99, 102, 241, 0.2); }
       </style>
-      <div class="inspector-header">
+      <div class="inspector-header-mini">
         <div class="inspector-title-group">
           <span id="panel-title" class="inspector-title">LAYERS</span>
           <span id="unit-count" class="inspector-badge">0 UNITS</span>
@@ -144,6 +143,7 @@ export class ElementInspector extends HTMLElement {
       <div id="panel-content"></div>
     `;
   }
+
   private rebuildPanel(label: Label, state: AppState): void {
     const container = this.shadowRoot?.getElementById('panel-content');
     const title = this.shadowRoot?.getElementById('panel-title');
@@ -152,81 +152,42 @@ export class ElementInspector extends HTMLElement {
 
     container.innerHTML = '';
     const selectedIds = state.selectedElementIds;
-    const selectedId = selectedIds[0] || null;
 
-    if (selectedIds.length === 0) {
-      if (title) title.textContent = 'LABEL SETUP';
-      if (countLabel) countLabel.textContent = 'BLUEPRINT';
-      
-      const docSetup = document.createElement('inspector-document-setup') as InspectorDocumentSetup;
-      docSetup.labelConfig = label.config;
-      docSetup.preferences = state.preferences;
-      docSetup.thumbnailUrl = this.currentThumbnail;
-      container.appendChild(docSetup);
-    } else if (selectedIds.length >= 2) {
-      if (title) title.textContent = 'MULTI-SELECTION';
-      if (countLabel) countLabel.textContent = `${selectedIds.length} UNITS`;
+    if (title) title.textContent = selectedIds.length >= 2 ? 'MULTI-SELECTION' : 'PROPERTIES';
+    if (countLabel) countLabel.textContent = `${label.elements.length} UNITS`;
 
+    // Se houver multi-seleção, mostra as ferramentas de alinhamento no topo
+    if (selectedIds.length >= 2) {
       const alignCluster = document.createElement('ui-align-cluster');
       container.appendChild(alignCluster);
-
-      // Também mostramos os cards das camadas selecionadas para ações rápidas (lock/vis/del)
-      [...label.elements]
-        .filter(el => selectedIds.includes(el.id))
-        .sort((a, b) => b.zIndex - a.zIndex)
-        .forEach(el => {
-          const card = document.createElement('inspector-layer-card') as InspectorLayerCard;
-          card.element = el;
-          card.selected = true; // Forçamos visual de selecionado
-          card.hasOverflow = this.overflowWarnings.has(el.id);
-          container.appendChild(card);
-        });
-    } else {
-      if (title) title.textContent = 'PROPERTIES';
-      if (countLabel) countLabel.textContent = `${label.elements.length} UNITS`;
-      
-      [...label.elements].sort((a, b) => b.zIndex - a.zIndex).forEach(el => {
-        const card = document.createElement('inspector-layer-card') as InspectorLayerCard;
-        card.element = el;
-        card.selected = el.id === selectedId;
-        card.hasOverflow = this.overflowWarnings.has(el.id);
-        container.appendChild(card);
-      });
     }
+
+    // Renderiza TODAS as camadas da etiqueta
+    [...label.elements].sort((a, b) => b.zIndex - a.zIndex).forEach(el => {
+      const card = document.createElement('inspector-layer-card') as InspectorLayerCard;
+      card.element = el;
+      card.selected = selectedIds.includes(el.id);
+      card.hasOverflow = this.overflowWarnings.has(el.id);
+      container.appendChild(card);
+    });
   }
 
-  private syncValues(label: Label, state: AppState): void {
+  private syncValues(label: Label): void {
     const root = this.shadowRoot!;
-    const selectedId = this.currentSelectedId;
-
-    if (!selectedId) {
-      const docSetup = root.querySelector('inspector-document-setup') as InspectorDocumentSetup;
-      if (docSetup) {
-        docSetup.labelConfig = label.config;
-        docSetup.preferences = state.preferences;
+    root.querySelectorAll<InspectorLayerCard>('inspector-layer-card').forEach(card => {
+      const el = label.elements.find(e => e.id === card.element?.id);
+      if (el) {
+        card.element = el;
+        card.hasOverflow = this.overflowWarnings.has(el.id);
       }
-    } else {
-      root.querySelectorAll<InspectorLayerCard>('inspector-layer-card').forEach(card => {
-        const el = label.elements.find(e => e.id === card.element?.id);
-        if (el) {
-          card.element = el;
-          card.hasOverflow = this.overflowWarnings.has(el.id);
-        }
-      });
-    }
+    });
   }
 
   private onInspectorChange(e: CustomEvent<InspectorChangeDetail>): void {
     const { prop, value } = e.detail;
     
-    if (prop.startsWith('doc.')) {
-      const label = store.getState().currentLabel;
-      if (label) {
-        eventBus.emit('label:config:update', { ...label.config, [prop.replace('doc.', '')]: value });
-      }
-    } else if (prop.startsWith('pref.')) {
-      eventBus.emit('preferences:update', { [prop.replace('pref.', '')]: value });
-    } else {
+    // Este módulo lida apenas com propriedades de elementos
+    if (!prop.startsWith('doc.') && !prop.startsWith('pref.')) {
       const target = e.target as HTMLElement;
       const card = target.closest('inspector-layer-card') as InspectorLayerCard;
       const id = card?.element?.id || this.currentSelectedId;
@@ -238,14 +199,6 @@ export class ElementInspector extends HTMLElement {
 
   private onInspectorAction(e: CustomEvent<InspectorActionDetail>): void {
     const { action, id } = e.detail;
-
-    if (action === 'open-vault') {
-      const modal = document.getElementById('vault-modal') as HTMLElement;
-      if (modal) modal.setAttribute('open', '');
-      UISM.play(UISM.enumPresets.OPEN);
-      return;
-    }
-
     if (!id) return;
 
     switch (action) {
@@ -254,6 +207,14 @@ export class ElementInspector extends HTMLElement {
           eventBus.emit('element:select', id);
           UISM.play(UISM.enumPresets.TAP);
         }
+        break;
+      case 'multi-select':
+        const currentIds = store.getState().selectedElementIds;
+        const newIds = currentIds.includes(id)
+          ? currentIds.filter(item => item !== id)
+          : [...currentIds, id];
+        eventBus.emit('element:select', newIds);
+        UISM.play(UISM.enumPresets.TAP);
         break;
       case 'toggle-vis':
         const elVis = store.getState().currentLabel?.elements.find(item => item.id === id);
@@ -288,15 +249,6 @@ export class ElementInspector extends HTMLElement {
     }
     eventBus.emit('element:update', { id, updates });
   }
-
-  private updateDigitalTwin = debounce(async (label: Label | null) => {
-    if (!label) return;
-    const { templateManager } = await import('../../domain/services/TemplateManager');
-    this.currentThumbnail = await templateManager.captureThumbnail(label);
-    
-    const docSetup = this.shadowRoot?.querySelector('inspector-document-setup') as InspectorDocumentSetup;
-    if (docSetup) docSetup.thumbnailUrl = this.currentThumbnail;
-  }, 1000);
 
   private syncOverflowStatus(): void {
     const cards = this.shadowRoot?.querySelectorAll<InspectorLayerCard>('inspector-layer-card');

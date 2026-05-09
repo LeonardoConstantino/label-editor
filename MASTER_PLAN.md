@@ -52,7 +52,8 @@ Este Master Plan coordena a fase final de desenvolvimento, focando em estabilida
 | **62** | [Ferramentas de Alinhamento e Distribuição](./tasks/62_power_layout.md) | 06 | [x] | 41 | `task/62-power-layout` |
 | **63** | [Smart Snapping & Guias Magnéticas](./tasks/63_smart_snapping.md) | 06 | [x] | 04 | `task/63-smart-snapping` |
 | **26** | [Sangria e Marcas de Corte (PDF)](./tasks/26_a4_printing.md) | 06 | [x] | 10 | `task/26-a4-printing` |
-| **73** | [Adoção Universal do AppSelect](./tasks/73_universal_select_adoption.md) | 06 | [ ] | 69 | `task/73-select-adoption` |
+| **73** | [Adoção Universal do AppSelect](./tasks/73_universal_select_adoption.md) | 06 | [x] | 69 | `task/73-select-adoption` |
+| **76** | ["The Active Slot" - Navegação Modular](./tasks/76-active-slot.md) | 06 | [/] | 46 | `task/76-active-slot` |
 | **52** | [Action Icon de Lock nos Cards de Camada](./tasks/52_ui_layer_lock.md) | 05 | [x] | 41 | `task/52-ui-layer-lock` |
 | **58** | [Elemento de Código (QR Code / Barcode)](./tasks/58_element_code.md) | 05 | [ ] | 41 | `task/58-element-code` |
 | **42** | [BorderElement (Standalone Moldura)](./tasks/42_border_element.md) | 05 | [x] | 41 | `task/42-border-element` |

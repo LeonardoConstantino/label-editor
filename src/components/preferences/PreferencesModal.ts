@@ -17,7 +17,7 @@ settingsSheet.replaceSync(`
   :host {
     display: block;
     width: 100%;
-    height: 100%;
+    height: 68dvh;
   }
 
   .settings-container {

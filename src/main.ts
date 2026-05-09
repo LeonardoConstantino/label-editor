@@ -14,7 +14,7 @@ import { ToastManager } from './components/common/toast';
 import { getOSInfo } from './utils/os-detection';
 import './components/editor/EditorCanvas';
 import './components/editor/Toolbar';
-import './components/editor/ElementInspector';
+import './components/editor/AppCockpit';
 import './components/editor/StatusBar';
 import './components/editor/VaultGallery';
 import './components/editor/WelcomeScreen';

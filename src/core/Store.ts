@@ -14,6 +14,7 @@ export interface AppState {
   canUndo: boolean;
   canRedo: boolean;
   preferences: UserPreferences;
+  activeModuleId: 'blueprint' | 'layers' | 'assets';
 }
 
 /**
@@ -30,7 +31,8 @@ export class Store {
       clipboard: [],
       canUndo: false,
       canRedo: false,
-      preferences: DEFAULT_PREFERENCES
+      preferences: DEFAULT_PREFERENCES,
+      activeModuleId: 'blueprint'
     };
 
     this.registerEvents();
@@ -184,6 +186,11 @@ export class Store {
     });
 
     eventBus.on('history:snapshot', () => this.takeSnapshot(true));
+
+    eventBus.on('module:switch', ({ moduleId }: { moduleId: any }) => {
+      this.state.activeModuleId = moduleId;
+      this.emit();
+    });
   }
 
   private mergeUpdates(current: AnyElement, updates: any): AnyElement {

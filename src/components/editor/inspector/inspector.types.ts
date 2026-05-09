@@ -19,6 +19,7 @@ export interface InspectorChangeDetail {
  */
 export type InspectorActionType = 
   | 'select' 
+  | 'multi-select'
   | 'toggle-vis' 
   | 'toggle-lock'
   | 'up' 

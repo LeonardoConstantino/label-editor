@@ -30,6 +30,7 @@ export class InspectorLayerCard extends HTMLElement {
   private _element: AnyElement | null = null;
   private _selected: boolean = false;
   private _hasOverflow: boolean = false;
+  private _sectionsRendered: boolean = false;
 
   constructor() {
     super();
@@ -42,6 +43,7 @@ export class InspectorLayerCard extends HTMLElement {
   set element(el: AnyElement) {
     const prevId = this._element?.id;
     const prevLocked = this._element?.locked;
+    const prevVisible = this._element?.visible;
     this._element = el;
     
     if (prevId !== el.id) {
@@ -51,6 +53,9 @@ export class InspectorLayerCard extends HTMLElement {
       this.syncSections();
       if (prevLocked !== el.locked) {
         this.updateLockState();
+      }
+      if (prevVisible !== el.visible) {
+        this.updateVisibilityState();
       }
     }
   }
@@ -62,7 +67,7 @@ export class InspectorLayerCard extends HTMLElement {
   set selected(val: boolean) {
     if (this._selected !== val) {
       this._selected = val;
-      this.render();
+      this.updateSelectionVisuals();
     }
   }
 
@@ -72,7 +77,9 @@ export class InspectorLayerCard extends HTMLElement {
   }
 
   connectedCallback(): void {
-    this.render();
+    if (!this.shadowRoot?.innerHTML) {
+      this.render();
+    }
   }
 
   private render(): void {
@@ -132,25 +139,19 @@ export class InspectorLayerCard extends HTMLElement {
           transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        /* Hover Tátil */
         .precision-checkbox:hover {
           border-color: var(--color-accent-primary);
           background: rgba(99, 102, 241, 0.1);
         }
 
-        /* Clique Mecânico */
-        .precision-checkbox:active {
-          transform: scale(0.85);
-        }
+        .precision-checkbox:active { transform: scale(0.85); }
 
-        /* Estado Ligado (Preenchido com a cor de Ação) */
         .precision-checkbox:checked {
           background: var(--color-accent-primary);
           border-color: var(--color-accent-primary);
           box-shadow: 0 0 8px rgba(99, 102, 241, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.2);
         }
 
-        /* A Mágica do Checkmark via CSS puro (Elástico) */
         .precision-checkbox::after {
           content: '';
           width: 3.5px;
@@ -164,7 +165,6 @@ export class InspectorLayerCard extends HTMLElement {
 
         .precision-checkbox:checked::after {
           opacity: 1;
-          /* Faz o "V" dar um pulo sutil quando aparece */
           transform: rotate(45deg) scale(1) translateY(-1px);
         }
         /* ========================================== */
@@ -180,10 +180,7 @@ export class InspectorLayerCard extends HTMLElement {
 
       <div class="element-card ${isSelected ? 'selected' : ''} ${isLocked ? 'is-locked' : ''}" data-id="${id}">
         
-        <!-- CABEÇALHO DA CAMADA -->
         <div class="card-header" id="header-select">
-          
-          <!-- NOVO: O Checkbox de Precisão para Multi-seleção -->
           <input type="checkbox" class="precision-checkbox" id="chk-select" ${isSelected ? 'checked' : ''} title="Selecionar Camada">
           
           <span class="type-tag">${escapeHTML(el.type)}</span>
@@ -202,15 +199,14 @@ export class InspectorLayerCard extends HTMLElement {
         </div>
 
         <div class="card-content" id="sections-container">
-          <!-- Seções injetadas via JS -->
+          <!-- Seções injetadas sob demanda -->
         </div>
       </div>
     `;
 
+    this._sectionsRendered = false;
     this.setupListeners();
-    if (isSelected) {
-      this.renderSections();
-    }
+    this.updateSelectionVisuals();
   }
 
   private setupListeners(): void {
@@ -218,10 +214,19 @@ export class InspectorLayerCard extends HTMLElement {
     const id = this._element?.id;
     if (!id) return;
 
-    // Seleção de Card
+    // Seleção de Card (Single)
     root.getElementById('header-select')?.addEventListener('click', (e) => {
-      if ((e.target as HTMLElement).closest('.action-btn')) return;
+      const target = e.target as HTMLElement;
+      if (target.closest('.action-btn')) return;
+      if (target.closest('.precision-checkbox')) return;
+      
       dispatchInspectorAction(this, { action: 'select', id });
+    });
+
+    // Multi-seleção via Checkbox
+    root.getElementById('chk-select')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      dispatchInspectorAction(this, { action: 'multi-select', id });
     });
 
     // Toggle Visibilidade
@@ -236,37 +241,35 @@ export class InspectorLayerCard extends HTMLElement {
       dispatchInspectorAction(this, { action: 'toggle-lock', id });
     });
 
-    // Gerenciamento de Z-Index para Selects (Task 44/69 Fix)
+    // Gerenciamento de Z-Index para Selects
     root.addEventListener('ui-select:open', () => {
       this.classList.add('elevated');
     });
     root.addEventListener('ui-select:close', () => {
       this.classList.remove('elevated');
     });
+  }
 
-    if (this._selected) {
-      const container = root.getElementById('sections-container')!;
-      
-      container.addEventListener('app-input', (e: Event) => {
-        if (this._element?.locked) return;
-        const target = e.target as HTMLElement;
-        const prop = target.getAttribute('data-prop');
-        if (prop === 'name') {
-          const detail = (e as CustomEvent).detail;
-          if (detail && typeof detail === 'object' && 'value' in detail) {
-            dispatchInspectorChange(this, { prop, value: detail.value });
-          }
-        }
-      });
+  private updateSelectionVisuals(): void {
+    const shadow = this.shadowRoot;
+    if (!shadow) return;
 
-      container.addEventListener('click', (e) => {
-        if (this._element?.locked) return;
-        const btn = (e.target as HTMLElement).closest('[data-card-action]');
-        if (btn) {
-          const action = btn.getAttribute('data-card-action') as InspectorActionType;
-          dispatchInspectorAction(this, { action, id });
-        }
-      });
+    const card = shadow.querySelector('.element-card');
+    const content = shadow.getElementById('sections-container');
+    const chk = shadow.getElementById('chk-select') as HTMLInputElement;
+
+    if (card) {
+      card.classList.toggle('selected', this._selected);
+      this.classList.toggle('selected', this._selected);
+    }
+
+    if (chk) chk.checked = this._selected;
+
+    if (content) {
+      content.style.display = this._selected ? 'flex' : 'none';
+      if (this._selected && !this._sectionsRendered) {
+        this.renderSections();
+      }
     }
   }
 
@@ -274,6 +277,7 @@ export class InspectorLayerCard extends HTMLElement {
     const container = this.shadowRoot?.getElementById('sections-container');
     if (!container || !this._element) return;
 
+    container.innerHTML = '';
     const el = this._element;
 
     const idSection = document.createElement('div');
@@ -314,6 +318,29 @@ export class InspectorLayerCard extends HTMLElement {
     `;
     container.appendChild(footer);
 
+    // Setup delegated listeners for sections
+    container.addEventListener('app-input', (e: Event) => {
+      if (this._element?.locked) return;
+      const target = e.target as HTMLElement;
+      const prop = target.getAttribute('data-prop');
+      if (prop === 'name') {
+        const detail = (e as CustomEvent).detail;
+        if (detail && typeof detail === 'object' && 'value' in detail) {
+          dispatchInspectorChange(this, { prop, value: detail.value });
+        }
+      }
+    });
+
+    container.addEventListener('click', (e) => {
+      if (this._element?.locked) return;
+      const btn = (e.target as HTMLElement).closest('[data-card-action]');
+      if (btn) {
+        const action = btn.getAttribute('data-card-action') as InspectorActionType;
+        dispatchInspectorAction(this, { action, id: el.id });
+      }
+    });
+
+    this._sectionsRendered = true;
     this.syncSections();
   }
 
@@ -352,13 +379,17 @@ export class InspectorLayerCard extends HTMLElement {
     card?.classList.toggle('is-locked', isLocked);
   }
 
+  private updateVisibilityState(): void {
+    this.updateHeader();
+  }
+
   private updateWarningTag(): void {
     const tag = this.shadowRoot?.getElementById('warning-tag');
     if (tag) tag.style.display = this._hasOverflow ? 'inline' : 'none';
   }
 
   private syncSections(): void {
-    if (!this._selected || !this.shadowRoot || !this._element) return;
+    if (!this._selected || !this.shadowRoot || !this._element || !this._sectionsRendered) return;
     
     const el = this._element;
     const shadow = this.shadowRoot;

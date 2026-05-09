@@ -104,6 +104,12 @@
 
   .animate-pulse-led         { animation: pulse-led 2s infinite; }
   .animate-pulse-led-magenta { animation: pulse-led-magenta 1s infinite; }
+
+  .dev-mode-magenta {
+    background-color: #d946ef !important;
+    box-shadow: 0 0 12px #d946ef !important;
+    animation: pulse-led-magenta 1s infinite !important;
+  }
 }
 
 /* ==========================================

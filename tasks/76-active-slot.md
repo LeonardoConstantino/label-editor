@@ -17,7 +17,19 @@ Substituir a alternância fixa entre "Setup" e "Layers" por uma arquitetura de m
 - **Ícone Direto:** O botão de exibir o Rack deve ter o ícone `<ui-icon name="chevrons-up-down">`.
 
 ## Critérios de Aceite
-- [ ] O usuário consegue trocar entre os painéis através do Rack expansível.
-- [ ] O painel de conteúdo sofre desfoque visual (`blur`) e encolhe ao abrir o menu, para manter o foco na seleção.
-- [ ] O texto e ícone do cabeçalho atualizam refletindo o módulo escolhido.
-- [ ] O Rack se fecha automaticamente se o usuário clicar fora dele.
+- [x] O usuário consegue trocar entre os painéis através do Rack expansível.
+- [x] O painel de conteúdo sofre desfoque visual (`blur`) e encolhe ao abrir o menu, para manter o foco na seleção.
+- [x] O texto e ícone do cabeçalho atualizam refletindo o módulo escolhido.
+- [x] O Rack se fecha automaticamente se o usuário clicar fora dele.
+
+---
+
+## 🚀 Observações para Futuros Módulos (Slots)
+
+Com a arquitetura modular estabelecida, os próximos "cartuchos" a serem implementados no Rack são:
+
+1.  **Production Studio (Batch):** Migrar a lógica de mapeamento de variáveis e geração de lotes do modal atual para um módulo lateral focado em produtividade.
+2.  **Asset Library (Gallery):** Um navegador de imagens e SVGs diretamente no cockpit, facilitando o drag-and-drop para o canvas.
+3.  **Variable Manager:** Central de gerenciamento de campos dinâmicos e regras de formatação avançada.
+4.  **History Visualizer:** Uma lista cronológica de snapshots com preview, permitindo saltos temporais precisos no design.
+

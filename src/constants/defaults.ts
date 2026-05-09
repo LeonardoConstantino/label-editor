@@ -4,7 +4,7 @@ import { ElementType, BorderStyle, TextOverflow, ImageFit } from '../domain/mode
  * DEBUG: Flag global para ativar/desativar logs de debug detalhados.
  */
 const debug = {
-  state: false,
+  state: true,
 };
 
 export const setDebug = (value: boolean) => {

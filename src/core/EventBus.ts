@@ -28,6 +28,7 @@ export interface EventMap {
   'ui:modal:open': { id: string };
   'ui:modal:close': { id: string };
   'ui:open:help': { tab?: string; source?: string };
+  'module:switch': { moduleId: string };
 
   // Element Manipulation
   'element:add': AnyElement;

@@ -18,6 +18,7 @@ interface InputWithMetadata extends HTMLElement {
 
 /**
  * InspectorDocumentSetup: Container de Nível 2 para configuração global.
+ * Agora integrado como módulo no AppCockpit.
  */
 export class InspectorDocumentSetup extends HTMLElement {
   private _labelConfig: Label['config'] | null = null;
@@ -35,6 +36,7 @@ export class InspectorDocumentSetup extends HTMLElement {
   set labelConfig(config: Label['config']) {
     this._labelConfig = config;
     this.syncValues();
+    this.updateDigitalTwinVisuals();
   }
 
   set preferences(prefs: UserPreferences) {
@@ -49,9 +51,11 @@ export class InspectorDocumentSetup extends HTMLElement {
 
   connectedCallback(): void {
     this.render();
+    this.setupSelects();
     this.setupListeners();
     this.syncValues();
     this.syncDigitalTwin();
+    this.updateDigitalTwinVisuals();
   }
 
   private render(): void {
@@ -62,17 +66,18 @@ export class InspectorDocumentSetup extends HTMLElement {
 
     this.shadowRoot.innerHTML = `
       <style>
-        :host { display: flex; flex-direction: column; gap: 12px; }
+        :host { display: flex; flex-direction: column; flex: 1; min-height: 0; gap: 12px; padding: 20px; box-sizing: border-box; overflow-y: auto; }
         .row-ui { display: flex; gap: 10px; margin-bottom: 4px; align-items: flex-end; }
         .row-ui > * { flex: 1; min-width: 0; }
         .fixed-small { flex: none; width: 100px; }
         
         .monitor-container {
-          position: relative; width: 100%; height: 192px; 
+          position: relative; width: 100%; height: 180px; 
           background: #0a0c10; border: 1px solid var(--color-border-ui);
           border-radius: 12px; display: flex; align-items: center; 
           justify-content: center; margin-bottom: 24px; overflow: hidden;
           cursor: pointer; transition: all 0.3s var(--ease-spring);
+          flex-shrink: 0;
         }
         .monitor-container:hover { border-color: var(--color-accent-primary); }
         .monitor-container:hover .monitor-overlay { opacity: 1; }
@@ -80,7 +85,6 @@ export class InspectorDocumentSetup extends HTMLElement {
         .digital-twin {
           position: relative; background: white; 
           box-shadow: 0 0 15px rgba(0,0,0,0.8); transition: all 0.3s;
-          aspect-ratio: ${widthMM} / ${heightMM};
           max-height: 80%; max-width: 80%;
         }
         
@@ -96,16 +100,16 @@ export class InspectorDocumentSetup extends HTMLElement {
         }
 
         .cota-badge {
-          position: absolute; background: rgba(255, 255, 255, 0.1);
+          position: absolute; background: rgba(0, 0, 0, 0.6);
           border: 1px solid var(--color-accent-primary); color: white;
-          font-family: var(--font-mono); font-size: 10px; padding: 2px 6px;
-          border-radius: 4px; pointer-events: none; opacity: 0.6;
+          font-family: var(--font-mono); font-size: 9px; padding: 1px 4px;
+          border-radius: 3px; pointer-events: none; white-space: nowrap;
         }
       </style>
 
       <!-- DIGITAL TWIN MONITOR -->
       <div class="monitor-container" id="btn-open-vault">
-        <div class="digital-twin">
+        <div class="digital-twin" id="twin-box">
           <img id="monitor-img" src="${this._thumbnailUrl}" 
                class="w-full h-full object-contain" 
                style="${!this._thumbnailUrl ? `background-color: ${backgroundColor || 'white'}` : ''}" />
@@ -118,8 +122,8 @@ export class InspectorDocumentSetup extends HTMLElement {
           </div>
         </div>
 
-        <div class="cota-badge" style="top: 8px;">${widthMM}mm</div>
-        <div class="cota-badge" style="right: 8px; writing-mode: vertical-rl;">${heightMM}mm</div>
+        <div class="cota-badge" id="badge-w" style="top: 8px;">${widthMM}mm</div>
+        <div class="cota-badge" id="badge-h" style="right: 8px; writing-mode: vertical-rl;">${heightMM}mm</div>
       </div>
       
       <div class="flex items-center justify-between mb-1">
@@ -189,6 +193,7 @@ export class InspectorDocumentSetup extends HTMLElement {
           <ui-number-scrubber data-prop="pref.snapThresholdMM" value="${snapThresholdMM}" min="0.5" max="10" step="0.5" unit="mm" class="w-1/2 flex-none"></ui-number-scrubber>
         </div>
       </div>
+      <div class="h-20 shrink-0"></div> <!-- Espaçador para o status bar -->
     `;
 
     // Injeta as opções no select
@@ -196,8 +201,6 @@ export class InspectorDocumentSetup extends HTMLElement {
     if (select) {
       select.options = LABEL_PRESETS;
     }
-
-    this.setupSelects();
   }
 
   private setupSelects() {
@@ -248,6 +251,7 @@ export class InspectorDocumentSetup extends HTMLElement {
     root.addEventListener('app-input', changeHandler);
     root.addEventListener('input', changeHandler);
     root.addEventListener('change', changeHandler);
+    root.addEventListener('app-select', changeHandler); // Suporte para os novos selects com data-prop
 
     // Listener para o Preset Select
     root.getElementById('select-preset')?.addEventListener('app-select', (e: any) => {
@@ -341,9 +345,32 @@ export class InspectorDocumentSetup extends HTMLElement {
     });
   }
 
+  private updateDigitalTwinVisuals(): void {
+    const shadow = this.shadowRoot;
+    if (!shadow || !this._labelConfig) return;
+    const { widthMM, heightMM, backgroundColor } = this._labelConfig;
+    
+    const box = shadow.getElementById('twin-box');
+    const img = shadow.getElementById('monitor-img') as HTMLImageElement;
+    const badgeW = shadow.getElementById('badge-w');
+    const badgeH = shadow.getElementById('badge-h');
+
+    if (box) {
+      box.style.aspectRatio = `${widthMM} / ${heightMM}`;
+    }
+    if (img && !this._thumbnailUrl) {
+      img.style.backgroundColor = backgroundColor || 'white';
+    }
+    if (badgeW) badgeW.textContent = `${widthMM}mm`;
+    if (badgeH) badgeH.textContent = `${heightMM}mm`;
+  }
+
   private syncDigitalTwin(): void {
     const img = this.shadowRoot?.getElementById('monitor-img') as HTMLImageElement;
-    if (img) img.src = this._thumbnailUrl;
+    if (img && this._thumbnailUrl) {
+      img.src = this._thumbnailUrl;
+      img.style.backgroundColor = 'transparent';
+    }
   }
 }
 
