@@ -136,7 +136,7 @@ export class InspectorDocumentSetup extends HTMLElement {
         <ui-number-scrubber label="H" data-prop="doc.heightMM" value="${heightMM}" unit="mm" step="1"></ui-number-scrubber>
       </div>
       <div class="row-ui">
-        <ui-number-scrubber label="DPI" data-prop="doc.dpi" value="${dpi}" min="72" max="600" step="1" unit="dpi"></ui-number-scrubber>
+        <app-select id="dpi-select" label="DPI" data-prop="doc.dpi" value="${dpi}" style="flex: 1"></app-select>
         <app-input label="Paper" type="color" data-prop="doc.backgroundColor" value="${escapeHTML(backgroundColor || '#ffffff')}" class="fixed-small"></app-input>
       </div>
       <div class="row-ui">
@@ -167,11 +167,7 @@ export class InspectorDocumentSetup extends HTMLElement {
         </div>
         <div class="flex justify-between items-center">
           <span class="font-mono text-[11px] text-text-muted">UNIT</span>
-          <select data-prop="pref.unit" class="input-prism" style="width: 80px; padding: 2px 6px; height: 24px; font-size: 10px;">
-            <option value="mm" ${unit === 'mm' ? 'selected' : ''}>MM</option>
-            <option value="px" ${unit === 'px' ? 'selected' : ''}>PX</option>
-            <option value="pt" ${unit === 'pt' ? 'selected' : ''}>PT</option>
-          </select>
+          <app-select id="unit-select" data-prop="pref.unit" value="${unit}" style="width: 100px; flex: none;"></app-select>
         </div>
         
         <div class="divider border-t border-white/5 my-1"></div>
@@ -199,6 +195,31 @@ export class InspectorDocumentSetup extends HTMLElement {
     const select = this.shadowRoot.getElementById('select-preset') as any;
     if (select) {
       select.options = LABEL_PRESETS;
+    }
+
+    this.setupSelects();
+  }
+
+  private setupSelects() {
+    const shadow = this.shadowRoot!;
+    
+    const dpiSelect = shadow.getElementById('dpi-select') as any;
+    if (dpiSelect) {
+      dpiSelect.options = [
+        { value: '72', label: '72 DPI', sublabel: 'Web Standard' },
+        { value: '150', label: '150 DPI', sublabel: 'Draft Quality' },
+        { value: '300', label: '300 DPI', sublabel: 'Print Quality' },
+        { value: '600', label: '600 DPI', sublabel: 'Ultra High-Res' }
+      ];
+    }
+
+    const unitSelect = shadow.getElementById('unit-select') as any;
+    if (unitSelect) {
+      unitSelect.options = [
+        { value: 'mm', label: 'Millimeters (mm)' },
+        { value: 'px', label: 'Pixels (px)' },
+        { value: 'pt', label: 'Points (pt)' }
+      ];
     }
   }
 
@@ -302,7 +323,7 @@ export class InspectorDocumentSetup extends HTMLElement {
       else if (prop === 'pref.gridOpacity') {
         if (input.value != prefs.gridOpacity) input.value = prefs.gridOpacity;
       }
-      else if (prop === 'pref.unit' && input instanceof HTMLSelectElement) {
+      else if (prop === 'pref.unit') {
          if (input.value !== prefs.unit) input.value = prefs.unit;
       }
       else if (prop === 'pref.snapToGrid') {

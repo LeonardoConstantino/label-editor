@@ -57,6 +57,16 @@ class ShortcutService {
     eventBus.on('ui:modal:close', () => {
       this.popContext();
     });
+
+    // Estratégia para AppSelect: Protege atalhos quando um dropdown está aberto
+    // Como os eventos são DOM-level e borbulham, ouvimos no document.
+    document.addEventListener('ui-select:open', () => {
+      this.pushContext('input');
+    });
+
+    document.addEventListener('ui-select:close', () => {
+      this.popContext();
+    });
   }
 
   private registerDefaults(): void {

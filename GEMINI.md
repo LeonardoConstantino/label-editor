@@ -50,6 +50,12 @@ The project follows a modular, event-driven architecture:
 
 ## Session Logs
 
+### 2026-05-09: Unificação de UI & Robustez de Teclado
+- **Task 73 (Universal Select):** Finalizada a migração de todos os seletores nativos para o componente `AppSelect`.
+  - **Visual:** Todas as seções do Inspector e o Document Setup agora utilizam o padrão glassmorphic.
+  - **Acessibilidade:** Implementada navegação por teclado (Setas, Enter, Escape) e gerenciamento de foco no `AppSelect`.
+  - **Proteção de Atalhos:** Implementada estratégia dupla no `KeyboardShortcutManager` e `ShortcutService` para detectar foco em componentes customizados e bloquear comandos globais (ex: mover elemento) durante a navegação no menu.
+
 ### 2026-05-08: Otimização de Performance & Histórico
 - **Task 59 (History Debounce):** Implementado mecanismo de debounce inteligente para snapshots de histórico.
   - **Lógica:** Ações contínuas (drag, resize, typing) agora aguardam um tempo de inatividade antes de consolidar no Undo/Redo.

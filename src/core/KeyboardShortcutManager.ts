@@ -762,18 +762,27 @@ class KeyboardShortcutManager {
   }
 
   /**
-   * Verifica se foco está em input (Suporta Shadow DOM)
+   * Verifica se foco está em input (Suporta Shadow DOM e Componentes Customizados)
    */
   private _isInputFocused(): boolean {
     let el = document.activeElement;
+    const inputTags = ['INPUT', 'TEXTAREA', 'SELECT', 'APP-INPUT', 'APP-SELECT', 'UI-NUMBER-SCRUBBER'];
     
+    // Verifica o host inicial
+    if (el && inputTags.includes(el.tagName)) return true;
+
     // Perfura o Shadow DOM para encontrar o elemento real com foco
     while (el && el.shadowRoot && el.shadowRoot.activeElement) {
       el = el.shadowRoot.activeElement;
+      if (el && inputTags.includes(el.tagName)) return true;
     }
 
+    // Caso especial: DIVs com tabindex dentro de componentes (como o AppSelect)
+    const isFocusableDiv = el?.tagName === 'DIV' && el.hasAttribute('tabindex');
+
     return (
-      ['INPUT', 'TEXTAREA', 'SELECT'].includes(el?.tagName || '') ||
+      inputTags.includes(el?.tagName || '') ||
+      isFocusableDiv ||
       (el as HTMLElement)?.isContentEditable === true
     );
   }

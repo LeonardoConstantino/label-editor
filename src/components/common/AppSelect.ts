@@ -1,4 +1,5 @@
 import { sharedSheet } from '../../utils/shared-styles';
+import { UISM } from '../../core/UISoundManager';
 
 export interface SelectOption {
   value: string;
@@ -8,13 +9,14 @@ export interface SelectOption {
 
 /**
  * AppSelect: Componente de seleção customizado com visual Tactile Prism.
- * Versão robusta usando posicionamento absoluto e z-index controlado pelo pai.
+ * Versão robusta com suporte a acessibilidade (teclado) e glassmorphism.
  */
 export class AppSelect extends HTMLElement {
   private _options: SelectOption[] = [];
   private _value: string = '';
   private _label: string = '';
   private _isOpen: boolean = false;
+  private _abortController: AbortController | null = null;
 
   constructor() {
     super();
@@ -51,7 +53,7 @@ export class AppSelect extends HTMLElement {
   set value(val: string) {
     if (this._value !== val) {
       this._value = val;
-      this.render();
+      this.updateSelectionVisuals();
     }
   }
 
@@ -62,6 +64,10 @@ export class AppSelect extends HTMLElement {
   connectedCallback() {
     this.render();
     this.setupListeners();
+  }
+
+  disconnectedCallback() {
+    this._abortController?.abort();
   }
 
   private toggle() {
@@ -75,6 +81,10 @@ export class AppSelect extends HTMLElement {
       
       if (this._isOpen) {
         this.dispatchEvent(new CustomEvent('ui-select:open', { bubbles: true, composed: true }));
+        // Focus na opção selecionada ou na primeira
+        const selected = this.shadowRoot?.querySelector('.select-option.selected') as HTMLElement;
+        const first = this.shadowRoot?.querySelector('.select-option') as HTMLElement;
+        (selected || first)?.focus();
       } else {
         this.dispatchEvent(new CustomEvent('ui-select:close', { bubbles: true, composed: true }));
       }
@@ -93,31 +103,37 @@ export class AppSelect extends HTMLElement {
   }
 
   private selectOption(val: string) {
-    this._value = val;
+    if (this._value !== val) {
+      this._value = val;
+      // Evento específico para o componente
+      this.dispatchEvent(new CustomEvent('app-select', { 
+        detail: { value: val },
+        bubbles: true, 
+        composed: true 
+      }));
+      
+      // Evento padrão de mudança para o orquestrador
+      this.dispatchEvent(new CustomEvent('change', { 
+        detail: { value: val },
+        bubbles: true,
+        composed: true
+      }));
+    }
     this.close();
-    this.render(); // Redesenha para atualizar o label do trigger
-    
-    // Evento específico para o componente
-    this.dispatchEvent(new CustomEvent('app-select', { 
-      detail: { value: val },
-      bubbles: true, 
-      composed: true 
-    }));
-    
-    // Evento padrão de mudança para o orquestrador
-    this.dispatchEvent(new CustomEvent('change', { 
-      detail: { value: val },
-      bubbles: true,
-      composed: true
-    }));
+    this.updateSelectionVisuals();
+    UISM.play(UISM.enumPresets.TAP);
   }
 
   private setupListeners() {
-    this.shadowRoot?.addEventListener('click', (e) => {
+    this._abortController = new AbortController();
+    const { signal } = this._abortController;
+    const root = this.shadowRoot!;
+
+    root.addEventListener('click', (e) => {
       const target = e.target as HTMLElement;
       
-      const trigger = target.closest('.select-trigger');
-      if (trigger) {
+      const triggerClick = target.closest('.select-trigger');
+      if (triggerClick) {
         e.stopPropagation();
         this.toggle();
         return;
@@ -128,9 +144,60 @@ export class AppSelect extends HTMLElement {
         const val = option.getAttribute('data-value');
         if (val !== null) {
           this.selectOption(val);
+          (root.querySelector('.select-trigger') as HTMLElement)?.focus();
         }
       }
-    });
+    }, { signal });
+
+    // Keyboard handling
+    root.addEventListener('keydown', (e: Event) => {
+      const ke = e as KeyboardEvent;
+      const target = e.target as HTMLElement;
+      const trigger = root.querySelector('.select-trigger') as HTMLElement;
+      const isTrigger = target.classList.contains('select-trigger');
+      const isOption = target.classList.contains('select-option');
+
+      if (isTrigger) {
+        if (ke.key === 'Enter' || ke.key === ' ') {
+          ke.preventDefault();
+          this.toggle();
+        }
+        if (ke.key === 'ArrowDown' && !this._isOpen) {
+          ke.preventDefault();
+          this.toggle();
+        }
+      }
+
+      if (isOption) {
+        if (ke.key === 'Enter' || ke.key === ' ') {
+          ke.preventDefault();
+          const val = target.getAttribute('data-value');
+          if (val) this.selectOption(val);
+          trigger.focus();
+        }
+
+        if (ke.key === 'ArrowDown') {
+          ke.preventDefault();
+          const next = target.nextElementSibling as HTMLElement;
+          if (next) next.focus();
+        }
+
+        if (ke.key === 'ArrowUp') {
+          ke.preventDefault();
+          const prev = target.previousElementSibling as HTMLElement;
+          if (prev) prev.focus();
+          else {
+            this.close();
+            trigger.focus();
+          }
+        }
+      }
+
+      if (ke.key === 'Escape' && this._isOpen) {
+        this.close();
+        trigger.focus();
+      }
+    }, { signal });
 
     // Fechar ao clicar fora (no documento)
     const handleOutsideClick = (e: MouseEvent) => {
@@ -145,14 +212,13 @@ export class AppSelect extends HTMLElement {
     const shadow = this.shadowRoot;
     if (!shadow) return;
     
-    // Atualiza o label do trigger sem re-renderizar tudo se possível
     const selectedOption = this._options.find(o => o.value === this._value);
     const labelSpan = shadow.querySelector('.select-trigger span');
     if (labelSpan) labelSpan.textContent = selectedOption ? selectedOption.label : 'Select...';
     
-    // Atualiza classes das opções
     shadow.querySelectorAll('.select-option').forEach(opt => {
       opt.classList.toggle('selected', opt.getAttribute('data-value') === this._value);
+      opt.setAttribute('aria-selected', (opt.getAttribute('data-value') === this._value).toString());
     });
   }
 
@@ -167,33 +233,20 @@ export class AppSelect extends HTMLElement {
         :host { display: block; position: relative; font-family: var(--font-sans); }
         
         .select-label {
-          font-family: var(--font-mono);
-          font-size: 10px;
-          color: var(--color-text-muted);
-          text-transform: uppercase;
-          margin-bottom: 4px;
-          display: block;
+          font-family: var(--font-mono); font-size: 10px; color: var(--color-text-muted);
+          text-transform: uppercase; margin-bottom: 4px; display: block;
         }
 
         .select-trigger {
-          background: var(--color-surface-elevated);
-          border: 1px solid var(--color-border-ui);
-          border-radius: 8px;
-          padding: 6px 12px;
-          color: var(--color-text-main);
-          font-size: 11px;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          cursor: pointer;
-          transition: all 0.2s var(--ease-spring);
-          user-select: none;
-          min-height: 32px;
+          background: var(--color-surface-elevated); border: 1px solid var(--color-border-ui);
+          border-radius: 8px; padding: 6px 12px; color: var(--color-text-main);
+          font-size: 11px; display: flex; align-items: center; justify-content: space-between;
+          cursor: pointer; transition: all 0.2s var(--ease-spring); user-select: none;
+          min-height: 32px; outline: none;
         }
 
-        .select-trigger:hover {
-          border-color: var(--color-accent-primary);
-          background: var(--color-surface-solid);
+        .select-trigger:hover, .select-trigger:focus-visible {
+          border-color: var(--color-accent-primary); background: var(--color-surface-solid);
         }
 
         .select-trigger.open {
@@ -201,49 +254,33 @@ export class AppSelect extends HTMLElement {
           box-shadow: 0 0 15px rgba(99, 102, 241, 0.2);
         }
 
-        .arrow { font-size: 8px; opacity: 0.5; transition: transform 0.3s; }
+        .arrow { font-size: 8px; opacity: 0.5; transition: transform 0.3s; pointer-events: none; }
         .open .arrow { transform: rotate(180deg); }
 
         .select-dropdown {
-          position: absolute;
-          top: calc(100% + 4px);
-          left: 0;
-          width: 100%;
-          min-width: 160px;
-          background: #1a1d24; /* Solid para evitar problemas de transparência em camadas */
-          border: 1px solid var(--color-border-ui);
-          border-radius: 8px;
-          z-index: 10000;
-          max-height: 200px;
-          overflow-y: auto;
-          display: none;
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+          position: absolute; top: calc(100% + 4px); left: 0; width: 100%;
+          min-width: 160px; background: #1a1d24; border: 1px solid var(--color-border-ui);
+          border-radius: 8px; z-index: 10000; max-height: 200px; overflow-y: auto;
+          display: none; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
         }
 
         .select-option {
-          padding: 8px 12px;
-          font-size: 11px;
-          cursor: pointer;
-          transition: all 0.15s;
-          display: flex;
-          flex-direction: column;
-          gap: 2px;
+          padding: 8px 12px; font-size: 11px; cursor: pointer; transition: all 0.15s;
+          display: flex; flex-direction: column; gap: 2px; outline: none;
         }
 
-        .select-option:hover {
-          background: var(--color-accent-primary);
-          color: white;
+        .select-option:hover, .select-option:focus-visible {
+          background: var(--color-accent-primary); color: white;
         }
 
         .select-option.selected {
-          color: var(--color-accent-primary);
-          font-weight: 600;
+          color: var(--color-accent-primary); font-weight: 600;
           background: rgba(99, 102, 241, 0.1);
         }
 
-        .select-option.selected:hover { color: white; background: var(--color-accent-primary); }
+        .select-option.selected:hover, .select-option.selected:focus-visible { color: white; background: var(--color-accent-primary); }
 
-        .sublabel { font-size: 9px; opacity: 0.6; }
+        .sublabel { font-size: 9px; opacity: 0.6; pointer-events: none; }
 
         .select-dropdown::-webkit-scrollbar { width: 4px; }
         .select-dropdown::-webkit-scrollbar-thumb { background: var(--color-border-ui); border-radius: 2px; }
@@ -251,14 +288,18 @@ export class AppSelect extends HTMLElement {
 
       ${this._label ? `<span class="select-label">${this._label}</span>` : ''}
       
-      <div class="select-trigger">
+      <div class="select-trigger" tabindex="0" role="combobox" aria-expanded="false" aria-haspopup="listbox">
         <span>${displayLabel}</span>
         <span class="arrow">▼</span>
       </div>
 
-      <div class="select-dropdown">
+      <div class="select-dropdown" role="listbox">
         ${this._options.map(opt => `
-          <div class="select-option ${opt.value === this._value ? 'selected' : ''}" data-value="${opt.value}">
+          <div class="select-option ${opt.value === this._value ? 'selected' : ''}" 
+               data-value="${opt.value}" 
+               tabindex="-1" 
+               role="option" 
+               aria-selected="${opt.value === this._value}">
             <span class="label">${opt.label}</span>
             ${opt.sublabel ? `<span class="sublabel">${opt.sublabel}</span>` : ''}
           </div>
