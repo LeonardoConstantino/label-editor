@@ -41,7 +41,7 @@ export function resolveInspectorValue(e: Event): string | number | boolean | nul
   const detail = (e as CustomEvent).detail;
 
   // 1. Caso COMPONENTES (AppInput, AppSelect, Scrubber): Extrai do contrato detail.value
-  if (tagName === 'app-input' || tagName === 'app-select' || tagName === 'ui-number-scrubber') {
+  if (tagName === 'app-input' || tagName === 'app-select' || tagName === 'ui-number-scrubber' || tagName === 'app-color-picker') {
     return (detail && typeof detail === 'object' && 'value' in detail) ? detail.value : undefined;
   }
 

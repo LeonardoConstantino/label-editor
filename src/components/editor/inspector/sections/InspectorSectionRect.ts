@@ -7,6 +7,7 @@ import { HelpContentProvider } from '../../../../utils/HelpContentProvider';
 // Garantir registros
 import '../../../common/AppInput';
 import '../../../common/UINumberScrubber';
+import '../../../common/AppColorPicker';
 
 interface InputWithMetadata extends HTMLElement {
   value: string | number;
@@ -54,8 +55,10 @@ export class InspectorSectionRect extends HTMLElement {
         ${HelpContentProvider.buildTooltip('rect')}
       </div>
       <div class="row-ui">
-        <app-input label="Fill" type="color" data-prop="fillColor" value="${escapeHTML(el.fillColor)}" style="flex:1"></app-input>
-        <app-input label="Stroke" type="color" data-prop="strokeColor" value="${escapeHTML(el.strokeColor)}" style="flex:1"></app-input>
+        <app-color-picker label="Fill"   data-prop="fillColor"   value="${el.fillColor}"></app-color-picker>
+      </div>
+      <div class="row-ui">
+        <app-color-picker label="Stroke" data-prop="strokeColor" value="${el.strokeColor}"></app-color-picker>
       </div>
       <div class="row-ui">
         <ui-number-scrubber label="Radius" data-prop="borderRadius" value="${el.borderRadius || 0}" min="0" step="0.5" unit="mm"></ui-number-scrubber>
@@ -80,6 +83,7 @@ export class InspectorSectionRect extends HTMLElement {
     };
 
     root.addEventListener('app-input', handler);
+    root.addEventListener('app-color-pick', handler);
     root.addEventListener('input', handler);
     root.addEventListener('change', handler);
   }

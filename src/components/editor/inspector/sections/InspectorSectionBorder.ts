@@ -7,6 +7,7 @@ import { HelpContentProvider } from '../../../../utils/HelpContentProvider';
 
 // Garantir registros
 import '../../../common/AppInput';
+import '../../../common/AppColorPicker';
 import '../../../common/AppSelect';
 import '../../../common/UINumberScrubber';
 
@@ -60,9 +61,12 @@ export class InspectorSectionBorder extends HTMLElement {
       <div class="row-ui">
         <app-select id="border-style" label="Line Style" data-prop="style" value="${el.style}"></app-select>
       </div>
+      
+      <div class="row-ui">
+        <app-color-picker label="Color" data-prop="color" value="${escapeHTML(el.color)}" no-transparent></app-color-picker>
+      </div>
 
       <div class="row-ui">
-        <app-input label="Color" type="color" data-prop="color" value="${escapeHTML(el.color)}" style="flex: 1"></app-input>
         <ui-number-scrubber label="Inset" data-prop="position.x" value="${el.position.x}" step="0.5" unit="mm" style="flex: 1"></ui-number-scrubber>
       </div>
 
@@ -109,6 +113,7 @@ export class InspectorSectionBorder extends HTMLElement {
     };
 
     root.addEventListener('app-input', handler);
+    root.addEventListener('app-color-pick', handler);
     root.addEventListener('app-select', handler);
     root.addEventListener('input', handler);
     root.addEventListener('change', handler);

@@ -8,6 +8,7 @@ import { HelpContentProvider } from '../../../utils/HelpContentProvider';
 
 // Garantir registros
 import '../../common/AppInput';
+import '../../common/AppColorPicker';
 import '../../common/UINumberScrubber';
 import '../../common/AppSelect';
 
@@ -163,7 +164,7 @@ export class InspectorDocumentSetup extends HTMLElement {
         </div>
         <div class="flex justify-between items-center">
           <span class="font-mono text-[11px] text-text-muted">GRID COLOR</span>
-          <app-input type="color" data-prop="pref.gridColor" value="${gridColor || '#6366f1'}" class="w-1/2 flex-none"></app-input>
+          <app-color-picker data-prop="pref.gridColor" value="${gridColor || '#6366f1'}" no-transparent class="w-1/2"></app-color-picker>
         </div>
         <div class="flex justify-between items-center">
           <span class="font-mono text-[11px] text-text-muted">GRID OPACITY</span>
@@ -249,6 +250,7 @@ export class InspectorDocumentSetup extends HTMLElement {
     };
 
     root.addEventListener('app-input', changeHandler);
+    root.addEventListener('app-color-pick', changeHandler);
     root.addEventListener('input', changeHandler);
     root.addEventListener('change', changeHandler);
     root.addEventListener('app-select', changeHandler); // Suporte para os novos selects com data-prop

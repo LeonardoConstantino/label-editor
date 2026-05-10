@@ -114,7 +114,6 @@ export class InspectorLayerCard extends HTMLElement {
         :host(.selected) .card-header {
           background: var(--color-accent-primary-alpha, rgba(99, 102, 241, 0.1));
           border-color: var(--color-accent-primary-alpha, rgba(99, 102, 241, 0.2));
-          box-shadow: inset 2px 0 0 var(--color-accent-primary);
         }
 
         .card-header:hover { background: rgba(255, 255, 255, 0.05); }

@@ -8,6 +8,7 @@ import { HelpContentProvider } from '../../../../utils/HelpContentProvider';
 // Garantir registros
 import '../../../common/AppInput';
 import '../../../common/AppSelect';
+import '../../../common/AppColorPicker';
 import '../../../common/UINumberScrubber';
 import '../../../common/tooltip';
 import '../../../common/icon';
@@ -49,6 +50,11 @@ export class InspectorSectionText extends HTMLElement {
         :host { display: flex; flex-direction: column; gap: 8px; padding-bottom: 16px; }
         .row-ui { display: flex; gap: 10px; align-items: flex-end; }
         .row-ui > * { flex: 1; min-width: 0; }
+        .switch-row { 
+          display: flex; justify-content: space-between; align-items: center;
+          padding: 8px 12px; background: var(--color-surface-elevated);
+          border: 1px solid var(--color-border-ui); border-radius: 8px;
+        }
         .fixed-small { flex: none; width: 100px; }
         .divider { height: 1px; background: var(--color-border-ui); margin: 4px 0; opacity: 0.3; }
         .checkbox-row { display: flex; items-center justify-between; padding: 4px 0; }
@@ -74,15 +80,18 @@ export class InspectorSectionText extends HTMLElement {
 
       <div class="row-ui">
         <ui-number-scrubber id="font-size-scrubber" label="Size" data-prop="fontSize" value="${el.fontSize}" min="1" max="200" step="1" unit="pt" ${isScaleMode ? 'disabled' : ''}></ui-number-scrubber>
-        <app-input label="Color" type="color" data-prop="color" value="${escapeHTML(el.color)}" class="fixed-small"></app-input>
+      </div>
+      <div class="row-ui">
+        <app-color-picker label="Color" data-prop="color" value="${escapeHTML(el.color)}" no-transparent></app-color-picker>
+      </div>
+
+      <div class="switch-row">
+          <span class="font-mono text-[9px] text-text-muted uppercase">Justify</span>
+          <input type="checkbox" data-prop="justify" ${el.justify ? 'checked' : ''}>
       </div>
 
       <div class="row-ui">
         <ui-number-scrubber label="Lead" data-prop="lineHeight" value="${el.lineHeight || 1.2}" min="0.5" max="3" step="0.1" unit="lh"></ui-number-scrubber>
-        <div class="flex flex-col gap-1 justify-end items-center pb-1">
-           <span class="font-mono text-[9px] text-text-muted uppercase">Justify</span>
-           <input type="checkbox" data-prop="justify" ${el.justify ? 'checked' : ''}>
-        </div>
       </div>
 
       <div class="divider"></div>
@@ -180,6 +189,7 @@ export class InspectorSectionText extends HTMLElement {
     };
 
     root.addEventListener('app-input', handler);
+    root.addEventListener('app-color-pick', handler);
     root.addEventListener('app-select', handler);
     root.addEventListener('input', handler);
     root.addEventListener('change', handler);
