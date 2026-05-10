@@ -30,6 +30,7 @@ Este Master Plan coordena a fase final de desenvolvimento, focando em estabilida
 | **71** | [Mapeamento e Tipagem de Eventos (EventMap)](./tasks/71_event_orchestration.md) | 10 | [x] | — | `task/71-event-mapping` |
 | **74** | [System Status Bar (Telemetry & Dev Console)](./tasks/74-status-bar.md) | 07 | [x] | 46 | `task/74-status-bar` |
 | **75** | [System Preferences Modal (Calibration Matrix)](./tasks/75-settings-modal.md) | 07 | [/] | — | `task/75-settings-modal` |
+| **81** | [Encapsulamento de Stack via CSS Isolation](./tasks/81_css_isolation.md) | 09 | [ ] | — | `task/81-css-isolation` |
 
 ### Fase B: Gestão de Projetos & UX (Retenção do Usuário)
 | ID | Task | Pri | Status | Deps | Branch |
@@ -54,6 +55,10 @@ Este Master Plan coordena a fase final de desenvolvimento, focando em estabilida
 | **26** | [Sangria e Marcas de Corte (PDF)](./tasks/26_a4_printing.md) | 06 | [x] | 10 | `task/26-a4-printing` |
 | **73** | [Adoção Universal do AppSelect](./tasks/73_universal_select_adoption.md) | 06 | [x] | 69 | `task/73-select-adoption` |
 | **76** | ["The Active Slot" - Navegação Modular](./tasks/76-active-slot.md) | 06 | [/] | 46 | `task/76-active-slot` |
+| **77** | [Production Studio Module (Batch Data & Imposition)](./tasks/77-production-studio.md) | 06 | [ ] | 76 | `task/77-production-studio` |
+| **78** | [Asset Library Module (The Parts Bin)](./tasks/78-asset-library.md) | 06 | [ ] | 76 | `task/78-asset-library` |
+| **79** | [Variable Manager Module (Visual Data Pipeline)](./tasks/79-variable-manager.md) | 06 | [ ] | 76 | `task/79-variable-manager` |
+| **80** | [History Visualizer (The Time Machine)](./tasks/80-history-visualizer.md) | 06 | [ ] | 76 | `task/80-history-visualizer` |
 | **52** | [Action Icon de Lock nos Cards de Camada](./tasks/52_ui_layer_lock.md) | 05 | [x] | 41 | `task/52-ui-layer-lock` |
 | **58** | [Elemento de Código (QR Code / Barcode)](./tasks/58_element_code.md) | 05 | [ ] | 41 | `task/58-element-code` |
 | **42** | [BorderElement (Standalone Moldura)](./tasks/42_border_element.md) | 05 | [x] | 41 | `task/42-border-element` |
