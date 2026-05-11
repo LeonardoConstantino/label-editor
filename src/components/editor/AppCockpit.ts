@@ -11,6 +11,7 @@ import { UISM } from '../../core/UISoundManager';
 import './ModuleRack';
 import './ElementInspector';
 import './inspector/InspectorDocumentSetup';
+import './modules/HistoryVisualizer';
 
 /**
  * AppCockpit: O orquestrador central do painel lateral (Aside).
@@ -133,6 +134,8 @@ export class AppCockpit extends HTMLElement {
 
     if (moduleId === 'layers') {
       component = document.createElement('element-inspector');
+    } else if (moduleId === 'history') {
+      component = document.createElement('history-visualizer');
     } else {
       // Default: blueprint
       component = document.createElement('inspector-document-setup');

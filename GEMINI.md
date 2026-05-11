@@ -50,36 +50,38 @@ The project follows a modular, event-driven architecture:
 
 ## Session Logs
 
+### 2026-05-11: Visual History & Time Machine
+- **Task 80 (History Visualizer):** Implementada a "Time Machine" para navegação visual do histórico.
+  - **Componente:** Novo módulo `HistoryVisualizer` no Rack de Cartuchos.
+  - **Fita Cronológica:** Exibição de miniaturas (thumbnails) de cada snapshot geradas em tempo real.
+  - **Interação:** Suporte a "Time Travel" via clique direto na linha do tempo e feedback sonoro de "engrenagem" no scroll.
+  - **Integridade:** Refatoração do `HistoryManager` e `Store` para suportar descrições de ações e saltos temporais diretos.
+  - **Qualidade:** Estabilização completa da suíte de testes (50 testes passando).
+
 ### 2026-05-09: Unificação de UI & Robustez de Teclado
 - **Task 73 (Universal Select):** Finalizada a migração de todos os seletores nativos para o componente `AppSelect`.
-  - **Visual:** Todas as seções do Inspector e o Document Setup agora utilizam o padrão glassmorphic.
-  - **Acessibilidade:** Implementada navegação por teclado (Setas, Enter, Escape) e gerenciamento de foco no `AppSelect`.
-  - **Proteção de Atalhos:** Implementada estratégia dupla no `KeyboardShortcutManager` e `ShortcutService` para detectar foco em componentes customizados e bloquear comandos globais (ex: mover elemento) durante a navegação no menu.
+- **Task 76 (Active Slot):** Arquitetura modular de módulos no cockpit lateral.
 
 ### 2026-05-08: Otimização de Performance & Histórico
-- **Task 59 (History Debounce):** Implementado mecanismo de debounce inteligente para snapshots de histórico.
-  - **Lógica:** Ações contínuas (drag, resize, typing) agora aguardam um tempo de inatividade antes de consolidar no Undo/Redo.
-  - **Atômico:** Ações como Adicionar/Deletar permanecem instantâneas.
-  - **Configuração:** Adicionada aba "Performance" no Modal de Preferências para ajustar a sensibilidade.
-- **Task 75 (Settings Modal):** Implementação finalizada e integrada com controle de histórico.
+- **Task 59 (History Debounce):** Mecanismo de debounce para snapshots de histórico.
 
 ### 2026-05-07: Orquestração Técnica & Padronização de Eventos
-- **Task 71 (EventMap):** Formalização de todo o sistema de comunicação do aplicativo via EventBus tipado.
+- **Task 71 (EventMap):** Formalização do sistema de comunicação via EventBus tipado.
 
 ### 2026-05-06: Inteligência de Layout, Telemetria & Ajuda Contextual
-- **Task 63 (Smart Snapping):** Atração magnética inteligente durante o arraste de elementos.
-- **Task 74 (Status Bar):** Central de telemetria profissional (FPS, Render Time, Element Breakdown).
-- **Task 62 (Power Layout):** Ferramentas de alinhamento e distribuição em lote.
+- **Task 63 (Smart Snapping):** Atração magnética inteligente.
+- **Task 74 (Status Bar):** Central de telemetria profissional.
+- **Task 62 (Power Layout):** Ferramentas de alinhamento e distribuição.
 
 ### 2026-05-03: Refinamento de UX & Suporte a Transparência
 - **Task 72 (Help Tooltips):** Padronização da experiência de ajuda contextual.
-- **Hotfix (Transparency):** Corrigido bug onde imagens transparentes ficavam com fundo preto.
+- **Hotfix (Transparency):** Corrigido bug de fundo preto em imagens transparentes.
 
 ### 2026-05-02: Maturidade de Renderização & Unificação de UI
-- **Task 44 (Text Pro):** Renderização profissional com alinhamento vertical e overflow inteligente.
+- **Task 44 (Text Pro):** Renderização profissional de texto.
 - **Task 43 (Adv Renderers):** Blending Modes e borderRadius real.
-- **Task 42 (Border Element):** Estilo DOUBLE concêntrico matemático.
-- **Task 69 (UI Select):** Criado o componente `AppSelect` com visual glassmorphic.
+- **Task 42 (Border Element):** Estilo DOUBLE concêntrico.
+- **Task 69 (UI Select):** Criado o componente `AppSelect`.
 
 ### 2026-04-30: Arquitetura de Componentes & Integridade de UI
 - **Task 46 (Deep Refactor):** Modularização do `ElementInspector` em 3 níveis.

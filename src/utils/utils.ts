@@ -22,6 +22,8 @@ export function debounce<T extends (...args: any[]) => any>(
 interface FormatDateOptions {
   /** Adiciona HH:mm ao formato absoluto */
   includeTime?: boolean;
+    /** Retorna somente o horário */
+  onlyTime?: boolean;
   /** Retorna "há 2 dias" ao invés de "28/12/2025" */
   isRelative?: boolean;
   /** Código BCP 47 (ex: 'en-US', 'es-ES') */
@@ -44,6 +46,7 @@ export function formatDate(
   isoString: string,
   {
     includeTime = false,
+    onlyTime = false,
     isRelative = false,
     locale = 'pt-BR',
   }: FormatDateOptions = {},
@@ -52,6 +55,15 @@ export function formatDate(
 
   const date = new Date(isoString);
   if (isNaN(date.getTime())) throw new Error('Data inválida');
+
+  if (onlyTime) {
+    return new Intl.DateTimeFormat(locale, {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false,
+    }).format(date);
+  }
 
   if (isRelative) {
     const diffInSeconds = Math.floor((date.getTime() - Date.now()) / 1000);

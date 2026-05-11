@@ -16,6 +16,7 @@ export interface EventMap {
   'state:change': AppState;
   'history:undo': { source?: string };
   'history:redo': { source?: string };
+  'history:jump': { index: number };
   'history:snapshot': { description?: string };
 
   // UI & Feedback

@@ -14,15 +14,17 @@ export interface AppState {
   canUndo: boolean;
   canRedo: boolean;
   preferences: UserPreferences;
-  activeModuleId: 'blueprint' | 'layers' | 'assets';
+  activeModuleId: 'blueprint' | 'layers' | 'assets' | 'history' | 'variables' | 'batch';
 }
 
 /**
- * Store: Gerenciador de estado centralizado com suporte a Histórico Otimizado (Task 59).
+ * Store: Gerenciador de estado centralizado com suporte a Histórico Otimizado (Task 59)
+ * e Visualizador de Histórico (Task 80).
  */
 export class Store {
   private state: AppState;
   private snapshotTimer: any = null;
+  private pendingDescription: string = 'Ação';
 
   constructor() {
     this.state = {
@@ -51,7 +53,7 @@ export class Store {
         if (!this.state.currentLabel) return;
         this.state.currentLabel.elements.push(element);
         UISM.play(UISM.enumPresets.SWOOSHIN);
-      }, { immediate: true });
+      }, { immediate: true, description: `Adicionou ${element.type}` });
     });
 
     eventBus.on('element:update', ({ id, updates, silent }: { id: string; updates: Partial<AnyElement>, silent?: boolean }) => {
@@ -69,6 +71,8 @@ export class Store {
         return;
       }
 
+      const propName = Object.keys(updates)[0] || 'propriedade';
+
       this.performAction(() => {
         this.state.currentLabel!.elements[index] = newElement;
 
@@ -79,7 +83,7 @@ export class Store {
         } else {
           eventBus.emit('element:warning:clear', { id });
         }
-      }, { immediate: false, silent });
+      }, { immediate: false, silent, description: `Alterou ${propName}` });
     });
 
     eventBus.on('elements:update', (batch: { id: string; updates: Partial<AnyElement> }[]) => {
@@ -98,7 +102,7 @@ export class Store {
             this.state.currentLabel!.elements[index] = newElement;
           }
         });
-      }, { immediate: true });
+      }, { immediate: true, description: 'Atualização em lote' });
     });
 
     eventBus.on('element:reorder', ({ id, direction }: { id: string, direction: 'up' | 'down' }) => {
@@ -108,7 +112,7 @@ export class Store {
         if (!el) return;
         el.zIndex += (direction === 'up' ? 1 : -1);
         UISM.play(UISM.enumPresets.SWOOSHIN);
-      }, { immediate: true });
+      }, { immediate: true, description: 'Reordenou camada' });
     });
 
     eventBus.on('element:delete', (id: string) => {
@@ -117,7 +121,7 @@ export class Store {
         this.state.currentLabel.elements = this.state.currentLabel.elements.filter(el => id !== el.id);
         this.state.selectedElementIds = this.state.selectedElementIds.filter(elId => elId !== id);
         UISM.play(UISM.enumPresets.DELETE);
-      }, { immediate: true });
+      }, { immediate: true, description: 'Removeu camada' });
     });
 
     eventBus.on('element:duplicate', (id: string) => {
@@ -129,14 +133,14 @@ export class Store {
         const copy = JSON.parse(JSON.stringify(original));
         copy.id = crypto.randomUUID();
         copy.name = `${original.name || original.type} (Copy)`;
-        copy.position.x += 5; // Offset visual
+        copy.position.x += 5;
         copy.position.y += 5;
-        copy.zIndex = Math.max(...this.state.currentLabel.elements.map(e => e.zIndex)) + 1;
+        copy.zIndex = Math.max(...this.state.currentLabel.elements.map(e => e.zIndex), 0) + 1;
 
         this.state.currentLabel.elements.push(copy);
         this.state.selectedElementIds = [copy.id];
         UISM.play(UISM.enumPresets.COPY);
-      }, { immediate: true });
+      }, { immediate: true, description: 'Duplicou camada' });
     });
 
     eventBus.on('element:select', (ids: string | string[]) => {
@@ -146,6 +150,7 @@ export class Store {
 
     eventBus.on('history:undo', () => this.undo());
     eventBus.on('history:redo', () => this.redo());
+    eventBus.on('history:jump', ({ index }) => this.jumpTo(index));
     
     eventBus.on('label:config:update', (config: any) => {
       this.performAction(() => {
@@ -154,7 +159,6 @@ export class Store {
         const { LIMITS } = DEFAULTS;
         let hasClamped = false;
 
-        // Clamping de dimensões
         const width = Math.min(Math.max(config.widthMM, LIMITS.MIN_DIMENSION_MM), LIMITS.MAX_WIDTH_MM);
         const height = Math.min(Math.max(config.heightMM, LIMITS.MIN_DIMENSION_MM), LIMITS.MAX_HEIGHT_MM);
         const dpi = Math.min(Math.max(config.dpi, LIMITS.MIN_DPI), LIMITS.MAX_DPI);
@@ -173,19 +177,18 @@ export class Store {
         if (hasClamped) {
           UISM.play(UISM.enumPresets.WARNING);
         }
-      }, { immediate: true });
+      }, { immediate: true, description: 'Configuração do documento' });
     });
 
     eventBus.on('preferences:update', (prefs: Partial<UserPreferences>) => {
       this.state.preferences = { ...this.state.preferences, ...prefs };
       this.emit();
-      // Persiste via PreferenceManager (import dinâmico para evitar circular dependency)
       import('../domain/services/PreferenceManager').then(m => {
         m.preferenceManager.savePreferences(this.state.preferences);
       });
     });
 
-    eventBus.on('history:snapshot', () => this.takeSnapshot(true));
+    eventBus.on('history:snapshot', (data) => this.takeSnapshot(true, data?.description));
 
     eventBus.on('module:switch', ({ moduleId }: { moduleId: any }) => {
       this.state.activeModuleId = moduleId;
@@ -205,60 +208,54 @@ export class Store {
     return newElement;
   }
 
-  private performAction(action: () => void, options: { immediate?: boolean; silent?: boolean } = {}): void {
+  private performAction(action: () => void, options: { immediate?: boolean; silent?: boolean; description?: string } = {}): void {
     if (!this.state.currentLabel) return;
     action();
     
     if (!options.silent) {
-      this.takeSnapshot(options.immediate ?? true);
+      this.takeSnapshot(options.immediate ?? true, options.description);
     }
     
     this.state.currentLabel.updatedAt = Date.now();
     this.emit();
   }
 
-  /**
-   * Captura o estado para o histórico.
-   * @param immediate Se true, grava agora. Se false, aplica debounce.
-   */
-  private takeSnapshot(immediate: boolean = true): void {
+  private takeSnapshot(immediate: boolean = true, description: string = 'Ação'): void {
     if (!this.state.currentLabel) return;
+    this.pendingDescription = description;
 
-    // Se for imediato, cancela qualquer timer pendente e executa
     if (immediate) {
       if (this.snapshotTimer) {
         clearTimeout(this.snapshotTimer);
         this.snapshotTimer = null;
       }
-      this._doSnapshot();
+      this._doSnapshot(this.pendingDescription);
       return;
     }
 
-    // Lógica de Debounce para ações contínuas
     if (this.snapshotTimer) clearTimeout(this.snapshotTimer);
     
     const ms = this.state.preferences.historySensitivity ?? 400;
     
     if (ms <= 0) {
-      this._doSnapshot();
+      this._doSnapshot(this.pendingDescription);
     } else {
       this.snapshotTimer = setTimeout(() => {
-        this._doSnapshot();
+        this._doSnapshot(this.pendingDescription);
         this.snapshotTimer = null;
       }, ms);
     }
   }
 
-  private _doSnapshot(): void {
+  private _doSnapshot(description: string): void {
     if (!this.state.currentLabel) return;
     eventBus.emit('request:canvas:snapshot', (ctx: CanvasRenderingContext2D) => {
-      historyManager.snapshot(ctx, this.state.currentLabel!.elements);
+      historyManager.snapshot(ctx, this.state.currentLabel!.elements, description);
       this.updateHistoryStatus();
     });
   }
 
   private undo(): void {
-    // Cancela snapshot pendente se o usuário desfazer
     if (this.snapshotTimer) {
       clearTimeout(this.snapshotTimer);
       this.snapshotTimer = null;
@@ -273,6 +270,19 @@ export class Store {
 
   private redo(): void {
     const snapshot = historyManager.redo();
+    if (snapshot) {
+      this.applySnapshot(snapshot);
+      UISM.play(UISM.enumPresets.REPLACE);
+    }
+  }
+
+  private jumpTo(index: number): void {
+    if (this.snapshotTimer) {
+      clearTimeout(this.snapshotTimer);
+      this.snapshotTimer = null;
+    }
+
+    const snapshot = historyManager.jumpTo(index);
     if (snapshot) {
       this.applySnapshot(snapshot);
       UISM.play(UISM.enumPresets.REPLACE);
@@ -304,7 +314,7 @@ export class Store {
     this.state.currentLabel = label;
     historyManager.clear();
     this.state.selectedElementIds = [];
-    this.takeSnapshot(true);
+    this.takeSnapshot(true, 'Abriu etiqueta');
     this.emit();
   }
 

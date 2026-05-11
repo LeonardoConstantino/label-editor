@@ -190,7 +190,7 @@ export class EditorCanvas extends HTMLElement {
     // ═══════════════════════════════════════════════════════════
     this.ctx.strokeStyle = gridColor || 'rgba(99, 102, 241, 0.08)';
     this.ctx.globalAlpha = (gridOpacity ?? 0.3) * 0.4;
-    this.ctx.lineWidth = 0.5;
+    this.ctx.lineWidth = 1.5;
     this.ctx.setLineDash([2, 4]);
     this.ctx.beginPath();
 
@@ -209,7 +209,7 @@ export class EditorCanvas extends HTMLElement {
     // ═══════════════════════════════════════════════════════════
     this.ctx.strokeStyle = gridColor || 'rgba(99, 102, 241, 0.2)';
     this.ctx.globalAlpha = gridOpacity ?? 0.3;
-    this.ctx.lineWidth = 1;
+    this.ctx.lineWidth = 1.5;
     this.ctx.setLineDash([4, 2]);
     this.ctx.beginPath();
 

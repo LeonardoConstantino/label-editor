@@ -175,7 +175,8 @@ export class ModuleRack extends HTMLElement {
     const moduleMap: Record<string, { label: string, icon: string }> = {
       'blueprint': { label: 'Blueprint Setup', icon: 'settings' },
       'layers': { label: 'Layer Properties', icon: 'layers' },
-      'assets': { label: 'Asset Library', icon: 'image' }
+      'assets': { label: 'Asset Library', icon: 'image' },
+      'history': { label: 'Time Machine', icon: 'clock' }
     };
 
     const info = moduleMap[activeId] || moduleMap['blueprint'];
@@ -274,6 +275,14 @@ export class ModuleRack extends HTMLElement {
           <div class="item-text">
             <span class="item-title">Layer Properties</span>
             <span class="item-desc">Detailed editing for selected elements.</span>
+          </div>
+        </div>
+
+        <div class="rack-item" data-id="history">
+          <ui-icon name="clock" class="mt-0.5 text-accent-primary" style="pointer-events: none;"></ui-icon>
+          <div class="item-text">
+            <span class="item-title">Time Machine</span>
+            <span class="item-desc">Visual timeline and state restoration.</span>
           </div>
         </div>
 

@@ -5,10 +5,14 @@ import { ElementType } from '../../models/elements/BaseElement';
 describe('ElementValidator', () => {
   it('should validate a correct text element', () => {
     const el: any = {
+      id: 'test-id',
+      name: 'Test Element',
       type: ElementType.TEXT,
       opacity: 1,
+      rotation: 0,
       fontSize: 12,
       color: '#000000',
+      content: 'Hello World',
       lineHeight: 1.2,
       dimensions: { width: 50, height: 10 }
     };
@@ -19,10 +23,14 @@ describe('ElementValidator', () => {
 
   it('should fail on invalid hex color', () => {
     const el: any = {
+      id: 'test-id',
+      name: 'Test Element',
       type: ElementType.TEXT,
       opacity: 1,
+      rotation: 0,
       fontSize: 12,
       color: 'not-a-color',
+      content: 'Hello World',
       lineHeight: 1.2,
       dimensions: { width: 50, height: 10 }
     };
@@ -33,10 +41,14 @@ describe('ElementValidator', () => {
 
   it('should fail on negative font size', () => {
     const el: any = {
+      id: 'test-id',
+      name: 'Test Element',
       type: ElementType.TEXT,
       opacity: 1,
+      rotation: 0,
       fontSize: -5,
       color: '#000000',
+      content: 'Hello World',
       lineHeight: 1.2,
       dimensions: { width: 50, height: 10 }
     };
@@ -47,8 +59,11 @@ describe('ElementValidator', () => {
 
   it('should fail on zero or negative dimensions', () => {
     const el: any = {
+      id: 'test-id',
+      name: 'Test Element',
       type: ElementType.RECTANGLE,
       opacity: 1,
+      rotation: 0,
       fillColor: '#ffffff',
       strokeColor: '#000000',
       strokeWidth: 1,
@@ -62,8 +77,11 @@ describe('ElementValidator', () => {
 
   it('should fail if dimensions exceed limits', () => {
     const el: any = {
+      id: 'test-id',
+      name: 'Test Element',
       type: ElementType.RECTANGLE,
       opacity: 1,
+      rotation: 0,
       fillColor: '#ffffff',
       strokeColor: '#000000',
       strokeWidth: 1,
@@ -77,10 +95,14 @@ describe('ElementValidator', () => {
 
   it('should validate opacity range', () => {
     const el: any = {
+      id: 'test-id',
+      name: 'Test Element',
       type: ElementType.TEXT,
       opacity: 1.5,
+      rotation: 0,
       fontSize: 12,
       color: '#000000',
+      content: 'Hello World',
       lineHeight: 1.2,
       dimensions: { width: 50, height: 10 }
     };

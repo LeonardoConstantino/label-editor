@@ -4,6 +4,7 @@ export interface HistorySnapshot {
   imageData: ImageData;
   elements: AnyElement[];
   timestamp: number;
+  description: string;
 }
 
 /**
@@ -17,7 +18,7 @@ export class HistoryManager {
   /**
    * Captura o estado atual do canvas e dos elementos.
    */
-  public snapshot(ctx: CanvasRenderingContext2D, elements: AnyElement[]): void {
+  public snapshot(ctx: CanvasRenderingContext2D, elements: AnyElement[], description: string = 'Ação'): void {
     const imageData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
     
     // Deep clone dos elementos
@@ -29,7 +30,8 @@ export class HistoryManager {
     this.history.push({
       imageData,
       elements: elementsClone,
-      timestamp: Date.now()
+      timestamp: Date.now(),
+      description
     });
 
     if (this.history.length > this.maxSnapshots) {
@@ -43,7 +45,7 @@ export class HistoryManager {
    * Retorna ao estado anterior.
    */
   public undo(): HistorySnapshot | null {
-    if (this.currentIndex > 0) {
+    if (this.canUndo()) {
       this.currentIndex--;
       return this.history[this.currentIndex];
     }
@@ -54,8 +56,19 @@ export class HistoryManager {
    * Avança para o próximo estado.
    */
   public redo(): HistorySnapshot | null {
-    if (this.currentIndex < this.history.length - 1) {
+    if (this.canRedo()) {
       this.currentIndex++;
+      return this.history[this.currentIndex];
+    }
+    return null;
+  }
+
+  /**
+   * Salta para um índice específico no histórico.
+   */
+  public jumpTo(index: number): HistorySnapshot | null {
+    if (index >= 0 && index < this.history.length) {
+      this.currentIndex = index;
       return this.history[this.currentIndex];
     }
     return null;
@@ -75,6 +88,19 @@ export class HistoryManager {
 
   public getMaxSize(): number {
     return this.maxSnapshots;
+  }
+
+  public getCurrentIndex(): number {
+    return this.currentIndex;
+  }
+
+  public getHistory(): ReadonlyArray<Omit<HistorySnapshot, 'elements' | 'imageData'>> {
+    // Retorna uma versão leve do histórico para a UI (sem dados pesados)
+    return this.history.map(({ timestamp, description }) => ({ timestamp, description }));
+  }
+
+  public getFullHistory(): ReadonlyArray<HistorySnapshot> {
+    return this.history;
   }
 
   public clear(): void {

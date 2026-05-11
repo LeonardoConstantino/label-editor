@@ -1,7 +1,6 @@
 import { RectangleElement } from '../../../../domain/models/elements/SpecificElements';
 import { sharedSheet } from '../../../../utils/shared-styles';
 import { dispatchInspectorChange, resolveInspectorValue } from '../inspector-events';
-import { escapeHTML } from '../../../../utils/sanitize';
 import { HelpContentProvider } from '../../../../utils/HelpContentProvider';
 
 // Garantir registros
