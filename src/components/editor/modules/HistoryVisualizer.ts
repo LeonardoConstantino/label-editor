@@ -4,6 +4,9 @@ import { historyManager, HistorySnapshot } from '../../../domain/services/Histor
 import { UISM } from '../../../core/UISoundManager';
 import { AppState } from '../../../core/Store';
 import { formatDate } from '../../../utils/utils';
+import { escapeHTML } from '../../../utils/sanitize';
+import { HelpContentProvider } from '../../../utils/HelpContentProvider';
+import { confirmDialog } from '../../common/confirm';
 
 /**
  * HistoryVisualizer: Módulo "Time Machine" para navegação visual do histórico.
@@ -53,7 +56,7 @@ export class HistoryVisualizer extends HTMLElement {
     }
 
     // Clique delegado para os itens da linha do tempo
-    this.shadowRoot?.addEventListener('click', (e: Event) => {
+    this.shadowRoot?.addEventListener('click', async (e: Event) => {
       const target = e.target as HTMLElement;
       const item = target.closest('.history-node');
       if (item) {
@@ -66,7 +69,14 @@ export class HistoryVisualizer extends HTMLElement {
       }
 
       if (target.closest('#btn-clear-history')) {
-        if (confirm('Deseja limpar o cache do histórico? Isso economizará memória mas removerá os pontos de desfazer.')) {
+        const ok = await confirmDialog.ask('Clear History Cache', 'Deseja limpar o cache do histórico? Isso economizará memória mas removerá os pontos de desfazer.', 
+          {
+            variant: 'danger',
+            confirmText: 'Excluir snapshots',
+            cancelText: 'Manter snapshots',
+            countdown: 1,
+          },);
+        if (ok) {
           historyManager.clear();
           eventBus.emit('history:snapshot', { description: 'Genesis' });
           UISM.play(UISM.enumPresets.DELETE);
@@ -360,7 +370,7 @@ export class HistoryVisualizer extends HTMLElement {
 
       <div class="header">
         <span class="header-title">Chronological Tape</span>
-        <ui-icon name="clock" style="--icon-size: 14px; opacity: 0.5"></ui-icon>
+        ${HelpContentProvider.buildTooltip('history', 'bottom')}
       </div>
 
       <div id="history-container">
@@ -374,12 +384,6 @@ export class HistoryVisualizer extends HTMLElement {
       </div>
     `;
   }
-}
-
-function escapeHTML(str: string): string {
-  const p = document.createElement('p');
-  p.textContent = str;
-  return p.innerHTML;
 }
 
 customElements.define('history-visualizer', HistoryVisualizer);

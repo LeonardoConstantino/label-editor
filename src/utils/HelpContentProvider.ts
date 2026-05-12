@@ -122,6 +122,47 @@ export const InspectorHelpData: Record<string, HelpTooltipConfig> = {
       text: 'Inputs aceitam fórmulas matemáticas. Pressione <kbd class="kbd-prism">Ctrl</kbd>+<kbd class="kbd-prism">/</kbd> para atalhos.',
       isSuccess: false
     }
+  },
+  production: {
+    title: 'Production Studio',
+    icon: 'zap',
+    commands: [
+      { label: 'CSV Link', desc: 'Mapeia colunas da planilha para o design.' },
+      { label: 'Paginator', desc: 'Navega pelos registros para Live Preview.' },
+      { label: 'Imposition', desc: 'Organiza etiquetas no A4 para impressão.' }
+    ],
+    proTip: {
+      icon: 'lightning',
+      text: 'O modo Production protege as variáveis {{var}} de edições acidentais.',
+      isSuccess: true
+    }
+  },
+  assets: {
+    title: 'Asset Library',
+    icon: 'image',
+    commands: [
+      { label: 'Bin', desc: 'Onde suas peças e logotipos ficam guardados.' },
+      { label: 'Drag-Drop', desc: 'Arraste uma peça diretamente para o Canvas.' }
+    ],
+    proTip: {
+      icon: 'sparkles',
+      text: 'Arquivos SVG mantêm a nitidez infinita durante o redimensionamento.',
+      isSuccess: false
+    }
+  },
+  history: {
+    title: 'Time Machine',
+    icon: 'clock',
+    commands: [
+      { label: 'Timeline', desc: 'Fita cronológica de todas as suas ações.' },
+      { label: 'Jump', desc: 'Clique em um nó para viajar no tempo.' },
+      { label: 'Memory', desc: 'Limpe o cache para liberar RAM no navegador.' }
+    ],
+    proTip: {
+      icon: 'cpu',
+      text: 'Novas edições após um salto no tempo criam um novo futuro alternativo.',
+      isSuccess: false
+    }
   }
 };
 

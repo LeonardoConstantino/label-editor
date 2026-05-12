@@ -9,6 +9,20 @@ const helpData = {
         'Visão geral do Cockpit: Canvas centralizado com ferramentas de precisão',
     },
     {
+      id: 't4',
+      title: 'Active Slot (Cockpit)',
+      content:
+        'O painel lateral é modular. Utilize o "Rack de Cartuchos" no topo para alternar entre configurações de Blueprint, Propriedades de Camada e a Máquina do Tempo. Cada módulo é especializado e otimiza o espaço de trabalho.',
+      imageDescription: 'Sistema de Navegação Modular: Alternância dinâmica de ferramentas',
+    },
+    {
+      id: 't5',
+      title: 'Time Machine (Histórico)',
+      content:
+        'Navegue visualmente por todas as suas alterações. O Time Machine exibe miniaturas de cada estado anterior do design. Basta um clique para saltar no tempo e restaurar o projeto exatamente como ele estava, sem perder o rastro da sua evolução.',
+      imageDescription: 'Visual History: Fita cronológica com previews em tempo real',
+    },
+    {
       id: 't2',
       title: 'Automação de Lote',
       content:
@@ -36,8 +50,16 @@ const helpData = {
       q: 'O PDF gerado está em qual tamanho?',
       a: 'O gerador de lote organiza suas etiquetas automaticamente em folhas A4 (210x297mm), calculando a melhor disposição para evitar desperdício de papel.',
     },
+    {
+      q: 'O que acontece com o histórico ao saltar no tempo?',
+      a: 'Ao selecionar um estado passado no Time Machine, o app viaja para aquele momento. Se você fizer uma nova alteração a partir dali, uma nova linha do tempo é criada e os estados que estavam no "futuro" daquele ponto são descartados.',
+    },
   ],
   proTips: [
+    {
+      icon: 'clock',
+      tip: 'No Time Machine, use a roda do mouse para sentir o feedback tátil (micro-tics) enquanto navega pelo histórico.',
+    },
     {
       icon: 'sparkles',
       tip: 'Aperte [Ctrl+/] para ver a lista completa de atalhos e acelerar seu fluxo de trabalho.',
