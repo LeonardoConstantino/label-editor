@@ -176,7 +176,8 @@ export class ModuleRack extends HTMLElement {
       'blueprint': { label: 'Blueprint Setup', icon: 'settings' },
       'layers': { label: 'Layer Properties', icon: 'layers' },
       'assets': { label: 'Asset Library', icon: 'image' },
-      'history': { label: 'Time Machine', icon: 'clock' }
+      'history': { label: 'Time Machine', icon: 'clock' },
+      'variables': { label: 'Variable Manager', icon: 'cpu' }
     };
 
     const info = moduleMap[activeId] || moduleMap['blueprint'];
@@ -283,6 +284,14 @@ export class ModuleRack extends HTMLElement {
           <div class="item-text">
             <span class="item-title">Time Machine</span>
             <span class="item-desc">Visual timeline and state restoration.</span>
+          </div>
+        </div>
+
+        <div class="rack-item" data-id="variables">
+          <ui-icon name="cpu" class="mt-0.5 text-accent-primary" style="pointer-events: none;"></ui-icon>
+          <div class="item-text">
+            <span class="item-title">Variable Manager</span>
+            <span class="item-desc">Visual data pipeline and formatters.</span>
           </div>
         </div>
 

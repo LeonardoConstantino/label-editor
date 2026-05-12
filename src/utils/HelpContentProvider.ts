@@ -163,6 +163,20 @@ export const InspectorHelpData: Record<string, HelpTooltipConfig> = {
       text: 'Novas edições após um salto no tempo criam um novo futuro alternativo.',
       isSuccess: false
     }
+  },
+  variables: {
+    title: 'Variable Manager',
+    icon: 'cpu',
+    commands: [
+      { label: 'Pipeline', desc: 'Visualiza o fluxo do dado bruto ao formatado.' },
+      { label: 'Formatters', desc: 'Aplica filtros como Moeda, Data ou Caixa Alta.' },
+      { label: 'Fallback', desc: 'Define um valor padrão caso o dado falte.' }
+    ],
+    proTip: {
+      icon: 'lightning',
+      text: 'Alterar um formatador aqui atualiza todas as camadas que usam essa variável.',
+      isSuccess: true
+    }
   }
 };
 

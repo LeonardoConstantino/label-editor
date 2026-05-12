@@ -12,6 +12,7 @@ import './ModuleRack';
 import './ElementInspector';
 import './inspector/InspectorDocumentSetup';
 import './modules/HistoryVisualizer';
+import './modules/VariableManager';
 
 /**
  * AppCockpit: O orquestrador central do painel lateral (Aside).
@@ -136,6 +137,8 @@ export class AppCockpit extends HTMLElement {
       component = document.createElement('element-inspector');
     } else if (moduleId === 'history') {
       component = document.createElement('history-visualizer');
+    } else if (moduleId === 'variables') {
+      component = document.createElement('variable-manager');
     } else {
       // Default: blueprint
       component = document.createElement('inspector-document-setup');

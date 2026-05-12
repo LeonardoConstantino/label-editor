@@ -1,9 +1,110 @@
 import Papa from 'papaparse';
 
+export interface ParsedTag {
+  fullMatch: string;
+  key: string;
+  formatters: string[];
+  fallback?: string;
+}
+
+export interface FormatterDef {
+  name: string;
+  label: string;
+  sublabel: string;
+  fn: (value: any, params: string[]) => any;
+}
+
+/**
+ * Registro central de formatadores do sistema.
+ */
+export const FORMATTERS: Record<string, FormatterDef> = {
+  upper: {
+    name: 'upper',
+    label: 'UPPERCASE',
+    sublabel: 'TEXT -> TEXT',
+    fn: (v) => String(v).toUpperCase()
+  },
+  lower: {
+    name: 'lower',
+    label: 'lowercase',
+    sublabel: 'TEXT -> text',
+    fn: (v) => String(v).toLowerCase()
+  },
+  trim: {
+    name: 'trim',
+    label: 'Trim Space',
+    sublabel: ' text -> text',
+    fn: (v) => String(v).trim()
+  },
+  capitalize: {
+    name: 'capitalize',
+    label: 'Capitalize',
+    sublabel: 'text -> Text',
+    fn: (v) => {
+      const s = String(v);
+      return s.charAt(0).toUpperCase() + s.slice(1);
+    }
+  },
+  title: {
+    name: 'title',
+    label: 'Title Case',
+    sublabel: 'tEXt -> Text',
+    fn: (v) => String(v).replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase())
+  },
+  currency: {
+    name: 'currency',
+    label: 'Currency R$',
+    sublabel: '12.5 -> R$ 12,50',
+    fn: (v) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(parseFloat(v) || 0)
+  },
+  number: {
+    name: 'number',
+    label: 'Number (BR)',
+    sublabel: '1250.5 -> 1.250,50',
+    fn: (v) => new Intl.NumberFormat('pt-BR').format(parseFloat(v) || 0)
+  },
+  percent: {
+    name: 'percent',
+    label: 'Percent %',
+    sublabel: '0.12 -> 12%',
+    fn: (v) => new Intl.NumberFormat('pt-BR', { style: 'percent' }).format(parseFloat(v) || 0)
+  },
+  truncate: {
+    name: 'truncate(20)',
+    label: 'Truncate...',
+    sublabel: 'Long text -> Long...',
+    fn: (v, params) => {
+      const limit = parseInt(params[0]) || 20;
+      const str = String(v);
+      return str.length > limit ? str.substring(0, limit) + '...' : str;
+    }
+  },
+  date: {
+    name: 'date',
+    label: 'Date (BR)',
+    sublabel: '2023-01 -> 01/01/2023',
+    fn: (v) => DataSourceParser.formatDate(v, false)
+  },
+  datetime: {
+    name: 'datetime',
+    label: 'DateTime (BR)',
+    sublabel: '2023-01... -> 01/01... 12:00',
+    fn: (v) => DataSourceParser.formatDate(v, true)
+  },
+  json: {
+    name: 'json',
+    label: 'JSON Raw',
+    sublabel: '{obj} -> {"a":1}',
+    fn: (v) => JSON.stringify(v, null, 2)
+  }
+};
+
 /**
  * DataSourceParser: Processa arquivos externos para geração em lote.
  */
 export class DataSourceParser {
+  private static readonly TAG_REGEX = /\{\{\s*([\w\s."'-]+)(?::([\w,()\s.:-]+))?(?:\|\|([^}]+))?\s*\}\}/g;
+
   /**
    * Converte um arquivo CSV em um array de objetos usando PapaParse.
    */
@@ -40,10 +141,57 @@ export class DataSourceParser {
   }
 
   /**
+   * Retorna a lista de formatadores para o AppSelect.
+   */
+  public static getFormatterOptions() {
+    return Object.values(FORMATTERS).map(f => ({
+      value: f.name,
+      label: f.label,
+      sublabel: f.sublabel
+    }));
+  }
+
+  /**
+   * Encontra todas as tags em uma string e as retorna estruturadas.
+   */
+  public static parseTags(text: string): ParsedTag[] {
+    const tags: ParsedTag[] = [];
+    let match;
+    
+    this.TAG_REGEX.lastIndex = 0;
+
+    while ((match = this.TAG_REGEX.exec(text)) !== null) {
+      tags.push({
+        fullMatch: match[0],
+        key: match[1].trim(),
+        formatters: match[2] ? match[2].split(':').map(f => f.trim()).filter(Boolean) : [],
+        fallback: match[3]?.trim()
+      });
+    }
+
+    return tags;
+  }
+
+  /**
+   * Reconstrói uma tag a partir de seus componentes.
+   */
+  public static rebuildTag(tag: Omit<ParsedTag, 'fullMatch'>): string {
+    let result = `{{ ${tag.key}`;
+    
+    if (tag.formatters.length > 0) {
+      result += `:${tag.formatters.join(':')}`;
+    }
+    
+    if (tag.fallback !== undefined && tag.fallback !== '') {
+      result += `||${tag.fallback}`;
+    }
+    
+    result += ' }}';
+    return result;
+  }
+
+  /**
    * Aplica os dados em uma string substituindo variáveis {{key}}
-   * Suporta formatadores: {{ valor:currency }}
-   * Suporta valores padrão: {{ nome||Anônimo }}
-   * Suporta encadeamento: {{ texto:trim:upper }}
    */
   public static interpolate(
     template: string,
@@ -51,27 +199,19 @@ export class DataSourceParser {
   ): string {
     if (!template) return '';
 
-    // Regex para: {{ variavel : formatador(params) || valor_padrao }}
-    // Captura 1: variavel (incluindo espaços, pontos, hífens e aspas)
-    // Captura 2: formatadores (opcional, pode ser múltiplos separados por :)
-    // Captura 3: valor padrão (opcional, após ||)
-    const regex = /\{\{\s*([\w\s."'-]+)(?::([\w,()\s.:-]+))?(?:\|\|([^}]+))?\s*\}\}/g;
-
     return template.replace(
-      regex,
+      this.TAG_REGEX,
       (match, keyRaw, formattersStr, defaultValue) => {
         const key = keyRaw.trim();
         let value = data[key];
 
-        // Se valor não existe ou é nulo/undefined, usa valor padrão se disponível
         if (value === undefined || value === null) {
           if (defaultValue !== undefined) {
             return defaultValue.trim();
           }
-          return match; // Mantém a tag original se não houver valor padrão
+          return match;
         }
 
-        // Aplica formatadores se houver
         if (formattersStr) {
           const formatters = formattersStr.split(':');
           for (const f of formatters) {
@@ -87,62 +227,27 @@ export class DataSourceParser {
   }
 
   /**
-   * Executa a lógica de formatação para um valor.
+   * Executa a lógica de formatação para um valor usando o registro central.
    */
   private static applyFormatter(value: any, formatter: string): any {
-    // Regex para capturar nome do formatador e parâmetros entre parênteses
     const parts = formatter.match(/^(\w+)(?:\((.*)\))?$/);
     if (!parts) return value;
 
     const name = parts[1].toLowerCase();
     const params = parts[2] ? parts[2].split(',').map((p) => p.trim()) : [];
 
-    switch (name) {
-      case 'upper':
-        return String(value).toUpperCase();
-      case 'lower':
-        return String(value).toLowerCase();
-      case 'trim':
-        return String(value).trim();
-      case 'capitalize': {
-        const s = String(value);
-        return s.charAt(0).toUpperCase() + s.slice(1);
-      }
-      case 'title':
-        return String(value).replace(/\w\S*/g, (txt) => {
-          return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
-        });
-      case 'currency':
-        return new Intl.NumberFormat('pt-BR', {
-          style: 'currency',
-          currency: 'BRL',
-        }).format(parseFloat(value) || 0);
-      case 'number':
-        return new Intl.NumberFormat('pt-BR').format(parseFloat(value) || 0);
-      case 'percent':
-        return new Intl.NumberFormat('pt-BR', {
-          style: 'percent',
-        }).format(parseFloat(value) || 0);
-      case 'truncate': {
-        const limit = parseInt(params[0]) || 20;
-        const str = String(value);
-        return str.length > limit ? str.substring(0, limit) + '...' : str;
-      }
-      case 'date':
-        return this.formatDate(value, false);
-      case 'datetime':
-        return this.formatDate(value, true);
-      case 'json':
-        return JSON.stringify(value, null, 2);
-      default:
-        return value;
+    const def = FORMATTERS[name];
+    if (def) {
+      return def.fn(value, params);
     }
+
+    return value;
   }
 
   /**
    * Helper para formatação de datas (padrão brasileiro).
    */
-  private static formatDate(value: any, showTime: boolean): string {
+  public static formatDate(value: any, showTime: boolean): string {
     try {
       const date = new Date(value);
       if (isNaN(date.getTime())) return String(value);
@@ -153,8 +258,8 @@ export class DataSourceParser {
         year: 'numeric',
       };
       if (showTime) {
-        options.hour = '2-digit';
-        options.minute = '2-digit';
+        options.hour = '2-digit',
+        options.minute = '2-digit'
       }
       return new Intl.DateTimeFormat('pt-BR', options).format(date);
     } catch {
