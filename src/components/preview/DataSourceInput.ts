@@ -2,12 +2,12 @@ import eventBus from '../../core/EventBus';
 import { store } from '../../core/Store';
 import { UISM } from '../../core/UISoundManager';
 import { canvasRenderer } from '../../domain/services/CanvasRenderer';
-import { dataSourceParser } from '../../domain/services/DataSourceParser';
 import { ElementType } from '../../domain/models/elements/BaseElement';
 import '../common/AppButton';
 import '../common/icon';
 import '../common/UINumberScrubber';
 import '../common/ui-variable-badge';
+import '../common/UiDataGateway';
 import { DEFAULTS } from '../../constants/defaults';
 import { sharedSheet } from '../../utils/shared-styles';
 import { escapeHTML } from '../../utils/sanitize';
@@ -23,12 +23,12 @@ interface A4Config {
 
 /**
  * DataSourceInput: Production Cockpit (Takeover Interface)
- * Implementa o fluxo de geração em lote com Live Preview em A4 e Upload UX Refinado.
+ * Implementa o fluxo de geração em lote com Live Preview em A4 e o novo Data Gateway.
  */
 export class DataSourceInput extends HTMLElement {
   private dataList: Record<string, any>[] = [];
   private currentFileName = '';
-  private dataFields: string[] = []; // Campos vindo do CSV/JSON
+  private dataFields: string[] = []; // Campos vindo do CSV/JSON/Manual
   private labelPlaceholders: string[] = []; // {{vars}} extraídas da Etiqueta
 
   private a4Config: A4Config = {
@@ -40,7 +40,7 @@ export class DataSourceInput extends HTMLElement {
     zoom: 0.45,
   };
 
-  private isDragging = false;
+  private _abortController: AbortController | null = null;
 
   constructor() {
     super();
@@ -52,6 +52,10 @@ export class DataSourceInput extends HTMLElement {
 
   connectedCallback(): void {
     this.render();
+  }
+
+  disconnectedCallback() {
+    this._abortController?.abort();
   }
 
   /**
@@ -81,13 +85,10 @@ export class DataSourceInput extends HTMLElement {
 
     this.refreshLabelPlaceholders();
 
-    const dropZoneClass = this.isDragging ? 'drop-zone dragging' : 'drop-zone';
-
     this.shadowRoot.innerHTML = `
       <style>
         :host { display: block; height: 100%; }
         
-        /* Visualização da Sangria no Preview */
         .bleed-preview-box {
           position: absolute;
           inset: calc(var(--bleed) * -1mm);
@@ -96,7 +97,6 @@ export class DataSourceInput extends HTMLElement {
           z-index: 1;
         }
 
-        /* Marcas de Corte no Preview */
         .crop-mark {
           position: absolute;
           width: 4mm;
@@ -131,20 +131,13 @@ export class DataSourceInput extends HTMLElement {
                           <span class="text-[10px] text-text-muted">${this.dataList.length} records detected</span>
                         </div>
                       </div>
-                      <button class="p-1.5 rounded-lg hover:bg-accent-danger/20 text-accent-danger transition-colors cursor-pointer" id="btn-remove-file" title="Remove file">
+                      <button class="p-1.5 rounded-lg hover:bg-accent-danger/20 text-accent-danger transition-colors cursor-pointer" id="btn-remove-file" title="Remove data">
                         <ui-icon name="trash" size="md"></ui-icon>
                       </button>
                     </div>
                   `
                     : `
-                    <div id="drop-zone" class="${dropZoneClass}">
-                      <ui-icon name="text" style="transform: scale(1.5); opacity: 0.5"></ui-icon>
-                      <div style="text-align: center">
-                        <span style="display: block; font-size: 12px; font-weight: 600;">Drop CSV | JSON | TXT</span>
-                        <span style="font-size: 10px; color: var(--color-text-muted);">or click to browse</span>
-                      </div>
-                      <input type="file" id="file-input" accept=".csv,.json,.txt" style="display: none;">
-                    </div>
+                    <ui-data-gateway id="data-gateway"></ui-data-gateway>
                   `
                 }
               </div>
@@ -258,39 +251,24 @@ export class DataSourceInput extends HTMLElement {
 
   private attachEvents(): void {
     const shadow = this.shadowRoot!;
+    this._abortController = new AbortController();
+    const { signal } = this._abortController;
 
-    const dropZone = shadow.getElementById('drop-zone');
-    const fileInput = shadow.getElementById('file-input') as HTMLInputElement;
+    const gateway = shadow.getElementById('data-gateway');
     const btnRemove = shadow.getElementById('btn-remove-file');
 
-    if (dropZone) {
-      dropZone.addEventListener('click', () => fileInput.click());
-      dropZone.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        if (!this.isDragging) {
-          this.isDragging = true;
-          dropZone.classList.add('dragging');
-        }
-      });
-      dropZone.addEventListener('dragleave', (e) => {
-        e.preventDefault();
-        this.isDragging = false;
-        dropZone.classList.remove('dragging');
-      });
-      dropZone.addEventListener('drop', (e) => {
-        e.preventDefault();
-        this.isDragging = false;
-        dropZone.classList.remove('dragging');
-        const file = e.dataTransfer?.files[0];
-        if (file) this.handleFile(file);
-      });
-    }
+    if (gateway) {
+      gateway.addEventListener('data-ready', (e: any) => {
+        this.dataList = e.detail.data;
+        this.currentFileName = e.detail.sourceName;
+        this.dataFields = Object.keys(this.dataList[0]);
+        eventBus.emit('notify', { type: 'success', message: `${this.dataList.length} records detected.` });
+        this.render();
+      }, { signal });
 
-    if (fileInput) {
-      fileInput.addEventListener('change', () => {
-        const file = fileInput.files?.[0];
-        if (file) this.handleFile(file);
-      });
+      gateway.addEventListener('data-error', (e: any) => {
+        eventBus.emit('notify', { type: 'error', message: e.detail.message });
+      }, { signal });
     }
 
     if (btnRemove) {
@@ -300,27 +278,27 @@ export class DataSourceInput extends HTMLElement {
         this.currentFileName = '';
         UISM.play(UISM.enumPresets.DELETE);
         this.render();
-      });
+      }, { signal });
     }
 
-    this.setupConfigListeners(shadow);
+    this.setupConfigListeners(shadow, signal);
 
     shadow.getElementById('cfg-crop')?.addEventListener('change', (e: any) => {
       this.a4Config.showCropMarks = e.target.checked;
       UISM.play(UISM.enumPresets.TAP);
       this.updatePreview();
-    });
+    }, { signal });
 
     shadow.getElementById('btn-close')?.addEventListener('click', () => {
       const modal = document.getElementById('batch-modal') as any;
       if (modal) modal.removeAttribute('open');
-    });
+    }, { signal });
 
     shadow
       .getElementById('btn-generate')
       ?.addEventListener('click', async () => {
         if (this.dataList.length === 0) {
-          eventBus.emit('notify', { type: 'warning', message: 'Upload a data source first.' });
+          eventBus.emit('notify', { type: 'warning', message: 'Input or upload data first.' });
           return;
         }
 
@@ -328,7 +306,7 @@ export class DataSourceInput extends HTMLElement {
         if (missing.length > 0) {
           eventBus.emit('notify', {
             type: 'warning',
-            message: `Warning: Labels need {{${missing.join('}}, {{')}}}, but these fields weren't found in your file.`,
+            message: `Warning: Template needs {{${missing.join('}}, {{')}}}, but some aren't in your data.`,
           });
         }
 
@@ -338,10 +316,10 @@ export class DataSourceInput extends HTMLElement {
           UISM.play(UISM.enumPresets.SUCCESS);
           await pdfGenerator.generateLotePDF(label, this.dataList, this.a4Config);
         }
-      });
+      }, { signal });
   }
 
-  private setupConfigListeners(shadow: ShadowRoot): void {
+  private setupConfigListeners(shadow: ShadowRoot, signal: AbortSignal): void {
     const configHandlers: Record<string, (value: any) => void> = {
       'cfg-cols': (value) => {
         this.a4Config.columns = value || 1;
@@ -362,7 +340,7 @@ export class DataSourceInput extends HTMLElement {
       'cfg-zoom': (value) => {
         this.a4Config.zoom = (value || 45) / 100;
         const sheet = shadow.getElementById('a4-sheet')!;
-        sheet.style.transform = `scale(${this.a4Config.zoom})`;
+        if (sheet) sheet.style.transform = `scale(${this.a4Config.zoom})`;
       },
     };
 
@@ -370,43 +348,9 @@ export class DataSourceInput extends HTMLElement {
       const element = shadow.getElementById(id);
       if (!element) return;
       const listener = (e: any) => handler(e.detail.value);
-      element.addEventListener('change', listener);
-      element.addEventListener('input', listener);
+      element.addEventListener('change', listener, { signal });
+      element.addEventListener('input', listener, { signal });
     });
-  }
-
-  private async handleFile(file: File): Promise<void> {
-    try {
-      this.currentFileName = file.name;
-      const data = await this.parseFileByExtension(file);
-
-      if (data && data.length > 0) {
-        this.dataFields = Object.keys(data[0]);
-        this.dataList = data;
-        UISM.play(UISM.enumPresets.NOTIFY);
-        this.render();
-        eventBus.emit('notify', {
-          type: 'success',
-          message: `${data.length} records loaded successfully.`,
-        });
-      } else {
-        throw new Error('The file is empty or invalid.');
-      }
-    } catch (e: any) {
-      this.currentFileName = '';
-      this.dataList = [];
-      UISM.play(UISM.enumPresets.WARNING);
-      eventBus.emit('notify', { type: 'error', message: e.message });
-      this.render();
-    }
-  }
-
-  private async parseFileByExtension(file: File): Promise<Record<string, any>[]> {
-    const extension = file.name.slice(file.name.lastIndexOf('.')).toLowerCase();
-    if (extension === '.csv') return dataSourceParser.parseCSV(file);
-    if (extension === '.json') return dataSourceParser.parseJSON(file);
-    if (extension === '.txt') return dataSourceParser.parseTXT(file);
-    throw new Error(`Unsupported format: ${extension}`);
   }
 
   private updateDataSummary(): void {
@@ -447,6 +391,8 @@ export class DataSourceInput extends HTMLElement {
     const shadow = this.shadowRoot!;
     const sheet = shadow.getElementById('a4-sheet')!;
     const label = store.getState().currentLabel;
+
+    if (!sheet) return;
 
     sheet.style.setProperty('--a4-margin', `${this.a4Config.marginMM}mm`);
     sheet.style.setProperty('--a4-gap', `${this.a4Config.gapMM}mm`);
@@ -492,7 +438,7 @@ export class DataSourceInput extends HTMLElement {
       container.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
       container.style.border = '1px solid rgba(0,0,0,0.05)';
       container.style.position = 'relative';
-      container.style.overflow = 'visible'; // Permite ver a sangria se quisermos
+      container.style.overflow = 'visible';
 
       if (this.a4Config.bleedMM > 0) {
         const bleedBox = document.createElement('div');
@@ -526,8 +472,7 @@ export class DataSourceInput extends HTMLElement {
     const ctx = canvas.getContext('2d', { alpha: true })!;
     const currentDpi = label.config.dpi || DEFAULTS.CANVAS.dpi;
 
-    // Aumentamos a resolução interna do canvas do thumb para não ficar tão embaçado
-    const renderScale = 4; // 4x o tamanho em mm
+    const renderScale = 4;
     canvas.width = label.config.widthMM * renderScale;
     canvas.height = label.config.heightMM * renderScale;
 

@@ -471,7 +471,7 @@
     @apply flex flex-col h-full -m-6 bg-canvas overflow-hidden;
   }
   .studio-main {
-    @apply flex flex-1 overflow-hidden;
+    @apply flex overflow-hidden;
   }
   .studio-sidebar {
     @apply w-96 bg-surface-solid/50 border-r border-border-ui p-8 flex flex-col gap-8 overflow-y-auto;
@@ -485,7 +485,7 @@
     background-size: 20px 24px;
   }
   .studio-footer {
-    @apply h-20 bg-surface-solid border-t border-border-ui flex items-center justify-between px-10 z-10;
+    @apply bg-surface-solid border-t border-border-ui flex items-center justify-between p-3 px-10 z-10;
   }
 
   .preview-grid {
@@ -686,38 +686,33 @@
 @layer components {
   input[type='checkbox']:not(.precision-checkbox) {
     appearance: none;
-    width: 36px;
-    height: 20px;
+    width: 32px;
+    height: 18px;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid var(--color-border-ui);
     border-radius: 20px;
-    background: #050505;
-    box-shadow:
-      inset 0 2px 4px rgba(0, 0, 0, 0.8),
-      0 1px 0 rgba(255, 255, 255, 0.05);
     position: relative;
     cursor: pointer;
-    transition: background 0.3s ease;
+    transition: all 0.3s ease;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
   }
   input[type='checkbox']:not(.precision-checkbox)::before {
     content: '';
     position: absolute;
-    top: 2px;
-    left: 2px;
-    width: 16px;
-    height: 16px;
+    top: 2px; left: 2px;
+    width: 12px; height: 12px;
+    background: var(--color-text-muted);
     border-radius: 50%;
-    background: #3f3f46;
-    transition: all 0.4s var(--ease-spring);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+    transition: transform 0.4s var(--ease-spring);
   }
   input[type='checkbox']:not(.precision-checkbox):checked {
     background: var(--color-accent-primary);
-    box-shadow:
-      inset 0 2px 4px rgba(0, 0, 0, 0.3),
-      0 0 12px rgba(99, 102, 241, 0.4);
+    border-color: var(--color-accent-primary);
   }
   input[type='checkbox']:not(.precision-checkbox):checked::before {
-    left: calc(100% - 18px);
+    transform: translateX(14px);
     background: #ffffff;
+    box-shadow: 0 0 10px rgba(255,255,255,0.4);
   }
 }
 

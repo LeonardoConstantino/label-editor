@@ -21,6 +21,7 @@ import './components/editor/WelcomeScreen';
 import './components/editor/HelpCenter';
 import './components/preferences/PreferencesModal';
 import './components/common/modal';
+import './components/common/UiDataGateway';
 import './components/preview/DataSourceInput';
 import './components/common/UINumberScrubber';
 import './components/common/tooltip';

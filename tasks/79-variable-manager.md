@@ -41,10 +41,10 @@ Quando o usuário expande o acordeon de uma variável, ele entra no construtor d
 - **Remoção de Filtro (X):** O som reverso de "Vaporize" (ruído estático sumindo).
 
 ## Critérios de Aceite
-- [ ] O painel reflete com precisão todas as `{{variáveis}}` atuais do Canvas sem repetição.
-- [ ] O usuário consegue anexar formatadores visuais (como Moeda ou Maiúsculas) através do botão de Adicionar, e a string da camada de texto no *Store* é atualizada com a sintaxe correta automaticamente.
-- [ ] O campo de Fallback (Valor Reserva) é suportado.
-- [ ] A interação é contínua e as edições disparam eventos de histórico corretamente.
+- [x] O painel reflete com precisão todas as `{{variáveis}}` atuais do Canvas sem repetição.
+- [x] O usuário consegue anexar formatadores visuais (como Moeda ou Maiúsculas) através do botão de Adicionar, e a string da camada de texto no *Store* é atualizada com a sintaxe correta automaticamente.
+- [x] O campo de Fallback (Valor Reserva) é suportado.
+- [x] A interação é contínua e as edições disparam eventos de histórico corretamente.
 
 ---
 

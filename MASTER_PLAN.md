@@ -36,6 +36,7 @@ Este Master Plan coordena a fase final de desenvolvimento, focando em estabilida
 | ID | Task | Pri | Status | Deps | Branch |
 |----|------|-----|--------|------|--------|
 | **36** | [Retomada Automática & Tela Inicial](./tasks/36_work_resumption.md) | 08 | [/] | 35 | `task/36-boot-welcome` |
+| **82** | [Data Gateway Module (Unified Entry)](./tasks/82_data_gateway.md) | 08 | [ ] | — | `task/82-data-gateway` |
 | **80** | [History Visualizer (The Time Machine)](./tasks/80-history-visualizer.md) | 07 | [x] | 76 | `task/80-history-visualizer` |
 | **33** | [Importação/Exportação de JSON (.label)](./tasks/33_json_import_export.md) | 07 | [x] | 07 | `task/33-json-io` |
 | **46** | [Refatoração Profunda ElementInspector](./tasks/46_inspector_refactor.md) | 07 | [x] | 29 | `task/46-inspector-refactor` |
