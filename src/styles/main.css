@@ -294,6 +294,7 @@
   }
   ui-modal::part(body) {
     color: var(--color-text-muted);
+    padding: 0;
   }
   ui-modal::part(close-btn):hover {
     color: var(--color-accent-primary);
@@ -468,7 +469,7 @@
    ========================================== */
 @layer components {
   .studio-container {
-    @apply flex flex-col h-full -m-6 bg-canvas overflow-hidden;
+    @apply flex flex-col h-full bg-canvas overflow-hidden;
   }
   .studio-main {
     @apply flex overflow-hidden;
@@ -485,7 +486,7 @@
     background-size: 20px 24px;
   }
   .studio-footer {
-    @apply bg-surface-solid border-t border-border-ui flex items-center justify-between p-3 px-10 z-10;
+    @apply bg-surface-solid border-t border-border-ui flex items-center justify-between py-5 px-10 z-10;
   }
 
   .preview-grid {
