@@ -153,6 +153,8 @@ export class EditorCanvas extends HTMLElement {
     this.ctx.fillStyle = config.backgroundColor || '#ffffff';
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
+    const productionData = state.productionData[state.productionPreviewIndex] || null;
+
     elements
       .filter((el) => el.visible !== false)
       .sort((a, b) => a.zIndex - b.zIndex)
@@ -161,6 +163,7 @@ export class EditorCanvas extends HTMLElement {
           ctx: this.ctx,
           scale,
           dpi: config.dpi,
+          data: productionData
         });
         if (state.selectedElementIds.includes(element.id)) {
           this.drawSelectionOutline(element, scale, config.dpi);

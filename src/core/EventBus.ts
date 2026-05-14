@@ -31,6 +31,12 @@ export interface EventMap {
   'ui:open:help': { tab?: string; source?: string };
   'module:switch': { moduleId: string };
 
+  // Production & Batch
+  'production:data:update': { data: any[]; sourceName: string };
+  'production:preview:index': { index: number };
+  'production:print:open': {};
+  'production:config:update': Partial<import('../domain/services/PDFGenerator').BatchLayoutOptions>;
+
   // Element Manipulation
   'element:add': AnyElement;
   'element:update': { id: string; updates: Partial<AnyElement>; silent?: boolean };

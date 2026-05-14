@@ -1,10 +1,11 @@
 import { jsPDF } from 'jspdf';
 import { Label, AnyElement } from '../models/Label';
 import { canvasRenderer } from './CanvasRenderer';
-import { DataSourceParser } from './DataSourceParser';
-import { ElementType } from '../models/elements/BaseElement';
 import { UnitConverter } from '../../utils/units';
 import { DEFAULTS } from '../../constants/defaults';
+
+export type PaperFormat = 'a4' | 'a3' | 'letter';
+export type PageOrientation = 'portrait' | 'landscape';
 
 export interface BatchLayoutOptions {
   marginMM: number;
@@ -12,38 +13,57 @@ export interface BatchLayoutOptions {
   columns: number;
   showCropMarks: boolean;
   bleedMM: number;
+  paperFormat: PaperFormat;
+  orientation: PageOrientation;
+  zoom: number; // UI only
 }
 
 /**
  * PDFGenerator: Gera o PDF final com todas as etiquetas do lote.
  */
 export class PDFGenerator {
+  private readonly PAPER_SIZES: Record<PaperFormat, { w: number, h: number }> = {
+    'a4': { w: 210, h: 297 },
+    'a3': { w: 297, h: 420 },
+    'letter': { w: 215.9, h: 279.4 }
+  };
+
   /**
    * Gera e faz o download do PDF baseado na etiqueta e nos dados fornecidos.
-   * Suporta layout A4 multi-etiqueta com sangria e marcas de corte.
+   * Suporta layout multi-etiqueta com sangria, marcas de corte e papel dinâmico (Task 67).
    */
   public async generateLotePDF(
     label: Label, 
     dataList: Record<string, any>[], 
-    layout: BatchLayoutOptions = { marginMM: 10, gapMM: 5, columns: 2, showCropMarks: true, bleedMM: 2 }
+    layout: BatchLayoutOptions = { 
+      marginMM: 10, 
+      gapMM: 5, 
+      columns: 2, 
+      showCropMarks: true, 
+      bleedMM: 2,
+      paperFormat: 'a4',
+      orientation: 'portrait',
+      zoom: 1
+    }
   ): Promise<void> {
     const pdf = new jsPDF({
-      orientation: 'portrait',
+      orientation: layout.orientation,
       unit: 'mm',
-      format: 'a4'
+      format: layout.paperFormat
     });
 
-    const PAGE_WIDTH = 210;
-    const PAGE_HEIGHT = 297;
+    const size = this.PAPER_SIZES[layout.paperFormat];
+    const PAGE_WIDTH = layout.orientation === 'portrait' ? size.w : size.h;
+    const PAGE_HEIGHT = layout.orientation === 'portrait' ? size.h : size.w;
+    
     const bleed = layout.bleedMM || 0;
 
-    // Canvas oculto para renderização em alta resolução (incluindo sangria)
+    // Canvas oculto para renderização em alta resolução
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d', { alpha: true })!;
     const dpi = label.config.dpi || DEFAULTS.CANVAS.dpi;
     const scale = UnitConverter.mmToPx(1, dpi);
 
-    // O canvas agora tem o tamanho da etiqueta + sangria nos 4 lados
     const renderWidthMM = label.config.widthMM + (bleed * 2);
     const renderHeightMM = label.config.heightMM + (bleed * 2);
 
@@ -65,51 +85,44 @@ export class PDFGenerator {
         colIndex = 0;
       }
 
-      // Renderiza Etiqueta no Canvas (com sangria)
+      // Renderiza Etiqueta no Canvas
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      
-      // Fundo (preenche toda a área de sangria)
       ctx.fillStyle = label.config.backgroundColor || '#ffffff';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // Salva contexto para aplicar offset da sangria aos elementos
       ctx.save();
       ctx.translate(UnitConverter.mmToPx(bleed, dpi), UnitConverter.mmToPx(bleed, dpi));
 
       label.elements.forEach(element => {
         const elementCopy = JSON.parse(JSON.stringify(element)) as AnyElement;
-        if (elementCopy.type === ElementType.TEXT) {
-          (elementCopy as any).content = DataSourceParser.interpolate((elementCopy as any).content, data);
-        }
-        canvasRenderer.render(elementCopy, { ctx, scale, dpi });
+        canvasRenderer.render(elementCopy, { ctx, scale, dpi, data });
       });
       ctx.restore();
 
-      // Adiciona ao PDF na posição calculada
-      // Compensamos o X e Y do PDF para que a "arte" comece na margem, mas a sangria extrapole
       const pdfX = currentX - bleed;
       const pdfY = currentY - bleed;
       
       const imgData = canvas.toDataURL('image/png');
       pdf.addImage(imgData, 'PNG', pdfX, pdfY, renderWidthMM, renderHeightMM);
 
-      // Marcas de corte profissionais (L-marks)
       if (layout.showCropMarks) {
         this.drawCropMarks(pdf, currentX, currentY, label.config.widthMM, label.config.heightMM);
       }
 
       // Incrementa para a próxima posição
       colIndex++;
-      if (colIndex >= layout.columns || (currentX + (label.config.widthMM * 2) + layout.gapMM > PAGE_WIDTH - layout.marginMM)) {
+      const nextX = currentX + label.config.widthMM + layout.gapMM;
+      
+      if (colIndex >= layout.columns || (nextX + label.config.widthMM > PAGE_WIDTH - layout.marginMM)) {
         colIndex = 0;
         currentX = layout.marginMM;
         currentY += label.config.heightMM + layout.gapMM;
       } else {
-        currentX += label.config.widthMM + layout.gapMM;
+        currentX = nextX;
       }
     }
 
-    pdf.save(`lote_a4_${Date.now()}.pdf`);
+    pdf.save(`batch_${layout.paperFormat}_${Date.now()}.pdf`);
   }
 
   /**

@@ -50,13 +50,20 @@ The project follows a modular, event-driven architecture:
 
 ## Session Logs
 
-### 2026-05-11: Visual History & Time Machine
+### 2026-05-12: Estúdio de Produção & Impressão Dinâmica
+- **Task 77 & 67 (Unified Production):** Migração do fluxo de lote para o cockpit lateral e suporte a papéis dinâmicos.
+  - **Módulo Studio:** Novo `ProductionStudio` no Active Slot para gestão de dados e live preview.
+  - **Live Preview:** O Canvas principal agora reflete os dados do registro selecionado no paginador em tempo real.
+  - **Print Matrix:** Novo modal de calibração física com preview de wireframe leve para imposição em A4, A3 e Letter.
+  - **Dynamic Engine:** Refatorado `PDFGenerator` para suportar orientações Portrait/Landscape e múltiplos formatos de papel.
+  - **Data Gateway:** Integração total do `<ui-data-gateway>` para entrada manual ou upload de arquivos.
+
+### 2026-05-11 (Extra): Entrada Unificada de Dados
+- **Task 82 (Data Gateway):** Implementado o componente `<ui-data-gateway>` para centralizar a entrada de dados.
+
+### 2026-05-11: Automação de Dados & Time Machine
+- **Task 79 (Variable Manager):** Implementado o orquestrador visual de pipeline de dados.
 - **Task 80 (History Visualizer):** Implementada a "Time Machine" para navegação visual do histórico.
-  - **Componente:** Novo módulo `HistoryVisualizer` no Rack de Cartuchos.
-  - **Fita Cronológica:** Exibição de miniaturas (thumbnails) de cada snapshot geradas em tempo real.
-  - **Interação:** Suporte a "Time Travel" via clique direto na linha do tempo e feedback sonoro de "engrenagem" no scroll.
-  - **Integridade:** Refatoração do `HistoryManager` e `Store` para suportar descrições de ações e saltos temporais diretos.
-  - **Qualidade:** Estabilização completa da suíte de testes (50 testes passando).
 
 ### 2026-05-09: Unificação de UI & Robustez de Teclado
 - **Task 73 (Universal Select):** Finalizada a migração de todos os seletores nativos para o componente `AppSelect`.
@@ -64,24 +71,3 @@ The project follows a modular, event-driven architecture:
 
 ### 2026-05-08: Otimização de Performance & Histórico
 - **Task 59 (History Debounce):** Mecanismo de debounce para snapshots de histórico.
-
-### 2026-05-07: Orquestração Técnica & Padronização de Eventos
-- **Task 71 (EventMap):** Formalização do sistema de comunicação via EventBus tipado.
-
-### 2026-05-06: Inteligência de Layout, Telemetria & Ajuda Contextual
-- **Task 63 (Smart Snapping):** Atração magnética inteligente.
-- **Task 74 (Status Bar):** Central de telemetria profissional.
-- **Task 62 (Power Layout):** Ferramentas de alinhamento e distribuição.
-
-### 2026-05-03: Refinamento de UX & Suporte a Transparência
-- **Task 72 (Help Tooltips):** Padronização da experiência de ajuda contextual.
-- **Hotfix (Transparency):** Corrigido bug de fundo preto em imagens transparentes.
-
-### 2026-05-02: Maturidade de Renderização & Unificação de UI
-- **Task 44 (Text Pro):** Renderização profissional de texto.
-- **Task 43 (Adv Renderers):** Blending Modes e borderRadius real.
-- **Task 42 (Border Element):** Estilo DOUBLE concêntrico.
-- **Task 69 (UI Select):** Criado o componente `AppSelect`.
-
-### 2026-04-30: Arquitetura de Componentes & Integridade de UI
-- **Task 46 (Deep Refactor):** Modularização do `ElementInspector` em 3 níveis.

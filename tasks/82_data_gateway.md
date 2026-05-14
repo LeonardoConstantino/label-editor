@@ -27,7 +27,7 @@ Criar o componente `<ui-data-gateway>` para unificar a entrada manual de listas 
 5. Adicionar feedback sonoro: `NOTIFY` ao detectar dados válidos.
 
 ## Critérios de Aceite
-- [ ] O componente alterna visualmente entre modo "Notepad" e "Scanner" durante o drag-over.
-- [ ] Colar uma lista de nomes no textarea e clicar em um botão (ou via auto-save) gera os registros corretamente.
-- [ ] Arrastar um arquivo CSV processa os dados e emite o evento `data-ready`.
-- [ ] O visual segue rigorosamente o padrão *Tactile Prism* (glassmorphism, monospace).
+- [x] O componente alterna visualmente entre modo "Notepad" e "Scanner" durante o drag-over.
+- [x] Colar uma lista de nomes no textarea e clicar em um botão (ou via auto-save) gera os registros corretamente.
+- [x] Arrastar um arquivo CSV processa os dados e emite o evento `data-ready`.
+- [x] O visual segue rigorosamente o padrão *Tactile Prism* (glassmorphism, monospace).

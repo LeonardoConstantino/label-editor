@@ -13,6 +13,7 @@ import './ElementInspector';
 import './inspector/InspectorDocumentSetup';
 import './modules/HistoryVisualizer';
 import './modules/VariableManager';
+import './modules/ProductionStudio';
 
 /**
  * AppCockpit: O orquestrador central do painel lateral (Aside).
@@ -61,6 +62,12 @@ export class AppCockpit extends HTMLElement {
         this.syncModule(state.activeModuleId);
       }
       this.updateDigitalTwin(state.currentLabel);
+    }, { signal });
+
+    // Abre o Modal de Produção
+    eventBus.on('production:print:open', () => {
+      const modal = document.getElementById('batch-modal') as HTMLElement;
+      if (modal) modal.setAttribute('open', '');
     }, { signal });
 
     // Sugestão inteligente: trocar para 'layers' se um elemento for selecionado no canvas
@@ -121,15 +128,6 @@ export class AppCockpit extends HTMLElement {
     const slot = this.shadowRoot?.getElementById('active-slot');
     if (!slot) return;
 
-    // Caso especial: Production Studio abre o modal
-    if (moduleId === 'batch') {
-      const modal = document.getElementById('batch-modal') as any;
-      if (modal) modal.setAttribute('open', '');
-      // Volta para o módulo anterior no cockpit para não ficar com o slot vazio ou errado
-      setTimeout(() => eventBus.emit('module:switch', { moduleId: 'blueprint' }), 100);
-      return;
-    }
-
     slot.innerHTML = '';
     let component: HTMLElement;
 
@@ -139,6 +137,8 @@ export class AppCockpit extends HTMLElement {
       component = document.createElement('history-visualizer');
     } else if (moduleId === 'variables') {
       component = document.createElement('variable-manager');
+    } else if (moduleId === 'batch') {
+      component = document.createElement('production-studio');
     } else {
       // Default: blueprint
       component = document.createElement('inspector-document-setup');

@@ -6,6 +6,7 @@ import { UISM } from './UISoundManager';
 import { overflowValidator } from '../domain/services/OverflowValidator';
 import { elementValidator } from '../domain/validators/ElementValidator';
 import { DEFAULTS } from '../constants/defaults';
+import type { BatchLayoutOptions } from '../domain/services/PDFGenerator';
 
 export interface AppState {
   currentLabel: Label | null;
@@ -15,6 +16,12 @@ export interface AppState {
   canRedo: boolean;
   preferences: UserPreferences;
   activeModuleId: 'blueprint' | 'layers' | 'assets' | 'history' | 'variables' | 'batch';
+  
+  // Production State
+  productionData: any[];
+  productionPreviewIndex: number;
+  productionSourceName: string;
+  printConfig: BatchLayoutOptions;
 }
 
 /**
@@ -34,7 +41,21 @@ export class Store {
       canUndo: false,
       canRedo: false,
       preferences: DEFAULT_PREFERENCES,
-      activeModuleId: 'blueprint'
+      activeModuleId: 'blueprint',
+      
+      productionData: [],
+      productionPreviewIndex: 0,
+      productionSourceName: '',
+      printConfig: {
+        marginMM: 10,
+        gapMM: 5,
+        columns: 2,
+        showCropMarks: true,
+        bleedMM: 2,
+        paperFormat: 'a4',
+        orientation: 'portrait',
+        zoom: 0.45
+      }
     };
 
     this.registerEvents();
@@ -192,6 +213,24 @@ export class Store {
 
     eventBus.on('module:switch', ({ moduleId }: { moduleId: any }) => {
       this.state.activeModuleId = moduleId;
+      this.emit();
+    });
+
+    // --- PRODUCTION EVENTS ---
+    eventBus.on('production:data:update', ({ data, sourceName }) => {
+      this.state.productionData = data;
+      this.state.productionSourceName = sourceName;
+      this.state.productionPreviewIndex = 0;
+      this.emit();
+    });
+
+    eventBus.on('production:preview:index', ({ index }) => {
+      this.state.productionPreviewIndex = index;
+      this.emit();
+    });
+
+    eventBus.on('production:config:update', (updates) => {
+      this.state.printConfig = { ...this.state.printConfig, ...updates };
       this.emit();
     });
   }
