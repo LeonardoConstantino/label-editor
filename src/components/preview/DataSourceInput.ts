@@ -16,6 +16,9 @@ import { sharedSheet } from '../../utils/shared-styles';
  */
 export class DataSourceInput extends HTMLElement {
   private _abortController: AbortController | null = null;
+  private _isProcessing = false;
+  private _progress = 0;
+  private _progressMessage = '';
 
   private readonly PAPER_SIZES: Record<PaperFormat, { w: number, h: number }> = {
     'a4': { w: 210, h: 297 },
@@ -65,6 +68,14 @@ export class DataSourceInput extends HTMLElement {
       if (modal) modal.removeAttribute('open');
     }, { signal });
 
+    // Escuta progresso do Worker
+    eventBus.on('production:progress', (data) => {
+      this._isProcessing = true;
+      this._progress = data.progress;
+      this._progressMessage = data.message;
+      this.syncAll();
+    }, { signal });
+
     // Botão Gerar
     root.getElementById('btn-generate')?.addEventListener('click', async () => {
       const state = store.getState();
@@ -72,8 +83,21 @@ export class DataSourceInput extends HTMLElement {
       
       const label = state.currentLabel;
       if (label) {
+        this._isProcessing = true;
+        this._progress = 0;
+        this._progressMessage = 'Starting Worker...';
+        this.syncAll();
+
         UISM.play(UISM.enumPresets.SUCCESS);
-        await pdfGenerator.generateLotePDF(label, state.productionData, state.printConfig);
+        
+        try {
+          await pdfGenerator.generateLotePDFWorker(label, state.productionData, state.printConfig);
+        } catch (err: any) {
+          eventBus.emit('notify', { type: 'error', message: 'PDF Error: ' + err.message });
+        } finally {
+          this._isProcessing = false;
+          this.syncAll();
+        }
       }
     }, { signal });
 
@@ -91,6 +115,11 @@ export class DataSourceInput extends HTMLElement {
       'cfg-format': (v) => eventBus.emit('production:config:update', { paperFormat: v }),
       'cfg-orientation': (v) => eventBus.emit('production:config:update', { orientation: v }),
       'cfg-zoom': (v) => eventBus.emit('production:config:update', { zoom: v / 100 }),
+      'cfg-quality': (v) => {
+        if (v === 'draft') eventBus.emit('production:config:update', { exportFormat: 'jpeg', exportQuality: 0.5 });
+        else if (v === 'standard') eventBus.emit('production:config:update', { exportFormat: 'jpeg', exportQuality: 0.8 });
+        else if (v === 'high') eventBus.emit('production:config:update', { exportFormat: 'png', exportQuality: 1.0 });
+      }
     };
 
     const changeHandler = (e: any) => {
@@ -117,6 +146,16 @@ export class DataSourceInput extends HTMLElement {
     const state = store.getState();
     const shadow = this.shadowRoot!;
     if (!shadow) return;
+
+    // Se estiver processando, mostra overlay de progresso
+    const overlay = shadow.getElementById('processing-overlay');
+    if (overlay) {
+      overlay.style.display = this._isProcessing ? 'flex' : 'none';
+      const bar = shadow.getElementById('progress-bar-fill');
+      const msg = shadow.getElementById('progress-msg');
+      if (bar) bar.style.width = `${this._progress}%`;
+      if (msg) msg.textContent = this._progressMessage;
+    }
 
     const { productionData, productionSourceName, printConfig } = state;
 
@@ -170,6 +209,15 @@ export class DataSourceInput extends HTMLElement {
     syncInput('cfg-orientation', printConfig.orientation);
     syncInput('cfg-zoom', Math.round(printConfig.zoom * 100));
     syncInput('cfg-crop', printConfig.showCropMarks, true);
+
+    // Sincroniza o preset de qualidade
+    const qualitySelect = shadow.getElementById('cfg-quality') as any;
+    if (qualitySelect) {
+      let qVal = 'standard';
+      if (printConfig.exportFormat === 'png') qVal = 'high';
+      else if (printConfig.exportQuality <= 0.5) qVal = 'draft';
+      if (qualitySelect.value !== qVal) qualitySelect.value = qVal;
+    }
 
     // 3. Sync Footer
     const batchSummary = shadow.getElementById('batch-summary')!;
@@ -286,7 +334,17 @@ export class DataSourceInput extends HTMLElement {
 
     this.shadowRoot.innerHTML = `
       <style>
-        :host { display: block; height: 100%; }
+        :host { display: block; height: 100%; position: relative; }
+
+        /* Overlay de Processamento (Task 24) */
+        .processing-overlay {
+          position: absolute; inset: 0; background: rgba(10, 12, 16, 0.95);
+          display: none; flex-direction: column; align-items: center; justify-content: center;
+          z-index: 1000; backdrop-filter: blur(12px);
+        }
+        .progress-container { width: 300px; height: 4px; background: rgba(255,255,255,0.05); border-radius: 2px; overflow: hidden; margin-bottom: 12px; }
+        .progress-bar-fill { height: 100%; background: var(--color-accent-primary); width: 0%; transition: width 0.3s; box-shadow: 0 0 10px var(--color-accent-primary); }
+        .progress-msg { font-family: var(--font-mono); font-size: 10px; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.1em; }
         
         .bleed-preview-box {
           position: absolute;
@@ -315,6 +373,15 @@ export class DataSourceInput extends HTMLElement {
       </style>
 
       <div class="studio-container">
+        <!-- OVERLAY DE PROCESSAMENTO -->
+        <div class="processing-overlay" id="processing-overlay">
+          <ui-icon name="lightning" style="--icon-size: 40px; margin-bottom: 20px;" class="text-accent-primary animate-pulse"></ui-icon>
+          <div class="progress-container">
+            <div class="progress-bar-fill" id="progress-bar-fill"></div>
+          </div>
+          <div class="progress-msg" id="progress-msg">Initializing Engine...</div>
+        </div>
+
         <div class="studio-main">
           <div class="studio-sidebar">
             
@@ -336,6 +403,13 @@ export class DataSourceInput extends HTMLElement {
                    <span class="label-prism" style="margin:0; font-size: 10px;">Render Crop Marks</span>
                    <input type="checkbox" id="cfg-crop">
                 </div>
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-3">
+              <h4 class="font-mono text-[10px] text-text-muted uppercase tracking-[0.2em] mb-1">3. Output Quality</h4>
+              <div class="control-group">
+                <app-select id="cfg-quality" label="Export Preset"></app-select>
               </div>
             </div>
           </div>
@@ -382,6 +456,15 @@ export class DataSourceInput extends HTMLElement {
       orientSelect.options = [
         { value: 'portrait', label: 'Portrait', sublabel: 'Vertical' },
         { value: 'landscape', label: 'Landscape', sublabel: 'Horizontal' }
+      ];
+    }
+
+    const qualitySelect = this.shadowRoot.getElementById('cfg-quality') as any;
+    if (qualitySelect) {
+      qualitySelect.options = [
+        { value: 'draft', label: 'Draft', sublabel: 'Fast / Small (JPEG 0.5)' },
+        { value: 'standard', label: 'Standard', sublabel: 'Balanced (JPEG 0.8)' },
+        { value: 'high', label: 'High-Res', sublabel: 'Print Ready (PNG Lossless)' }
       ];
     }
   }

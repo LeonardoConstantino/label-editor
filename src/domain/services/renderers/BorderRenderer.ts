@@ -78,7 +78,7 @@ export class BorderRenderer implements IRenderer {
    * Helper para desenhar retângulo arredondado (Stroke)
    */
   private drawRoundedRect(
-    ctx: CanvasRenderingContext2D, 
+    ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D, 
     x: number, y: number, 
     w: number, h: number, 
     radiusMM: number, 

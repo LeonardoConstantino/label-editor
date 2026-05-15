@@ -9,10 +9,11 @@ import { UnitConverter } from '../../utils/units';
 import eventBus from '../../core/EventBus';
 
 export interface RenderContext {
-  ctx: CanvasRenderingContext2D;
+  ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D;
   scale: number; // mm -> px (incluindo previewScale se houver)
   dpi: number;
   data?: Record<string, any>;
+  images?: Map<string, ImageBitmap | HTMLImageElement>;
 }
 
 /**

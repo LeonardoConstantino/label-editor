@@ -94,7 +94,7 @@ export class TextRenderer implements IRenderer {
         ctx.clip();
       }
 
-      drawText(ctx, content, config);
+      drawText(ctx as any, content, config);
     } else {
       // Fallback robusto
       ctx.font = `${element.fontStyle || ''} ${element.fontWeight || 400} ${fontSizePx}px ${element.fontFamily || 'sans-serif'}`;
@@ -119,11 +119,16 @@ export class TextRenderer implements IRenderer {
   /**
    * Obtém ou cria o canvas offline para medições sem poluir o canvas principal.
    */
-  private getOffscreenContext(): CanvasRenderingContext2D {
+  private getOffscreenContext(): OffscreenCanvasRenderingContext2D | CanvasRenderingContext2D {
     if (!TextRenderer.offscreenCanvas) {
-      TextRenderer.offscreenCanvas = document.createElement('canvas');
+      if (typeof document !== 'undefined') {
+        TextRenderer.offscreenCanvas = document.createElement('canvas') as any;
+      } else {
+        // Fallback para Worker
+        TextRenderer.offscreenCanvas = new OffscreenCanvas(1, 1) as any;
+      }
     }
-    return TextRenderer.offscreenCanvas.getContext('2d', { willReadFrequently: true, alpha: true })!;
+    return TextRenderer.offscreenCanvas!.getContext('2d', { willReadFrequently: true, alpha: true }) as any;
   }
 
   /**
@@ -144,7 +149,7 @@ export class TextRenderer implements IRenderer {
       const fontSize = (minFontSize + maxFontSize) / 2;
       
       // Medimos no dummyCtx (não polui o canvas principal)
-      const result = drawText(dummyCtx, text, {
+      const result = drawText(dummyCtx as any, text, {
         x: 0, y: 0, width, height, 
         fontSize, font, fontWeight, fontStyle,
         lineHeight: lineHeight * fontSize,
@@ -172,7 +177,7 @@ export class TextRenderer implements IRenderer {
     const dummyCtx = this.getOffscreenContext();
     const { width, height, fontSize, font, fontWeight, lineHeight, justify, fontStyle } = options;
 
-    const testFit = (t: string) => drawText(dummyCtx, t, {
+    const testFit = (t: string) => drawText(dummyCtx as any, t, {
       x: 0, y: 0, width, height, 
       fontSize, font, fontWeight, fontStyle,
       lineHeight: lineHeight * fontSize,

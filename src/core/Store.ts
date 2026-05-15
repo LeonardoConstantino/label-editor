@@ -54,7 +54,9 @@ export class Store {
         bleedMM: 2,
         paperFormat: 'a4',
         orientation: 'portrait',
-        zoom: 0.45
+        zoom: 0.45,
+        exportFormat: 'jpeg',
+        exportQuality: 0.8
       }
     };
 

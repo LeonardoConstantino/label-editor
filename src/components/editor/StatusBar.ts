@@ -7,6 +7,7 @@ import { getOSInfo } from '../../utils/os-detection';
 
 /**
  * StatusBar: Gerencia a barra de telemetria baseada em IDs no DOM global.
+ * Agora com suporte a feedback de produção em segundo plano (Task 24 Juice).
  */
 export class StatusBar {
   private clickCount = 0;
@@ -19,6 +20,9 @@ export class StatusBar {
 
   // Cache de elementos do DOM global
   private get led() { return document.getElementById('sys-led'); }
+  private get statusText() { return document.getElementById('sys-status-text'); }
+  private get prodContainer() { return document.getElementById('production-status-container'); }
+  private get prodPercent() { return document.getElementById('production-percent'); }
   private get renderTimeEl() { return document.getElementById('render-time'); }
   private get elCountEl() { return document.getElementById('el-count'); }
   private get zoomLvlEl() { return document.getElementById('zoom-lvl'); }
@@ -34,11 +38,46 @@ export class StatusBar {
       this.updatePerfMetrics();
     }, { signal });
 
+    // --- PRODUCTION FEEDBACK (JUICE) ---
+    eventBus.on('production:start', () => {
+      if (this.prodContainer) {
+        this.prodContainer.style.display = 'flex';
+        if (this.statusText) this.statusText.textContent = 'PRODUCING';
+        if (this.led) this.led.style.backgroundColor = 'var(--color-accent-primary)';
+      }
+    }, { signal });
+
+    eventBus.on('production:progress', (data) => {
+      if (this.prodPercent) {
+        this.prodPercent.textContent = `${data.progress}%`;
+      }
+    }, { signal });
+
+    eventBus.on('production:complete', () => {
+      this.resetProductionUI('COMPLETED');
+      UISM.play(UISM.enumPresets.SUCCESS);
+      setTimeout(() => this.resetProductionUI(), 3000);
+    }, { signal });
+
+    eventBus.on('production:error', (data) => {
+      this.resetProductionUI('ERROR');
+      if (this.led) this.led.style.backgroundColor = 'var(--color-accent-danger)';
+      console.error('[StatusBar] Production Error:', data.message);
+      setTimeout(() => this.resetProductionUI(), 5000);
+    }, { signal });
+
     this.led?.addEventListener('click', () => this.handleLedClick());
 
-    // Inicia loop de FPS
     this.startFpsLoop();
     this.updateTelemetry(store.getState());
+  }
+
+  private resetProductionUI(tempText?: string) {
+    if (this.prodContainer) this.prodContainer.style.display = 'none';
+    if (this.statusText) this.statusText.textContent = tempText || 'SYS OK';
+    if (this.led) {
+      this.led.style.backgroundColor = ''; // Volta ao CSS original (success)
+    }
   }
 
   destroy(): void {
@@ -63,10 +102,11 @@ export class StatusBar {
   private handleLedClick() {
     this.clickCount++;
     clearTimeout(this.clickTimer);
+    
     this.clickTimer = setTimeout(() => { this.clickCount = 0; }, 1000);
 
     if (this.clickCount === 5) {
-      this.led?.classList.add('dev-mode-magenta'); // CSS class must be defined in main.css
+      this.led?.classList.add('dev-mode-magenta');
       console.log('%c[LABEL FORGE OS] Developer Mode Unlocked', 'color: #d946ef; font-weight: bold; font-size: 14px;');
       console.table(store.getState());
       UISM.play(UISM.enumPresets.NOTIFY);
@@ -78,7 +118,6 @@ export class StatusBar {
     const timeStr = `${this.lastRenderTime.toFixed(2)}MS`;
     if (this.renderTimeEl) this.renderTimeEl.textContent = timeStr;
 
-    // Atualiza o conteúdo do template para o próximo clone do tooltip
     if (this.tpl) {
       const c = this.tpl.content;
       const fps = c.querySelector('#fps-lvl');

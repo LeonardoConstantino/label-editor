@@ -36,6 +36,10 @@ export interface EventMap {
   'production:preview:index': { index: number };
   'production:print:open': {};
   'production:config:update': Partial<import('../domain/services/PDFGenerator').BatchLayoutOptions>;
+  'production:progress': { current: number; total: number; progress: number; message: string };
+  'production:start': { total: number };
+  'production:complete': {};
+  'production:error': { message: string };
 
   // Element Manipulation
   'element:add': AnyElement;

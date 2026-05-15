@@ -40,7 +40,10 @@ export class RectangleRenderer implements IRenderer {
     ctx.restore();
   }
 
-  private drawRoundedPath(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number): void {
+  private drawRoundedPath(
+    ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D, 
+    x: number, y: number, w: number, h: number, r: number
+  ): void {
     // Garante que o raio não ultrapasse metade da largura ou altura
     const radius = Math.min(r, w / 2, h / 2);
     ctx.beginPath();

@@ -3,9 +3,11 @@ import { Label, AnyElement } from '../models/Label';
 import { canvasRenderer } from './CanvasRenderer';
 import { UnitConverter } from '../../utils/units';
 import { DEFAULTS } from '../../constants/defaults';
+import eventBus from '../../core/EventBus';
 
 export type PaperFormat = 'a4' | 'a3' | 'letter';
 export type PageOrientation = 'portrait' | 'landscape';
+export type ExportFormat = 'png' | 'jpeg';
 
 export interface BatchLayoutOptions {
   marginMM: number;
@@ -16,10 +18,13 @@ export interface BatchLayoutOptions {
   paperFormat: PaperFormat;
   orientation: PageOrientation;
   zoom: number; // UI only
+  exportFormat: ExportFormat;
+  exportQuality: number; // 0.1 a 1.0 (relevante para JPEG)
 }
 
 /**
  * PDFGenerator: Gera o PDF final com todas as etiquetas do lote.
+ * Suporta execução em Thread Principal ou via Web Worker (Task 24).
  */
 export class PDFGenerator {
   private readonly PAPER_SIZES: Record<PaperFormat, { w: number, h: number }> = {
@@ -27,6 +32,52 @@ export class PDFGenerator {
     'a3': { w: 297, h: 420 },
     'letter': { w: 215.9, h: 279.4 }
   };
+
+  /**
+   * Versão Worker da geração de PDF (Não trava a UI).
+   */
+  public async generateLotePDFWorker(label: Label, dataList: any[], layout: BatchLayoutOptions): Promise<void> {
+    return new Promise((resolve, reject) => {
+      // @ts-ignore - Vite worker import
+      const worker = new Worker(new URL('./BatchWorker.ts', import.meta.url), { type: 'module' });
+      
+      const dpi = label.config.dpi || DEFAULTS.CANVAS.dpi;
+
+      // Inicia feedback global
+      eventBus.emit('production:start', { total: dataList.length });
+
+      worker.onmessage = (e) => {
+        const { type, current, total, progress, message, blob } = e.data;
+        
+        if (type === 'progress') {
+          eventBus.emit('production:progress', { current, total, progress, message });
+        } else if (type === 'complete') {
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = `batch_${layout.paperFormat}_${Date.now()}.pdf`;
+          link.click();
+          URL.revokeObjectURL(url);
+          worker.terminate();
+          eventBus.emit('production:complete', {});
+          resolve();
+        } else if (type === 'error') {
+          worker.terminate();
+          eventBus.emit('production:error', { message });
+          reject(new Error(message));
+        }
+      };
+
+      worker.onerror = (err) => {
+        worker.terminate();
+        eventBus.emit('production:error', { message: 'Worker crashed' });
+        reject(err);
+      };
+
+      // Inicia a tarefa
+      worker.postMessage({ label, dataList, layout, dpi });
+    });
+  }
 
   /**
    * Gera e faz o download do PDF baseado na etiqueta e nos dados fornecidos.
@@ -43,7 +94,9 @@ export class PDFGenerator {
       bleedMM: 2,
       paperFormat: 'a4',
       orientation: 'portrait',
-      zoom: 1
+      zoom: 0.45,
+      exportFormat: 'jpeg',
+      exportQuality: 0.8
     }
   ): Promise<void> {
     const pdf = new jsPDF({
@@ -58,7 +111,6 @@ export class PDFGenerator {
     
     const bleed = layout.bleedMM || 0;
 
-    // Canvas oculto para renderização em alta resolução
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d', { alpha: true })!;
     const dpi = label.config.dpi || DEFAULTS.CANVAS.dpi;
@@ -77,7 +129,6 @@ export class PDFGenerator {
     for (let i = 0; i < dataList.length; i++) {
       const data = dataList[i];
 
-      // Verifica se cabe na página atual (eixo Y), senão nova página
       if (currentY + label.config.heightMM > PAGE_HEIGHT - layout.marginMM) {
         pdf.addPage();
         currentX = layout.marginMM;
@@ -85,7 +136,6 @@ export class PDFGenerator {
         colIndex = 0;
       }
 
-      // Renderiza Etiqueta no Canvas
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.fillStyle = label.config.backgroundColor || '#ffffff';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -102,14 +152,15 @@ export class PDFGenerator {
       const pdfX = currentX - bleed;
       const pdfY = currentY - bleed;
       
-      const imgData = canvas.toDataURL('image/png');
-      pdf.addImage(imgData, 'PNG', pdfX, pdfY, renderWidthMM, renderHeightMM);
+      const mimeType = `image/${layout.exportFormat}`;
+      const imgData = canvas.toDataURL(mimeType, layout.exportFormat === 'jpeg' ? layout.exportQuality : undefined);
+      
+      pdf.addImage(imgData, layout.exportFormat.toUpperCase(), pdfX, pdfY, renderWidthMM, renderHeightMM);
 
       if (layout.showCropMarks) {
         this.drawCropMarks(pdf, currentX, currentY, label.config.widthMM, label.config.heightMM);
       }
 
-      // Incrementa para a próxima posição
       colIndex++;
       const nextX = currentX + label.config.widthMM + layout.gapMM;
       
@@ -125,31 +176,24 @@ export class PDFGenerator {
     pdf.save(`batch_${layout.paperFormat}_${Date.now()}.pdf`);
   }
 
-  /**
-   * Desenha marcas de corte (L-shaped) nos 4 cantos da etiqueta
-   */
   private drawCropMarks(pdf: jsPDF, x: number, y: number, w: number, h: number): void {
-    const markLength = 3; // mm
-    const markOffset = 1; // mm de distância da borda da sangria
+    const markLength = 3; 
+    const markOffset = 1; 
     
     pdf.setDrawColor(150, 150, 150);
     pdf.setLineWidth(0.1);
 
-    // Canto Superior Esquerdo
-    pdf.line(x, y - markOffset, x, y - markOffset - markLength); // Vertical
-    pdf.line(x - markOffset, y, x - markOffset - markLength, y); // Horizontal
+    pdf.line(x, y - markOffset, x, y - markOffset - markLength); 
+    pdf.line(x - markOffset, y, x - markOffset - markLength, y); 
 
-    // Canto Superior Direito
     pdf.line(x + w, y - markOffset, x + w, y - markOffset - markLength);
     pdf.line(x + w + markOffset, y, x + w + markOffset + markLength, y);
 
-    // Canto Inferior Esquerdo
     pdf.line(x, y + h + markOffset, x, y + h + markOffset + markLength);
     pdf.line(x - markOffset, y + h, x - markOffset - markLength, y + h);
 
-    // Canto Inferior Direito
     pdf.line(x + w, y + h + markOffset, x + w, y + h + markOffset + markLength);
-    pdf.line(x + w + markOffset, y + h, x + w + markOffset + markLength, y + h);
+    pdf.line(x + w + markOffset, y, x + w + markOffset + markLength, y);
   }
 }
 

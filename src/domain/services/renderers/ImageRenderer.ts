@@ -10,22 +10,29 @@ export class ImageRenderer implements IRenderer {
 
   render(element: ImageElement, context: RenderContext): void {
     if (!element.src) return;
-    const { ctx, scale } = context;
+    const { ctx, scale, images } = context;
 
     const x = element.position.x * scale;
     const y = element.position.y * scale;
     const w = element.dimensions.width * scale;
     const h = element.dimensions.height * scale;
 
-    let img = this.imageCache.get(element.src);
+    let img = images?.get(element.src);
 
     if (!img) {
-      img = new Image();
-      img.src = element.src;
-      this.imageCache.set(element.src, img);
+      if (typeof Image === 'undefined') return; // No worker e sem cache, ignora
+      
+      img = this.imageCache.get(element.src);
+      if (!img) {
+        img = new Image();
+        img.src = element.src;
+        this.imageCache.set(element.src, (img as HTMLImageElement));
+      }
     }
 
-    if (img.complete) {
+    const isReady = (img instanceof ImageBitmap) || (img instanceof HTMLImageElement && img.complete);
+
+    if (isReady) {
       ctx.save();
       
       // 1. Aplica Blending Mode (Task 43)
@@ -38,10 +45,10 @@ export class ImageRenderer implements IRenderer {
       ctx.imageSmoothingQuality = 'high';
 
       // 3. Desenha com Fit
-      this.drawImageScaled(ctx, img, x, y, w, h, element.fit);
+      this.drawImageScaled(ctx as any, img!, x, y, w, h, element.fit);
 
       ctx.restore();
-    } else {
+    } else if (img instanceof HTMLImageElement) {
       img.onload = () => {
         // Redraw ocorrerá no próximo frame da Store
       };
@@ -50,7 +57,7 @@ export class ImageRenderer implements IRenderer {
 
   private drawImageScaled(
     ctx: CanvasRenderingContext2D, 
-    img: HTMLImageElement, 
+    img: HTMLImageElement | ImageBitmap, 
     x: number, y: number, w: number, h: number, 
     fit: string
   ): void {
