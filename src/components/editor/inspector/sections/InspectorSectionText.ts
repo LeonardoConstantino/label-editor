@@ -92,6 +92,11 @@ export class InspectorSectionText extends HTMLElement {
 
       <div class="row-ui">
         <ui-number-scrubber label="Lead" data-prop="lineHeight" value="${el.lineHeight || 1.2}" min="0.5" max="3" step="0.1" unit="lh"></ui-number-scrubber>
+        <ui-number-scrubber label="Track" data-prop="letterSpacing" value="${el.letterSpacing || 0}" min="-2" max="10" step="0.1" unit="mm"></ui-number-scrubber>
+      </div>
+
+      <div class="row-ui">
+        <app-select id="text-transform" label="Case" data-prop="textTransform" value="${el.textTransform}"></app-select>
       </div>
 
       <div class="divider"></div>
@@ -141,6 +146,15 @@ export class InspectorSectionText extends HTMLElement {
       styleSelect.options = [
         { value: 'normal', label: 'Normal' },
         { value: 'italic', label: 'Italic' }
+      ];
+    }
+
+    const transform = shadow.getElementById('text-transform') as any;
+    if (transform) {
+      transform.options = [
+        { value: 'none', label: 'Original', sublabel: 'No transformation' },
+        { value: 'uppercase', label: 'UPPERCASE', sublabel: 'Force caps' },
+        { value: 'lowercase', label: 'lowercase', sublabel: 'Force small' }
       ];
     }
 
@@ -227,6 +241,8 @@ export class InspectorSectionText extends HTMLElement {
       else if (prop === 'textAlign') val = el.textAlign;
       else if (prop === 'verticalAlign') val = el.verticalAlign;
       else if (prop === 'overflow') val = el.overflow;
+      else if (prop === 'letterSpacing') val = el.letterSpacing;
+      else if (prop === 'textTransform') val = el.textTransform;
 
       if (input instanceof HTMLInputElement && input.type === 'checkbox') {
         if (input.checked !== !!val) input.checked = !!val;

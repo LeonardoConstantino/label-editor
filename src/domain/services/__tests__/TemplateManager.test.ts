@@ -38,6 +38,8 @@ describe('TemplateManager', () => {
         verticalAlign: 'top',
         overflow: TextOverflow.CLIP,
         lineHeight: 1.2,
+        letterSpacing: 0,
+        textTransform: 'none',
         justify: false,
         keepRatio: false
       }

@@ -50,13 +50,15 @@ The project follows a modular, event-driven architecture:
 
 ## Session Logs
 
+### 2026-05-15: Tipografia Avançada & Estabilidade
+- **Task 38 (Tipografia Avançada):** Implementados controles profissionais de texto.
+  - **Tracking:** Suporte nativo a `letter-spacing` (mm) utilizando a API `ctx.letterSpacing` do Canvas 2D.
+  - **Text Transform:** Opções de `Uppercase`, `Lowercase` e `None` integradas ao renderer e inspector.
+  - **UI:** Novos scrubbers e seletores adicionados à seção de Texto do Cockpit.
+  - **QA:** Estabilização total das suítes de testes unitários (49/49 passando).
+
 ### 2026-05-12: Estúdio de Produção & Impressão Dinâmica
 - **Task 77 & 67 (Unified Production):** Migração do fluxo de lote para o cockpit lateral e suporte a papéis dinâmicos.
-  - **Módulo Studio:** Novo `ProductionStudio` no Active Slot para gestão de dados e live preview.
-  - **Live Preview:** O Canvas principal agora reflete os dados do registro selecionado no paginador em tempo real.
-  - **Print Matrix:** Novo modal de calibração física com preview de wireframe leve para imposição em A4, A3 e Letter.
-  - **Dynamic Engine:** Refatorado `PDFGenerator` para suportar orientações Portrait/Landscape e múltiplos formatos de papel.
-  - **Data Gateway:** Integração total do `<ui-data-gateway>` para entrada manual ou upload de arquivos.
 
 ### 2026-05-11 (Extra): Entrada Unificada de Dados
 - **Task 82 (Data Gateway):** Implementado o componente `<ui-data-gateway>` para centralizar a entrada de dados.
@@ -68,6 +70,3 @@ The project follows a modular, event-driven architecture:
 ### 2026-05-09: Unificação de UI & Robustez de Teclado
 - **Task 73 (Universal Select):** Finalizada a migração de todos os seletores nativos para o componente `AppSelect`.
 - **Task 76 (Active Slot):** Arquitetura modular de módulos no cockpit lateral.
-
-### 2026-05-08: Otimização de Performance & Histórico
-- **Task 59 (History Debounce):** Mecanismo de debounce para snapshots de histórico.

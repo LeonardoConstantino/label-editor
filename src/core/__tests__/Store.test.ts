@@ -59,6 +59,8 @@ describe('Store', () => {
       verticalAlign: 'middle',
       overflow: 'clip',
       lineHeight: 1.2,
+      letterSpacing: 0,
+      textTransform: 'none',
       justify: false
     } as any;
 
@@ -93,6 +95,8 @@ describe('Store', () => {
       verticalAlign: 'middle',
       overflow: 'clip',
       lineHeight: 1.2,
+      letterSpacing: 0,
+      textTransform: 'none',
       justify: false
     } as any;
     eventBus.emit('element:add', newElement);
@@ -126,6 +130,8 @@ describe('Store', () => {
       verticalAlign: 'middle',
       overflow: 'clip',
       lineHeight: 1.2,
+      letterSpacing: 0,
+      textTransform: 'none',
       justify: false
     } as any;
     eventBus.emit('element:add', newElement);
@@ -164,6 +170,8 @@ describe('Store', () => {
       verticalAlign: 'middle',
       overflow: 'clip',
       lineHeight: 1.2,
+      letterSpacing: 0,
+      textTransform: 'none',
       justify: false
     } as any;
 

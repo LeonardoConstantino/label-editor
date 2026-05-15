@@ -72,6 +72,8 @@ export const DEFAULTS = {
     verticalAlign: 'middle' as const,
     overflow: TextOverflow.WRAP,
     lineHeight: 1.2,
+    letterSpacing: 0,
+    textTransform: 'none' as const,
     justify: false
   },
 

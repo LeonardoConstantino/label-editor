@@ -33,8 +33,17 @@ export class TextRenderer implements IRenderer {
       content = DataSourceParser.interpolate(content, data);
     }
 
+    // Task 38: Text Transform
+    if (element.textTransform === 'uppercase') content = content.toUpperCase();
+    if (element.textTransform === 'lowercase') content = content.toLowerCase();
+
     ctx.save();
     ctx.fillStyle = element.color || '#000000';
+
+    // Task 38: Letter Spacing (Tracking)
+    // Converte mm para px
+    const spacingPx = (element.letterSpacing || 0) * (dpi / 25.4);
+    ctx.letterSpacing = `${spacingPx}px`;
 
     if (typeof drawText === 'function') {
       const commonProps = {

@@ -2,6 +2,7 @@ import { BaseElement, Dimensions, BorderStyle, TextOverflow, ImageFit, Composite
 
 export type TextAlign = 'left' | 'center' | 'right';
 export type VerticalAlign = 'top' | 'middle' | 'bottom';
+export type TextTransform = 'none' | 'uppercase' | 'lowercase';
 
 export interface TextElement extends BaseElement {
   dimensions: Dimensions;
@@ -15,6 +16,8 @@ export interface TextElement extends BaseElement {
   verticalAlign: VerticalAlign;
   overflow: TextOverflow;
   lineHeight: number;
+  letterSpacing: number; // mm
+  textTransform: TextTransform;
   justify: boolean;
 }
 
