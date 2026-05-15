@@ -164,7 +164,7 @@ export class ProductionStudio extends HTMLElement {
             
             <div class="paginator-controls">
               <button class="btn-nav" id="btn-prev" ${state.productionPreviewIndex === 0 ? 'disabled' : ''}>
-                <ui-icon name="maximize" style="transform: rotate(-90deg); --icon-size: 12px;"></ui-icon>
+                <ui-icon name="chevron-left"></ui-icon>
               </button>
               
               <div class="page-info">
@@ -172,7 +172,7 @@ export class ProductionStudio extends HTMLElement {
               </div>
               
               <button class="btn-nav" id="btn-next" ${state.productionPreviewIndex >= state.productionData.length - 1 ? 'disabled' : ''}>
-                <ui-icon name="maximize" style="transform: rotate(90deg); --icon-size: 12px;"></ui-icon>
+                <ui-icon name="chevron-right"></ui-icon>
               </button>
             </div>
 
@@ -208,7 +208,7 @@ export class ProductionStudio extends HTMLElement {
       ${hasData ? `
         <div class="action-area">
           <app-button id="btn-open-matrix" variant="primary" style="width: 100%; height: 44px; letter-spacing: 0.1em; font-weight: bold;">
-            <ui-icon name="zap" class="mr-2"></ui-icon> OPEN PRODUCTION COCKPIT
+            <ui-icon name="lightning" size="30" class="mr-2"></ui-icon> OPEN PRODUCTION COCKPIT
           </app-button>
         </div>
       ` : ''}

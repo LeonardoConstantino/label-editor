@@ -30,6 +30,7 @@ Este Master Plan coordena a fase final de desenvolvimento, focando em estabilida
 | **71** | [Mapeamento e Tipagem de Eventos (EventMap)](./tasks/71_event_orchestration.md) | 10 | [x] | — | `task/71-event-mapping` |
 | **74** | [System Status Bar (Telemetry & Dev Console)](./tasks/74-status-bar.md) | 07 | [x] | 46 | `task/74-status-bar` |
 | **75** | [System Preferences Modal (Calibration Matrix)](./tasks/75-settings-modal.md) | 07 | [/] | — | `task/75-settings-modal` |
+| **24** | [Otimização de Lote & Qualidade (Web Workers)](./tasks/24_batch_perf.md) | 09 | [ ] | 77 | `task/24-batch-workers` |
 | **81** | [Encapsulamento de Stack via CSS Isolation](./tasks/81_css_isolation.md) | 09 | [ ] | — | `task/81-css-isolation` |
 
 ### Fase B: Gestão de Projetos & UX (Retenção do Usuário)

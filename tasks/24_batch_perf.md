@@ -1,20 +1,30 @@
-# Task 24: Otimização de Lote (Web Workers)
+# Task 24: Otimização de Lote & Qualidade (Web Workers & Compression)
 
 ## Objetivo
-Mover a lógica de renderização massiva e geração de PDF para um **Web Worker**, garantindo que a Thread Principal (UI) permaneça fluida (60 FPS) mesmo durante o processamento de grandes conjuntos de dados.
+Mover a lógica de renderização massiva e geração de PDF para um **Web Worker** e implementar controles de compressão/qualidade. O objetivo é garantir que a UI permaneça fluida e que arquivos PDF com muitas etiquetas coloridas não atinjam tamanhos proibitivos (ex: 150MB para 61 unidades).
 
 ## Workflow
 1. `git checkout -b task/24-batch-workers`
-2. Criar `src/domain/services/BatchWorker.ts`.
-3. Refatorar `PDFGenerator.ts` para delegar o trabalho pesado.
+2. **Core Optimization:** 
+   - Refatorar `PDFGenerator.ts` para suportar níveis de compressão (JPEG vs PNG).
+   - Adicionar parâmetro `exportQuality` (0.1 a 1.0) às `BatchLayoutOptions`.
+3. **Web Worker:** Criar `src/domain/services/BatchWorker.ts` para processar a renderização via `OffscreenCanvas`.
+4. **UI Integration:** Adicionar controles de "Output Quality" no `DataSourceInput`.
 
-## Detalhamento
-- **OffscreenCanvas:** Utilizar o `OffscreenCanvas` dentro do Worker para renderizar as etiquetas sem tocar no DOM.
-- **Worker Messaging:** Implementar um protocolo de comunicação (postMessage) que reporte o progresso em tempo real (ex: "Processando 45/200").
-- **UI Feedback:** Criar um indicador de progresso (spinner ou barra) no `Batch Studio` que reaja às mensagens do Worker.
-- **Memory Management:** Garantir que o Worker limpe as referências de canvas após cada página para evitar vazamentos de memória (Memory Leaks).
+## Detalhamento Técnico
+- **Compression Strategy:** Trocar `canvas.toDataURL('image/png')` por `image/jpeg` com qualidade variável. PNGs em alta resolução sem compressão são a causa principal de arquivos gigantes.
+- **OffscreenCanvas:** Renderizar etiquetas no Worker para liberar a Main Thread.
+- **Memory Management:** Descartar blobs e referências de imagem imediatamente após a inserção no PDF.
+- **Progress Protocol:** O Worker deve emitir progresso percentual para a UI.
+
+## Opções de Qualidade (Nova Feature)
+O usuário deve poder escolher entre:
+- **Draft (Fast/Small):** 72 DPI, JPEG Quality 0.5.
+- **Standard (Balanced):** 150 DPI, JPEG Quality 0.8.
+- **High-Res (Print Ready):** 300 DPI, PNG (Lossless).
 
 ## Critérios de Aceite
-- [ ] A aplicação permite interagir com a Toolbar ou Inspector enquanto o PDF está sendo gerado em segundo plano.
-- [ ] O usuário vê uma barra de progresso real.
-- [ ] Suporte a lotes de 100+ etiquetas sem aviso de "Página sem resposta".
+- [ ] Geração de 100+ etiquetas sem travar a interface.
+- [ ] Redução drástica no tamanho do arquivo (etiquetas coloridas em lote não devem exceder 20-30MB em modo Standard).
+- [ ] Barra de progresso real exibida durante o processamento.
+- [ ] Seletor de qualidade funcional no Production Cockpit.

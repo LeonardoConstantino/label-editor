@@ -17,6 +17,6 @@ Adicionar propriedades comuns a todos os elementos da etiqueta para aumentar a f
 - **Inspector:** Adicionar scrubbers para Opacidade e Rotação no grupo "Transform".
 
 ## Critérios de Aceite
-- [ ] Elementos giram e ficam transparentes em tempo real no Canvas.
-- [ ] O nome customizado aparece no header do card no Inspector.
-- [ ] Histórico (Undo/Redo) suporta essas mudanças.
+- [x] Elementos giram e ficam transparentes em tempo real no Canvas.
+- [x] O nome customizado aparece no header do card no Inspector.
+- [x] Histórico (Undo/Redo) suporta essas mudanças.

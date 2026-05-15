@@ -16,6 +16,6 @@ Refinar o alinhamento visual do cabeçalho do Inspector (`inspector-header`), ad
    - Verificar o alinhamento do título "LAYERS" e do ícone de ajuda em relação aos `element-card` que estão logo abaixo no painel.
 
 ## Critérios de Aceite
-- [ ] O cabeçalho do Inspector possui um respiro visual de 8px à direita.
-- [ ] O alinhamento horizontal entre o header e o conteúdo do painel está consistente.
-- [ ] Nenhuma quebra de layout em resoluções menores.
+- [x] O cabeçalho do Inspector possui um respiro visual de 8px à direita.
+- [x] O alinhamento horizontal entre o header e o conteúdo do painel está consistente.
+- [x] Nenhuma quebra de layout em resoluções menores.

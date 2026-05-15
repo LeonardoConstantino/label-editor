@@ -125,7 +125,7 @@ export const InspectorHelpData: Record<string, HelpTooltipConfig> = {
   },
   production: {
     title: 'Production Studio',
-    icon: 'zap',
+    icon: 'lightning',
     commands: [
       { label: 'CSV Link', desc: 'Mapeia colunas da planilha para o design.' },
       { label: 'Paginator', desc: 'Navega pelos registros para Live Preview.' },

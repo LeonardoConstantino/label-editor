@@ -108,7 +108,7 @@ hudSheet.replaceSync(`
   /* ── Viewport de texto (máscara de overflow) ── */
   .tip-viewport {
     position:   relative;
-    overflow:   hidden;
+    /*overflow:   hidden;*/
     height:     18px;
     display:    flex;
     align-items: center;
@@ -124,7 +124,7 @@ hudSheet.replaceSync(`
     font-family: var(--font-mono, 'JetBrains Mono', monospace);
     font-size:   12px;
     line-height: 1;
-    white-space: nowrap;
+    /*white-space: nowrap;*/
     color:       var(--color-text-muted, rgba(148, 163, 184, 0.5));
     transition:
       color     0.3s ease,
