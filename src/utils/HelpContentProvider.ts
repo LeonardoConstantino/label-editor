@@ -170,7 +170,8 @@ export const InspectorHelpData: Record<string, HelpTooltipConfig> = {
     commands: [
       { label: 'Pipeline', desc: 'Visualiza o fluxo do dado bruto ao formatado.' },
       { label: 'Formatters', desc: 'Aplica filtros como Moeda, Data ou Caixa Alta.' },
-      { label: 'Fallback', desc: 'Define um valor padrão caso o dado falte.' }
+      { label: 'Fallback', desc: 'Define um valor padrão caso o dado falte.' },
+      { label: 'Metadata', desc: 'Use {{index}}, {{total}}, {{date}} para informações dinâmicas.' }
     ],
     proTip: {
       icon: 'lightning',

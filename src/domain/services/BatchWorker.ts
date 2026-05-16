@@ -97,6 +97,11 @@ self.onmessage = async (e: MessageEvent<WorkerTask>) => {
         scale,
         dpi,
         data,
+        context: {
+          index: i,
+          total: dataList.length,
+          date: new Date().toISOString()
+        },
         images: imageCache
       });
       

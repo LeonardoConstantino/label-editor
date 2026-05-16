@@ -165,6 +165,7 @@ export class AppCockpit extends HTMLElement {
           flex: 1;
           min-height: 0;
           overflow: hidden;
+          isolation: isolate;
         }
 
         #module-workspace {

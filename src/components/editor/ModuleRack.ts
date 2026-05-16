@@ -233,7 +233,7 @@ export class ModuleRack extends HTMLElement {
           transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
           box-shadow: 0 30px 60px rgba(0,0,0,0.9);
           opacity: 0;
-          z-index: 1001;
+          z-index: 50;
         }
         .rack-menu.open { max-height: 500px; opacity: 1; padding: 12px 0; }
 

@@ -13,6 +13,7 @@ export interface RenderContext {
   scale: number; // mm -> px (incluindo previewScale se houver)
   dpi: number;
   data?: Record<string, any>;
+  context?: Record<string, any>; // Task 50: System context (index, total, date)
   images?: Map<string, ImageBitmap | HTMLImageElement>;
 }
 

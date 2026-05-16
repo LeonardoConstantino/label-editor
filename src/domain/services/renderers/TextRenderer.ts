@@ -30,7 +30,7 @@ export class TextRenderer implements IRenderer {
     // Interpolação de variáveis
     let content = element.content || '';
     if (data) {
-      content = DataSourceParser.interpolate(content, data);
+      content = DataSourceParser.interpolate(content, data, context.context);
     }
 
     // Task 38: Text Transform

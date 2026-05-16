@@ -64,6 +64,16 @@ export class VariableManager extends HTMLElement {
         this.removeFormatter(key, formatter);
         return;
       }
+
+      const sysBadge = target.closest('.sys-badge') as HTMLElement;
+      if (sysBadge) {
+        const text = sysBadge.getAttribute('data-copy');
+        if (text) {
+          navigator.clipboard.writeText(text);
+          eventBus.emit('notify', { message: `Copied ${text} to clipboard`, type: 'info' });
+          UISM.play(UISM.enumPresets.TAP);
+        }
+      }
     }, { signal });
 
     root.addEventListener('app-input', (e: any) => {
@@ -302,6 +312,25 @@ export class VariableManager extends HTMLElement {
         :host { display: flex; flex-direction: column; height: 100%; background: #0a0c10; font-family: var(--font-sans); }
         .header { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border-bottom: 1px solid var(--color-border-ui); background: rgba(0,0,0,0.2); }
         .header-title { font-family: var(--font-mono); font-size: 10px; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.1em; }
+        
+        .system-tray {
+          padding: 16px 20px;
+          background: rgba(99, 102, 241, 0.03);
+          border-bottom: 1px solid var(--color-border-ui);
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+        }
+        .system-badges { display: flex; flex-wrap: wrap; gap: 8px; }
+        .sys-badge {
+          font-family: var(--font-mono); font-size: 10px; font-weight: bold;
+          color: var(--color-accent-primary);
+          background: rgba(99, 102, 241, 0.1);
+          padding: 4px 8px; border-radius: 6px; border: 1px solid rgba(99, 102, 241, 0.2);
+          cursor: pointer; transition: all 0.2s;
+        }
+        .sys-badge:hover { background: rgba(99, 102, 241, 0.2); border-color: var(--color-accent-primary); transform: translateY(-1px); }
+
         #vars-container { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 24px; }
         .var-card { background: rgba(255,255,255,0.02); border: 1px solid var(--color-border-ui); border-radius: 12px; padding: 16px; margin-bottom: 8px; }
         .var-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
@@ -332,6 +361,22 @@ export class VariableManager extends HTMLElement {
       <div class="header">
         <span class="header-title">Variable Manager</span>
         ${HelpContentProvider.buildTooltip('variables', 'bottom')}
+      </div>
+
+      <div class="system-tray">
+        <span class="label-prism" style="margin:0">System Metadata</span>
+        <div class="system-badges">
+          <ui-tooltip tooltip="The zero-based index of the label in the batch." placement="top">
+            <span class="sys-badge" slot="target" data-copy="{{index}}">{{index}}</span>
+          </ui-tooltip>
+          <ui-tooltip tooltip="The total number of labels in the current batch." placement="top">
+            <span class="sys-badge" slot="target" data-copy="{{total}}">{{total}}</span>
+          </ui-tooltip>
+          <ui-tooltip tooltip="The current generation date/time." placement="top">
+            <span class="sys-badge" slot="target" data-copy="{{date}}">{{date}}</span>
+          </ui-tooltip>
+        </div>
+        <p class="text-[9px] text-text-muted italic">Click to copy or type them in any text layer.</p>
       </div>
 
       <div id="vars-container"></div>

@@ -163,7 +163,12 @@ export class EditorCanvas extends HTMLElement {
           ctx: this.ctx,
           scale,
           dpi: config.dpi,
-          data: productionData
+          data: productionData,
+          context: {
+            index: state.productionPreviewIndex,
+            total: state.productionData.length,
+            date: new Date().toISOString()
+          }
         });
         if (state.selectedElementIds.includes(element.id)) {
           this.drawSelectionOutline(element, scale, config.dpi);

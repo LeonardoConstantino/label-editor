@@ -275,7 +275,7 @@ export class DataSourceInput extends HTMLElement {
 
     const toRender = productionData.slice(0, labelsPerPage);
 
-    toRender.forEach((data) => {
+    toRender.forEach((data, index) => {
       const container = document.createElement('div');
       container.className = 'label-artboard';
       container.style.width = `${label.config.widthMM}mm`;
@@ -302,7 +302,7 @@ export class DataSourceInput extends HTMLElement {
       container.appendChild(canvas);
       sheet.appendChild(container);
 
-      this.renderLabelThumb(canvas, label, data);
+      this.renderLabelThumb(canvas, label, data, index, productionData.length);
     });
   }
 
@@ -314,7 +314,7 @@ export class DataSourceInput extends HTMLElement {
     });
   }
 
-  private renderLabelThumb(canvas: HTMLCanvasElement, label: any, data: any): void {
+  private renderLabelThumb(canvas: HTMLCanvasElement, label: any, data: any, index: number, total: number): void {
     const ctx = canvas.getContext('2d', { alpha: true })!;
     const dpi = 150;
     const renderScale = (dpi / 25.4);
@@ -325,7 +325,17 @@ export class DataSourceInput extends HTMLElement {
     canvas.style.height = '100%';
 
     label.elements.forEach((el: any) => {
-      canvasRenderer.render(el, { ctx, scale: renderScale, dpi, data });
+      canvasRenderer.render(el, { 
+        ctx, 
+        scale: renderScale, 
+        dpi, 
+        data,
+        context: {
+          index,
+          total,
+          date: new Date().toISOString()
+        }
+      });
     });
   }
 

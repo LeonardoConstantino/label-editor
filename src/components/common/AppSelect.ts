@@ -260,7 +260,7 @@ export class AppSelect extends HTMLElement {
         .select-dropdown {
           position: absolute; top: calc(100% + 4px); left: 0; width: 100%;
           min-width: 160px; background: #1a1d24; border: 1px solid var(--color-border-ui);
-          border-radius: 8px; z-index: 10000; max-height: 200px; overflow-y: auto;
+          border-radius: 8px; z-index: 50; max-height: 200px; overflow-y: auto;
           display: none; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
         }
 

@@ -92,8 +92,12 @@ export class InspectorLayerCard extends HTMLElement {
 
     this.shadowRoot.innerHTML = `
       <style>
-        :host { display: block; margin-bottom: 8px; position: relative; }
-        :host(.elevated) { z-index: 100; }
+        :host { 
+          display: block; 
+          margin-bottom: 8px; 
+          position: relative; 
+          isolation: isolate;
+        }
         
         .card-content { display: ${isSelected ? 'flex' : 'none'}; flex-direction: column; gap: 12px; padding: 12px 8px; }
         .is-locked #sections-container { pointer-events: none; opacity: 0.6; filter: grayscale(0.5); }
@@ -238,14 +242,6 @@ export class InspectorLayerCard extends HTMLElement {
     root.getElementById('btn-toggle-lock')?.addEventListener('click', (e) => {
       e.stopPropagation();
       dispatchInspectorAction(this, { action: 'toggle-lock', id });
-    });
-
-    // Gerenciamento de Z-Index para Selects
-    root.addEventListener('ui-select:open', () => {
-      this.classList.add('elevated');
-    });
-    root.addEventListener('ui-select:close', () => {
-      this.classList.remove('elevated');
     });
   }
 

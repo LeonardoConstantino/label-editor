@@ -197,7 +197,12 @@ export class TemplateManager {
       canvasRenderer.renderAll(label.elements, {
         ctx,
         scale,
-        dpi: 72
+        dpi: 72,
+        context: {
+          index: 0,
+          total: 1,
+          date: new Date().toISOString()
+        }
       });
 
       resolve(canvas.toDataURL('image/webp', 0.8));

@@ -96,6 +96,33 @@ export const FORMATTERS: Record<string, FormatterDef> = {
     label: 'JSON Raw',
     sublabel: '{obj} -> {"a":1}',
     fn: (v) => JSON.stringify(v, null, 2)
+  },
+  add: {
+    name: 'add(1)',
+    label: 'Math: Add',
+    sublabel: '10 -> 11',
+    fn: (v, params) => (parseFloat(v) || 0) + (parseFloat(params[0]) || 0)
+  },
+  sub: {
+    name: 'sub(1)',
+    label: 'Math: Subtract',
+    sublabel: '10 -> 9',
+    fn: (v, params) => (parseFloat(v) || 0) - (parseFloat(params[0]) || 0)
+  },
+  mul: {
+    name: 'mul(2)',
+    label: 'Math: Multiply',
+    sublabel: '10 -> 20',
+    fn: (v, params) => (parseFloat(v) || 0) * (parseFloat(params[0]) || 1)
+  },
+  div: {
+    name: 'div(2)',
+    label: 'Math: Divide',
+    sublabel: '10 -> 5',
+    fn: (v, params) => {
+      const divisor = parseFloat(params[0]) || 1;
+      return divisor !== 0 ? (parseFloat(v) || 0) / divisor : v;
+    }
   }
 };
 
@@ -192,10 +219,12 @@ export class DataSourceParser {
 
   /**
    * Aplica os dados em uma string substituindo variáveis {{key}}
+   * Agora suporta um objeto de contexto global (Task 50).
    */
   public static interpolate(
     template: string,
     data: Record<string, any>,
+    context: Record<string, any> = {}
   ): string {
     if (!template) return '';
 
@@ -203,7 +232,13 @@ export class DataSourceParser {
       this.TAG_REGEX,
       (match, keyRaw, formattersStr, defaultValue) => {
         const key = keyRaw.trim();
+        
+        // Prioridade 1: Dados do registro (row)
+        // Prioridade 2: Contexto global (index, total, date...)
         let value = data[key];
+        if (value === undefined || value === null) {
+          value = context[key];
+        }
 
         if (value === undefined || value === null) {
           if (defaultValue !== undefined) {

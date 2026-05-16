@@ -81,4 +81,37 @@ describe('DataSourceParser.interpolate', () => {
   it('should handle spaces inside tags', () => {
     expect(DataSourceParser.interpolate('{{   nome   :   upper   }}', data)).toBe('JOÃO SILVA');
   });
+
+  describe('Task 50: Context & Math', () => {
+    const context = { index: 5, total: 100, date: '2026-05-16' };
+
+    it('should interpolate context variables if not in data', () => {
+      expect(DataSourceParser.interpolate('Etiqueta {{ index }} de {{ total }}', {}, context)).toBe('Etiqueta 5 de 100');
+    });
+
+    it('should prioritize data over context', () => {
+      expect(DataSourceParser.interpolate('{{ index }}', { index: 'RealData' }, context)).toBe('RealData');
+    });
+
+    it('should apply math:add formatter', () => {
+      expect(DataSourceParser.interpolate('{{ index:add(1) }}', {}, context)).toBe('6');
+      expect(DataSourceParser.interpolate('{{ preco:add(100) }}', data)).toBe('1350.5');
+    });
+
+    it('should apply math:sub formatter', () => {
+      expect(DataSourceParser.interpolate('{{ total:sub(1) }}', {}, context)).toBe('99');
+    });
+
+    it('should apply math:mul formatter', () => {
+      expect(DataSourceParser.interpolate('{{ index:mul(2) }}', {}, context)).toBe('10');
+    });
+
+    it('should apply math:div formatter', () => {
+      expect(DataSourceParser.interpolate('{{ total:div(2) }}', {}, context)).toBe('50');
+    });
+
+    it('should chain context, math and other formatters', () => {
+      expect(DataSourceParser.interpolate('COUNT: {{ total:sub(1):mul(10):number }}', {}, context)).toBe('COUNT: 990');
+    });
+  });
 });
