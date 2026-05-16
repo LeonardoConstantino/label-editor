@@ -81,6 +81,20 @@ export const InspectorHelpData: Record<string, HelpTooltipConfig> = {
       isSuccess: false
     }
   },
+  code: {
+    title: 'Code Generation',
+    icon: 'qr-code',
+    commands: [
+      { label: 'Format', desc: 'QR Code, Code 128, EAN-13 e outros.' },
+      { label: 'Dynamic', desc: 'Injete variáveis {{key}} no conteúdo.' },
+      { label: 'ECC', desc: 'Nível de correção de erros para QR Codes.' }
+    ],
+    proTip: {
+      icon: 'sparkles',
+      text: 'Use códigos de barras para logística e QR Codes para links ou pagamentos.',
+      isSuccess: false
+    }
+  },
   setup: {
     title: 'Document Setup',
     icon: 'settings',

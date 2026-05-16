@@ -5,6 +5,7 @@ import { TextRenderer } from './renderers/TextRenderer';
 import { RectangleRenderer } from './renderers/RectangleRenderer';
 import { ImageRenderer } from './renderers/ImageRenderer';
 import { BorderRenderer } from './renderers/BorderRenderer';
+import { CodeRenderer } from './renderers/CodeRenderer';
 import { UnitConverter } from '../../utils/units';
 import eventBus from '../../core/EventBus';
 
@@ -28,6 +29,7 @@ export class CanvasRenderer {
     this.renderers.set(ElementType.RECTANGLE, new RectangleRenderer());
     this.renderers.set(ElementType.IMAGE, new ImageRenderer());
     this.renderers.set(ElementType.BORDER, new BorderRenderer());
+    this.renderers.set(ElementType.CODE, new CodeRenderer());
   }
 
   /**

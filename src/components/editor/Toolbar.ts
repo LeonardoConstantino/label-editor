@@ -155,7 +155,22 @@ export class EditorToolbar extends HTMLElement {
             ${this.getShortcutHTML('b')}
           </div>
           <p class="text-text-muted text-[10px] leading-relaxed">
-            Adiciona uma borda decorativa ao redor de toda a etiqueta.
+            Adiciona uma borda/moldura retangular em volta da etiqueta.
+          </p>
+        </div>
+      </ui-tooltip>
+
+      <ui-tooltip placement="bottom" delay="300">
+        <app-button slot="target" id="add-code" variant="secondary">
+          <ui-icon name="qr-code"></ui-icon>
+        </app-button>
+        <div slot="content" class="tooltip-rich-panel">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-text-main text-[12px] font-semibold tracking-wide">Código</span>
+            ${this.getShortcutHTML('c')}
+          </div>
+          <p class="text-text-muted text-[10px] leading-relaxed">
+            Gera QR Codes ou Códigos de Barras dinâmicos.
           </p>
         </div>
       </ui-tooltip>
@@ -290,6 +305,10 @@ export class EditorToolbar extends HTMLElement {
 
     shadow.getElementById('add-border')?.addEventListener('click', () => {
       eventBus.emit('element:add', ElementFactory.create(ElementType.BORDER));
+    });
+
+    shadow.getElementById('add-code')?.addEventListener('click', () => {
+      eventBus.emit('element:add', ElementFactory.create(ElementType.CODE));
     });
 
     shadow

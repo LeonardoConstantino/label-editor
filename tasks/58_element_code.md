@@ -25,7 +25,14 @@ Adicionar um novo tipo de elemento `CodeElement` que suporte a geração dinâmi
    - No Inspector, permitir a troca do tipo de código e ajuste do nível de correção de erro (ECC) para QR Codes.
 
 ## Critérios de Aceite
-- [ ] O elemento de código renderiza corretamente no Canvas e no PDF.
-- [ ] A interpolação de variáveis no conteúdo do código funciona perfeitamente (ex: QR diferente por linha de CSV).
-- [ ] O sistema permanece fluido (60 FPS) ao arrastar um elemento de código.
-- [ ] A arquitetura permite a adição de novos formatos de código com esforço mínimo.
+- [/] O elemento de código renderiza corretamente no Canvas e no PDF.
+- [/] A interpolação de variáveis no conteúdo do código funciona perfeitamente.
+- [x] O sistema permanece fluido (60 FPS) ao arrastar um elemento de código.
+- [x] A arquitetura permite a adição de novos formatos de código com esforço mínimo.
+
+## Observações de Estabilidade (Hotfix)
+- **Status:** Incompleta / Bloqueada por Validação.
+- **Problema:** Bibliotecas como `bwip-js` lançam exceções fatais se o conteúdo não seguir o padrão rígido do formato (ex: EAN-13 exige exatamente 12 ou 13 dígitos).
+- **Medida Provisória:** Apenas `qrcode` e `code128` estão habilitados por aceitarem conteúdo alfanumérico genérico.
+- **Ação Futura:** Implementar uma camada de validação no `CodeRenderer` ou no `ElementValidator` que avise o usuário ou renderize um placeholder de erro em vez de quebrar a aplicação.
+

@@ -2,7 +2,8 @@ export enum ElementType {
   BORDER = 'border',
   RECTANGLE = 'rectangle',
   TEXT = 'text',
-  IMAGE = 'image'
+  IMAGE = 'image',
+  CODE = 'code'
 }
 
 export enum BorderStyle {

@@ -100,5 +100,15 @@ export const DEFAULTS = {
     width: 1,
     color: '#000000',
     radius: 0
+  },
+
+  [ElementType.CODE]: {
+    dimensions: { width: 30, height: 30 },
+    content: 'https://label-forge.os',
+    codeType: 'qrcode' as const,
+    color: '#000000',
+    backgroundColor: 'transparent',
+    includeText: false,
+    errorCorrection: 'M' as const
   }
 } as const;

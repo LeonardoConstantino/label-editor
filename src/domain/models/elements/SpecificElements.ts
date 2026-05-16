@@ -43,3 +43,15 @@ export interface BorderElement extends BaseElement {
   color: string;
   radius: number; // cantos em mm
 }
+
+export type CodeType = 'qrcode' | 'code128' | 'ean13' | 'upca' | 'datamatrix';
+
+export interface CodeElement extends BaseElement {
+  dimensions: Dimensions;
+  content: string; // Suporta interpolação {{key}}
+  codeType: CodeType;
+  color: string;
+  backgroundColor: string;
+  includeText: boolean; // Para barcodes: mostrar o texto legível abaixo
+  errorCorrection: 'L' | 'M' | 'Q' | 'H'; // Apenas para QR
+}
