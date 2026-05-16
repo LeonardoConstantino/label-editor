@@ -50,6 +50,14 @@ The project follows a modular, event-driven architecture:
 
 ## Session Logs
 
+### 2026-05-16: Resiliência & Proteção de Dados
+- **Task 36 (Work Resumption & Protection):** Implementada camada de segurança contra perda de dados.
+  - **Auto-save:** Novo `SessionManager` salva o estado instântaneo no IndexedDB a cada edição (v2 do DB).
+  - **Dirty State:** Rastreamento de mudanças não sincronizadas com o cofre (Vault).
+  - **Proteção de Saída:** Bloqueio nativo de fechamento de aba se houver trabalho pendente.
+  - **UI Feedback:** Indicador "Unsaved" âmbar na Status Bar para consciência situacional.
+  - **Boot BIOS:** Refatoração da sequência de inicialização para restauração silenciosa de sessão.
+
 ### 2026-05-15: Tipografia Avançada & Estabilidade
 - **Task 38 (Tipografia Avançada):** Implementados controles profissionais de texto.
   - **Tracking:** Suporte nativo a `letter-spacing` (mm) utilizando a API `ctx.letterSpacing` do Canvas 2D.

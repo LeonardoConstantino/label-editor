@@ -24,7 +24,7 @@ O usuário deve poder escolher entre:
 - **High-Res (Print Ready):** 300 DPI, PNG (Lossless).
 
 ## Critérios de Aceite
-- [ ] Geração de 100+ etiquetas sem travar a interface.
-- [ ] Redução drástica no tamanho do arquivo (etiquetas coloridas em lote não devem exceder 20-30MB em modo Standard).
-- [ ] Barra de progresso real exibida durante o processamento.
-- [ ] Seletor de qualidade funcional no Production Cockpit.
+- [x] Geração de 100+ etiquetas sem travar a interface.
+- [x] Redução drástica no tamanho do arquivo (etiquetas coloridas em lote não devem exceder 20-30MB em modo Standard).
+- [x] Barra de progresso real exibida durante o processamento.
+- [x] Seletor de qualidade funcional no Production Cockpit.

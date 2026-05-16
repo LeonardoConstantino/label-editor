@@ -17,6 +17,6 @@ Expandir o controle sobre o texto, permitindo ajustes finos que são comuns em e
 - **Canvas Update:** Integrar as propriedades de `lineHeight` e `align` nas configurações do `canvas-txt`.
 
 ## Critérios de Aceite
-- [ ] Textos com múltiplas linhas respeitam o `lineHeight`.
-- [ ] O usuário pode forçar CAIXA ALTA via Inspector.
-- [ ] Alinhamento vertical funciona dentro do retângulo de dimensões.
+- [x] Textos com múltiplas linhas respeitam o `lineHeight`.
+- [x] O usuário pode forçar CAIXA ALTA via Inspector.
+- [x] Alinhamento vertical funciona dentro do retângulo de dimensões.

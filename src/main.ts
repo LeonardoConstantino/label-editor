@@ -113,43 +113,57 @@ document.addEventListener('DOMContentLoaded', async () => {
   const statusBar = new StatusBar();
   statusBar.init();
 
+  const { sessionManager } = await import('./domain/services/SessionManager');
+
   // BIOS: Boot Sequence
   const lastProjectId = localStorage.getItem('last_active_project');
   const hasSeenGuide = localStorage.getItem('has_seen_guide') === 'true';
   let loadedFromSession = false;
 
-  if (lastProjectId) {
+  // 1. Tenta restaurar sessão instântanea (Auto-save)
+  const savedSession = await sessionManager.getSavedSession();
+  if (savedSession) {
+    store.loadLabel(savedSession);
+    loadedFromSession = true;
+    logger.info('Main', 'Session restored from auto-save');
+  } 
+  // 2. Fallback: Tenta restaurar último projeto ativo do Vault
+  else if (lastProjectId) {
     const templates = await templateManager.getTemplates();
     const lastProject = templates.find((t) => t.id === lastProjectId);
 
     if (lastProject) {
       store.loadLabel(lastProject);
       loadedFromSession = true;
-
-      eventBus.emit('notify', {
-        type: 'success',
-        message: 'Sessão anterior restaurada.',
-        duration: 3000,
-      });
-      UISM.play(UISM.enumPresets.SUCCESS);
+      logger.info('Main', `Session restored from template: ${lastProjectId}`);
     }
   }
 
-  // Se não carregou sessão e nunca viu o guia, mostra Welcome
-  if (!loadedFromSession && !hasSeenGuide) {
-    const welcomeModal = document.getElementById('welcome-modal') as any;
-    if (welcomeModal) welcomeModal.setAttribute('open', '');
-    store.loadLabel(defaultLabel);
-  } else if (!loadedFromSession) {
-    // Se já viu o guia mas não tem sessão, apenas carrega a etiqueta padrão
-    store.loadLabel(defaultLabel);
-    logger.info('Main', `Standard session initialized: ${defaultLabel.id}`);
+  // 3. Se nada foi carregado, mostra Welcome ou Blank
+  if (!loadedFromSession) {
+    if (!hasSeenGuide) {
+      const welcomeModal = document.getElementById('welcome-modal') as any;
+      if (welcomeModal) welcomeModal.setAttribute('open', '');
+      store.loadLabel(defaultLabel);
+    } else {
+      store.loadLabel(defaultLabel);
+      logger.info('Main', 'Fresh blank session started');
+    }
   }
+
+  // Proteção de Saída (Dirty State)
+  window.onbeforeunload = (e) => {
+    if (store.getState().isDirty) {
+      e.preventDefault();
+      e.returnValue = ''; // Exibe alerta padrão do navegador
+      return '';
+    }
+  };
 
   // Notifica Store sobre preferências carregadas (para sincronizar UI)
   eventBus.emit('preferences:update', prefs);
 
-  // Monitora mudança de projeto para salvar última sessão
+  // Monitora mudança de projeto para salvar última sessão no LocalStorage (como índice)
   eventBus.on('state:change', (state: any) => {
     if (state.currentLabel?.id) {
       localStorage.setItem('last_active_project', state.currentLabel.id);

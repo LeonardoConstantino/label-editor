@@ -24,7 +24,7 @@
         >
           <div
             slot="target"
-            class="flex items-center justify-between pl-3 pr-5 h-6 font-mono text-[9px] uppercase tracking-[0.05em] text-text-muted tabular-nums w-full mt-auto shrink-0 select-none"
+            class="flex items-center justify-between gap-3 pl-3 pr-5 h-6 font-mono text-[9px] uppercase tracking-[0.05em] text-text-muted tabular-nums w-full mt-auto shrink-0 select-none"
           >
             <div class="flex items-center gap-3">
               <span
@@ -34,9 +34,12 @@
               ></span>
               <span id="sys-status-text">SYS OK</span>
               <div id="production-status-container" class="hidden items-center gap-2 ml-2 border-l border-white/10 pl-2 animate-in fade-in duration-300">
-                <span class="w-1.5 h-1.5 rounded-full bg-accent-primary animate-pulse shadow-[0_0_6px_var(--color-accent-primary)]"></span>
                 <span class="text-accent-primary font-bold" id="production-percent">0%</span>
               </div>
+              <!-- <div id="dirty-indicator" class="hidden items-center gap-1.5 ml-3 border-l border-white/10 pl-3 group" title="Unsaved changes in Vault">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]"></span>
+                <span class="text-[9px] text-amber-500/80 font-mono font-bold tracking-tighter uppercase">Unsaved</span>
+              </div> -->
             </div>
 
             <div class="flex items-center gap-3">

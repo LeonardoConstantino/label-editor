@@ -30,13 +30,13 @@ Este Master Plan coordena a fase final de desenvolvimento, focando em estabilida
 | **71** | [Mapeamento e Tipagem de Eventos (EventMap)](./tasks/71_event_orchestration.md) | 10 | [x] | — | `task/71-event-mapping` |
 | **74** | [System Status Bar (Telemetry & Dev Console)](./tasks/74-status-bar.md) | 07 | [x] | 46 | `task/74-status-bar` |
 | **75** | [System Preferences Modal (Calibration Matrix)](./tasks/75-settings-modal.md) | 07 | [/] | — | `task/75-settings-modal` |
-| **24** | [Otimização de Lote & Qualidade (Web Workers)](./tasks/24_batch_perf.md) | 09 | [ ] | 77 | `task/24-batch-workers` |
+| **24** | [Otimização de Lote & Qualidade (Web Workers)](./tasks/24_batch_perf.md) | 09 | [x] | 77 | `task/24-batch-workers` |
 | **81** | [Encapsulamento de Stack via CSS Isolation](./tasks/81_css_isolation.md) | 09 | [ ] | — | `task/81-css-isolation` |
 
 ### Fase B: Gestão de Projetos & UX (Retenção do Usuário)
 | ID | Task | Pri | Status | Deps | Branch |
 |----|------|-----|--------|------|--------|
-| **36** | [Retomada Automática & Tela Inicial](./tasks/36_work_resumption.md) | 08 | [/] | 35 | `task/36-boot-welcome` |
+| **36** | [Retomada Automática & Tela Inicial](./tasks/36_work_resumption.md) | 08 | [x] | 35 | `task/36-boot-welcome` |
 | **82** | [Data Gateway Module (Unified Entry)](./tasks/82_data_gateway.md) | 08 | [x] | — | `task/82-data-gateway` |
 | **80** | [History Visualizer (The Time Machine)](./tasks/80-history-visualizer.md) | 07 | [x] | 76 | `task/80-history-visualizer` |
 | **33** | [Importação/Exportação de JSON (.label)](./tasks/33_json_import_export.md) | 07 | [x] | 07 | `task/33-json-io` |

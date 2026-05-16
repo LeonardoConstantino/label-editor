@@ -14,6 +14,7 @@ export interface AppState {
   clipboard: AnyElement[];
   canUndo: boolean;
   canRedo: boolean;
+  isDirty: boolean;
   preferences: UserPreferences;
   activeModuleId: 'blueprint' | 'layers' | 'assets' | 'history' | 'variables' | 'batch';
   
@@ -40,6 +41,7 @@ export class Store {
       clipboard: [],
       canUndo: false,
       canRedo: false,
+      isDirty: false,
       preferences: DEFAULT_PREFERENCES,
       activeModuleId: 'blueprint',
       
@@ -218,6 +220,11 @@ export class Store {
       this.emit();
     });
 
+    eventBus.on('template:saved', () => {
+      this.state.isDirty = false;
+      this.emit();
+    });
+
     // --- PRODUCTION EVENTS ---
     eventBus.on('production:data:update', ({ data, sourceName }) => {
       this.state.productionData = data;
@@ -251,6 +258,7 @@ export class Store {
 
   private performAction(action: () => void, options: { immediate?: boolean; silent?: boolean; description?: string } = {}): void {
     if (!this.state.currentLabel) return;
+    this.state.isDirty = true;
     action();
     
     if (!options.silent) {
@@ -355,6 +363,7 @@ export class Store {
     this.state.currentLabel = label;
     historyManager.clear();
     this.state.selectedElementIds = [];
+    this.state.isDirty = false;
     this.takeSnapshot(true, 'Abriu etiqueta');
     this.emit();
   }

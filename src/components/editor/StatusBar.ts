@@ -26,6 +26,7 @@ export class StatusBar {
   private get renderTimeEl() { return document.getElementById('render-time'); }
   private get elCountEl() { return document.getElementById('el-count'); }
   private get zoomLvlEl() { return document.getElementById('zoom-lvl'); }
+  // private get dirtyIndicator() { return document.getElementById('dirty-indicator'); }
   private get tpl() { return document.getElementById('telemetric-balloon') as HTMLTemplateElement; }
 
   init(): void {
@@ -129,6 +130,19 @@ export class StatusBar {
 
   private updateTelemetry(state: AppState) {
     if (!state.currentLabel) return;
+
+    // Task 36: Dirty State Indicator
+    if (state.isDirty) {
+      this.led?.classList.add('bg-amber-500', 'shadow-[0_0_8px_rgba(245,158,11,0.5)]');
+      this.statusText?.classList.add('text-amber-500');
+      this.statusText!.textContent = 'UNSAVED';
+      this.statusText?.setAttribute('title', 'Unsaved changes in Vault');
+    }else {
+      this.led?.classList.remove('bg-amber-500', 'shadow-[0_0_8px_rgba(245,158,11,0.5)]');
+      this.statusText?.classList.remove('text-amber-500');
+      this.statusText!.textContent = 'SYS OK';
+      this.statusText?.setAttribute('title', 'Developer Mode: Click 5 times on the LED');
+    }
 
     const count = state.currentLabel.elements.length;
     const zoom = Math.round(state.currentLabel.config.previewScale * 100);
