@@ -144,6 +144,7 @@ export class ModuleRack extends HTMLElement {
   private updateVisualState() {
     const rack = this.shadowRoot?.getElementById('rack-menu');
     const trigger = this.shadowRoot?.getElementById('rack-trigger');
+    const triggerIcon = this.shadowRoot?.getElementById('trigger-icon');
     if (rack && trigger) {
       rack.classList.toggle('open', this._isOpen);
       trigger.classList.toggle('active', this._isOpen);
@@ -155,8 +156,17 @@ export class ModuleRack extends HTMLElement {
         composed: true
       }));
       
-      if (this._isOpen) UISM.playCustom(encaixeThud);
-      else UISM.playCustom(cancelamentoClick);
+      if (this._isOpen) {
+        if (triggerIcon) {
+          triggerIcon.style.transform = 'rotate(180deg)';
+        }
+        UISM.playCustom(encaixeThud);
+      } else {
+        if (triggerIcon) {
+          triggerIcon.style.transform = 'rotate(0deg)';
+        }
+        UISM.playCustom(cancelamentoClick);
+      }
     }
   }
 
@@ -223,6 +233,8 @@ export class ModuleRack extends HTMLElement {
           background: var(--color-surface-elevated); border-radius: 6px; border: 1px solid var(--color-border-ui);
           color: var(--color-accent-primary);
         }
+        
+        #trigger-icon { transition: all 0.5s var(--ease-spring); }
 
         .rack-menu {
           position: absolute; top: 100%; left: 0; width: 100%;
@@ -258,7 +270,7 @@ export class ModuleRack extends HTMLElement {
             </div>
             <span class="module-name" id="active-module-name">Blueprint Setup</span>
           </div>
-          <ui-icon name="maximize" style="--icon-size: 12px; transform: rotate(90deg); opacity: 0.5; pointer-events: none;"></ui-icon>
+          <ui-icon id="trigger-icon" name="chevron-down" style="opacity: 0.5; pointer-events: none;"></ui-icon>
         </div>
       </div>
 
