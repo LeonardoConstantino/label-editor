@@ -27,7 +27,7 @@ Expandir o interpolador para suportar variáveis de contexto do lote (`index`, `
    - Validar se `{{ index }} / {{ total }}` renderiza corretamente no Batch Preview.
 
 ## Critérios de Aceite
-- [ ] Variáveis `index` e `total` acessíveis em qualquer campo de texto interpolado.
-- [ ] Relatório de viabilidade/decisão sobre a implementação matemática documentado no PR.
-- [ ] (Se viável) Suporte a pelo menos um método de ajuste numérico (ex: somar 1 ao index).
-- [ ] Testes unitários garantindo que variáveis de contexto não sobrescrevam dados reais do CSV.
+- [x] Variáveis `index` e `total` acessíveis em qualquer campo de texto interpolado.
+- [x] Relatório de viabilidade/decisão sobre a implementação matemática documentado no PR.
+- [x] (Se viável) Suporte a pelo menos um método de ajuste numérico (ex: somar 1 ao index).
+- [x] Testes unitários garantindo que variáveis de contexto não sobrescrevam dados reais do CSV.

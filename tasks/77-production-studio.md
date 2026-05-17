@@ -36,7 +36,7 @@ Controles numéricos (`<ui-number-scrubber>`) altamente responsivos. Se o usuár
 - **Ação Final:** Botão `.btn-success` pulsante: `[ EXPORT 500 LABELS TO PDF ]`. Somente este botão dispara o motor `jsPDF`.
 
 ## Critérios de Aceite
-- [ ] O paginador do painel lateral altera a renderização da etiqueta no canvas sem perder as variáveis de template.
-- [ ] O Modal de "Print Matrix" renderiza a prévia visual correta (Quantas cabem numa folha) baseado nas margens digitadas.
-- [ ] Arrastar os sliders/scrubbers de margem recalcula o layout do papel A4 em tempo real (sem lentidão/engasgos extremos).
-- [ ] O botão final exporta o PDF com o grid milimétrico perfeito configurado no modal.
+- [x] O paginador do painel lateral altera a renderização da etiqueta no canvas sem perder as variáveis de template.
+- [x] O Modal de "Print Matrix" renderiza a prévia visual correta (Quantas cabem numa folha) baseado nas margens digitadas.
+- [x] Arrastar os sliders/scrubbers de margem recalcula o layout do papel A4 em tempo real (sem lentidão/engasgos extremos).
+- [x] O botão final exporta o PDF com o grid milimétrico perfeito configurado no modal.

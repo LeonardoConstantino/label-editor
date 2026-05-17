@@ -16,6 +16,6 @@ Flexibilizar o gerador de PDF para suportar etiquetas horizontais (paisagem), fo
    - Incluir select para "Paper Size" e toggle para "Orientation".
 
 ## Critérios de Aceite
-- [ ] O usuário pode gerar um PDF em formato A3.
-- [ ] Etiquetas horizontais são impressas corretamente no modo Paisagem sem cortes laterais indevidos.
-- [ ] O layout de múltiplas colunas se adapta corretamente à nova largura de página disponível.
+- [x] O usuário pode gerar um PDF em formato A3.
+- [x] Etiquetas horizontais são impressas corretamente no modo Paisagem sem cortes laterais indevidos.
+- [x] O layout de múltiplas colunas se adapta corretamente à nova largura de página disponível.

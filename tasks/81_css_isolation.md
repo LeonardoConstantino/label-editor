@@ -16,7 +16,7 @@ O `isolation: isolate` cria um novo Stacking Context sem a necessidade de defini
 5. **Clean-up:** Revisar valores exorbitantes de `z-index` (ex: 10000) no `AppSelect` e `ModuleRack` para valores mais semânticos dentro de seus contextos isolados.
 
 ## Critérios de Aceite
-- [ ] Dropdowns do `AppSelect` dentro de um `InspectorLayerCard` sobrepõem corretamente o card abaixo sem necessidade de elevação manual do card pai.
-- [ ] O menu do `ModuleRack` abre sobre o workspace sem interferir na renderização de outros componentes globais.
-- [ ] A performance de renderização permanece estável (isolation é uma propriedade leve para o browser).
-- [ ] O código visual fica mais limpo, usando a hierarquia natural do DOM dentro de contextos protegidos.
+- [x] Dropdowns do `AppSelect` dentro de um `InspectorLayerCard` sobrepõem corretamente o card abaixo sem necessidade de elevação manual do card pai.
+- [x] O menu do `ModuleRack` abre sobre o workspace sem interferir na renderização de outros componentes globais.
+- [x] A performance de renderização permanece estável (isolation é uma propriedade leve para o browser).
+- [x] O código visual fica mais limpo, usando a hierarquia natural do DOM dentro de contextos protegidos.

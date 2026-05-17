@@ -11,6 +11,8 @@ export interface WorkerTask {
   dpi: number;
 }
 
+// TODO: Implementar estrategia para carregar fontes da main thread no worker (ex: via IndexedDB ou Transferable Objects) para garantir fidelidade total (Task 24 Fidelity Fix)
+
 // @ts-ignore
 self.onmessage = async (e: MessageEvent<WorkerTask>) => {
   const { label, dataList, layout, dpi } = e.data;
