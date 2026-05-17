@@ -1,10 +1,26 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="system">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
     <title>Label Editor | Tactile Prism</title>
+    <script>
+      // Previne FOUC (Flash of Unstyled Content) aplicando tema window.matchMedia antes do carregamento do CSS
+      (function() {
+        try {
+          let theme;
+          if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            theme = 'dark';
+          } else {
+            theme = 'light';
+          }
+          document.documentElement.setAttribute('data-theme', theme);
+        } catch (e) {
+          console.error('Error applying theme:', e);
+        }
+      })();
+    </script>
   </head>
   <body>
     <div class="layout-container">
@@ -140,7 +156,7 @@
       <div>
         <div class="flex justify-between mb-2 pb-1 border-b border-white/10">
           <span class="flex items-center gap-1.5 text-accent-primary">
-            <ui-icon name="command-line" style="--icon-size: 12px"></ui-icon>
+            <ui-icon name="command-line" size="xs"></ui-icon>
             Telemetry Dashboard
           </span>
           <span class="text-accent-success animate-pulse font-mono text-[9px]"

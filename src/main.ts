@@ -88,6 +88,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
+  // Atualiza o tema com base na preferência do usuário
+  const applyTheme = (theme: string) => {
+    document.documentElement.setAttribute('data-theme', theme);
+  };
+  applyTheme(prefs.theme);
+  eventBus.on('preferences:change', (updatedPrefs: any) => {
+    if (updatedPrefs.theme) {
+      applyTheme(updatedPrefs.theme);
+    }
+  });
+
   await templateManager.init();
   shortcutService.init(isMac);
 

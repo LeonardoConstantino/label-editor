@@ -7,7 +7,8 @@
 @import 'tailwindcss';
 
 /* Definição correta do Dark Mode manual para Tailwind v4 */
-@variant dark (&:where(.dark, .dark *));
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+@custom-variant light (&:where([data-theme=light], [data-theme=light] *));
 
 @theme {
   /* Fontes Modernas e Técnicas */
@@ -34,6 +35,32 @@
   --shadow-panel: 0 8px 32px rgba(0, 0, 0, 0.5);
   --shadow-neon-primary: 0 0 12px rgba(99, 102, 241, 0.4);
 }
+
+/* =========================================
+   LIGHT MODE (The Clinical Lab Mode)
+   ========================================= */
+[data-theme='light']  {
+    /* Fundos: Cinza claro com nuances de profundidade */
+    --color-canvas: #f8fafc; /* Slate 50 - base respirável */
+    --color-surface: rgba(241, 245, 249, 0.75); /* Slate 100 com transparência (efeito vidro) */
+    --color-surface-solid: #f1f5f9; /* Slate 100 sólido para modais */
+    --color-border-ui: #e2e8f0; /* Slate 200 - bordas discretas */
+
+    /* Textos: Inversão com contraste confortável */
+    --color-text-main: #0f172a; /* Slate 900 */
+    --color-text-muted: #64748b; /* Slate 500 */
+
+    /* Acentos: Mantidos para consistência visual */
+    --color-accent-primary: #6366f1; /* Indigo inalterado */
+    --color-accent-hover: #4f46e5;
+    --color-accent-success: #10b981;
+    --color-accent-danger: #f43f5e;
+    --color-accent-warning: #f59e0b;
+
+    /* Física Visual: Sombras suavizadas */
+    --shadow-panel: 0 4px 16px rgba(15, 23, 42, 0.08); /* Sombra leve para elevação */
+    --shadow-neon-primary: 0 0 8px rgba(99, 102, 241, 0.2); /* Glow reduzido */
+  }
 
 @layer base {
   body {
