@@ -51,18 +51,21 @@ export const FORMATTERS: Record<string, FormatterDef> = {
     sublabel: 'tEXt -> Text',
     fn: (v) => String(v).replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase())
   },
+  // TODO: Talvez adicionar parâmetro de locale para currency.
   currency: {
     name: 'currency',
     label: 'Currency R$',
     sublabel: '12.5 -> R$ 12,50',
     fn: (v) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(parseFloat(v) || 0)
   },
+  // TODO: Talvez adicionar parâmetro de locale para number.
   number: {
     name: 'number',
     label: 'Number (BR)',
     sublabel: '1250.5 -> 1.250,50',
     fn: (v) => new Intl.NumberFormat('pt-BR').format(parseFloat(v) || 0)
   },
+  // TODO: Talvez adicionar parâmetro de locale para percent.
   percent: {
     name: 'percent',
     label: 'Percent %',
@@ -79,6 +82,7 @@ export const FORMATTERS: Record<string, FormatterDef> = {
       return str.length > limit ? str.substring(0, limit) + '...' : str;
     }
   },
+  // TODO: Talvez adicionar parâmetros de locale e offset para date e datetime.
   date: {
     name: 'date',
     label: 'Date (BR)',
@@ -91,6 +95,7 @@ export const FORMATTERS: Record<string, FormatterDef> = {
     sublabel: '2023-01... -> 01/01... 12:00',
     fn: (v) => DataSourceParser.formatDate(v, true)
   },
+  // TODO: Adicionar limitação de profundidade para evitar loops em objetos muito grandes.
   json: {
     name: 'json',
     label: 'JSON Raw',
