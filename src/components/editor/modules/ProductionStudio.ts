@@ -5,6 +5,7 @@ import { UISM } from '../../../core/UISoundManager';
 import { HelpContentProvider } from '../../../utils/HelpContentProvider';
 import { ElementType } from '../../../domain/models/elements/BaseElement';
 import { escapeHTML } from '../../../utils/sanitize';
+import { confirmDialog } from '../../common/confirm';
 
 // Importar sub-componentes
 import '../../common/AppButton';
@@ -56,7 +57,7 @@ export class ProductionStudio extends HTMLElement {
     }, { signal });
 
     // 3. Paginador e Controles
-    root.addEventListener('click', (e: Event) => {
+    root.addEventListener('click', async (e: Event) => {
       const target = e.target as HTMLElement;
       const state = store.getState();
 
@@ -73,7 +74,17 @@ export class ProductionStudio extends HTMLElement {
       }
 
       if (target.closest('#btn-clear-data')) {
-        if (confirm('Deseja remover os dados carregados?')) {
+        const ok = await confirmDialog.ask(
+          'Confirmar Desconexão',
+          'Esta ação irá remover os dados carregados e desconectar a fonte de dados. Deseja continuar?',
+          {
+            variant: 'danger',
+            confirmText: 'Sim, desconectar',
+            cancelText: 'Cancelar',
+            countdown: 1,
+          },
+        );
+        if (ok) {
           eventBus.emit('production:data:update', { data: [], sourceName: '' });
           UISM.play(UISM.enumPresets.DELETE);
         }
