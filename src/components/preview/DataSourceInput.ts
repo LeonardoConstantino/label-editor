@@ -2,6 +2,7 @@ import { store, AppState } from '../../core/Store';
 import { UISM } from '../../core/UISoundManager';
 import { canvasRenderer } from '../../domain/services/CanvasRenderer';
 import { PaperFormat, pdfGenerator } from '../../domain/services/PDFGenerator';
+import { escapeHTML } from '../../utils/sanitize';
 import '../common/AppButton';
 import '../common/icon';
 import '../common/UINumberScrubber';
@@ -16,6 +17,7 @@ import { sharedSheet } from '../../utils/shared-styles';
  */
 export class DataSourceInput extends HTMLElement {
   private _abortController: AbortController | null = null;
+  private dataList: Record<string, any>[] = [];
   private _isProcessing = false;
   private _progress = 0;
   private _progressMessage = '';
@@ -60,6 +62,7 @@ export class DataSourceInput extends HTMLElement {
     root.addEventListener('data-ready', (e: any) => {
       const { data, sourceName } = e.detail;
       eventBus.emit('production:data:update', { data, sourceName });
+      this.dataList = data;
     }, { signal });
 
     // Botão Fechar
@@ -164,6 +167,7 @@ export class DataSourceInput extends HTMLElement {
     const hasData = productionData.length > 0;
 
     if (hasData) {
+      this.dataList = productionData;
       if (!uploadContainer.querySelector('.active-connection')) {
         uploadContainer.innerHTML = `
           <div class="active-connection w-full p-4 bg-accent-success/10 border border-accent-success/20 rounded-xl flex items-center justify-between animate-in fade-in duration-300">
@@ -181,7 +185,11 @@ export class DataSourceInput extends HTMLElement {
       const countEl = shadow.getElementById('records-count-display');
       if (nameEl) nameEl.textContent = productionSourceName;
       if (countEl) countEl.textContent = `${productionData.length} records connected`;
+      if (this.dataList.length > 0) {
+        this.updateDataSummary();
+      }
     } else {
+      this.dataList = [];
       if (!uploadContainer.querySelector('ui-data-gateway')) {
         uploadContainer.innerHTML = `<ui-data-gateway id="data-gateway" style="height: 180px;"></ui-data-gateway>`;
       }
@@ -339,6 +347,41 @@ export class DataSourceInput extends HTMLElement {
     });
   }
 
+  private updateDataSummary(): void {
+    const box = this.shadowRoot!.getElementById('data-summary-box')!;
+    if (!this.dataList.length) return;
+
+    const headers = Object.keys(this.dataList[0]);
+    const displayHeaders = headers.slice(0, 4);
+
+    box.innerHTML = `
+      <div class="flex flex-col gap-3 animate-in fade-in duration-500">
+        <h4 class="font-mono text-[10px] text-text-muted uppercase tracking-[0.2em] mb-1">Data Preview (First 3)</h4>
+        <div class="overflow-x-auto border border-border-ui/30 rounded-lg">
+          <table class="data-mini-table">
+            <thead>
+              <tr>${displayHeaders.map((h) => `<th>${escapeHTML(h)}</th>`).join('')}${headers.length > 4 ? '<th>...</th>' : ''}</tr>
+            </thead>
+            <tbody>
+              ${this.dataList
+                .slice(0, 3)
+                .map(
+                  (row) => `
+                <tr>
+                  ${displayHeaders.map((h) => `<td>${escapeHTML(String(row[h]))}</td>`).join('')}
+                  ${headers.length > 4 ? '<td class="text-text-muted">...</td>' : ''}
+                </tr>
+              `,
+                )
+                .join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    `;
+
+    }
+
   private renderSkeleton(): void {
     if (!this.shadowRoot) return;
 
@@ -422,6 +465,12 @@ export class DataSourceInput extends HTMLElement {
                 <app-select id="cfg-quality" label="Export Preset"></app-select>
               </div>
             </div>
+
+            <!-- Data Summary -->
+            <div class="data-preview-container" id="data-summary-box">
+              ${this.dataList.length > 0 ? '' : '<div class="status-badge">Waiting for data...</div>'}
+            </div>
+
           </div>
 
           <div class="studio-preview">
