@@ -58,7 +58,12 @@ The project follows a modular, event-driven architecture:
   - **UI Feedback:** Indicador "Unsaved" âmbar na Status Bar para consciência situacional.
   - **Boot BIOS:** Refatoração da sequência de inicialização para restauração silenciosa de sessão.
 
-### 2026-05-15: Tipografia Avançada & Estabilidade
+### 2026-05-18: Fidelidade Tipográfica & Performance de Dados
+- **Task 83 (Font Fidelity in Workers):** Alcançada fidelidade visual de 100% no PDF final.
+  - **Captura Resiliente:** Motor de extração de fontes capaz de atravessar CORS e `@import` recursivos.
+  - **Multi-level Cache:** Implementado cache em memória (Sessão) e persistência em IndexedDB (v3) para binários de fontes.
+  - **Zero Redundância:** Downloads e varreduras de CSS ocorrem apenas uma vez, otimizando drasticamente a geração de lotes repetidos.
+- **Task 50 & 58 Refinements:** Melhorias de sincronização atômica no Elemento de Código e Metadados.
 - **Task 38 (Tipografia Avançada):** Implementados controles profissionais de texto.
   - **Tracking:** Suporte nativo a `letter-spacing` (mm) utilizando a API `ctx.letterSpacing` do Canvas 2D.
   - **Text Transform:** Opções de `Uppercase`, `Lowercase` e `None` integradas ao renderer e inspector.

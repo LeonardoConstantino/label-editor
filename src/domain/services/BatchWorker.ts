@@ -9,15 +9,31 @@ export interface WorkerTask {
   dataList: any[];
   layout: any;
   dpi: number;
+  fontBuffers?: any[]; // Task 83: Binários das fontes para fidelidade total
 }
-
-// TODO: Implementar estrategia para carregar fontes da main thread no worker (ex: via IndexedDB ou Transferable Objects) para garantir fidelidade total (Task 24 Fidelity Fix)
 
 // @ts-ignore
 self.onmessage = async (e: MessageEvent<WorkerTask>) => {
-  const { label, dataList, layout, dpi } = e.data;
+  const { label, dataList, layout, dpi, fontBuffers } = e.data;
 
   try {
+    // 1. Carregamento de Fontes (Task 83)
+    if (fontBuffers && fontBuffers.length > 0) {
+      for (const font of fontBuffers) {
+        try {
+          const fontFace = new FontFace(font.family, font.buffer, {
+            weight: font.weight,
+            style: font.style
+          });
+          const loadedFace = await fontFace.load();
+          // @ts-ignore
+          self.fonts.add(loadedFace);
+        } catch (err) {
+          console.error(`[Worker] Failed to register font: ${font.family}`, err);
+        }
+      }
+    }
+
     const pdf = new jsPDF({
       orientation: layout.orientation,
       unit: 'mm',
@@ -47,7 +63,7 @@ self.onmessage = async (e: MessageEvent<WorkerTask>) => {
     const ctx = canvas.getContext('2d')!;
     const scale = dpi / 25.4;
 
-    // Cache de ImageBitmaps para o ImageRenderer (Task 24 Fidelity Fix)
+    // Cache de ImageBitmaps para o ImageRenderer
     const imageCache: Map<string, ImageBitmap> = new Map();
     for (const el of label.elements) {
       if (el.type === 'image' && el.src && !imageCache.has(el.src)) {
@@ -57,7 +73,7 @@ self.onmessage = async (e: MessageEvent<WorkerTask>) => {
           const bitmap = await createImageBitmap(blob);
           imageCache.set(el.src, bitmap);
         } catch (err) {
-          console.error('Worker failed to load image:', el.src, err);
+          console.error('[Worker] Failed to load image:', el.src, err);
         }
       }
     }
@@ -75,7 +91,7 @@ self.onmessage = async (e: MessageEvent<WorkerTask>) => {
         current: i + 1, 
         total: dataList.length,
         progress,
-        message: `Rendering label ${i + 1} of ${dataList.length} (${progress}%)`
+        message: `Rendering label ${i + 1} of ${dataList.length}...`
       });
 
       if (currentY + label.config.heightMM > PAGE_HEIGHT - layout.marginMM) {
@@ -93,7 +109,6 @@ self.onmessage = async (e: MessageEvent<WorkerTask>) => {
       ctx.translate(bleed * scale, bleed * scale);
 
       // --- 100% FIDELITY RENDER ---
-      // Agora usamos o MESMO orquestrador do canvas principal
       canvasRenderer.renderAll(label.elements, {
         ctx: ctx as any,
         scale,

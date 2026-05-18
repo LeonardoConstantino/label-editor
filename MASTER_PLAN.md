@@ -31,6 +31,7 @@ Este Master Plan coordena a fase final de desenvolvimento, focando em estabilida
 | **74** | [System Status Bar (Telemetry & Dev Console)](./tasks/74-status-bar.md) | 07 | [x] | 46 | `task/74-status-bar` |
 | **75** | [System Preferences Modal (Calibration Matrix)](./tasks/75-settings-modal.md) | 07 | [/] | — | `task/75-settings-modal` |
 | **24** | [Otimização de Lote & Qualidade (Web Workers)](./tasks/24_batch_perf.md) | 09 | [x] | 77 | `task/24-batch-workers` |
+| **83** | [Fidelidade de Fontes no Web Worker](./tasks/83_worker_font_fidelity.md) | 09 | [x] | 24 | `task/83-worker-fonts` |
 | **81** | [Encapsulamento de Stack via CSS Isolation](./tasks/81_css_isolation.md) | 09 | [x] | — | `task/81-css-isolation` |
 
 ### Fase B: Gestão de Projetos & UX (Retenção do Usuário)
@@ -61,11 +62,13 @@ Este Master Plan coordena a fase final de desenvolvimento, focando em estabilida
 | **77** | [Production Studio (Batch Data)](./tasks/77-production-studio.md) | 06 | [x] | 76 | `task/77-production-studio` |
 | **78** | [Asset Library (Parts Bin)](./tasks/78-asset-library.md) | 06 | [ ] | 76 | `task/78-asset-library` |
 | **79** | [Variable Manager (Data Pipeline)](./tasks/79-variable-manager.md) | 06 | [x] | 76 | `task/79-variable-manager` |
+| **85** | [Typeface Engine (Custom Font Manager)](./tasks/85_typeface_engine.md) | 06 | [ ] | 76 | `task/85-typeface-engine` |
 | **52** | [Action Icon de Lock nos Cards de Camada](./tasks/52_ui_layer_lock.md) | 05 | [x] | 41 | `task/52-ui-layer-lock` |
 | **58** | [Elemento de Código (QR Code / Barcode)](./tasks/58_element_code.md) | 05 | [/] | 41 | `task/58-element-code` |
 | **42** | [BorderElement (Standalone Moldura)](./tasks/42_border_element.md) | 05 | [x] | 41 | `task/42-border-element` |
 | **43** | [Renderers Avançados (Shapes & Blending)](./tasks/43_adv_renderers.md) | 05 | [x] | 12 | `task/43-adv-renderers` |
 | **50** | [Metadados e Cálculos no Interpolador](./tasks/50_interpolator_metadata_math.md) | 05 | [x] | 34 | `task/50-interpolator-meta` |
+| **84** | [Expansão e Robustez do DataSourceParser](./tasks/84_parser_enhancements.md) | 04 | [ ] | 50 | `task/84-parser-pro` |
 
 ### Fase D: Refinamentos Avançados & Estética
 | ID | Task | Pri | Status | Deps | Branch |

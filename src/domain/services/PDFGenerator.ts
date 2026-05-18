@@ -4,6 +4,8 @@ import { canvasRenderer } from './CanvasRenderer';
 import { UnitConverter } from '../../utils/units';
 import { DEFAULTS } from '../../constants/defaults';
 import eventBus from '../../core/EventBus';
+import { FontTransfer } from '../../utils/FontTransfer';
+import { ElementType } from '../models/elements/BaseElement';
 
 export type PaperFormat = 'a4' | 'a3' | 'letter';
 export type PageOrientation = 'portrait' | 'landscape';
@@ -37,6 +39,17 @@ export class PDFGenerator {
    * Versão Worker da geração de PDF (Não trava a UI).
    */
   public async generateLotePDFWorker(label: Label, dataList: any[], layout: BatchLayoutOptions): Promise<void> {
+    // 1. Identifica fontes únicas usadas no design
+    const families = new Set<string>();
+    label.elements.forEach(el => {
+      if (el.type === ElementType.TEXT) {
+        families.add((el as any).fontFamily || 'Inter');
+      }
+    });
+
+    // 2. Captura os buffers das fontes (binários)
+    const fontBuffers = await FontTransfer.getFontBuffers(Array.from(families));
+
     return new Promise((resolve, reject) => {
       // @ts-ignore - Vite worker import
       const worker = new Worker(new URL('./BatchWorker.ts', import.meta.url), { type: 'module' });
@@ -74,8 +87,8 @@ export class PDFGenerator {
         reject(err);
       };
 
-      // Inicia a tarefa
-      worker.postMessage({ label, dataList, layout, dpi });
+      // Inicia a tarefa enviando também os buffers das fontes
+      worker.postMessage({ label, dataList, layout, dpi, fontBuffers });
     });
   }
 
