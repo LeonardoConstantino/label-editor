@@ -6,6 +6,7 @@ import { DEFAULTS } from '../../constants/defaults';
 import { ElementFactory } from '../models/elements/ElementFactory';
 import eventBus from '../../core/EventBus';
 import { logger } from '../../core/Logger';
+import { FontLoader } from '../../utils/FontLoader';
 
 export class TemplateManager {
   private readonly STORE_NAME = 'templates';
@@ -16,6 +17,7 @@ export class TemplateManager {
 
   private setupListeners(): void {
     eventBus.on('template:save', () => this.saveCurrentLabel());
+    eventBus.on('label:opened', (label) => this.injectFontsFromLabel(label));
   }
 
   /**
@@ -60,6 +62,7 @@ export class TemplateManager {
   async loadTemplate(id: string): Promise<void> {
     const label = await db.get<Label>(this.STORE_NAME, id);
     if (label) {
+      this.injectFontsFromLabel(label);
       store.loadLabel(label);
     }
   }
@@ -130,6 +133,8 @@ export class TemplateManager {
           if (!label.id || !label.config || !Array.isArray(label.elements)) {
             throw new Error('Arquivo .label inválido ou corrompido.');
           }
+
+          this.injectFontsFromLabel(label);
 
           // Injeta no Store
           store.loadLabel(label);
@@ -207,6 +212,14 @@ export class TemplateManager {
 
       resolve(canvas.toDataURL('image/webp', 0.8));
     });
+  }
+
+  private injectFontsFromLabel(label: Label) {
+    if (label.config.customFonts) {
+      label.config.customFonts.forEach(f => {
+        if (f.active && f.url) FontLoader.inject(f.url);
+      });
+    }
   }
 
   /**

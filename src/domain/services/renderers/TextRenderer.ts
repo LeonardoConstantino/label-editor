@@ -7,8 +7,9 @@ import { DataSourceParser } from '../DataSourceParser';
 import { UnitConverter } from '../../../utils/units';
 
 /**
- * TextRenderer: Utiliza a biblioteca canvas-txt para renderização profissional de texto.
- * Suporta alinhamento vertical, múltiplos modos de overflow e tipografia avançada (Task 44).
+ * TextRenderer: Renderiza elementos de texto com suporte a Scale, Wrap e Variáveis.
+ * Utiliza a biblioteca canvas-txt para quebra de linha profissional.
+ * Otimizado para fontes customizadas e ambientes Worker (Task 83/85).
  */
 export class TextRenderer implements IRenderer {
   // Canvas offline compartilhado para medições de performance
@@ -43,11 +44,14 @@ export class TextRenderer implements IRenderer {
     // Task 38: Letter Spacing (Tracking)
     // Converte mm para px
     const spacingPx = (element.letterSpacing || 0) * (dpi / 25.4);
-    ctx.letterSpacing = `${spacingPx}px`;
+    (ctx as any).letterSpacing = `${spacingPx}px`;
+
+    const fontFamily = element.fontFamily || 'Inter';
+    const quotedFont = fontFamily.includes(' ') ? `"${fontFamily}"` : fontFamily;
 
     if (typeof drawText === 'function') {
       const commonProps = {
-        font: element.fontFamily || 'Inter, sans-serif',
+        font: quotedFont,
         fontWeight: String(element.fontWeight || '400'),
         fontStyle: element.fontStyle || 'normal',
         lineHeight: (element.lineHeight || 1.2),
@@ -97,7 +101,7 @@ export class TextRenderer implements IRenderer {
       drawText(ctx as any, content, config);
     } else {
       // Fallback robusto
-      ctx.font = `${element.fontStyle || ''} ${element.fontWeight || 400} ${fontSizePx}px ${element.fontFamily || 'sans-serif'}`;
+      ctx.font = `${element.fontStyle || ''} ${element.fontWeight || 400} ${fontSizePx}px ${quotedFont}, sans-serif`;
       ctx.textBaseline = this.mapVAlignToBaseline(element.verticalAlign);
       ctx.textAlign = element.textAlign as CanvasTextAlign;
       
@@ -145,16 +149,19 @@ export class TextRenderer implements IRenderer {
     let maxFontSize = 500; 
     let iterations = 0;
 
+    const quotedFont = font.includes(' ') ? `"${font}"` : font;
+
     while (minFontSize <= maxFontSize && iterations < 50) {
       const fontSize = (minFontSize + maxFontSize) / 2;
       
       // Medimos no dummyCtx (não polui o canvas principal)
       const result = drawText(dummyCtx as any, text, {
         x: 0, y: 0, width, height, 
-        fontSize, font, fontWeight, fontStyle,
+        fontSize, font: quotedFont, fontWeight, fontStyle,
         lineHeight: lineHeight * fontSize,
         justify,
-      } as any);
+        debug: false
+      });
 
       if (result.height > height) {
         maxFontSize = fontSize - 0.1;

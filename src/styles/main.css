@@ -3,7 +3,7 @@
    Label Design Editor & Batch Generator
    ========================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Geist+Mono:ital,wght@0,100..900;1,100..900&family=Geist:ital,wght@0,100..900;1,100..900&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');
 @import 'tailwindcss';
 
 /* Definição correta do Dark Mode manual para Tailwind v4 */
@@ -621,7 +621,8 @@
   /* 3. A Tecla Física (HUD Key) para atalhos de teclado */
   .kbd-prism,
   kbd.kbd-prism {
-    @apply inline-flex items-center justify-center font-mono text-[9px] font-bold text-text-muted uppercase tracking-wider select-none;
+    @apply inline-flex items-center justify-center text-[9px] font-bold text-text-muted uppercase tracking-wider select-none;
+    font-family: geist-mono, monospace;
     background-color: var(--color-surface-solid);
     border: 1px solid var(--color-border-ui);
     border-radius: 4px;

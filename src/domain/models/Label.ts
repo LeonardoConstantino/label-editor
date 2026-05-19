@@ -3,13 +3,21 @@ import {
   TextElement, 
   ImageElement, 
   RectangleElement, 
-  BorderElement 
+  BorderElement,
+  CodeElement
 } from './elements/SpecificElements';
 
 // Re-exportando para facilitar o acesso de outros componentes
 export { ElementType };
 
-export type AnyElement = TextElement | ImageElement | RectangleElement | BorderElement;
+export type AnyElement = TextElement | ImageElement | RectangleElement | BorderElement | CodeElement;
+
+export interface CustomFont {
+  id: string;
+  name: string;
+  url: string;
+  active: boolean;
+}
 
 export interface CanvasConfig {
   widthMM: number;
@@ -17,6 +25,7 @@ export interface CanvasConfig {
   dpi: number;
   previewScale: number;
   backgroundColor: string;
+  customFonts?: CustomFont[]; // Task 85: Fontes externas injetadas
 }
 
 export interface Label {

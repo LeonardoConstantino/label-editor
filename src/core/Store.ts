@@ -365,6 +365,7 @@ export class Store {
     this.state.selectedElementIds = [];
     this.state.isDirty = false;
     this.takeSnapshot(true, 'Abriu etiqueta');
+    eventBus.emit('label:opened', label); // Task 85: Avisa os interessados (ex: Font Injection)
     this.emit();
   }
 

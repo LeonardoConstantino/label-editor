@@ -54,6 +54,7 @@ export interface EventMap {
 
   // Document & Persistence
   'label:config:update': CanvasConfig;
+  'label:opened': Label;
   'preferences:update': Partial<UserPreferences>;
   'preferences:change': UserPreferences;
   'template:save': { source?: string };

@@ -1,4 +1,6 @@
+import { store } from '../../../../core/Store';
 import { TextElement } from '../../../../domain/models/elements/SpecificElements';
+import { CustomFont } from '../../../../domain/models/Label';
 import { TextOverflow } from '../../../../domain/models/elements/BaseElement';
 import { sharedSheet } from '../../../../utils/shared-styles';
 import { dispatchInspectorChange, resolveInspectorValue } from '../inspector-events';
@@ -15,7 +17,6 @@ import '../../../common/icon';
 
 /**
  * InspectorSectionText: Propriedades de Tipografia e Conteúdo.
- * Implementa alinhamentos e overflow profissionais (Task 44) usando AppSelect.
  */
 export class InspectorSectionText extends HTMLElement {
   private _element: TextElement | null = null;
@@ -117,17 +118,6 @@ export class InspectorSectionText extends HTMLElement {
   private setupSelects() {
     const shadow = this.shadowRoot!;
     
-    const fontSelect = shadow.getElementById('font-family') as any;
-    if (fontSelect) {
-      fontSelect.options = [
-        { value: 'Inter', label: 'Inter', sublabel: 'Sans-Serif (Default)' },
-        { value: 'JetBrains Mono', label: 'JetBrains Mono', sublabel: 'Monospace (Data)' },
-        { value: 'Arial', label: 'Arial', sublabel: 'System' },
-        { value: 'Times New Roman', label: 'Times New Roman', sublabel: 'Serif' },
-        { value: 'Geist', label: 'Geist', sublabel: 'Modern Sans' }
-      ];
-    }
-
     const weightSelect = shadow.getElementById('font-weight') as any;
     if (weightSelect) {
       weightSelect.options = [
@@ -214,6 +204,8 @@ export class InspectorSectionText extends HTMLElement {
     const el = this._element;
     const shadow = this.shadowRoot;
 
+    this.updateFontOptions();
+
     const isScaleMode = el.overflow === TextOverflow.SCALE;
     const sizeScrubber = shadow.getElementById('font-size-scrubber') as any;
     if (sizeScrubber) {
@@ -254,6 +246,35 @@ export class InspectorSectionText extends HTMLElement {
         }
       }
     });
+  }
+
+  private updateFontOptions() {
+    const shadow = this.shadowRoot!;
+    const state = store.getState();
+    const customFonts = (state.currentLabel?.config.customFonts || []).filter((f: CustomFont) => f.active);
+
+    const fontSelect = shadow.getElementById('font-family') as any;
+    if (fontSelect) {
+      const baseOptions = [
+        { value: 'Inter', label: 'Inter', sublabel: 'Sans-Serif (Default)' },
+        { value: 'JetBrains Mono', label: 'JetBrains Mono', sublabel: 'Monospace (Data)' },
+        { value: 'Arial', label: 'Arial', sublabel: 'System' },
+        { value: 'Times New Roman', label: 'Times New Roman', sublabel: 'Serif' },
+        { value: 'Geist', label: 'Geist', sublabel: 'Modern Sans' }
+      ];
+
+      const customOptions = customFonts.map((f: CustomFont) => ({ 
+        value: f.name, 
+        label: f.name, 
+        sublabel: 'Custom' 
+      }));
+
+      const allOptions = [...baseOptions, ...customOptions];
+      
+      if (fontSelect.options?.length !== allOptions.length) {
+        fontSelect.options = allOptions;
+      }
+    }
   }
 }
 

@@ -116,6 +116,9 @@ export class InspectorLayerCard extends HTMLElement {
         }
         
         /* O Juice da Linha Selecionada */
+        :host(.selected) {
+          z-index: 1;
+        }
         :host(.selected) .card-header {
           background: var(--color-accent-primary-alpha, rgba(99, 102, 241, 0.1));
           border-color: var(--color-accent-primary-alpha, rgba(99, 102, 241, 0.2));

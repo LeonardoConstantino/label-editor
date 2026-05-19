@@ -192,6 +192,20 @@ export const InspectorHelpData: Record<string, HelpTooltipConfig> = {
       text: 'Alterar um formatador aqui atualiza todas as camadas que usam essa variável.',
       isSuccess: true
     }
+  },
+  typeface: {
+    title: 'Typeface Engine',
+    icon: 'text',
+    commands: [
+      { label: 'Inject', desc: 'Cole URLs do Google Fonts para expandir a biblioteca.' },
+      { label: 'Specimen', desc: 'Edite o texto do card para testar a fonte.' },
+      { label: 'Toggle', desc: 'Habilite/Desabilite fontes para otimizar performance.' }
+    ],
+    proTip: {
+      icon: 'sparkles',
+      text: 'Fontes customizadas são salvas no arquivo da etiqueta automaticamente.',
+      isSuccess: true
+    }
   }
 };
 

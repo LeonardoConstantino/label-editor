@@ -14,6 +14,7 @@ import './inspector/InspectorDocumentSetup';
 import './modules/HistoryVisualizer';
 import './modules/VariableManager';
 import './modules/ProductionStudio';
+import './modules/TypefaceEngine';
 
 /**
  * AppCockpit: O orquestrador central do painel lateral (Aside).
@@ -137,6 +138,8 @@ export class AppCockpit extends HTMLElement {
       component = document.createElement('history-visualizer');
     } else if (moduleId === 'variables') {
       component = document.createElement('variable-manager');
+    } else if (moduleId === 'typeface') {
+      component = document.createElement('typeface-engine');
     } else if (moduleId === 'batch') {
       component = document.createElement('production-studio');
     } else {

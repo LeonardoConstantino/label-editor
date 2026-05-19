@@ -187,7 +187,8 @@ export class ModuleRack extends HTMLElement {
       'layers': { label: 'Layer Properties', icon: 'layers' },
       'assets': { label: 'Asset Library', icon: 'image' },
       'history': { label: 'Time Machine', icon: 'clock' },
-      'variables': { label: 'Variable Manager', icon: 'cpu' }
+      'variables': { label: 'Variable Manager', icon: 'cpu' },
+      'typeface': { label: 'Typeface Engine', icon: 'text' }
     };
 
     const info = moduleMap[activeId] || moduleMap['blueprint'];
@@ -304,6 +305,14 @@ export class ModuleRack extends HTMLElement {
           <div class="item-text">
             <span class="item-title">Variable Manager</span>
             <span class="item-desc">Visual data pipeline and formatters.</span>
+          </div>
+        </div>
+
+        <div class="rack-item" data-id="typeface">
+          <ui-icon name="text" class="mt-0.5 text-accent-primary" style="pointer-events: none;"></ui-icon>
+          <div class="item-text">
+            <span class="item-title">Typeface Engine</span>
+            <span class="item-desc">Custom fonts and Google Fonts terminal.</span>
           </div>
         </div>
 
