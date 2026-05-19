@@ -45,10 +45,10 @@ Para garantir que um design compartilhado mantenha sua identidade visual, a Task
 - **Fallback State:** O componente já deve nascer com 3 fontes nativas pré-listadas no painel (ex: `Inter`, `JetBrains Mono`, `Arial`), mas sem o botão de lixeira (pois são de sistema).
 
 ## Critérios de Aceite
-- [ ] O usuário consegue colar um link do Google Fonts e o painel extrai o Nome da Fonte corretamente.
-- [ ] Um novo "Cartão de Fonte" é renderizado na lista, baixando a tipografia e aplicando o estilo ao texto de *Live Preview* interno.
-- [ ] O texto de preview (Espécime) permite edição livre pelo usuário.
-- [ ] Desabilitar o toggle de uma fonte impede que ela apareça na lista de seleção de fontes do *Element Inspector*, sem excluí-la do projeto.
+- [x] O usuário consegue colar um link do Google Fonts e o painel extrai o Nome da Fonte corretamente.
+- [x] Um novo "Cartão de Fonte" é renderizado na lista, baixando a tipografia e aplicando o estilo ao texto de *Live Preview* interno.
+- [x] O texto de preview (Espécime) permite edição livre pelo usuário.
+- [x] Desabilitar o toggle de uma fonte impede que ela apareça na lista de seleção de fontes do *Element Inspector*, sem excluí-la do projeto.
 
 ---
 
