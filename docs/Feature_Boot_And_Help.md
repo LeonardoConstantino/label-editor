@@ -68,7 +68,7 @@ Para resolver isso de forma elegante, criaremos um **Modal com Abas (Tabs)**.
 
 **Estrutura do HTML para o Modal de Ajuda:**
 ```html
-<ui-modal id="help-center-modal" class="w-[800px]"> <!-- Modal largo -->
+<ui-modal id="help-center-modal" class="w-200"> <!-- Modal largo -->
   
   <div slot="header" class="flex items-center gap-6 border-b border-border-ui pb-0">
     <!-- Abas de Navegação (Tabs) -->
@@ -80,7 +80,7 @@ Para resolver isso de forma elegante, criaremos um **Modal com Abas (Tabs)**.
     </button>
   </div>
 
-  <div slot="body" class="pt-4 h-[500px] overflow-hidden relative">
+  <div slot="body" class="pt-4 h-125 overflow-hidden relative">
     
     <!-- ABA 1: Quick Start Guide (O "Boas-vindas" do 1º acesso) -->
     <div id="tab-guide" class="h-full overflow-y-auto pr-2 flex flex-col gap-6">

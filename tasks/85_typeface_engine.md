@@ -34,7 +34,13 @@ Este módulo será dividido verticalmente em 2 zonas:
     - **O Juice Crítico:** Dentro desse bloco, haverá o texto *“The quick brown fox jumps over the lazy dog”*. Esse texto DEVE estar renderizando na fonte daquele cartão (`font-family: 'Nome da Fonte'`). 
     - O pulo do gato: Esse texto é editável (`contenteditable="true"`), permitindo que o usuário apague e digite o nome do produto dele ali mesmo para testar como as letras se comportam antes de usar no Canvas!
 
-### 3. Integração e Validação (Anti-Quebra)
+### 3. Estratégia de Persistência (Import/Export)
+Para garantir que um design compartilhado mantenha sua identidade visual, a Task 85 implementará o seguinte ciclo de vida:
+- **Salvatagem:** A lista de fontes ativas (`customFonts`) será salva dentro do objeto `LabelConfig`. Assim, o arquivo `.label` (JSON) transporta as metadados das fontes necessárias para o design.
+- **Bootstrapper de Importação:** No momento em que um arquivo é carregado (`TemplateManager.loadLabel`), o sistema deve varrer o `LabelConfig`, identificar fontes externas e disparar a injeção automática no `<head>` sem intervenção do usuário.
+- **Ponte de Fidelidade:** Como as fontes injetadas estarão presentes no DOM, o nosso motor de `FontTransfer` (Task 83) irá capturá-las automaticamente para o Web Worker durante a geração do PDF, garantindo fidelidade de 100% no arquivo final.
+
+### 4. Integração e Validação (Anti-Quebra)
 - **Validação Regex:** A IA deve implementar uma Regex que extrai o nome real da família tipográfica de dentro do Link do Google Fonts fornecido, ex: `family=Oswald:wght@400` -> Extrai `Oswald`.
 - **Fallback State:** O componente já deve nascer com 3 fontes nativas pré-listadas no painel (ex: `Inter`, `JetBrains Mono`, `Arial`), mas sem o botão de lixeira (pois são de sistema).
 

@@ -29,7 +29,7 @@ No painel de Configuração (`CanvasConfigPanel.ts`), o retângulo branco genér
 
   <!-- Overlay de Hover (O Convite) -->
   <div class="absolute inset-0 bg-accent-primary/10 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity duration-300">
-    <div class="bg-surface-solid border border-accent-primary text-text-main font-mono text-[10px] px-3 py-1.5 rounded uppercase tracking-widest shadow-[0_0_12px_rgba(99,102,241,0.4)]">
+    <div class="bg-surface-solid border border-accent-primary text-text-main font-mono text-[10px] px-3 py-1.5 rounded uppercase tracking-widest shadow-neon-primary">
       [ Open Vault ]
     </div>
   </div>
@@ -79,7 +79,7 @@ Cada item do array `Label[]` deve ser renderizado como um "Cartucho". A mágica 
 
 **Estrutura de cada Cartão (Para a IA renderizar via JS):**
 ```html
-<div class="group relative bg-surface-solid border border-border-ui rounded-xl overflow-hidden shadow-panel hover:border-accent-primary hover:-translate-y-1 transition-all duration-300 ease-[var(--ease-spring)]">
+<div class="group relative bg-surface-solid border border-border-ui rounded-xl overflow-hidden shadow-panel hover:border-accent-primary hover:-translate-y-1 transition-all duration-300 ease-spring">
   
   <!-- A "Vitrine" (Proporção da Imagem) -->
   <div class="bg-[#0a0c10] w-full h-40 flex items-center justify-center p-4 relative border-b border-border-ui">
@@ -128,7 +128,7 @@ Cada item do array `Label[]` deve ser renderizado como um "Cartucho". A mágica 
 Antes de mapear o array de `Label`, o JS deve sempre renderizar este slot estático para permitir a criação de um novo documento.
 
 ```html
-<button id="btn-new-template" class="w-full h-full min-h-[220px] rounded-xl border-2 border-dashed border-border-ui bg-black/10 flex flex-col items-center justify-center gap-3 text-text-muted hover:text-accent-primary hover:border-accent-primary hover:bg-accent-primary/5 transition-colors cursor-pointer group">
+<button id="btn-new-template" class="w-full h-full min-h-55 rounded-xl border-2 border-dashed border-border-ui bg-black/10 flex flex-col items-center justify-center gap-3 text-text-muted hover:text-accent-primary hover:border-accent-primary hover:bg-accent-primary/5 transition-colors cursor-pointer group">
   <div class="w-12 h-12 rounded-full bg-surface-solid border border-border-ui flex items-center justify-center group-hover:scale-110 transition-transform var(--ease-spring)">
     <ui-icon name="plus" class="w-6 h-6"></ui-icon>
   </div>
