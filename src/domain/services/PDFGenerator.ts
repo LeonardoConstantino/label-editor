@@ -11,24 +11,38 @@ export type PaperFormat = 'a4' | 'a3' | 'letter';
 export type PageOrientation = 'portrait' | 'landscape';
 export type ExportFormat = 'png' | 'jpeg';
 
+/**
+ * BatchLayoutOptions: Configurações de imposição e exportação do lote.
+ */
 export interface BatchLayoutOptions {
+  /** Margem externa da folha (mm) */
   marginMM: number;
+  /** Espaço entre etiquetas (mm) */
   gapMM: number;
+  /** Quantidade máxima de colunas por folha */
   columns: number;
+  /** Se deve renderizar marcas de corte (L-marks) */
   showCropMarks: boolean;
+  /** Área de sangria que extrapola a borda (mm) */
   bleedMM: number;
+  /** Tamanho do papel ISO ou US */
   paperFormat: PaperFormat;
+  /** Orientação da folha */
   orientation: PageOrientation;
-  zoom: number; // UI only
+  /** Escala visual do preview (apenas UI) */
+  zoom: number; 
+  /** Formato de compressão das imagens no PDF */
   exportFormat: ExportFormat;
-  exportQuality: number; // 0.1 a 1.0 (relevante para JPEG)
+  /** Qualidade da compressão (0.1 a 1.0) para JPEG */
+  exportQuality: number; 
 }
 
 /**
- * PDFGenerator: Gera o PDF final com todas as etiquetas do lote.
- * Suporta execução em Thread Principal ou via Web Worker (Task 24).
+ * PDFGenerator: O motor de saída final do Label Forge OS.
+ * Suporta geração massiva multi-página com imposição dinâmica e processamento via Web Workers.
  */
 export class PDFGenerator {
+  /** Mapeamento de dimensões físicas dos papéis suportados (mm) */
   private readonly PAPER_SIZES: Record<PaperFormat, { w: number, h: number }> = {
     'a4': { w: 210, h: 297 },
     'a3': { w: 297, h: 420 },
@@ -37,6 +51,11 @@ export class PDFGenerator {
 
   /**
    * Versão Worker da geração de PDF (Não trava a UI).
+   * Recomendado para lotes com mais de 20 etiquetas ou designs complexos.
+   * 
+   * @param label Definição da etiqueta (design).
+   * @param dataList Lista de registros para injeção.
+   * @param layout Opções de calibração física.
    */
   public async generateLotePDFWorker(label: Label, dataList: any[], layout: BatchLayoutOptions): Promise<void> {
     // 1. Identifica fontes únicas usadas no design
@@ -47,16 +66,16 @@ export class PDFGenerator {
       }
     });
 
-    // 2. Captura os buffers das fontes (binários)
+    // 2. Captura os buffers das fontes (binários) para garantir fidelidade no Worker
     const fontBuffers = await FontTransfer.getFontBuffers(Array.from(families));
 
     return new Promise((resolve, reject) => {
-      // @ts-ignore - Vite worker import
+      // @ts-ignore - Vite worker import pattern
       const worker = new Worker(new URL('./BatchWorker.ts', import.meta.url), { type: 'module' });
       
       const dpi = label.config.dpi || DEFAULTS.CANVAS.dpi;
 
-      // Inicia feedback global
+      // Inicia feedback global (StatusBar reagirá a isso)
       eventBus.emit('production:start', { total: dataList.length });
 
       worker.onmessage = (e) => {
@@ -87,14 +106,14 @@ export class PDFGenerator {
         reject(err);
       };
 
-      // Inicia a tarefa enviando também os buffers das fontes
+      // Inicia a tarefa enviando o payload completo
       worker.postMessage({ label, dataList, layout, dpi, fontBuffers });
     });
   }
 
   /**
-   * Gera e faz o download do PDF baseado na etiqueta e nos dados fornecidos.
-   * Suporta layout multi-etiqueta com sangria, marcas de corte e papel dinâmico (Task 67).
+   * Versão síncrona da geração de PDF (Executa na Main Thread).
+   * Utilizado para lotes pequenos ou quando Workers não estão disponíveis.
    */
   public async generateLotePDF(
     label: Label, 
@@ -124,6 +143,7 @@ export class PDFGenerator {
     
     const bleed = layout.bleedMM || 0;
 
+    // Canvas de renderização temporário
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d', { alpha: true })!;
     const dpi = label.config.dpi || DEFAULTS.CANVAS.dpi;
@@ -142,6 +162,7 @@ export class PDFGenerator {
     for (let i = 0; i < dataList.length; i++) {
       const data = dataList[i];
 
+      // Paginação automática (Y-axis)
       if (currentY + label.config.heightMM > PAGE_HEIGHT - layout.marginMM) {
         pdf.addPage();
         currentX = layout.marginMM;
@@ -174,6 +195,7 @@ export class PDFGenerator {
         this.drawCropMarks(pdf, currentX, currentY, label.config.widthMM, label.config.heightMM);
       }
 
+      // Cálculo de próxima posição (Z-pattern)
       colIndex++;
       const nextX = currentX + label.config.widthMM + layout.gapMM;
       
@@ -189,6 +211,9 @@ export class PDFGenerator {
     pdf.save(`batch_${layout.paperFormat}_${Date.now()}.pdf`);
   }
 
+  /**
+   * Desenha as marcas de corte (L-marks) profissionais nas quinas da etiqueta.
+   */
   private drawCropMarks(pdf: jsPDF, x: number, y: number, w: number, h: number): void {
     const markLength = 3; 
     const markOffset = 1; 
@@ -196,15 +221,19 @@ export class PDFGenerator {
     pdf.setDrawColor(150, 150, 150);
     pdf.setLineWidth(0.1);
 
+    // Top-Left
     pdf.line(x, y - markOffset, x, y - markOffset - markLength); 
     pdf.line(x - markOffset, y, x - markOffset - markLength, y); 
 
+    // Top-Right
     pdf.line(x + w, y - markOffset, x + w, y - markOffset - markLength);
     pdf.line(x + w + markOffset, y, x + w + markOffset + markLength, y);
 
+    // Bottom-Left
     pdf.line(x, y + h + markOffset, x, y + h + markOffset + markLength);
     pdf.line(x - markOffset, y + h, x - markOffset - markLength, y + h);
 
+    // Bottom-Right
     pdf.line(x + w, y + h + markOffset, x + w, y + h + markOffset + markLength);
     pdf.line(x + w + markOffset, y, x + w + markOffset + markLength, y);
   }

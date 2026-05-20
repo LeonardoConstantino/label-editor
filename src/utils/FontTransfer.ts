@@ -1,29 +1,44 @@
 import { logger } from '../core/Logger';
 import { db } from '../core/Database';
 
+/**
+ * FontData: Estrutura de transporte de binários de fonte.
+ */
 export interface FontData {
+  /** Nome da família tipográfica */
   family: string;
+  /** Buffer binário do arquivo .woff2 ou similar */
   buffer: ArrayBuffer;
+  /** Peso da fonte (ex: '400', 'bold') */
   weight?: string;
+  /** Estilo da fonte (ex: 'normal', 'italic') */
   style?: string;
+  /** URL original da fonte */
   url?: string;
 }
 
 /**
- * FontTransfer: Utilitário de alta resiliência e performance para extrair fontes.
- * Implementa cache em memória e persistência em IndexedDB para evitar downloads redundantes.
+ * FontTransfer: Utilitário de alta resiliência e performance para extrair fontes da Main Thread.
+ * Implementa cache multinível (Memória + IndexedDB) para garantir fidelidade visual em Web Workers.
+ * 
+ * Este serviço resolve o problema de SOP (Same-Origin Policy) e CORS ao capturar fontes do Google Fonts.
  */
 export class FontTransfer {
+  /** Cache em memória para evitar hits repetidos no IDB na mesma sessão */
   private static sessionCache = new Map<string, FontData[]>();
+  /** Cache do mapeamento CSS para evitar varreduras custosas no DOM */
   private static fontMap: Map<string, any[]> | null = null;
 
   /**
-   * Obtém os binários das fontes especificadas.
+   * Obtém os binários das fontes especificadas, utilizando cache ou download.
+   * 
+   * @param families Lista de nomes de fontes a serem capturadas.
+   * @returns Promessa com array de FontData contendo os buffers.
    */
   static async getFontBuffers(families: string[]): Promise<FontData[]> {
     const uniqueFamilies = families.map(f => f.toLowerCase().replace(/['"]/g, '').trim());
     const results: FontData[] = [];
-    
+
     // 1. Carrega o mapa de fontes do CSS apenas uma vez por sessão
     if (!this.fontMap) {
       this.fontMap = await this.scanAllSources();
@@ -38,7 +53,7 @@ export class FontTransfer {
 
       const fontInfos = this.fontMap.get(familyKey);
       if (!fontInfos) {
-        logger.warn('FontTransfer', `Font family not found: ${familyKey}`);
+        logger.warn('FontTransfer', `Font family not found in any stylesheet: ${familyKey}`);
         continue;
       }
 
@@ -54,7 +69,7 @@ export class FontTransfer {
             buffer = cached.buffer;
             logger.debug('FontTransfer', `Restored from IDB: ${info.family} (${info.weight})`);
           } else {
-            // C) Download (Apenas se não houver em nenhum cache)
+            // C) Download (Caso de uso inicial)
             const response = await fetch(info.url);
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             buffer = await response.arrayBuffer();
@@ -68,14 +83,14 @@ export class FontTransfer {
             family: info.family,
             weight: info.weight,
             style: info.style,
-            buffer: buffer.slice(0) // Clone para transferência
+            buffer: buffer.slice(0) // Clone para evitar problemas de transferência de ownership
           });
         } catch (err) {
           logger.error('FontTransfer', `Failed to obtain font binary: ${info.url}`, err);
         }
       }
 
-      // Alimenta Cache em Memória
+      // Alimenta Cache em Memória da sessão
       if (familyVariants.length > 0) {
         this.sessionCache.set(familyKey, familyVariants);
         results.push(...familyVariants);
@@ -86,7 +101,8 @@ export class FontTransfer {
   }
 
   /**
-   * Varre todas as fontes possíveis: styleSheets, links e imports.
+   * Varre todas as fontes possíveis: styleSheets, links e @imports.
+   * Utiliza fetch manual para arquivos CSS bloqueados por CORS.
    */
   private static async scanAllSources(): Promise<Map<string, { family: string, url: string, weight: string, style: string }[]>> {
     const map = new Map<string, any[]>();
@@ -96,6 +112,7 @@ export class FontTransfer {
       await this.processStyleSheet(sheet, map);
     }
 
+    // Varre links no DOM (segurança extra para links injetados dinamicamente)
     const links = Array.from(document.querySelectorAll('link[rel="stylesheet"]')) as HTMLLinkElement[];
     for (const link of links) {
       if (link.href && !sheets.some(s => s.href === link.href)) {
@@ -106,6 +123,9 @@ export class FontTransfer {
     return map;
   }
 
+  /**
+   * Tenta processar nativamente uma folha de estilo ou recorre ao fetch manual.
+   */
   private static async processStyleSheet(sheet: CSSStyleSheet, map: Map<string, any[]>) {
     try {
       const rules = sheet.cssRules || sheet.rules;
@@ -113,18 +133,24 @@ export class FontTransfer {
         await this.parseRules(Array.from(rules), map);
       }
     } catch (e) {
+      // Erro de Segurança (CORS) ao acessar cssRules: Recorre ao download do arquivo texto
       if (sheet.href) {
         await this.fetchAndParseManual(sheet.href, map);
       }
     }
   }
 
+  /**
+   * Faz o download do CSS como texto e realiza parsing manual via Regex.
+   * Suporta recursão para @import externos.
+   */
   private static async fetchAndParseManual(url: string, map: Map<string, any[]>) {
     try {
       const response = await fetch(url);
       const text = await response.text();
       this.parseCssText(text, map);
 
+      // Procura @import recursivos
       const importRegex = /@import\s+(?:url\()?['"]?([^'"]+)['"]?\)?[^;]*;/gi;
       let match;
       while ((match = importRegex.exec(text)) !== null) {
@@ -139,6 +165,9 @@ export class FontTransfer {
     }
   }
 
+  /**
+   * Parse de regras nativas CSSFontFaceRule.
+   */
   private static async parseRules(rules: CSSRule[], map: Map<string, any[]>) {
     for (const rule of rules) {
       if (rule instanceof CSSFontFaceRule) {
@@ -160,6 +189,9 @@ export class FontTransfer {
     }
   }
 
+  /**
+   * Parser via Regex para blocos @font-face dentro de strings CSS.
+   */
   private static parseCssText(text: string, map: Map<string, any[]>) {
     const fontFaceRegex = /@font-face\s*\{([^}]+)\}/gi;
     let match;

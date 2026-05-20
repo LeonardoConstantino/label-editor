@@ -43,7 +43,7 @@ export class HelpCenter extends HTMLElement {
         details summary::-webkit-details-marker { display: none; }
       </style>
 
-      <div class="flex flex-col h-full -m-6 bg-[#0a0c10] overflow-hidden">
+      <div class="flex flex-col h-full bg-[#0a0c10] overflow-hidden">
         <!-- TABS -->
         <nav class="flex items-center gap-8 px-8 border-b border-border-ui bg-surface-solid/40 backdrop-blur-md">
           <button class="font-mono text-[11px] uppercase tracking-[0.2em] pb-4 pt-6 border-b-2 transition-all duration-300 cursor-pointer ${this.activeTab === 'guide' ? 'border-accent-primary text-text-main font-bold' : 'border-transparent text-text-muted hover:text-text-main'}" data-tab="guide">

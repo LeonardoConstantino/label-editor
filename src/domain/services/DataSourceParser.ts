@@ -1,21 +1,37 @@
 import Papa from 'papaparse';
 
+/**
+ * ParsedTag: Representação estruturada de uma tag de interpolação.
+ * Ex: {{ preco:currency(BRL)||0.00 }}
+ */
 export interface ParsedTag {
+  /** A string original completa da tag */
   fullMatch: string;
+  /** A chave da variável (ex: 'preco') */
   key: string;
+  /** Lista de formatadores encadeados (ex: ['currency(BRL)']) */
   formatters: string[];
+  /** Valor de fallback se a chave não existir nos dados */
   fallback?: string;
 }
 
+/**
+ * FormatterDef: Definição de um formatador no registro central.
+ */
 export interface FormatterDef {
+  /** Identificador único do formatador */
   name: string;
+  /** Nome amigável para a UI */
   label: string;
+  /** Exemplo de transformação para a UI */
   sublabel: string;
+  /** Função de execução: recebe o valor bruto e parâmetros opcionais */
   fn: (value: any, params: string[]) => any;
 }
 
 /**
  * Registro central de formatadores do sistema.
+ * Adicione novos formatadores aqui para que apareçam automaticamente no VariableManager.
  */
 export const FORMATTERS: Record<string, FormatterDef> = {
   upper: {
@@ -51,21 +67,18 @@ export const FORMATTERS: Record<string, FormatterDef> = {
     sublabel: 'tEXt -> Text',
     fn: (v) => String(v).replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase())
   },
-  // TODO: Talvez adicionar parâmetro de locale para currency.
   currency: {
     name: 'currency',
     label: 'Currency R$',
     sublabel: '12.5 -> R$ 12,50',
     fn: (v) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(parseFloat(v) || 0)
   },
-  // TODO: Talvez adicionar parâmetro de locale para number.
   number: {
     name: 'number',
     label: 'Number (BR)',
     sublabel: '1250.5 -> 1.250,50',
     fn: (v) => new Intl.NumberFormat('pt-BR').format(parseFloat(v) || 0)
   },
-  // TODO: Talvez adicionar parâmetro de locale para percent.
   percent: {
     name: 'percent',
     label: 'Percent %',
@@ -73,7 +86,7 @@ export const FORMATTERS: Record<string, FormatterDef> = {
     fn: (v) => new Intl.NumberFormat('pt-BR', { style: 'percent' }).format(parseFloat(v) || 0)
   },
   truncate: {
-    name: 'truncate(20)',
+    name: 'truncate',
     label: 'Truncate...',
     sublabel: 'Long text -> Long...',
     fn: (v, params) => {
@@ -82,7 +95,6 @@ export const FORMATTERS: Record<string, FormatterDef> = {
       return str.length > limit ? str.substring(0, limit) + '...' : str;
     }
   },
-  // TODO: Talvez adicionar parâmetros de locale e offset para date e datetime.
   date: {
     name: 'date',
     label: 'Date (BR)',
@@ -95,7 +107,6 @@ export const FORMATTERS: Record<string, FormatterDef> = {
     sublabel: '2023-01... -> 01/01... 12:00',
     fn: (v) => DataSourceParser.formatDate(v, true)
   },
-  // TODO: Adicionar limitação de profundidade para evitar loops em objetos muito grandes.
   json: {
     name: 'json',
     label: 'JSON Raw',
@@ -132,13 +143,16 @@ export const FORMATTERS: Record<string, FormatterDef> = {
 };
 
 /**
- * DataSourceParser: Processa arquivos externos para geração em lote.
+ * DataSourceParser: O "Sistema de Infiltração" de dados do Label Forge OS.
+ * Responsável por parsing de arquivos (CSV, JSON, TXT) e interpolação dinâmica de tags.
  */
 export class DataSourceParser {
+  /** Regex para identificar tags: {{ chave : formatador : ... || fallback }} */
   private static readonly TAG_REGEX = /\{\{\s*([\w\s."'-]+)(?::([\w,()\s.:-]+))?(?:\|\|([^}]+))?\s*\}\}/g;
 
   /**
    * Converte um arquivo CSV em um array de objetos usando PapaParse.
+   * @param file Arquivo vindo de um input file ou drag-drop.
    */
   public async parseCSV(file: File): Promise<Record<string, string>[]> {
     return new Promise((resolve, reject) => {
@@ -164,6 +178,9 @@ export class DataSourceParser {
     return Array.isArray(data) ? data : [data];
   }
 
+  /**
+   * Converte um arquivo de texto em lista de nomes (um por linha).
+   */
   public async parseTXT(file: File): Promise<Record<string, any>[]> {
     const text = await file.text();
     const trimmedText = text.trim();
@@ -173,7 +190,7 @@ export class DataSourceParser {
   }
 
   /**
-   * Retorna a lista de formatadores para o AppSelect.
+   * Retorna a lista de formatadores mapeados para o componente AppSelect.
    */
   public static getFormatterOptions() {
     return Object.values(FORMATTERS).map(f => ({
@@ -184,7 +201,8 @@ export class DataSourceParser {
   }
 
   /**
-   * Encontra todas as tags em uma string e as retorna estruturadas.
+   * Identifica todas as tags de interpolação em um texto e as retorna estruturadas.
+   * Útil para o mapeamento visual no VariableManager.
    */
   public static parseTags(text: string): ParsedTag[] {
     const tags: ParsedTag[] = [];
@@ -205,7 +223,7 @@ export class DataSourceParser {
   }
 
   /**
-   * Reconstrói uma tag a partir de seus componentes.
+   * Reconstrói uma string de tag a partir de um objeto ParsedTag.
    */
   public static rebuildTag(tag: Omit<ParsedTag, 'fullMatch'>): string {
     let result = `{{ ${tag.key}`;
@@ -223,8 +241,12 @@ export class DataSourceParser {
   }
 
   /**
-   * Aplica os dados em uma string substituindo variáveis {{key}}
-   * Agora suporta um objeto de contexto global (Task 50).
+   * Aplica os dados em uma string substituindo variáveis {{key}}.
+   * Suporta uma hierarquia de dados (registro atual > contexto global).
+   * 
+   * @param template Texto com tags a ser processado.
+   * @param data Objeto de dados do registro atual (ex: linha do CSV).
+   * @param context Objeto de contexto global (ex: {{index}}, {{total}}).
    */
   public static interpolate(
     template: string,
@@ -267,7 +289,8 @@ export class DataSourceParser {
   }
 
   /**
-   * Executa a lógica de formatação para um valor usando o registro central.
+   * Localiza e executa a lógica de formatação de um valor.
+   * Suporta parâmetros via parênteses, ex: truncate(10).
    */
   private static applyFormatter(value: any, formatter: string): any {
     const parts = formatter.match(/^(\w+)(?:\((.*)\))?$/);
@@ -285,7 +308,9 @@ export class DataSourceParser {
   }
 
   /**
-   * Helper para formatação de datas (padrão brasileiro).
+   * Helper para formatação de datas (Padrão Brasileiro).
+   * @param value String de data ISO ou timestamp.
+   * @param showTime Se deve incluir horas e minutos.
    */
   public static formatDate(value: any, showTime: boolean): string {
     try {
@@ -298,8 +323,8 @@ export class DataSourceParser {
         year: 'numeric',
       };
       if (showTime) {
-        options.hour = '2-digit',
-        options.minute = '2-digit'
+        options.hour = '2-digit';
+        options.minute = '2-digit';
       }
       return new Intl.DateTimeFormat('pt-BR', options).format(date);
     } catch {
