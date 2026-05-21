@@ -61,7 +61,8 @@ Este Master Plan coordena a fase final de desenvolvimento, focando em estabilida
 | **76** | ["The Active Slot" - Navegação Modular](./tasks/76-active-slot.md) | 06 | [x] | 46 | `task/76-active-slot` |
 | **77** | [Production Studio (Batch Data)](./tasks/77-production-studio.md) | 06 | [x] | 76 | `task/77-production-studio` |
 | **23** | [Expansão de Atalhos & UX Power User](./tasks/23_shortcuts_acc.md) | 05 | [ ] | 76 | `task/23-shortcuts-pro` |
-| **78** | [Asset Library (Parts Bin)](./tasks/78-asset-library.md) | 06 | [ ] | 76 | `task/78-asset-library` |
+| **78** | [Asset Library (Parts Bin)](./tasks/78-asset-library.md) | 06 | [x] | 76 | `task/78-asset-library` |
+| **86** | [Micro Image Editor (Post-Processing)](./tasks/86_micro_image_editor.md) | 06 | [ ] | 78 | `task/86-asset-editor` |
 | **79** | [Variable Manager (Data Pipeline)](./tasks/79-variable-manager.md) | 06 | [x] | 76 | `task/79-variable-manager` |
 | **85** | [Typeface Engine (Custom Font Manager)](./tasks/85_typeface_engine.md) | 06 | [x] | 76 | `task/85-typeface-engine` |
 | **52** | [Action Icon de Lock nos Cards de Camada](./tasks/52_ui_layer_lock.md) | 05 | [x] | 41 | `task/52-ui-layer-lock` |
