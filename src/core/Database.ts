@@ -1,7 +1,7 @@
 import { IndexedDBStorage } from './IndexedDBStorage';
 
 export const DATABASE_NAME = 'label_editor_db';
-export const DATABASE_VERSION = 3;
+export const DATABASE_VERSION = 4;
 
 export const db = new IndexedDBStorage(DATABASE_NAME, DATABASE_VERSION, [
   {
@@ -23,5 +23,13 @@ export const db = new IndexedDBStorage(DATABASE_NAME, DATABASE_VERSION, [
   {
     name: 'fonts',
     keyPath: 'url' // Chave primária será a URL da fonte para cache eficiente
+  },
+  {
+    name: 'assets',
+    keyPath: 'id',
+    indices: [
+      { name: 'category', keyPath: 'category' },
+      { name: 'createdAt', keyPath: 'createdAt' }
+    ]
   }
 ]);

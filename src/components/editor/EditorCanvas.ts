@@ -5,6 +5,8 @@ import { SoundPreset, UISM } from '../../core/UISoundManager';
 import { UnitConverter } from '../../utils/units';
 import { sharedSheet } from '../../utils/shared-styles';
 import { snapService, SnapResult } from '../../domain/services/SnapService';
+import { ElementFactory } from '../../domain/models/elements/ElementFactory';
+import { ElementType } from '../../domain/models/Label';
 
 const gridSnapFeedback: SoundPreset = {
   freq: 1100,
@@ -119,6 +121,56 @@ export class EditorCanvas extends HTMLElement {
     this.canvas.addEventListener('mousedown', (e) => this.handleMouseDown(e));
     window.addEventListener('mousemove', this.handleMouseMoveBound);
     window.addEventListener('mouseup', this.handleMouseUpBound);
+
+    // --- Drag & Drop Support (Task 78) ---
+    this.workspace.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      if (e.dataTransfer) e.dataTransfer.dropEffect = 'copy';
+      this.artboard.style.boxShadow = '0 0 30px var(--color-accent-success)';
+    });
+
+    this.workspace.addEventListener('dragleave', () => {
+      this.artboard.style.boxShadow = '';
+    });
+
+    this.workspace.addEventListener('drop', (e) => {
+      e.preventDefault();
+      this.artboard.style.boxShadow = '';
+      
+      const jsonData = e.dataTransfer?.getData('application/json');
+      if (jsonData) {
+        try {
+          const asset = JSON.parse(jsonData);
+          const coords = this.getMouseMM(e);
+          this.handleAssetDrop(coords.x, coords.y, asset);
+        } catch (err) {
+          console.error('Failed to parse dropped asset', err);
+        }
+      }
+    });
+  }
+
+  private handleAssetDrop(x: number, y: number, asset: any) {
+    const state = store.getState();
+    const dpi = state.currentLabel?.config.dpi || 300;
+    
+    // Converte dimensões de PX para MM usando o UnitConverter
+    const wMM = UnitConverter.pxToMm(asset.widthPx || 100, dpi);
+    const hMM = UnitConverter.pxToMm(asset.heightPx || 100, dpi);
+
+    // Centraliza o asset: subtrai metade da largura/altura da posição do drop
+    const centeredX = x - (wMM / 2);
+    const centeredY = y - (hMM / 2);
+
+    const element = ElementFactory.create(ElementType.IMAGE, {
+      src: asset.src,
+      name: asset.name,
+      position: { x: centeredX, y: centeredY },
+      dimensions: { width: wMM, height: hMM }
+    });
+    
+    eventBus.emit('element:add', element);
+    UISM.play(UISM.enumPresets.OPEN); // Som de "encaixe"
   }
 
   private redraw(state: AppState = store.getState()): void {

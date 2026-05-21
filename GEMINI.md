@@ -8,78 +8,55 @@
 - **Language:** [TypeScript](https://www.typescriptlang.org/) (Strict Mode)
 - **Styling:** [Tailwind CSS v4.2](https://tailwindcss.com/) (CSS-first `@theme` configuration)
 - **Component Model:** [Web Components](https://developer.mozilla.org/en-US/docs/Web/API/Web_components) (Shadow DOM + Constructable Stylesheets)
-- **Testing:** [Vitest](https://vitest.dev/) with `jsdom`
 - **Architecture:** Event-Driven with a Centralized Store
 - **Storage:** [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API) for local-only template persistence
 
-### Architecture
-The project follows a modular, event-driven architecture:
-- **Core Layer:** `EventBus` for decoupled communication, `Store` for centralized state management, `UISoundManager` for tactile feedback, and `IndexedDBStorage`.
-- **Domain Layer:** Models (Label, Elements), Services (CanvasRenderer, PDFGenerator, HistoryManager), and Validators.
-- **UI Layer:** Pure Web Components (Shadow DOM) that react to state changes via the `EventBus`.
-
 ## Development Conventions
 
-### Code Style (Pragmatic Excellence)
-
-#### 1. TypeScript & Tipagem Estrita
+### 1. Code Style (Pragmatic Excellence)
 - ❌ **Proibido:** Uso de `any` em qualquer contexto.
-- ✅ **Permitido:** `unknown` combinado com *type guards* quando o tipo for realmente imprevisível.
-- ✅ **Obrigatório:** Modificadores de acesso explícitos (`private`, `protected`, `public`) em todos os membros de classe.
-- ✅ **Obrigatório:** Tipagem explícita de retorno em todas as funções e métodos públicos.
+- ✅ **Obrigatório:** Modificadores de acesso explícitos e tipagem de retorno em funções públicas.
+- ✅ **Shadow DOM:** Uso obrigatório para isolamento de estilos. Preferir `adoptedStyleSheets`.
 
-#### 2. Web Components (Shadow DOM)
-- ✅ **Shadow DOM:** Uso obrigatório para isolamento total de estilos e encapsulamento.
-- ✅ **Estilização:** Preferir `adoptedStyleSheets` para carregar CSS compartilhado (evitar injeção de `<style>` no `innerHTML`).
-- ✅ **Nomenclatura:** Prefixos semânticos `ui-` (reutilizáveis), `app-` (layout/funcional), `editor-` (domínio específico).
-- ✅ **Lifecycles:** `connectedCallback` e `disconnectedCallback` devem ser usados apenas para inicializar/limpar a UI e listeners, nunca para lógica de negócio pesada.
+### 2. Core Strategies
+- **Sincronização Atômica (Atomic Sync):** Para evitar a perda de foco e performance em re-renders, os componentes do editor seguem o padrão `renderSkeleton()` (executado uma vez) e `syncValues()` (atualizações granulares dos inputs/propriedades). Nunca use `innerHTML = ...` para atualizar valores em componentes complexos com inputs ativos.
+- **Event-Driven Orchestration:** Toda comunicação entre módulos (Rack, Cockpit, Canvas) deve passar pelo `EventBus` tipado. Consulte o [Event System Registry](./docs/Event_System_Registry.md) para a lista completa de contratos.
+- **Worker Fidelity:** A geração de PDFs massivos ocorre em `BatchWorker.ts` via `OffscreenCanvas`. Para fidelidade de 100%, o `FontTransfer` captura binários da Main Thread e os injeta no Worker.
+- **CSS Isolation:** O uso de `isolation: isolate` em containers de nível 1 (Aside, Modais) é obrigatório para gerenciar contextos de empilhamento (Z-Index) sem hacks.
 
-### Design System (Tactile Prism)
+### 3. Design System (Tactile Prism)
 - **Theme:** Native Dark Mode.
-- **Colors:** Canvas (`#0f1115`), Surface (`#161920`), Primary Accent Indigo (`#6366f1`).
-- **Typography:** `Inter`/`Geist` para UI, `JetBrains Mono`/`Geist Mono` para dados/code.
-- **Interactions:** Use spring physics for animations (`--ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1)`).
+- **Interactions:** Use spring physics (`--ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1)`).
+- **Typography:** `Inter` para UI, `JetBrains Mono` para dados técnicos.
 
-### Arquivos de referencia
-- **Proposta inicial** [Proposta](./docs/proposta%20de%20arquitetura.md)
-- **Design** [Design System](./docs/Design_System.md)
-- **Layout** [Layout/Ux](./docs/Layout_UX_Guide.md), [Welcome](./docs/Feature_Boot_And_Help.md), [The vault](./docs/Feature_The_Vault.md)
-- **Elements** [Definição de elementos](./docs/definition_elements.md)
-- **Event docs** [EventMap](./docs/Event_System_Registry.md)
-- **Skill de planejamento** [Multi-Agent Project Planner](./docs/Multi-Agent%20Project%20Planner.md)
+### Arquivos de Referência
+- **Design & Layout:** [Design System](./docs/Design_System.md) | [Layout/UX](./docs/Layout_UX_Guide.md)
+- **Elementos:** [Definição](./docs/definition_elements.md) | [Futuro](./docs/definition_elements_details_future.md)
+- **Documentação Viva:** [Help Center](./src/assets/data/helpData.ts) | [Event Registry](./docs/Event_System_Registry.md)
 
 ## Session Logs
 
-### 2026-05-16: Resiliência & Proteção de Dados
-- **Task 36 (Work Resumption & Protection):** Implementada camada de segurança contra perda de dados.
-  - **Auto-save:** Novo `SessionManager` salva o estado instântaneo no IndexedDB a cada edição (v2 do DB).
-  - **Dirty State:** Rastreamento de mudanças não sincronizadas com o cofre (Vault).
-  - **Proteção de Saída:** Bloqueio nativo de fechamento de aba se houver trabalho pendente.
-  - **UI Feedback:** Indicador "Unsaved" âmbar na Status Bar para consciência situacional.
-  - **Boot BIOS:** Refatoração da sequência de inicialização para restauração silenciosa de sessão.
+### 2026-05-21: Biblioteca de Ativos & Drag and Drop
+- **Task 78 (Asset Library):** Implementado o gerenciador de recursos visuais ("The Parts Bin").
+  - **Grid Masonry:** Miniaturas organizadas em 2 colunas com suporte a categorias (SVGs, Logos, Uploads).
+  - **Native Drag & Drop:** Arraste de assets diretamente do painel lateral para o Canvas com posicionamento preciso.
+  - **Persistência IDB:** Uploads de usuários são salvos permanentemente no IndexedDB v4.
+  - **Juice Tátil:** Feedback visual de glow no Canvas durante o arraste e sons de "velcro/encaixe".
+- **Evolução da Documentação:** `GEMINI.md` atualizado com estratégias core (Atomic Sync, CSS Isolation).
+
+### 2026-05-20: Consolidação & Documentação
+- **Task 20 (Documentation Expansion):** Refatoração massiva do README.md técnico e sincronização do Event Registry.
+- **Task 23 (Shortcuts Pro):** Planejamento do novo motor de atalhos "Power User".
 
 ### 2026-05-18: Fidelidade Tipográfica & Performance de Dados
-- **Task 83 (Font Fidelity in Workers):** Alcançada fidelidade visual de 100% no PDF final.
-  - **Captura Resiliente:** Motor de extração de fontes capaz de atravessar CORS e `@import` recursivos.
-  - **Multi-level Cache:** Implementado cache em memória (Sessão) e persistência em IndexedDB (v3) para binários de fontes.
-  - **Zero Redundância:** Downloads e varreduras de CSS ocorrem apenas uma vez, otimizando drasticamente a geração de lotes repetidos.
-- **Task 50 & 58 Refinements:** Melhorias de sincronização atômica no Elemento de Código e Metadados.
-- **Task 38 (Tipografia Avançada):** Implementados controles profissionais de texto.
-  - **Tracking:** Suporte nativo a `letter-spacing` (mm) utilizando a API `ctx.letterSpacing` do Canvas 2D.
-  - **Text Transform:** Opções de `Uppercase`, `Lowercase` e `None` integradas ao renderer e inspector.
-  - **UI:** Novos scrubbers e seletores adicionados à seção de Texto do Cockpit.
-  - **QA:** Estabilização total das suítes de testes unitários (49/49 passando).
+- **Task 83 (Font Fidelity):** 100% de paridade visual no Worker via captura de binários (CORS ready).
+- **Task 85 (Typeface Engine):** Injeção dinâmica de Google Fonts com persistência no projeto.
+- **Task 50 & 58 Refinements:** Sincronização atômica no Elemento de Código e Metadados de Lote.
+
+### 2026-05-16: Resiliência & Proteção de Dados
+- **Task 36 (Work Resumption):** Auto-save real no IndexedDB (v2), Dirty State e Proteção de Saída.
+- **Task 81 (CSS Isolation):** Cleanup de Z-Index via contextos de empilhamento explícitos.
 
 ### 2026-05-12: Estúdio de Produção & Impressão Dinâmica
 - **Task 77 & 67 (Unified Production):** Migração do fluxo de lote para o cockpit lateral e suporte a papéis dinâmicos.
-
-### 2026-05-11 (Extra): Entrada Unificada de Dados
-- **Task 82 (Data Gateway):** Implementado o componente `<ui-data-gateway>` para centralizar a entrada de dados.
-
-### 2026-05-11: Automação de Dados & Time Machine
-- **Task 79 (Variable Manager):** Implementado o orquestrador visual de pipeline de dados.
-- **Task 80 (History Visualizer):** Implementada a "Time Machine" para navegação visual do histórico.
-
-### 2026-05-09: Unificação de UI & Robustez de Teclado
-- **Task 73 (Universal Select):** Finalizada a migração de todos os seletores nativos para o componente `AppSelect`.
-- **Task 76 (Active Slot):** Arquitetura modular de módulos no cockpit lateral.
+- **Task 24 (Batch Workers):** Geração de PDF em background com compressão JPEG variável.

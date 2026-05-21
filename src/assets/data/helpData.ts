@@ -87,6 +87,10 @@ const helpData = {
       tip: 'Aperte [Ctrl+/] para ver a lista completa de atalhos e acelerar seu fluxo de trabalho.',
     },
     {
+      icon: 'image',
+      tip: 'Arquivos com "logo" no nome ou em formato .SVG são categorizados automaticamente na biblioteca.',
+    },
+    {
       icon: 'move',
       tip: 'Segure a tecla [Alt] enquanto arrasta com as setas para mover elementos com precisão de 0.1mm.',
     },

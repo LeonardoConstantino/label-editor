@@ -292,6 +292,14 @@ export class ModuleRack extends HTMLElement {
           </div>
         </div>
 
+        <div class="rack-item" data-id="assets">
+          <ui-icon name="image" class="mt-0.5 text-accent-primary" style="pointer-events: none;"></ui-icon>
+          <div class="item-text">
+            <span class="item-title">Asset Library</span>
+            <span class="item-desc">Project images, logos and reusable parts.</span>
+          </div>
+        </div>
+
         <div class="rack-item" data-id="history">
           <ui-icon name="clock" class="mt-0.5 text-accent-primary" style="pointer-events: none;"></ui-icon>
           <div class="item-text">

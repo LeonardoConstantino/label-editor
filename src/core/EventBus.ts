@@ -62,6 +62,7 @@ export interface EventMap {
   
   // Commands
   'command:toolbar:upload-image': { source?: string };
+  'command:canvas:drop-asset': { x: number; y: number; asset: { type: string, src: string, name: string } };
   'request:canvas:snapshot': (ctx: CanvasRenderingContext2D) => void;
   'command:canvas:restore': ImageData;
 }
