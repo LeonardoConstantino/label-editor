@@ -2,6 +2,7 @@ import { sharedSheet } from '../../utils/shared-styles';
 import { SoundPreset, UISM } from '../../core/UISoundManager';
 import eventBus from '../../core/EventBus';
 import { store, AppState } from '../../core/Store';
+import { UIKeyboardShortcuts } from '../common/KeyboardShortcuts';
 
 const destraqueCartucho: SoundPreset = {
   freq: 700,
@@ -84,6 +85,11 @@ export class ModuleRack extends HTMLElement {
 
   disconnectedCallback() {
     this._abortController?.abort();
+  }
+  
+  private getShortcutHTML(keyOrId: string): string {
+    const rendered = UIKeyboardShortcuts.renderShortcut(keyOrId);
+    return rendered ? rendered.html : `<kbd class="kbd-prism">${keyOrId}</kbd>`;
   }
 
   private setupListeners() {
@@ -279,7 +285,10 @@ export class ModuleRack extends HTMLElement {
         <div class="rack-item" data-id="blueprint">
           <ui-icon name="settings" class="mt-0.5 text-accent-primary" style="pointer-events: none;"></ui-icon>
           <div class="item-text">
-            <span class="item-title">Blueprint Setup</span>
+            <div class="flex items-center justify-between">
+               <span class="item-title">Blueprint Setup</span>
+               ${this.getShortcutHTML('ALT+1')}
+            </div>
             <span class="item-desc">Canvas dimensions, DPI and background.</span>
           </div>
         </div>
@@ -287,7 +296,10 @@ export class ModuleRack extends HTMLElement {
         <div class="rack-item" data-id="layers">
           <ui-icon name="layers" class="mt-0.5 text-accent-primary" style="pointer-events: none;"></ui-icon>
           <div class="item-text">
-            <span class="item-title">Layer Properties</span>
+            <div class="flex items-center justify-between">
+              <span class="item-title">Layer Properties</span>
+              ${this.getShortcutHTML('ALT+2')}
+            </div>
             <span class="item-desc">Detailed editing for selected elements.</span>
           </div>
         </div>
@@ -295,7 +307,10 @@ export class ModuleRack extends HTMLElement {
         <div class="rack-item" data-id="assets">
           <ui-icon name="image" class="mt-0.5 text-accent-primary" style="pointer-events: none;"></ui-icon>
           <div class="item-text">
-            <span class="item-title">Asset Library</span>
+            <div class="flex items-center justify-between">
+              <span class="item-title">Asset Library</span>
+              ${this.getShortcutHTML('ALT+3')}
+            </div>
             <span class="item-desc">Project images, logos and reusable parts.</span>
           </div>
         </div>
@@ -303,7 +318,10 @@ export class ModuleRack extends HTMLElement {
         <div class="rack-item" data-id="history">
           <ui-icon name="clock" class="mt-0.5 text-accent-primary" style="pointer-events: none;"></ui-icon>
           <div class="item-text">
-            <span class="item-title">Time Machine</span>
+            <div class="flex items-center justify-between">
+              <span class="item-title">Time Machine</span>
+              ${this.getShortcutHTML('ALT+4')}
+            </div>
             <span class="item-desc">Visual timeline and state restoration.</span>
           </div>
         </div>
@@ -311,7 +329,10 @@ export class ModuleRack extends HTMLElement {
         <div class="rack-item" data-id="variables">
           <ui-icon name="cpu" class="mt-0.5 text-accent-primary" style="pointer-events: none;"></ui-icon>
           <div class="item-text">
-            <span class="item-title">Variable Manager</span>
+            <div class="flex items-center justify-between">
+              <span class="item-title">Variable Manager</span>
+              ${this.getShortcutHTML('ALT+5')}
+            </div>
             <span class="item-desc">Visual data pipeline and formatters.</span>
           </div>
         </div>
@@ -319,7 +340,10 @@ export class ModuleRack extends HTMLElement {
         <div class="rack-item" data-id="typeface">
           <ui-icon name="text" class="mt-0.5 text-accent-primary" style="pointer-events: none;"></ui-icon>
           <div class="item-text">
-            <span class="item-title">Typeface Engine</span>
+            <div class="flex items-center justify-between">
+              <span class="item-title">Typeface Engine</span>
+              ${this.getShortcutHTML('ALT+6')}
+            </div>
             <span class="item-desc">Custom fonts and Google Fonts terminal.</span>
           </div>
         </div>
@@ -327,7 +351,10 @@ export class ModuleRack extends HTMLElement {
         <div class="rack-item" data-id="batch">
           <ui-icon name="lightning" class="mt-0.5 text-accent-success" style="pointer-events: none;"></ui-icon>
           <div class="item-text">
-            <span class="item-title">Production Studio</span>
+            <div class="flex items-center justify-between">
+              <span class="item-title">Production Studio</span>
+              ${this.getShortcutHTML('ALT+P')}
+            </div>
             <span class="item-desc">Batch processing and A4 layout export.</span>
           </div>
         </div>

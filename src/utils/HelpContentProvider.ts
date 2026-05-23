@@ -127,13 +127,15 @@ export const InspectorHelpData: Record<string, HelpTooltipConfig> = {
     title: 'Technical Guide',
     icon: 'cpu',
     commands: [
-      { key: 'Shift', label: 'Click', desc: 'Seleciona múltiplos elementos.' },
-      { key: 'Shift', label: 'Setas', desc: 'Ajuste rápido (±10mm)' },
-      { key: 'Alt', label: 'Setas', desc: 'Ajuste fino (±0.1mm)' }
+      { key: 'Alt+1..6', label: 'Modules', desc: 'Troca rápida de abas.' },
+      { key: '.', label: 'Cycle', desc: 'Seleciona próxima camada.' },
+      { key: '[ ]', label: 'Z-Index', desc: 'Avança/Recua camada.' },
+      { key: 'Shift', label: 'Arrows', desc: 'Ajuste rápido (±10mm)' },
+      { key: 'Alt', label: 'Arrows', desc: 'Ajuste fino (±0.1mm)' }
     ],
     proTip: {
       icon: 'keyboard',
-      text: 'Inputs aceitam fórmulas matemáticas. Pressione <kbd class="kbd-prism">Ctrl</kbd>+<kbd class="kbd-prism">/</kbd> para atalhos.',
+      text: 'Pressione <kbd class="kbd-prism">Ctrl</kbd>+<kbd class="kbd-prism">/</kbd> para o mapa completo de atalhos.',
       isSuccess: false
     }
   },

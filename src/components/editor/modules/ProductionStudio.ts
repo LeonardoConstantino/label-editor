@@ -10,6 +10,7 @@ import { confirmDialog } from '../../common/confirm';
 // Importar sub-componentes
 import '../../common/AppButton';
 import '../../common/icon';
+import '../../common/tooltip';
 import '../../common/UiDataGateway';
 import '../../common/ui-variable-badge';
 
@@ -128,7 +129,7 @@ export class ProductionStudio extends HTMLElement {
         :host { display: flex; flex-direction: column; height: 100%; background: #0a0c10; font-family: var(--font-sans); }
         .header { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border-bottom: 1px solid var(--color-border-ui); background: rgba(0,0,0,0.2); }
         .header-title { font-family: var(--font-mono); font-size: 10px; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.1em; }
-        
+        .header-description { font-size: 12px; color: var(--color-text-muted); }
         .content { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 24px; }
 
         .paginator-card {
@@ -174,17 +175,21 @@ export class ProductionStudio extends HTMLElement {
             </div>
             
             <div class="paginator-controls">
-              <button class="btn-nav" id="btn-prev" ${state.productionPreviewIndex === 0 ? 'disabled' : ''}>
-                <ui-icon name="chevron-left"></ui-icon>
-              </button>
+              <ui-tooltip tooltip="Previous record (Ctrl + <)" placement="top">
+                <button class="btn-nav" id="btn-prev" slot="target" ${state.productionPreviewIndex === 0 ? 'disabled' : ''}>
+                  <ui-icon name="chevron-left"></ui-icon>
+                </button>
+              </ui-tooltip>
               
               <div class="page-info">
                 RECORD ${String(state.productionPreviewIndex + 1).padStart(3, '0')} / ${state.productionData.length}
               </div>
               
-              <button class="btn-nav" id="btn-next" ${state.productionPreviewIndex >= state.productionData.length - 1 ? 'disabled' : ''}>
-                <ui-icon name="chevron-right"></ui-icon>
-              </button>
+              <ui-tooltip tooltip="Next record (Ctrl + >)" placement="top">
+                <button class="btn-nav" id="btn-next" slot="target" ${state.productionPreviewIndex >= state.productionData.length - 1 ? 'disabled' : ''}>
+                  <ui-icon name="chevron-right"></ui-icon>
+                </button>
+              </ui-tooltip>
             </div>
 
             <app-button id="btn-clear-data" variant="danger" style="width: 100%; font-size: 9px; margin-top: 8px;">

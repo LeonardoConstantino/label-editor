@@ -790,7 +790,7 @@ class KeyboardShortcutManager {
   // ==================== VALIDAÇÕES ====================
 
   private _validateKey(key: unknown): asserts key is string {
-    if (typeof key !== 'string' || key.trim() === '') {
+    if (typeof key !== 'string' || key.length === 0) {
       throw new TypeError('Key must be a non-empty string');
     }
   }

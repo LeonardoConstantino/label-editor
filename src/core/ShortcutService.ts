@@ -7,6 +7,7 @@ import { templateManager } from '../domain/services/TemplateManager';
 import { AnyElement, ElementType } from '../domain/models/Label';
 import { ElementFactory } from '../domain/models/elements/ElementFactory';
 import { getDebug } from '../constants/defaults';
+import { escapeHTML } from './../utils/sanitize';
 
 /**
  * PropClipboard: Armazena propriedades copiadas de um elemento.
@@ -20,6 +21,7 @@ interface PropClipboard {
 
 /**
  * ShortcutService: Orquestrador central de atalhos do Label Editor.
+ * Refatorado para usar o sistema de contextos nativo do KeyboardShortcutManager (Task 23).
  */
 class ShortcutService {
   private manager: KeyboardShortcutManager;
@@ -59,7 +61,6 @@ class ShortcutService {
     });
 
     // Estratégia para AppSelect: Protege atalhos quando um dropdown está aberto
-    // Como os eventos são DOM-level e borbulham, ouvimos no document.
     document.addEventListener('ui-select:open', () => {
       this.pushContext('input');
     });
@@ -69,7 +70,31 @@ class ShortcutService {
     });
   }
 
+  /**
+   * Helpers de contexto funcionais para o Manager.
+   */
+  private hasSelection = () => store.getState().selectedElementIds.length > 0;
+  private noSelection = () => store.getState().selectedElementIds.length === 0;
+
   private registerDefaults(): void {
+    // --- NAVEGAÇÃO DE MÓDULOS (Global) ---
+    const modules = ['blueprint', 'layers', 'assets', 'history', 'variables', 'typeface'];
+    modules.forEach((id, i) => {
+      this.manager.register(`alt+${i + 1}`, () => {
+        eventBus.emit('module:switch', { moduleId: id });
+        UISM.play(UISM.enumPresets.TAP);
+      }, { description: `Ir para módulo ${id}`, category: 'Navegação' });
+    });
+
+    this.manager.register('alt+arrowup', () => this.cycleModule('prev'), { description: 'Módulo anterior',context: ()=> this.noSelection(), category: 'Navegação' });
+    this.manager.register('alt+arrowdown', () => this.cycleModule('next'), { description: 'Próximo módulo',context: ()=> this.noSelection(), category: 'Navegação' });
+    this.manager.register('alt+arrowleft', () => this.navProduction('prev'), { description: 'Registro anterior',context: ()=> this.noSelection(), category: 'Produção' });
+    this.manager.register('alt+arrowright', () => this.navProduction('next'), { description: 'Próximo registro',context: ()=> this.noSelection(), category: 'Produção' });
+    
+    // Navegação de produção via Ctrl + setas
+    this.manager.register(`${this.metaKeyName}+arrowleft`, () => this.navProduction('prev'), { description: 'Registro anterior', context: ()=> this.noSelection(), category: 'Produção' });
+    this.manager.register(`${this.metaKeyName}+arrowright`, () => this.navProduction('next'), { description: 'Próximo registro', context: ()=> this.noSelection(), category: 'Produção' });
+
     // --- GESTÃO DE PROJETO ---
     this.manager.register(`${this.metaKeyName}+s`, (_e) => {
       eventBus.emit('template:save', { source: 'shortcut' });
@@ -77,11 +102,30 @@ class ShortcutService {
       eventBus.emit('notify', { message: 'Etiqueta salva com sucesso!', type: 'success' });
     }, { description: 'Salvar Template', category: 'Projeto', preventDefault: true });
 
+    this.manager.registerLongPress('s', () => {
+       UISM.play(UISM.enumPresets.SUCCESS);
+       eventBus.emit('template:save', { source: 'shortcut' });
+       eventBus.emit('notify', { message: 'Deep Sync em andamento...', type: 'info' });
+    }, { description: 'Sincronização Atômica', category: 'Easter Egg' });
+
     this.manager.register(`${this.metaKeyName}+alt+n`, (_e) => {
       templateManager.createNewProject();
       UISM.play(UISM.enumPresets.OPEN);
       eventBus.emit('notify', { message: 'Novo projeto criado', type: 'info' });
     }, { description: 'Novo Projeto', category: 'Projeto', preventDefault: true });
+
+    // --- MODAIS ---
+    this.manager.register('alt+v', () => {
+      const modal = document.getElementById('vault-modal') as any;
+      if (modal) modal.setAttribute('open', '');
+      UISM.play(UISM.enumPresets.OPEN);
+    }, { description: 'Abrir Vault', category: 'Projeto' });
+
+    this.manager.register('alt+p', () => {
+      const modal = document.getElementById('batch-modal') as any;
+      if (modal) modal.setAttribute('open', '');
+      UISM.play(UISM.enumPresets.OPEN);
+    }, { description: 'Abrir Produção', category: 'Produção' });
 
     // --- HISTÓRICO ---
     this.manager.register(`${this.metaKeyName}+z`, () => eventBus.emit('history:undo', { source: 'shortcut' }), 
@@ -90,18 +134,26 @@ class ShortcutService {
     this.manager.register(`${this.metaKeyName}+shift+z`, () => eventBus.emit('history:redo', { source: 'shortcut' }), 
       { description: 'Refazer', category: 'Edição', preventDefault: true });
 
-    // --- MANIPULAÇÃO DE ELEMENTOS ---
-    this.manager.register('delete', () => this.handleDelete(), {
-      description: 'Excluir Elemento', 
-      context: 'no-input',
-      preventDefault: true 
-    });
-    this.manager.register('backspace', () => this.handleDelete(), { description: 'Excluir Elemento', context: 'no-input', preventDefault: true });
+    // --- GESTÃO DE ELEMENTOS (Contexto: no-input) ---
+    this.manager.register('delete', () => this.handleDelete(), { description: 'Excluir', context: 'no-input', preventDefault: true });
+    this.manager.register('backspace', () => this.handleDelete(), { description: 'Excluir', context: 'no-input', preventDefault: true });
     
+    this.manager.register('v', () => eventBus.emit('element:select', []), { description: 'Ferramenta Seleção', context: 'no-input' });
+    this.manager.register('escape', () => eventBus.emit('element:select', []), { description: 'Ferramenta Seleção', context: 'no-input' });
+    
+    this.manager.register('.', () => this.cycleSelection('next'), { description: 'Próxima camada', context: 'no-input' });
+    this.manager.register(',', () => this.cycleSelection('prev'), { description: 'Camada anterior', context: 'no-input' });
+
+    this.manager.register('[', () => this.reorder('down'), { description: 'Recuar Camada', context: 'no-input' });
+    this.manager.register(']', () => this.reorder('up'), { description: 'Avançar Camada', context: 'no-input' });
+
     this.manager.register(`${this.metaKeyName}+d`, () => {
       const id = store.getState().selectedElementIds[0];
       if (id) eventBus.emit('element:duplicate', id);
     }, { description: 'Duplicar', category: 'Edição', context: 'no-input', preventDefault: true });
+
+    // --- MOVIMENTAÇÃO E REDIMENSIONAMENTO (Contextos Inteligentes) ---
+    this.registerTransformShortcuts();
 
     // --- PROP CLIPBOARD ---
     this.manager.register(`${this.metaKeyName}+alt+c`, () => this.copyProperties(), 
@@ -110,22 +162,9 @@ class ShortcutService {
     this.manager.register(`${this.metaKeyName}+alt+v`, () => this.pasteProperties(), 
       { description: 'Colar Propriedades', category: 'Edição', context: 'no-input', preventDefault: true });
 
-    // --- ORGANIZAÇÃO DE CAMADAS ---
-    this.manager.register(`${this.metaKeyName}+[`, () => this.reorder('down'), { description: 'Recuar Camada', category: 'Organizar' });
-    this.manager.register(`${this.metaKeyName}+]`, () => this.reorder('up'), { description: 'Avançar Camada', category: 'Organizar' });
-
     // --- VISIBILIDADE & BLOQUEIO ---
     this.manager.register(`${this.metaKeyName}+l`, () => this.toggleProp('locked'), { description: 'Bloquear/Desbloquear', category: 'Edição' });
     this.manager.register(`${this.metaKeyName}+shift+h`, () => this.toggleProp('visible'), { description: 'Ocultar/Mostrar', category: 'Edição' });
-
-    // --- SELEÇÃO ---
-    this.manager.register('escape', () => eventBus.emit('element:select', []), { description: 'Limpar Seleção' });
-
-    // --- MOVIMENTAÇÃO COM MULTIPLICADORES ---
-    this.registerMovementShortcuts();
-
-    // --- TOOLBAR RÁPIDA ---
-    this.registerToolbarShortcuts();
 
     // --- AJUDA ---
     this.manager.register(`${this.metaKeyName}+/`, () => {
@@ -138,21 +177,22 @@ class ShortcutService {
       UISM.play(UISM.enumPresets.OPEN);
     }, { description: 'Configurações', category: 'Ajuda', preventDefault: true });
 
-    //   logger.debug('ShortcutService', `Modo debug ${getDebug() ? 'ativado' : 'desativado'}!`);
-    //   eventBus.emit('notify', { message: `Modo debug ${getDebug() ? 'ativado' : 'desativado'}! Ver console para detalhes.`, type: 'warning', duration: 5000 });
+    // --- EASTER EGGS ---
+    this.manager.registerSequence(['p', 'r', 'i', 's', 'm'], () => {
+      eventBus.emit('notify', { message: 'PRISM MODE ACTIVE', type: 'success' });
+      document.body.style.filter = 'hue-rotate(90deg) contrast(1.2)';
+      setTimeout(() => document.body.style.filter = '', 5000);
+    }, { description: 'Modo Prism', category: 'Easter Egg' });
 
-    //   logger.setDeveloperMode(getDebug());
-    //   eventBus.setLog(getDebug());
-    //   this.manager.setDebug(getDebug());
-    // }, { description: 'Ativar Modo Debug', category: 'Easter Egg' });
+    // this.manager.registerLongPress(' ', () => {
+    //   document.body.style.cursor = 'grab';
+    //   eventBus.emit('notify', { message: 'Hand Tool Active', type: 'info' });
+    // }, { description: 'Ferramenta Mão', category: 'Navegação' });
 
-    this.manager.registerSequence(['t', 'e', 's', 't', 'e'], () => {
-      logger.debug('ShortcutService', 'Sequência de teste ativada!');
-      eventBus.emit('notify', { message: 'Sequência secreta ativada!', type: 'success', duration: 5000 });
-    }, { description: 'Sequência de Teste', category: 'Easter Egg' });
+    this.registerToolbarShortcuts();
   }
 
-  private registerMovementShortcuts(): void {
+  private registerTransformShortcuts(): void {
     const keys = ['arrowup', 'arrowdown', 'arrowleft', 'arrowright'];
     const deltas: Record<string, { x: number, y: number }> = {
       arrowup: { x: 0, y: -1 },
@@ -160,33 +200,115 @@ class ShortcutService {
       arrowleft: { x: -1, y: 0 },
       arrowright: { x: 1, y: 0 }
     };
-    const descriptionMap: Record<string, string> = {
+    const moveDescriptionMap: Record<string, string> = {
       arrowup: 'Mover para cima',
       arrowdown: 'Mover para baixo',
       arrowleft: 'Mover para a esquerda',
       arrowright: 'Mover para a direita'
     };
+    const resizeDescriptionMap: Record<string, string> = {
+      arrowup: 'Redimensionar altura',
+      arrowdown: 'Redimensionar altura',
+      arrowleft: 'Redimensionar largura',
+      arrowright: 'Redimensionar largura'
+    };
 
     keys.forEach(key => {
+      const d = deltas[key];
       // Registrar combinações para cada tecla de seta
       // Alt (0.1) | Normal (1.0) | Shift (10.0)
-      this.manager.register(key, (e) => {
-        let multiplier = 1;
-        if (e.shiftKey) multiplier = 10;
-        if (e.altKey) multiplier = 0.1;
-        const d = deltas[key];
-        this.moveSelectedElement(d.x * multiplier, d.y * multiplier);
-      }, {description: descriptionMap[key], context: 'no-input', preventDefault: true });
+      this.manager.register(key, (_e) => {
+        this.moveSelectedElement(d.x * 1, d.y * 1);
+      }, {description: moveDescriptionMap[key],category: 'Edição movimentação', context: 'no-input', preventDefault: true });
 
       this.manager.register(`shift+${key}`, (_e) => {
-        const d = deltas[key];
         this.moveSelectedElement(d.x * 10, d.y * 10);
-      }, { description: `${descriptionMap[key]} rápido`, context: 'no-input', preventDefault: true });
+      }, { description: `${moveDescriptionMap[key]} rápido`,category: 'Edição movimentação', context: 'no-input', preventDefault: true });
 
       this.manager.register(`alt+${key}`, (_e) => {
-        const d = deltas[key];
         this.moveSelectedElement(d.x * 0.1, d.y * 0.1);
-      }, { description: `${descriptionMap[key]} lento`, context: 'no-input', preventDefault: true });
+      }, { description: `${moveDescriptionMap[key]} lento`,category: 'Edição movimentação', context: 'no-input', preventDefault: true });
+      
+      // Redimensionar Elemento (Ctrl + Arrows)
+      this.manager.register(`${this.metaKeyName}+${key}`, (e) => {
+        this.resizeSelectedElement(d.x * 1, d.y * 1);
+      }, { 
+        description: `${resizeDescriptionMap[key]}`, 
+        category: 'Edição redimensionamento',
+        context: this.hasSelection, 
+        preventDefault: true 
+      });
+
+      this.manager.register(`${this.metaKeyName}+shift+${key}`, (e) => {
+        this.resizeSelectedElement(d.x * 10, d.y * 10);
+      }, { 
+        description: `${resizeDescriptionMap[key]} rápido`, 
+        category: 'Edição redimensionamento',
+        context: this.hasSelection, 
+        preventDefault: true 
+      });
+
+      this.manager.register(`${this.metaKeyName}+alt+${key}`, (e) => {
+        this.resizeSelectedElement(d.x * 0.1, d.y * 0.1);
+      }, { 
+        description: `${resizeDescriptionMap[key]} lento`, 
+        category: 'Edição redimensionamento',
+        context: this.hasSelection, 
+        preventDefault: true
+      });
+    });
+  }
+
+  private cycleModule(dir: 'next' | 'prev') {
+    const modules = ['blueprint', 'layers', 'assets', 'history', 'variables', 'typeface'];
+    const current = store.getState().activeModuleId;
+    let idx = modules.indexOf(current as any);
+    if (dir === 'next') idx = (idx + 1) % modules.length;
+    else idx = (idx - 1 + modules.length) % modules.length;
+    eventBus.emit('module:switch', { moduleId: modules[idx] });
+    UISM.play(UISM.enumPresets.TAP);
+  }
+
+  private cycleSelection(dir: 'next' | 'prev') {
+    const state = store.getState();
+    const label = state.currentLabel;
+    if (!label || label.elements.length === 0) return;
+
+    const elements = [...label.elements].sort((a, b) => b.zIndex - a.zIndex);
+    const currentId = state.selectedElementIds[0];
+    let idx = elements.findIndex(el => el.id === currentId);
+
+    if (dir === 'next') idx = (idx + 1) % elements.length;
+    else idx = (idx - 1 + elements.length) % elements.length;
+
+    eventBus.emit('element:select', elements[idx].id);
+    UISM.play(UISM.enumPresets.SELECT);
+  }
+
+  private navProduction(dir: 'next' | 'prev') {
+    const state = store.getState();
+    if (state.productionData.length === 0) return;
+    let newIndex = state.productionPreviewIndex;
+    if (dir === 'next') newIndex = Math.min(state.productionData.length - 1, newIndex + 1);
+    else newIndex = Math.max(0, newIndex - 1);
+    eventBus.emit('production:preview:index', { index: newIndex });
+    UISM.play(UISM.enumPresets.TAP);
+  }
+
+  private resizeSelectedElement(dw: number, dh: number) {
+    const state = store.getState();
+    const id = state.selectedElementIds[0];
+    const el = state.currentLabel?.elements.find(e => e.id === id);
+    if (!el || el.locked || !('dimensions' in el)) return;
+
+    eventBus.emit('element:update', {
+      id,
+      updates: {
+        dimensions: {
+          width: Math.max(1, Number((el.dimensions.width + dw).toFixed(2))),
+          height: Math.max(1, Number((el.dimensions.height + dh).toFixed(2)))
+        }
+      }
     });
   }
 

@@ -110,7 +110,7 @@ export class EditorToolbar extends HTMLElement {
             ${this.getShortcutHTML('t')}
           </div>
           <p class="text-text-muted text-[10px] leading-relaxed">
-            Adiciona uma nova camada de texto dinâmico ou estático.
+            Adiciona uma nova camada de texto. <span class="text-accent-primary opacity-80 font-bold">(Long-press)</span>
           </p>
         </div>
       </ui-tooltip>
@@ -125,7 +125,7 @@ export class EditorToolbar extends HTMLElement {
             ${this.getShortcutHTML('r')}
           </div>
           <p class="text-text-muted text-[10px] leading-relaxed">
-            Desenha um retângulo no canvas. Segure ${this.getShortcutHTML('shift+r')} para quadrado.
+            Desenha um retângulo. Segure ${this.getShortcutHTML('shift+r')} para quadrado. <span class="text-accent-primary opacity-80 font-bold">(Long-press)</span>
           </p>
         </div>
       </ui-tooltip>
@@ -140,7 +140,7 @@ export class EditorToolbar extends HTMLElement {
             ${this.getShortcutHTML('i')}
           </div>
           <p class="text-text-muted text-[10px] leading-relaxed">
-            Importa um arquivo local de imagem ou logotipo para a etiqueta.
+            Importa um logotipo local. <span class="text-accent-primary opacity-80 font-bold">(Long-press)</span>
           </p>
         </div>
       </ui-tooltip>
@@ -155,7 +155,7 @@ export class EditorToolbar extends HTMLElement {
             ${this.getShortcutHTML('b')}
           </div>
           <p class="text-text-muted text-[10px] leading-relaxed">
-            Adiciona uma borda/moldura retangular em volta da etiqueta.
+            Adiciona uma borda na etiqueta. <span class="text-accent-primary opacity-80 font-bold">(Long-press)</span>
           </p>
         </div>
       </ui-tooltip>
@@ -251,7 +251,7 @@ export class EditorToolbar extends HTMLElement {
             ${this.getShortcutHTML('ctrl+s')}
           </div>
           <p class="text-text-muted text-[10px] leading-relaxed">
-            Persiste o design atual no banco de dados local do navegador.
+            Persiste o design localmente. <span class="text-accent-primary opacity-80 font-bold">(Long-press Deep Sync)</span>
           </p>
         </div>
       </ui-tooltip>
@@ -262,10 +262,11 @@ export class EditorToolbar extends HTMLElement {
         </app-button>
         <div slot="content" class="tooltip-rich-panel">
           <div class="flex items-center justify-between mb-1.5">
-            <span class="text-text-main text-[12px] font-semibold tracking-wide">Projeto</span>
+            <span class="text-text-main text-[12px] font-semibold tracking-wide">Cofre (Vault)</span>
+            ${this.getShortcutHTML('alt+v')}
           </div>
           <p class="text-text-muted text-[10px] leading-relaxed">
-            Importar ou exportar arquivos de design (.label) para backup ou compartilhamento.
+            Importar ou exportar arquivos .label. <span class="text-accent-primary opacity-80 font-bold">(Long-press)</span>
           </p>
         </div>
       </ui-tooltip>
@@ -276,11 +277,11 @@ export class EditorToolbar extends HTMLElement {
         </app-button>
         <div slot="content" class="tooltip-rich-panel">
           <div class="flex items-center justify-between mb-1.5">
-            <span class="text-text-main text-[12px] font-semibold tracking-wide">Gerar Lote</span>
-            ${this.getShortcutHTML('p')}
+            <span class="text-text-main text-[12px] font-semibold tracking-wide">Produção</span>
+            ${this.getShortcutHTML('alt+p')}
           </div>
           <p class="text-text-muted text-[10px] leading-relaxed">
-            Renderiza múltiplas etiquetas em alta qualidade para impressão.
+            Exportação em massa. <span class="text-accent-primary opacity-80 font-bold">(Long-press)</span>
           </p>
         </div>
       </ui-tooltip>
