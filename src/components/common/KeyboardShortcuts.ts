@@ -29,7 +29,7 @@ export class UIKeyboardShortcuts extends HTMLElement {
    * Só funciona se os dados já foram injetados via UIKeyboardShortcuts.data = [...]
    */
   public static renderShortcut(keyOrId: string, _variant: string = 'default'): { html: string, description: string } | null {
-    if (!this.shortcutsData.length) return null;
+    if (!this.shortcutsData?.length) return null;
 
     const cleanKey = keyOrId.toLowerCase();
     const item = this.shortcutsData.find(s => 

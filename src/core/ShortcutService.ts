@@ -27,6 +27,8 @@ class ShortcutService {
   private isInitialized = false;
   private propClipboard: PropClipboard | null = null;
   private metaKeyName: string = 'ctrl';
+  private prismMode: boolean = false;
+  private readonly ZOOM_LEVELS = [0.1, 0.25, 0.5, 0.75, 1, 1.5, 2, 3, 4, 5];
 
   constructor() {
     this.manager = new KeyboardShortcutManager({
@@ -80,6 +82,32 @@ class ShortcutService {
 
   private registerDefaults(): void {
     // --- NAVEGAÇÃO DE MÓDULOS (Global) ---
+    this.registerModuleNavigationShortcuts();
+    // --- GESTÃO DE PROJETO ---
+    this.projectManagementShortcuts();
+    // --- MODAIS ---
+    this.registerModaisManagementShortcuts();
+    // --- HISTÓRICO ---
+    this.registerHistoryManagementShortcuts();
+    // --- GESTÃO DE ELEMENTOS (Contexto: no-input) ---
+    this.registerElementManagementShortcuts();
+    // --- PROP CLIPBOARD ---
+    this.registerClipboardShortcuts();
+    // --- VISIBILIDADE & BLOQUEIO ---
+    this.registerVisibilityAndLockShortcuts();
+    // --- AJUDA ---
+    this.registerHelp();
+    // --- MOVIMENTAÇÃO E REDIMENSIONAMENTO (Contextos Inteligentes) ---
+    this.registerTransformShortcuts();
+    // --- TOOLBAR (Global) ---
+    this.registerToolbarShortcuts();
+    // --- ZOOM (Global) ---
+    this.registerZoomShortcuts();
+    // --- EASTER EGGS ---
+    this.registerEasterEggs();
+  }
+
+  private registerModuleNavigationShortcuts() {
     const modules = [
       'blueprint',
       'layers',
@@ -129,8 +157,9 @@ class ShortcutService {
         category: 'Produção',
       },
     );
+  }
 
-    // --- GESTÃO DE PROJETO ---
+  private projectManagementShortcuts() {
     this.manager.register(
       `${this.metaKeyName}+s`,
       (_e) => {
@@ -177,8 +206,9 @@ class ShortcutService {
         preventDefault: true,
       },
     );
+  }
 
-    // --- MODAIS ---
+  private registerModaisManagementShortcuts() {
     this.manager.register(
       'alt+v',
       () => {
@@ -198,8 +228,9 @@ class ShortcutService {
       },
       { description: 'Abrir Produção', category: 'Produção' },
     );
+  }
 
-    // --- HISTÓRICO ---
+  private registerHistoryManagementShortcuts() {
     this.manager.register(
       `${this.metaKeyName}+z`,
       () => eventBus.emit('history:undo', { source: 'shortcut' }),
@@ -211,8 +242,9 @@ class ShortcutService {
       () => eventBus.emit('history:redo', { source: 'shortcut' }),
       { description: 'Refazer', category: 'Edição', preventDefault: true },
     );
+  }
 
-    // --- GESTÃO DE ELEMENTOS (Contexto: no-input) ---
+  private registerElementManagementShortcuts() {
     this.manager.register('delete', () => this.handleDelete(), {
       description: 'Excluir',
       context: 'no-input',
@@ -228,6 +260,7 @@ class ShortcutService {
     //   description: 'deselecionar elementos',
     //   context: 'no-input',
     // });
+
     this.manager.register('escape', () => eventBus.emit('element:select', []), {
       description: 'deselecionar elementos',
       context: 'no-input',
@@ -264,11 +297,9 @@ class ShortcutService {
         preventDefault: true,
       },
     );
+  }
 
-    // --- MOVIMENTAÇÃO E REDIMENSIONAMENTO (Contextos Inteligentes) ---
-    this.registerTransformShortcuts();
-
-    // --- PROP CLIPBOARD ---
+  private registerClipboardShortcuts() {
     this.manager.register(
       `${this.metaKeyName}+alt+c`,
       () => this.copyProperties(),
@@ -290,8 +321,9 @@ class ShortcutService {
         preventDefault: true,
       },
     );
+  }
 
-    // --- VISIBILIDADE & BLOQUEIO ---
+  private registerVisibilityAndLockShortcuts() {
     this.manager.register(
       `${this.metaKeyName}+l`,
       () => this.toggleProp('locked'),
@@ -302,8 +334,9 @@ class ShortcutService {
       () => this.toggleProp('visible'),
       { description: 'Ocultar/Mostrar', category: 'Edição' },
     );
+  }
 
-    // --- AJUDA ---
+  private registerHelp() {
     this.manager.register(
       `${this.metaKeyName}+/`,
       () => {
@@ -325,41 +358,50 @@ class ShortcutService {
       },
       { description: 'Configurações', category: 'Ajuda', preventDefault: true },
     );
+  }
 
-    // --- EASTER EGGS ---
+  private registerEasterEggs = () => {
+    // Easter Egg: Konami Code para Modo Prism
+    this.manager.registerKonamiCode(
+      () => {
+        logger.info(
+          'ShortcutService',
+          'Sera implementado em breve... (Konami Code)',
+        );
+      },
+      { description: 'Em desenvolvimento...', category: 'Easter Egg' },
+    );
+
     this.manager.registerSequence(
       ['p', 'r', 'i', 's', 'm'],
       () => {
         eventBus.emit('notify', {
-          message: 'PRISM MODE ACTIVE',
+          message: `PRISM MODE ${this.prismMode ? 'DESATIVADO' : 'ATIVADO'}!`,
           type: 'success',
         });
+
+        if (this.prismMode) {
+          document.body.style.filter = '';
+          this.prismMode = false;
+          return;
+        }
+
         document.body.style.filter = 'hue-rotate(90deg) contrast(1.2)';
-        setTimeout(() => (document.body.style.filter = ''), 5000);
+        this.prismMode = true;
       },
       { description: 'Modo Prism', category: 'Easter Egg' },
     );
 
-    this.manager.registerSequence(
-      ['k', 'b', 'd'],
-      () => {
-        eventBus.emit('notify', {
-          message: 'KBD MODE ACTIVE',
-          type: 'success',
-        });
-        console.log(this.manager.listShortcuts());
-      },
-      { description: 'Modo KBD', category: 'Easter Egg' },
+    // Easter Egg: Fibonacci Sequence
+    this.manager.registerFibonacciSequence(() => {
+      logger.info(
+        'ShortcutService',
+        'Sera implementado em breve... (Fibonacci Sequence)',
+      );
+    },
+      { description: 'Em desenvolvimento...', category: 'Easter Egg' },
     );
-
-    // this.manager.registerLongPress(' ', () => {
-    //   document.body.style.cursor = 'grab';
-    //   eventBus.emit('notify', { message: 'Hand Tool Active', type: 'info' });
-    // }, { description: 'Ferramenta Mão', category: 'Navegação' });
-
-    this.registerToolbarShortcuts();
-    this.registerZoomShortcuts();
-  }
+  };
 
   private registerTransformShortcuts(): void {
     const keys = ['arrowup', 'arrowdown', 'arrowleft', 'arrowright'];
@@ -466,8 +508,6 @@ class ShortcutService {
       );
     });
   }
-
-  private readonly ZOOM_LEVELS = [0.1, 0.25, 0.5, 0.75, 1, 1.5, 2, 3, 4, 5];
 
   private registerZoomShortcuts(): void {
     this.manager.register(

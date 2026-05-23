@@ -5,11 +5,11 @@ import { UISM } from '../../core/UISoundManager';
 import { UnitConverter } from '../../utils/units';
 import { ElementFactory } from '../../domain/models/elements/ElementFactory';
 import { templateManager } from '../../domain/services/TemplateManager';
+import { UIKeyboardShortcuts } from '../common/KeyboardShortcuts';
+import { sharedSheet } from '../../utils/shared-styles';
 import '../common/AppButton';
 import '../common/icon';
 import '../common/tooltip';
-import { sharedSheet } from '../../utils/shared-styles';
-import { UIKeyboardShortcuts } from '../common/KeyboardShortcuts';
 
 /**
  * EditorToolbar: A "Pílula de Controle" flutuante do Cockpit.

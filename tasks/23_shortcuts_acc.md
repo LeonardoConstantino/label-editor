@@ -33,7 +33,7 @@ Transformar a interação com o teclado em uma experiência de alta produtividad
 - Bloquear explicitamente atalhos do navegador durante o foco no app: `Ctrl+D` (favoritos), `Ctrl+P` (impressão padrão), `Ctrl+S` (salvar página).
 
 ## Critérios de Aceite
-- [ ] Atalhos de navegação funcionam sem tirar as mãos do teclado.
-- [ ] Redimensionamento via teclado é suave e preciso.
+- [x] Atalhos de navegação funcionam sem tirar as mãos do teclado.
+- [x] Redimensionamento via teclado é suave e preciso.
 - [ ] Pelo menos 2 Easter Eggs funcionais com sequências.
 - [ ] Feedback sonoro diferenciado para atalhos de sistema vs atalhos de design.

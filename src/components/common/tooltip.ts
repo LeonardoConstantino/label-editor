@@ -162,11 +162,6 @@ balloonStyles.replaceSync(`
     align-items: center;
   }
 
-  [part="content"] kbd {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-  }
 
   [part="content"] .control-desc {
     font-size: 11px;
