@@ -59,6 +59,7 @@ export interface EventMap {
   'preferences:change': UserPreferences;
   'template:save': { source?: string };
   'template:saved': Label;
+  'asset:edit': import('../components/editor/modules/AssetLibrary').Asset;
   
   // Commands
   'command:toolbar:upload-image': { source?: string };

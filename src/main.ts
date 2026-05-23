@@ -15,6 +15,7 @@ import { getOSInfo } from './utils/os-detection';
 import './components/editor/EditorCanvas';
 import './components/editor/Toolbar';
 import './components/editor/AppCockpit';
+import './components/editor/modules/MicroImageEditor';
 import './components/editor/StatusBar';
 import './components/editor/VaultGallery';
 import './components/editor/WelcomeScreen';

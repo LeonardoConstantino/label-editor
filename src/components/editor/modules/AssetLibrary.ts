@@ -95,6 +95,17 @@ export class AssetLibrary extends HTMLElement {
         if (isConfirmed) {
           this.deleteAsset(id);
         }
+        return;
+      }
+
+      const editBtn = target.closest('.btn-edit-asset');
+      if (editBtn) {
+        e.stopPropagation();
+        const id = editBtn.getAttribute('data-id')!;
+        const asset = this._assets.find(a => a.id === id);
+        if (asset) {
+          this.openEditor(asset);
+        }
       }
     }, { signal });
 
@@ -125,6 +136,24 @@ export class AssetLibrary extends HTMLElement {
       const target = e.target as HTMLElement;
       target.closest('.asset-item')?.classList.remove('is-dragging');
     }, { signal });
+
+    
+    // const modal = document.getElementById('image-editor-modal') as any;
+    eventBus.on('ui:modal:close', (data) => {
+      if (data.id === 'image-editor-modal') {
+        this.loadAssets();
+      }
+    }, { signal });
+  }
+
+  private openEditor(asset: Asset) {
+    const modal = document.getElementById('image-editor-modal') as any;
+    const editor = modal?.querySelector('micro-image-editor') as any;
+    if (modal && editor) {
+      editor.asset = asset;
+      modal.setAttribute('open', '');
+      UISM.play(UISM.enumPresets.OPEN);
+    }
   }
 
   private async loadAssets() {
@@ -212,9 +241,14 @@ export class AssetLibrary extends HTMLElement {
         </div>
         <div class="asset-overlay">
            <span class="asset-name">${asset.name}</span>
-           <button class="btn-delete-asset" data-id="${asset.id}">
-              <ui-icon name="trash" size="xs"></ui-icon>
-           </button>
+           <div class="flex gap-1">
+             <button class="btn-action btn-edit-asset" data-id="${asset.id}" title="Edit Image">
+                <ui-icon name="edit" size="xs" style="transform: scale(0.8)"></ui-icon>
+             </button>
+             <button class="btn-action btn-delete-asset" data-id="${asset.id}" title="Delete">
+                <ui-icon name="trash" size="xs"></ui-icon>
+             </button>
+           </div>
         </div>
       </div>
     `).join('');
@@ -244,8 +278,12 @@ export class AssetLibrary extends HTMLElement {
         .asset-preview img { max-width: 100%; max-height: 100%; object-fit: contain; pointer-events: none; }
         .asset-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); opacity: 0; transition: opacity 0.2s; display: flex; align-items: flex-end; justify-content: space-between; padding: 8px; }
         .asset-item:hover .asset-overlay { opacity: 1; }
-        .asset-name { font-size: 8px; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 70%; }
-        .btn-delete-asset { background: rgba(244, 63, 94, 0.2); border: none; border-radius: 4px; color: var(--color-accent-danger); cursor: pointer; padding: 4px; display: grid; place-items: center; }
+        .asset-name { font-size: 8px; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 60%; }
+        
+        .btn-action { width: 22px; height: 22px; border: none; border-radius: 4px; cursor: pointer; display: grid; place-items: center; transition: all 0.2s; }
+        .btn-edit-asset { background: rgba(99, 102, 241, 0.2); color: var(--color-accent-primary); }
+        .btn-edit-asset:hover { background: var(--color-accent-primary); color: white; }
+        .btn-delete-asset { background: rgba(244, 63, 94, 0.2); color: var(--color-accent-danger); }
         .btn-delete-asset:hover { background: var(--color-accent-danger); color: white; }
         .empty-state { grid-column: 1 / -1; padding: 40px 0; text-align: center; color: var(--color-text-muted); font-size: 11px; }
         #asset-upload-input { display: none; }
