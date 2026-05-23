@@ -356,7 +356,14 @@ export class Store {
   }
 
   public getState(): Readonly<AppState> {
-    return Object.freeze(JSON.parse(JSON.stringify(this.state)));
+    // Otimização: Não usamos mais JSON.stringify em todo o estado.
+    // productionData pode ser enorme e travar a Main Thread.
+    return Object.freeze({
+      ...this.state,
+      // Clonamos profundamente apenas o design (Label) para garantir imutabilidade da estrutura
+      currentLabel: this.state.currentLabel ? JSON.parse(JSON.stringify(this.state.currentLabel)) : null,
+      // productionData é tratado como somente-leitura por convenção na UI
+    });
   }
 
   public loadLabel(label: Label): void {

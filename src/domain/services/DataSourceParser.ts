@@ -1,4 +1,7 @@
 import Papa from 'papaparse';
+import { DataSanitizer } from '../../core/DataSanitizer';
+import eventBus from '../../core/EventBus';
+import { logger } from '../../core/Logger';
 
 /**
  * ParsedTag: Representação estruturada de uma tag de interpolação.
@@ -160,7 +163,20 @@ export class DataSourceParser {
         header: true,
         skipEmptyLines: true,
         complete: (results) => {
-          resolve(results.data as Record<string, string>[]);
+          let rows = results.data as any[];
+          
+          if (rows.length > DataSanitizer.MAX_RECORDS) {
+            eventBus.emit('notify', { 
+              type: 'warning', 
+              message: `File too large. Limited to first ${DataSanitizer.MAX_RECORDS} records.` 
+            });
+            rows = rows.slice(0, DataSanitizer.MAX_RECORDS);
+          }
+
+          const sanitizedData = rows.map(row => 
+            DataSanitizer.sanitizeValue(row)
+          );
+          resolve(sanitizedData);
         },
         error: (error) => {
           reject(error);
@@ -174,8 +190,25 @@ export class DataSourceParser {
    */
   public async parseJSON(file: File): Promise<Record<string, any>[]> {
     const text = await file.text();
+    
+    // Guardião de tamanho total (Task 87)
+    if (text.length > DataSanitizer.MAX_FILE_SIZE_BYTES) {
+       eventBus.emit('notify', { type: 'error', message: 'File is too large for memory.' });
+       return [];
+    }
+
     const data = JSON.parse(text);
-    return Array.isArray(data) ? data : [data];
+    let list = Array.isArray(data) ? data : [data];
+
+    if (list.length > DataSanitizer.MAX_RECORDS) {
+      eventBus.emit('notify', { 
+        type: 'warning', 
+        message: `JSON too large. Limited to ${DataSanitizer.MAX_RECORDS} records.` 
+      });
+      list = list.slice(0, DataSanitizer.MAX_RECORDS);
+    }
+
+    return list.map(row => DataSanitizer.sanitizeValue(row));
   }
 
   /**
@@ -183,10 +216,29 @@ export class DataSourceParser {
    */
   public async parseTXT(file: File): Promise<Record<string, any>[]> {
     const text = await file.text();
+    
+    // Guardião de tamanho total (Task 87)
+    if (text.length > DataSanitizer.MAX_FILE_SIZE_BYTES) {
+       eventBus.emit('notify', { type: 'error', message: 'File is too large for processing.' });
+       return [];
+    }
+
     const trimmedText = text.trim();
-    return trimmedText
-      ? trimmedText.split('\n').map((v) => ({ nome: v.trim() }))
-      : [];
+    if (!trimmedText) return [];
+
+    let lines = trimmedText.split('\n');
+    
+    if (lines.length > DataSanitizer.MAX_RECORDS) {
+      eventBus.emit('notify', { 
+        type: 'warning', 
+        message: `TXT too large. Limited to ${DataSanitizer.MAX_RECORDS} lines.` 
+      });
+      lines = lines.slice(0, DataSanitizer.MAX_RECORDS);
+    }
+
+    return lines.map((v) => 
+      DataSanitizer.sanitizeValue({ nome: v.trim() })
+    );
   }
 
   /**
@@ -301,7 +353,12 @@ export class DataSourceParser {
 
     const def = FORMATTERS[name];
     if (def) {
-      return def.fn(value, params);
+      try {
+        return def.fn(value, params);
+      } catch (err) {
+        logger.error('Parser', `Formatter error: ${name}`, err);
+        return value;
+      }
     }
 
     return value;

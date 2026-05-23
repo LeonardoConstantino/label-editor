@@ -1,6 +1,8 @@
 import { sharedSheet } from '../../utils/shared-styles';
 import { UISM } from '../../core/UISoundManager';
 import { dataSourceParser } from '../../domain/services/DataSourceParser';
+import { DataSanitizer } from '../../core/DataSanitizer';
+import eventBus from '../../core/EventBus';
 
 /**
  * UiDataGateway: Portal de entrada unificado para dados (Manual + Arquivo).
@@ -125,8 +127,17 @@ export class UiDataGateway extends HTMLElement {
     
     if (!text) return;
 
-    const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
-    const data = lines.map(line => ({ nome: line }));
+    let lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+    
+    if (lines.length > DataSanitizer.MAX_RECORDS) {
+      eventBus.emit('notify', { 
+        type: 'warning', 
+        message: `Input too large. Limited to ${DataSanitizer.MAX_RECORDS} lines.` 
+      });
+      lines = lines.slice(0, DataSanitizer.MAX_RECORDS);
+    }
+
+    const data = lines.map(line => DataSanitizer.sanitizeValue({ nome: line }));
 
     if (data.length > 0) {
       this.emitDataReady(data, 'Manual List');

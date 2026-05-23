@@ -3,6 +3,7 @@ import eventBus from '../../../core/EventBus';
 import { db } from '../../../core/Database';
 import { UISM } from '../../../core/UISoundManager';
 import { imageProcessor } from '../../../utils/imageProcessor';
+import { DataSanitizer } from '../../../core/DataSanitizer';
 import { logger } from '../../../core/Logger';
 import { HelpContentProvider } from '../../../utils/HelpContentProvider';
 import { confirmDialog } from '../../common/confirm';
@@ -167,11 +168,24 @@ export class AssetLibrary extends HTMLElement {
 
   private async handleFileUpload(file: File) {
     try {
+      const fileName = file.name.toLowerCase();
+      
+      // Validação de Segurança para SVGs (Task 87)
+      if (fileName.endsWith('.svg')) {
+        const text = await file.text();
+        if (!DataSanitizer.isSafeSVG(text)) {
+          eventBus.emit('notify', { 
+            type: 'error', 
+            message: 'Unsafe SVG detected. Script injection blocked.' 
+          });
+          return;
+        }
+      }
+
       const processed = await imageProcessor.process(file, 0.8, 800);
       
       // Lógica de Categorização Inteligente
       let category: Asset['category'] = 'upload';
-      const fileName = file.name.toLowerCase();
       
       if (fileName.endsWith('.svg')) {
         category = 'svg';

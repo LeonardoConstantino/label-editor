@@ -4,7 +4,7 @@ import { store, AppState } from '../../../core/Store';
 import { UISM } from '../../../core/UISoundManager';
 import { HelpContentProvider } from '../../../utils/HelpContentProvider';
 import { ElementType } from '../../../domain/models/elements/BaseElement';
-import { escapeHTML } from '../../../utils/sanitize';
+import { DataSanitizer } from '../../../core/DataSanitizer';
 import { confirmDialog } from '../../common/confirm';
 
 // Importar sub-componentes
@@ -171,7 +171,7 @@ export class ProductionStudio extends HTMLElement {
           <div class="paginator-card">
             <div class="flex flex-col gap-1">
               <span class="label-prism" style="margin:0">Live Preview Paginator</span>
-              <span class="source-tag">${state.productionSourceName}</span>
+              <span class="source-tag">${DataSanitizer.escapeHTML(state.productionSourceName)}</span>
             </div>
             
             <div class="paginator-controls">
@@ -202,7 +202,7 @@ export class ProductionStudio extends HTMLElement {
             <div class="badge-list">
               ${dataFields.map(f => {
                 const isUsed = this._labelPlaceholders.includes(f);
-                return `<ui-variable-badge state="${isUsed ? 'used' : 'missing'}">${escapeHTML(f)}</ui-variable-badge>`;
+                return `<ui-variable-badge state="${isUsed ? 'used' : 'missing'}">${DataSanitizer.escapeHTML(f)}</ui-variable-badge>`;
               }).join('')}
             </div>
           </div>
@@ -214,7 +214,7 @@ export class ProductionStudio extends HTMLElement {
             ${this._labelPlaceholders.map(p => {
               const isAvailable = dataFields.includes(p);
               return `<span class="variable-badge ${isAvailable ? '' : 'missing'}">
-                {{${escapeHTML(p)}}} ${isAvailable ? '' : '⚠️'}
+                {{${DataSanitizer.escapeHTML(p)}}} ${isAvailable ? '' : '⚠️'}
               </span>`;
             }).join('')}
           </div>

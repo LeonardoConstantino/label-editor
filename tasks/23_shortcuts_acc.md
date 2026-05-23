@@ -35,5 +35,5 @@ Transformar a interação com o teclado em uma experiência de alta produtividad
 ## Critérios de Aceite
 - [x] Atalhos de navegação funcionam sem tirar as mãos do teclado.
 - [x] Redimensionamento via teclado é suave e preciso.
-- [ ] Pelo menos 2 Easter Eggs funcionais com sequências.
-- [ ] Feedback sonoro diferenciado para atalhos de sistema vs atalhos de design.
+- [x] Pelo menos 2 Easter Eggs funcionais com sequências.
+- [x] Feedback sonoro diferenciado para atalhos de sistema vs atalhos de design.

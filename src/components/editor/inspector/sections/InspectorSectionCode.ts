@@ -78,11 +78,11 @@ export class InspectorSectionCode extends HTMLElement {
         <div class="row-ui">
           <div style="flex: 1">
             <span class="label-prism">Color</span>
-            <app-color-picker data-prop="color"></app-color-picker>
+            <app-color-picker data-prop="color" no-transparent></app-color-picker>
           </div>
           <div style="flex: 1">
             <span class="label-prism">BG Color</span>
-            <app-color-picker data-prop="backgroundColor"></app-color-picker>
+            <app-color-picker data-prop="backgroundColor" no-transparent></app-color-picker>
           </div>
         </div>
 

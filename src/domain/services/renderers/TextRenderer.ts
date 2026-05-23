@@ -5,6 +5,7 @@ import { TextOverflow } from '../../models/elements/BaseElement';
 import { RenderContext } from '../CanvasRenderer';
 import { DataSourceParser } from '../DataSourceParser';
 import { UnitConverter } from '../../../utils/units';
+import { DataSanitizer } from '../../../core/DataSanitizer';
 
 /**
  * TextRenderer: Renderiza elementos de texto com suporte a Scale, Wrap e Variáveis.
@@ -37,6 +38,12 @@ export class TextRenderer implements IRenderer {
     // Task 38: Text Transform
     if (element.textTransform === 'uppercase') content = content.toUpperCase();
     if (element.textTransform === 'lowercase') content = content.toLowerCase();
+
+    // Guardião de Performance (Task 87): Se o texto for absurdamente longo,
+    // forçamos o truncamento imediato para evitar DoS no motor de quebra de linha.
+    if (content.length > DataSanitizer.MAX_SAFE_TEXT_LENGTH) {
+      content = content.substring(0, DataSanitizer.MAX_SAFE_TEXT_LENGTH) + '...';
+    }
 
     ctx.save();
     ctx.fillStyle = element.color || '#000000';
@@ -176,6 +183,7 @@ export class TextRenderer implements IRenderer {
 
   /**
    * Trunca o texto com "..." se ele transbordar a caixa.
+   * Otimizado com busca binária para evitar loops lineares lentos (Task 87).
    */
   private applyEllipsis(
     text: string, 
@@ -194,16 +202,25 @@ export class TextRenderer implements IRenderer {
     let result = testFit(text);
     if (result.height <= height) return text;
 
-    // Se não coube, vamos diminuindo a string até caber com "..."
-    let currentText = text;
-    while (currentText.length > 0) {
-      currentText = currentText.slice(0, -1);
-      const truncated = currentText + '...';
-      result = testFit(truncated);
-      if (result.height <= height) return truncated;
+    // Busca Binária pelo ponto de corte ideal
+    let low = 0;
+    let high = text.length;
+    let bestTruncated = '...';
+
+    while (low <= high) {
+      const mid = Math.floor((low + high) / 2);
+      const test = text.substring(0, mid) + '...';
+      const res = testFit(test);
+
+      if (res.height <= height) {
+        bestTruncated = test;
+        low = mid + 1;
+      } else {
+        high = mid - 1;
+      }
     }
 
-    return '...';
+    return bestTruncated;
   }
 
   private mapVAlignToBaseline(vAlign: string): CanvasTextBaseline {

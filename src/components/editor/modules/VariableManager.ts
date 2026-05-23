@@ -6,6 +6,7 @@ import { DataSourceParser, ParsedTag } from '../../../domain/services/DataSource
 import { TextElement } from '../../../domain/models/elements/SpecificElements';
 import { ElementType } from '../../../domain/models/elements/BaseElement';
 import { HelpContentProvider } from '../../../utils/HelpContentProvider';
+import { DataSanitizer } from '../../../core/DataSanitizer';
 
 // Importar componentes de UI necessários
 import '../../common/AppButton';
@@ -227,6 +228,7 @@ export class VariableManager extends HTMLElement {
   private syncCardData(card: HTMLElement, v: GroupedVariable) {
     const baseTag = v.tags[0].tag;
     const usageCount = v.tags.length;
+    const safeKey = DataSanitizer.escapeHTML(v.key);
 
     const badge = card.querySelector('.usage-badge');
     if (badge) badge.textContent = `${usageCount} ${usageCount === 1 ? 'LAYER' : 'LAYERS'}`;
@@ -237,15 +239,18 @@ export class VariableManager extends HTMLElement {
       const newFmts = baseTag.formatters;
 
       if (JSON.stringify(currentFmts) !== JSON.stringify(newFmts)) {
-        pipelineMid.innerHTML = newFmts.map(f => `
-          <div class="pipeline-step">
-            <div class="step-dot active"></div>
-            <div class="formatter-block" data-fmt="${f}">
-              <span class="formatter-name">:${f}</span>
-              <button class="btn-remove-formatter" data-key="${v.key}" data-formatter="${f}">×</button>
+        pipelineMid.innerHTML = newFmts.map(f => {
+          const safeF = DataSanitizer.escapeHTML(f);
+          return `
+            <div class="pipeline-step">
+              <div class="step-dot active"></div>
+              <div class="formatter-block" data-fmt="${safeF}">
+                <span class="formatter-name">:${safeF}</span>
+                <button class="btn-remove-formatter" data-key="${safeKey}" data-formatter="${safeF}">×</button>
+              </div>
             </div>
-          </div>
-        `).join('');
+          `;
+        }).join('');
       }
     }
 
@@ -259,9 +264,10 @@ export class VariableManager extends HTMLElement {
   }
 
   private getCardTemplate(v: GroupedVariable) {
+    const safeKey = DataSanitizer.escapeHTML(v.key);
     return `
       <div class="var-header">
-        <span class="var-tag">{{${v.key}}}</span>
+        <span class="var-tag">{{${safeKey}}}</span>
         <span class="usage-badge">...</span>
       </div>
 
@@ -280,7 +286,7 @@ export class VariableManager extends HTMLElement {
           <div class="add-area">
             <app-select 
               class="add-formatter-select" 
-              data-key="${v.key}" 
+              data-key="${safeKey}" 
               placeholder="+ ADD FORMATTER"
               style="width: 140px; --select-height: 24px;"
             ></app-select>
@@ -296,7 +302,7 @@ export class VariableManager extends HTMLElement {
       <div class="fallback-area">
         <app-input 
           class="fallback-input" 
-          data-key="${v.key}" 
+          data-key="${safeKey}" 
           label="Fallback Value" 
           placeholder="Ex: N/A"
         ></app-input>
