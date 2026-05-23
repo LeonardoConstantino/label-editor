@@ -24,9 +24,9 @@ Criar uma interface leve de edição de imagens integrada ao módulo `AssetLibra
 - **Fidelidade:** Manter a resolução original do asset (respeitando o limite de 800-1200px definido no `imageProcessor`).
 
 ## Critérios de Aceite
-- [ ] O usuário consegue abrir qualquer imagem da biblioteca no editor.
-- [ ] O recorte (crop) gera uma nova imagem com as dimensões corretas.
-- [ ] A conversão para preto e branco (grayscale) é fiel e nítida.
+- [x] O usuário consegue abrir qualquer imagem da biblioteca no editor.
+- [x] O recorte (crop) gera uma nova imagem com as dimensões corretas.
+- [x] A conversão para preto e branco (grayscale) é fiel e nítida.
 - [ ] O asset editado é atualizado instantaneamente em todas as etiquetas que já o utilizam (Sync via EventBus).
 
 ---

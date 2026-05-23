@@ -50,13 +50,14 @@ export class MicroImageEditor extends HTMLElement {
   set asset(asset: Asset) {
     this._asset = asset;
     this.resetState();
-    this.loadImage();
+    if (this.isConnected) this.loadImage(); // guard
   }
 
   connectedCallback() {
     this.renderSkeleton();
     this.setupListeners();
     this.syncUI();
+    if (this._asset) this.loadImage(); // carrega se foi setado antes
   }
 
   disconnectedCallback() {
@@ -73,7 +74,9 @@ export class MicroImageEditor extends HTMLElement {
   }
 
   private setupListeners() {
+    this._abortController?.abort(); // garante limpeza antes de re-registrar
     this._abortController = new AbortController();
+
     const { signal } = this._abortController;
     const root = this.shadowRoot!;
 
@@ -385,19 +388,6 @@ export class MicroImageEditor extends HTMLElement {
         @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
 
         #apply-crop-row { margin-top: 8px; }
-
-        /* Custom Checkbox Style */
-        input[type="checkbox"] {
-          appearance: none; width: 34px; height: 18px; background: #222;
-          border-radius: 20px; position: relative; cursor: pointer; transition: 0.3s;
-          border: 1px solid var(--color-border-ui);
-        }
-        input[type="checkbox"]:checked { background: var(--color-accent-primary); }
-        input[type="checkbox"]::before {
-          content: ""; position: absolute; width: 12px; height: 12px;
-          background: white; border-radius: 50%; top: 2px; left: 3px; transition: 0.3s;
-        }
-        input[type="checkbox"]:checked::before { left: 17px; }
       </style>
 
       <div class="panel-controls">
