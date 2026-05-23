@@ -100,7 +100,7 @@ export class VaultGallery extends HTMLElement {
       }
     </style>
 
-    <div class="flex h-full w-full -m-6 bg-[#0a0c10] overflow-hidden">
+    <div class="flex h-full w-full bg-[#0a0c10] overflow-hidden">
       <aside id="sidebar" class="w-64 border-r border-border-ui bg-surface-solid/40 p-6 flex flex-col gap-6 backdrop-blur-md relative z-10 shadow-[10px_0_30px_rgba(0,0,0,0.5)]">
         <div class="flex items-center gap-2 mb-2 pb-4 border-b border-white/5">
           <ui-icon name="database" class="text-accent-primary drop-shadow-[0_0_8px_rgba(99,102,241,0.5)]"></ui-icon>
