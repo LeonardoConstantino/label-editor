@@ -1,19 +1,6 @@
 import { ElementType, BorderStyle, TextOverflow, ImageFit } from '../domain/models/elements/BaseElement';
 
 /**
- * DEBUG: Flag global para ativar/desativar logs de debug detalhados.
- */
-const debug = {
-  state: false,
-};
-
-export const setDebug = (value: boolean) => {
-  debug.state = value;
-};
-
-export const getDebug = () => debug.state;
-
-/**
  * LABEL_PRESETS: Dimensões comuns de etiquetas do mercado.
  */
 export const LABEL_PRESETS = [

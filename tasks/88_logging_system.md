@@ -16,17 +16,17 @@ Refatorar o sistema de logs (`Logger.ts`) para suportar níveis de severidade di
   - Sequência de teclas `L-O-G-S` alterna entre SILENT e o nível anterior.
 
 ## Escopo de Implementação
-- [ ] Refatorar `src/core/Logger.ts` para ser uma classe singleton com estado interno de nível.
-- [ ] Atualizar `src/domain/models/UserPreferences.ts` para incluir `logLevel: number`.
-- [ ] Implementar o "Boot Switch" no `main.ts` para configurar o Logger logo no início.
-- [ ] Adicionar seletor de "Log Level" no `PreferencesModal`.
-- [ ] Limpar as flags `DEBUG` do `src/constants/defaults.ts`.
+- [x] Refatorar `src/core/Logger.ts` para ser uma classe singleton com estado interno de nível.
+- [x] Atualizar `src/domain/models/UserPreferences.ts` para incluir `logLevel: number`.
+- [x] Implementar o "Boot Switch" no `main.ts` para configurar o Logger logo no início.
+- [x] Adicionar seletor de "Log Level" no `PreferencesModal`.
+- [x] Limpar as flags `DEBUG` do `src/constants/defaults.ts`.
 
 ## Critérios de Aceite
-- [ ] Logs de nível DEBUG não aparecem no console se o nível global for INFO ou ERROR.
-- [ ] Mudar o nível nas configurações reflete instantaneamente no comportamento do console.
-- [ ] O parâmetro de URL `debug` força o nível desejado ignorando o banco de dados.
-- [ ] Zero impacto na performance quando o nível for SILENT.
+- [x] Logs de nível DEBUG não aparecem no console se o nível global for INFO ou ERROR.
+- [x] Mudar o nível nas configurações reflete instantaneamente no comportamento do console.
+- [x] O parâmetro de URL `debug` força o nível desejado ignorando o banco de dados.
+- [x] Zero impacto na performance quando o nível for SILENT.
 
 ---
 **Esta task limpa o "ruído" do desenvolvimento e prepara o app para monitoramento profissional.**

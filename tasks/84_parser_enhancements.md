@@ -17,6 +17,6 @@ Evoluir o motor de interpolação e formatação para suportar localizações di
 4. Atualizar a UI do `VariableManager` para permitir a configuração desses parâmetros (opcional, foco inicial no motor).
 
 ## Critérios de Aceite
-- [ ] Formatadores aceitam parâmetros opcionais de locale.
-- [ ] O sistema não trava ao tentar processar JSONs extremamente profundos.
-- [ ] Erros de formatação são tratados graciosamente (retornam o valor original ou fallback).
+- [x] Formatadores aceitam parâmetros opcionais de locale.
+- [x] O sistema não trava ao tentar processar JSONs extremamente profundos.
+- [x] Erros de formatação são tratados graciosamente (retornam o valor original ou fallback).

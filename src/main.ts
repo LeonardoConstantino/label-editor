@@ -5,11 +5,11 @@ import { logger } from './core/Logger';
 import './styles/main.css';
 
 import { templateManager } from './domain/services/TemplateManager';
+import { ElementFactory } from './domain/models/elements/ElementFactory';
+import { shortcutService } from './core/ShortcutService';
 import { Label } from './domain/models/Label';
 import { DEFAULTS } from './constants/defaults';
-import { ElementFactory } from './domain/models/elements/ElementFactory';
 import { UISM } from './core/UISoundManager';
-import { shortcutService } from './core/ShortcutService';
 import { ToastManager } from './components/common/toast';
 import { getOSInfo } from './utils/os-detection';
 import './components/editor/EditorCanvas';
@@ -27,9 +27,11 @@ import './components/preview/DataSourceInput';
 import './components/common/UINumberScrubber';
 import './components/common/tooltip';
 import './components/common/ui-hud-tips';
+
 import helpData from './assets/data/helpData';
 import { InspectorHelpData } from './utils/HelpContentProvider';
 import { StatusBar } from './components/editor/StatusBar';
+import { FORMATTERS } from './domain/services/DataSourceParser';
 
 // Global Notification Listener
 eventBus.on('notify', (options: any) => {
@@ -63,14 +65,30 @@ const defaultLabel: Label = {
 };
 
 document.addEventListener('DOMContentLoaded', async () => {
-  const { isMac } = getOSInfo(); // Detecta o sistema operacional e ajusta variáveis globais
+  const { isMac } = getOSInfo();
 
-  // 1. Carrega preferências do usuário imediatamente
+  // 1. Detectar OVERRIDE de debug via URL (Task 88)
+  const urlParams = new URLSearchParams(window.location.search);
+  const debugOverride = urlParams.get('debug');
+  if (debugOverride !== null) {
+    const level = parseInt(debugOverride, 10);
+    if (!isNaN(level)) {
+      logger.setLevel(level as any);
+      logger.info('Main', `Debug level forced via URL: ${level}`);
+    }
+  }
+
+  // 2. Carrega preferências do usuário imediatamente
   const { preferenceManager } = await import('./domain/services/PreferenceManager');
   const prefs = await preferenceManager.getPreferences();
   store.loadPreferences(prefs);
 
-  // 2. Inicializa o som com base na preferência e contorna autoplay-block
+  // Se não houver override via URL, aplica a preferência do usuário (Task 88)
+  if (debugOverride === null) {
+    logger.setLevel(prefs.logLevel as any);
+  }
+
+  // 3. Inicializa o som com base na preferência e contorna autoplay-block
   UISM.toggle(prefs.audioEnabled);
 
   const playTestSound = () => {
@@ -82,23 +100,21 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.addEventListener('click', playTestSound, { once: true });
   document.addEventListener('keydown', playTestSound, { once: true });
 
-  // 3. Reage a mudanças de preferências de som em tempo real
+  // 4. Reage a mudanças de preferências em tempo real (Centralizado)
   eventBus.on('preferences:change', (updatedPrefs: any) => {
     if (updatedPrefs.audioEnabled !== undefined) {
       UISM.toggle(updatedPrefs.audioEnabled);
     }
-  });
-
-  // Atualiza o tema com base na preferência do usuário
-  const applyTheme = (theme: string) => {
-    document.documentElement.setAttribute('data-theme', theme);
-  };
-  applyTheme(prefs.theme);
-  eventBus.on('preferences:change', (updatedPrefs: any) => {
     if (updatedPrefs.theme) {
-      applyTheme(updatedPrefs.theme);
+      document.documentElement.setAttribute('data-theme', updatedPrefs.theme);
+    }
+    if (updatedPrefs.logLevel !== undefined && debugOverride === null) {
+      logger.setLevel(updatedPrefs.logLevel);
     }
   });
+
+  // Atualiza o tema inicial
+  document.documentElement.setAttribute('data-theme', prefs.theme);
 
   await templateManager.init();
   shortcutService.init(isMac);
@@ -118,6 +134,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     ...allShortcuts.map(i => `[${i.key||i.sequence}] - ${i.description}`),
     ...helpData.proTips.map(i => i.tip),
     ...inspectorTips,
+    ...Object.keys(FORMATTERS).map(key => `Formate dados da etiqueta Use → ${FORMATTERS[key].tip}`),
     'Dica: Use [Ctrl+Z] para desfazer ações.',
     'Dica: Use as setas do teclado para mover elementos selecionados.',
   ]);

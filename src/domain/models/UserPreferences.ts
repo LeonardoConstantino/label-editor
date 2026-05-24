@@ -13,6 +13,7 @@ export interface UserPreferences {
   snapToCanvas: boolean;
   snapThresholdMM: number;
   historySensitivity: number; // ms
+  logLevel: number; // 0=Silent, 1=Error, 2=Warn, 3=Info, 4=Debug
 }
 
 export const DEFAULT_PREFERENCES: UserPreferences = {
@@ -29,5 +30,6 @@ export const DEFAULT_PREFERENCES: UserPreferences = {
   snapToObjects: true,
   snapToCanvas: true,
   snapThresholdMM: 2.0,
-  historySensitivity: 400
+  historySensitivity: 400,
+  logLevel: 1 // Default: Errors only in production
 };

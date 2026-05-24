@@ -911,4 +911,4 @@ export class UISoundManager {
   }
 }
 
-export const UISM = new UISoundManager({enabled: false, logger: logger});
+export const UISM = new UISoundManager({enabled: true, logger: logger});

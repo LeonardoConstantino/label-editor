@@ -1,4 +1,3 @@
-import { getDebug } from '../constants/defaults';
 import { logger } from './Logger';
 
 // Type-only imports para evitar ciclos de dependência em runtime
@@ -315,4 +314,4 @@ class EventBus {
 }
 
 // Exporta instância global padrão
-export default new EventBus({ debug: getDebug(), logger });
+export default new EventBus({ debug: true, logger });

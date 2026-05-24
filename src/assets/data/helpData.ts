@@ -118,6 +118,10 @@ const helpData = {
       icon: 'pencil-ruler',
       tip: 'Você pode encadear formatadores complexos: {{valor:math(*1.1):currency(pt-BR,BRL)}}.',
     },
+    {
+      icon: 'command-line',
+      tip: 'Ative logs de depuração na inicialização do app passando ?debug=4 (Debug Level 4) na URL para insights detalhados do processo de renderização.',
+    },
   ],
   aboutSection: {
     version: '4.0.0-Beta (Tactile Prism)',

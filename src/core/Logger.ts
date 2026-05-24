@@ -1,36 +1,26 @@
 /**
- * @fileoverview Sistema de logging centralizado com níveis, namespaces, grupos, persistência e exportação
+ * @fileoverview Sistema de logging centralizado (Task 88)
+ * Níveis de severidade dinâmicos, persistência e overrides.
  */
 
-import { getDebug } from "../constants/defaults";
-
 /**
- * Níveis de log disponíveis
+ * Níveis de log disponíveis (Task 88 Hierarchy)
  */
 export const LogLevel = {
-  DEBUG: 0,
-  INFO: 1,
+  SILENT: 0,
+  ERROR: 1,
   WARN: 2,
-  ERROR: 3,
-  NONE: 4,
+  INFO: 3,
+  DEBUG: 4,
 } as const;
 
-/**
- * Tipo derivado dos níveis de log
- */
 export type LogLevelType = typeof LogLevel[keyof typeof LogLevel];
 
-/**
- * Formato de estilo para cada nível de log
- */
 interface LogFormatConfig {
   style: string;
   emoji: string;
 }
 
-/**
- * Entrada individual de log
- */
 interface LogEntry {
   level: LogLevelType;
   namespace: string;
@@ -41,9 +31,6 @@ interface LogEntry {
   stack: string | null;
 }
 
-/**
- * Opções de configuração do Logger
- */
 interface LoggerOptions {
   level?: LogLevelType;
   prefix?: string;
@@ -52,11 +39,11 @@ interface LoggerOptions {
   devMode?: boolean;
 }
 
-/**
- * Formatos de exportação disponíveis
- */
 type ExportFormat = 'json' | 'csv' | 'text';
 
+/**
+ * Logger: O motor de telemetria do Label Forge OS.
+ */
 export class Logger {
   private level: LogLevelType;
   private prefix: string;
@@ -67,14 +54,11 @@ export class Logger {
   private entries: LogEntry[];
   private activeGroups: string[];
 
-  /**
-   * @param options - Configurações do logger
-   */
   constructor(options: LoggerOptions = {}) {
     this.level = options.level ?? LogLevel.INFO;
     this.prefix = options.prefix ?? '[Logger]';
     this.persist = options.persist ?? false;
-    this.maxEntries = options.maxEntries ?? 100;
+    this.maxEntries = options.maxEntries ?? 200;
     this.devMode = options.devMode ?? false;
 
     this.logFormat = Object.freeze({
@@ -88,75 +72,51 @@ export class Logger {
     this.entries = [];
     this.activeGroups = [];
 
-    // Carregar logs persistidos (se habilitado)
     if (this.persist && typeof localStorage !== 'undefined') {
       this._loadFromStorage();
     }
   }
 
   /**
-   * Verifica se o nível de log atual permite a exibição da mensagem
+   * Verifica se o nível de log atual permite a exibição da mensagem.
+   * Ex: Se setting=3 (INFO), logamos 1(ERROR), 2(WARN) e 3(INFO).
    */
   shouldLog(level: LogLevelType): boolean {
-    return level >= this.level;
+    if (this.level === LogLevel.SILENT) return false;
+    return level <= this.level;
   }
 
-  /**
-   * Formata a mensagem de log com prefixo, namespace e timestamp
-   */
   format(namespace: string, msg: string): string {
     const timestamp = new Intl.DateTimeFormat('pt-br', {
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      day: '2-digit',
-      month: '2-digit',
-      hour12: false,
+      hour: '2-digit', minute: '2-digit', second: '2-digit',
+      day: '2-digit', month: '2-digit', hour12: false,
     }).format(new Date());
 
     return `${this.prefix} [${namespace}] ${msg} (${timestamp})`;
   }
 
   /**
-   * Define o nível mínimo de log
+   * Define o nível mínimo de log dinamicamente.
    */
   setLevel(level: LogLevelType): void {
     this.level = level;
+    // Se o nível for DEBUG, ativamos o devMode automaticamente para stack traces
+    this.devMode = level === LogLevel.DEBUG;
   }
 
-  /**
-   * Ativa ou desativa o modo desenvolvedor para capturar stack traces detalhados
-   * Útil para debugging avançado, mas pode impactar performance se usado em produção.
-   * @param enabled - true para ativar, false para desativar o modo desenvolvedor
-   * @returns void
-   */
   setDeveloperMode(enabled: boolean): void {
     this.devMode = enabled;
   }
 
-  /**
-   * Captura stack trace do chamador
-   */
   private _captureStackTrace(): string | null {
     if (!this.devMode) return null;
-
     const stack = new Error().stack;
     if (!stack) return null;
-
-    // Remove as primeiras linhas (Error + método interno do Logger)
     const lines = stack.split('\n').slice(3);
     return lines.join('\n');
   }
 
-  /**
-   * Salva entrada no histórico interno
-   */
-  private _saveEntry(
-    level: LogLevelType,
-    namespace: string,
-    msg: string,
-    args: unknown[]
-  ): void {
+  private _saveEntry(level: LogLevelType, namespace: string, msg: string, args: unknown[]): void {
     const entry: LogEntry = {
       level,
       namespace,
@@ -168,33 +128,18 @@ export class Logger {
     };
 
     this.entries.push(entry);
-
-    // Limitar tamanho do histórico
-    if (this.entries.length > this.maxEntries) {
-      this.entries.shift();
-    }
-
-    // Persistir se habilitado
-    if (this.persist && typeof localStorage !== 'undefined') {
-      this._saveToStorage();
-    }
+    if (this.entries.length > this.maxEntries) this.entries.shift();
+    if (this.persist && typeof localStorage !== 'undefined') this._saveToStorage();
   }
 
-  /**
-   * Salva logs no localStorage
-   */
   private _saveToStorage(): void {
     try {
       localStorage.setItem(`${this.prefix}_logs`, JSON.stringify(this.entries));
     } catch (e) {
-      const message = e instanceof Error ? e.message : 'Erro desconhecido';
-      console.warn('Falha ao persistir logs:', message);
+      console.warn('Falha ao persistir logs:', e);
     }
   }
 
-  /**
-   * Carrega logs do localStorage
-   */
   private _loadFromStorage(): void {
     try {
       const stored = localStorage.getItem(`${this.prefix}_logs`);
@@ -202,106 +147,61 @@ export class Logger {
         this.entries = JSON.parse(stored) as LogEntry[];
       }
     } catch (e) {
-      const message = e instanceof Error ? e.message : 'Erro desconhecido';
-      console.warn('Falha ao carregar logs persistidos:', message);
+      console.warn('Falha ao carregar logs persistidos:', e);
     }
   }
 
-  /**
-   * Exibe stack trace se devMode estiver ativo
-   */
   private _logStackTrace(): void {
     if (this.devMode) {
       const stack = this._captureStackTrace();
       if (stack) {
-        console.groupCollapsed(
-          '%c📍 Stack Trace',
-          'color: #9E9E9E; font-style: italic;'
-        );
+        console.groupCollapsed('%c📍 Stack Trace', 'color: #9E9E9E; font-style: italic;');
         console.log(stack);
         console.groupEnd();
       }
     }
   }
 
-  /**
-   * Registra uma mensagem de log no nível DEBUG
-   */
   debug(namespace: string, msg: string, ...args: unknown[]): void {
     if (this.shouldLog(LogLevel.DEBUG)) {
-      console.debug(
-        `%c${this.logFormat.debug.emoji} ${this.format(namespace, msg)}`,
-        this.logFormat.debug.style,
-        ...args
-      );
+      console.debug(`%c${this.logFormat.debug.emoji} ${this.format(namespace, msg)}`, this.logFormat.debug.style, ...args);
       this._logStackTrace();
       this._saveEntry(LogLevel.DEBUG, namespace, msg, args);
     }
   }
 
-  /**
-   * Registra uma mensagem de log genérica (nível DEBUG) para compatibilidade com console.log
-   */
   log(namespace: string, msg: string, ...args: unknown[]): void {
     if (this.shouldLog(LogLevel.DEBUG)) {
-      console.debug(
-        `%c${this.logFormat.log.emoji} ${this.format(namespace, msg)}`,
-        this.logFormat.log.style,
-        ...args
-      );
+      console.debug(`%c${this.logFormat.log.emoji} ${this.format(namespace, msg)}`, this.logFormat.log.style, ...args);
       this._logStackTrace();
       this._saveEntry(LogLevel.DEBUG, namespace, msg, args);
     }
   }
 
-  /**
-   * Registra uma mensagem de log no nível INFO
-   */
   info(namespace: string, msg: string, ...args: unknown[]): void {
     if (this.shouldLog(LogLevel.INFO)) {
-      console.info(
-        `%c${this.logFormat.info.emoji} ${this.format(namespace, msg)}`,
-        this.logFormat.info.style,
-        ...args
-      );
+      console.info(`%c${this.logFormat.info.emoji} ${this.format(namespace, msg)}`, this.logFormat.info.style, ...args);
       this._logStackTrace();
       this._saveEntry(LogLevel.INFO, namespace, msg, args);
     }
   }
 
-  /**
-   * Registra uma mensagem de log no nível WARN
-   */
   warn(namespace: string, msg: string, ...args: unknown[]): void {
     if (this.shouldLog(LogLevel.WARN)) {
-      console.warn(
-        `%c${this.logFormat.warn.emoji} ${this.format(namespace, msg)}`,
-        this.logFormat.warn.style,
-        ...args
-      );
+      console.warn(`%c${this.logFormat.warn.emoji} ${this.format(namespace, msg)}`, this.logFormat.warn.style, ...args);
       this._logStackTrace();
       this._saveEntry(LogLevel.WARN, namespace, msg, args);
     }
   }
 
-  /**
-   * Registra uma mensagem de log no nível ERROR
-   */
   error(namespace: string, msg: string, ...args: unknown[]): void {
     if (this.shouldLog(LogLevel.ERROR)) {
-      console.error(
-        `%c${this.logFormat.error.emoji} ${this.format(namespace, msg)}`,
-        this.logFormat.error.style,
-        ...args
-      );
+      console.error(`%c${this.logFormat.error.emoji} ${this.format(namespace, msg)}`, this.logFormat.error.style, ...args);
       this._logStackTrace();
       this._saveEntry(LogLevel.ERROR, namespace, msg, args);
     }
   }
 
-  /**
-   * Inicia um grupo de logs
-   */
   group(label: string): void {
     if (this.shouldLog(LogLevel.DEBUG)) {
       this.activeGroups.push(label);
@@ -309,9 +209,6 @@ export class Logger {
     }
   }
 
-  /**
-   * Inicia um grupo de logs colapsado
-   */
   groupCollapsed(label: string): void {
     if (this.shouldLog(LogLevel.DEBUG)) {
       this.activeGroups.push(label);
@@ -319,9 +216,6 @@ export class Logger {
     }
   }
 
-  /**
-   * Encerra o grupo de logs ativo
-   */
   groupEnd(): void {
     if (this.shouldLog(LogLevel.DEBUG)) {
       this.activeGroups.pop();
@@ -329,51 +223,30 @@ export class Logger {
     }
   }
 
-  /**
-   * Exporta logs em formato especificado
-   */
   export(format: ExportFormat = 'json'): string {
     switch (format.toLowerCase() as ExportFormat) {
-      case 'json':
-        return JSON.stringify(this.entries, null, 2);
-
+      case 'json': return JSON.stringify(this.entries, null, 2);
       case 'csv': {
         const headers = 'Timestamp,Level,Namespace,Message,Group,Stack\n';
-        const rows = this.entries
-          .map((e) => {
-            const levelName =
-              (Object.keys(LogLevel) as Array<keyof typeof LogLevel>).find(
-                (k) => LogLevel[k] === e.level
-              ) ?? 'UNKNOWN';
-            const group = e.group ? e.group.join(' > ') : '';
-            const stack = e.stack ? e.stack.replace(/"/g, '""') : '';
-            return `"${e.timestamp}","${levelName}","${e.namespace}","${e.message}","${group}","${stack}"`;
-          })
-          .join('\n');
+        const rows = this.entries.map((e) => {
+          const levelName = (Object.keys(LogLevel) as Array<keyof typeof LogLevel>).find((k) => LogLevel[k] === e.level) ?? 'UNKNOWN';
+          const group = e.group ? e.group.join(' > ') : '';
+          const stack = e.stack ? e.stack.replace(/"/g, '""') : '';
+          return `"${e.timestamp}","${levelName}","${e.namespace}","${e.message}","${group}","${stack}"`;
+        }).join('\n');
         return headers + rows;
       }
-
       case 'text':
-        return this.entries
-          .map((e) => {
-            const levelName =
-              (Object.keys(LogLevel) as Array<keyof typeof LogLevel>).find(
-                (k) => LogLevel[k] === e.level
-              ) ?? 'UNKNOWN';
-            const group = e.group ? ` [${e.group.join(' > ')}]` : '';
-            const stack = e.stack ? `\n${e.stack}` : '';
-            return `[${e.timestamp}] ${levelName} ${this.prefix} [${e.namespace}]${group}: ${e.message}${stack}`;
-          })
-          .join('\n\n');
-
-      default:
-        throw new Error(`Formato desconhecido: ${format}`);
+        return this.entries.map((e) => {
+          const levelName = (Object.keys(LogLevel) as Array<keyof typeof LogLevel>).find((k) => LogLevel[k] === e.level) ?? 'UNKNOWN';
+          const group = e.group ? ` [${e.group.join(' > ')}]` : '';
+          const stack = e.stack ? `\n${e.stack}` : '';
+          return `[${e.timestamp}] ${levelName} [${e.namespace}]${group}: ${e.message}${stack}`;
+        }).join('\n\n');
+      default: throw new Error(`Formato desconhecido: ${format}`);
     }
   }
 
-  /**
-   * Limpa histórico de logs
-   */
   clear(): void {
     this.entries = [];
     if (this.persist && typeof localStorage !== 'undefined') {
@@ -381,12 +254,10 @@ export class Logger {
     }
   }
 
-  /**
-   * Retorna cópia do histórico de logs
-   */
   getEntries(): LogEntry[] {
     return [...this.entries];
   }
 }
-// Instância única para o app
-export const logger = new Logger({ level:getDebug() ? LogLevel.DEBUG : LogLevel.INFO, prefix: '[LabelEditor]', devMode: getDebug() });
+
+// Inicializa com INFO por padrão, main.ts fará o override
+export const logger = new Logger({ level: LogLevel.INFO, prefix: '[LabelEditor]' });

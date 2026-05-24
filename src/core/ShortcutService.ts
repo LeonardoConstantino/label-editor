@@ -6,7 +6,6 @@ import { logger } from './Logger';
 import { templateManager } from '../domain/services/TemplateManager';
 import { AnyElement, ElementType } from '../domain/models/Label';
 import { ElementFactory } from '../domain/models/elements/ElementFactory';
-import { getDebug } from '../constants/defaults';
 
 /**
  * PropClipboard: Armazena propriedades copiadas de um elemento.
@@ -32,7 +31,7 @@ class ShortcutService {
 
   constructor() {
     this.manager = new KeyboardShortcutManager({
-      debug: getDebug(),
+      debug: true,
       enableSequences: true,
       enableLongPress: true,
       debounceDelay: 50,

@@ -438,7 +438,7 @@ export class PreferencesModal extends HTMLElement {
 
   private renderSkeleton() {
     if (!this.shadowRoot || !this._preferences) return;
-    const {audioEnabled, showGrid, gridSizeMM, gridColor, gridOpacity, snapToGrid, snapToObjects, snapToCanvas, snapThresholdMM, unit, historySensitivity} = this._preferences;
+    const {audioEnabled, showGrid, gridSizeMM, gridColor, gridOpacity, snapToGrid, snapToObjects, snapToCanvas, snapThresholdMM, unit} = this._preferences;
 
     this.shadowRoot.innerHTML = `
       <div class="settings-container">
@@ -582,7 +582,16 @@ export class PreferencesModal extends HTMLElement {
                   <span class="setting-desc">Debounce time for continuous actions (Undo stack optimization).</span>
                 </div>
                 <div class="setting-control">
-                  <app-select id="history-sensitivity-select" data-prop="historySensitivity" value="${historySensitivity}" style="width: 160px"></app-select>
+                  <app-select id="history-sensitivity-select" data-prop="historySensitivity" style="width: 160px"></app-select>
+                </div>
+              </div>
+              <div class="setting-row">
+                <div class="setting-info">
+                  <span class="setting-label">Log Level (Console)</span>
+                  <span class="setting-desc">Configure technical logging verbosity in browser console.</span>
+                </div>
+                <div class="setting-control">
+                  <app-select id="log-level-select" data-prop="logLevel" style="width: 160px"></app-select>
                 </div>
               </div>
             </div>
@@ -630,6 +639,17 @@ export class PreferencesModal extends HTMLElement {
         { value: '400', label: 'Agile', sublabel: 'Default speed' },
         { value: '800', label: 'Balanced', sublabel: 'Optimized stack' },
         { value: '1500', label: 'Conservative', sublabel: 'Long delays' }
+      ];
+    }
+
+    const logSelect = root.getElementById('log-level-select') as any;
+    if (logSelect) {
+      logSelect.options = [
+        { value: '0', label: 'Silent', sublabel: 'No console logs' },
+        { value: '1', label: 'Errors Only', sublabel: 'Critical failures' },
+        { value: '2', label: 'Warnings', sublabel: 'Stability alerts' },
+        { value: '3', label: 'Standard (Info)', sublabel: 'General workflow' },
+        { value: '4', label: 'Full Debug', sublabel: 'Technical payloads' }
       ];
     }
   }
