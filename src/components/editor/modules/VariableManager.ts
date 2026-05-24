@@ -241,10 +241,11 @@ export class VariableManager extends HTMLElement {
       if (JSON.stringify(currentFmts) !== JSON.stringify(newFmts)) {
         pipelineMid.innerHTML = newFmts.map(f => {
           const safeF = DataSanitizer.escapeHTML(f);
+          const tip = DataSourceParser.getFormatterTip(f.split('(')[0].trim());
           return `
             <div class="pipeline-step">
               <div class="step-dot active"></div>
-              <div class="formatter-block" data-fmt="${safeF}">
+              <div class="formatter-block" data-fmt="${safeF}" title="${DataSanitizer.escapeHTML(tip)}">
                 <span class="formatter-name">:${safeF}</span>
                 <button class="btn-remove-formatter" data-key="${safeKey}" data-formatter="${safeF}">×</button>
               </div>

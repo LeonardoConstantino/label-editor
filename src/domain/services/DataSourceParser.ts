@@ -28,6 +28,8 @@ export interface FormatterDef {
   label: string;
   /** Exemplo de transformação para a UI */
   sublabel: string;
+  /** Dica de uso detalhada (ex: :currency(locale, symbol)) */
+  tip?: string;
   /** Função de execução: recebe o valor bruto e parâmetros opcionais */
   fn: (value: any, params: string[]) => any;
 }
@@ -41,24 +43,28 @@ export const FORMATTERS: Record<string, FormatterDef> = {
     name: 'upper',
     label: 'UPPERCASE',
     sublabel: 'TEXT -> TEXT',
+    tip: ':upper (No parameters)',
     fn: (v) => String(v).toUpperCase()
   },
   lower: {
     name: 'lower',
     label: 'lowercase',
     sublabel: 'TEXT -> text',
+    tip: ':lower (No parameters)',
     fn: (v) => String(v).toLowerCase()
   },
   trim: {
     name: 'trim',
     label: 'Trim Space',
     sublabel: ' text -> text',
+    tip: ':trim (Removes start/end spaces)',
     fn: (v) => String(v).trim()
   },
   capitalize: {
     name: 'capitalize',
     label: 'Capitalize',
     sublabel: 'text -> Text',
+    tip: ':capitalize (Only first letter)',
     fn: (v) => {
       const s = String(v);
       return s.charAt(0).toUpperCase() + s.slice(1);
@@ -68,30 +74,49 @@ export const FORMATTERS: Record<string, FormatterDef> = {
     name: 'title',
     label: 'Title Case',
     sublabel: 'tEXt -> Text',
+    tip: ':title (Capitalizes Every Word)',
     fn: (v) => String(v).replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase())
   },
   currency: {
     name: 'currency',
-    label: 'Currency R$',
+    label: 'Currency (Locale)',
     sublabel: '12.5 -> R$ 12,50',
-    fn: (v) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(parseFloat(v) || 0)
+    tip: ':currency(locale, currencyCode) - e.g. :currency(en-US, USD)',
+    fn: (v, params) => {
+      const locale = params[0] || 'pt-BR';
+      const currency = params[1] || 'BRL';
+      return new Intl.NumberFormat(locale, { style: 'currency', currency }).format(parseFloat(v) || 0);
+    }
   },
   number: {
     name: 'number',
-    label: 'Number (BR)',
+    label: 'Number (Locale)',
     sublabel: '1250.5 -> 1.250,50',
-    fn: (v) => new Intl.NumberFormat('pt-BR').format(parseFloat(v) || 0)
+    tip: ':number(locale) - e.g. :number(de-DE)',
+    fn: (v, params) => {
+      const locale = params[0] || 'pt-BR';
+      return new Intl.NumberFormat(locale).format(parseFloat(v) || 0);
+    }
   },
   percent: {
     name: 'percent',
-    label: 'Percent %',
+    label: 'Percent (Locale)',
     sublabel: '0.12 -> 12%',
-    fn: (v) => new Intl.NumberFormat('pt-BR', { style: 'percent' }).format(parseFloat(v) || 0)
+    tip: ':percent(locale) - e.g. :percent(en-US)',
+    fn: (v, params) => {
+      const locale = params[0] || 'pt-BR';
+      return new Intl.NumberFormat(locale, { 
+        style: 'percent', 
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2 
+      }).format(parseFloat(v) || 0);
+    }
   },
   truncate: {
     name: 'truncate',
     label: 'Truncate...',
     sublabel: 'Long text -> Long...',
+    tip: ':truncate(length) - e.g. :truncate(15)',
     fn: (v, params) => {
       const limit = parseInt(params[0]) || 20;
       const str = String(v);
@@ -102,42 +127,90 @@ export const FORMATTERS: Record<string, FormatterDef> = {
     name: 'date',
     label: 'Date (BR)',
     sublabel: '2023-01 -> 01/01/2023',
+    tip: ':date (Short Brazilian format)',
     fn: (v) => DataSourceParser.formatDate(v, false)
   },
   datetime: {
     name: 'datetime',
     label: 'DateTime (BR)',
     sublabel: '2023-01... -> 01/01... 12:00',
+    tip: ':datetime (BR date with hours)',
     fn: (v) => DataSourceParser.formatDate(v, true)
+  },
+  date_format: {
+    name: 'date_format',
+    label: 'Date Format (Custom)',
+    sublabel: 'ISO -> Locale String',
+    tip: ':date_format(locale, style) - style: long | full',
+    fn: (v, params) => {
+      const locale = params[0] || 'pt-BR';
+      const options: Intl.DateTimeFormatOptions = { timeZone: 'UTC' };
+      if (params[1] === 'long') {
+        options.dateStyle = 'long';
+      } else if (params[1] === 'full') {
+        options.dateStyle = 'full';
+      }
+      try {
+        const d = DataSourceParser.parseDateSafe(v);
+        if (!d) return v;
+        return new Intl.DateTimeFormat(locale, options).format(d);
+      } catch { return v; }
+    }
+  },
+  date_add: {
+    name: 'date_add',
+    label: 'Date: Add Offset',
+    sublabel: 'Today -> +30 days',
+    tip: ':date_add(amount, unit) - unit: days | months | years',
+    fn: (v, params) => DataSourceParser.applyDateOffset(v, params, 'add')
+  },
+  date_sub: {
+    name: 'date_sub',
+    label: 'Date: Sub Offset',
+    sublabel: 'Today -> -7 days',
+    tip: ':date_sub(amount, unit) - unit: days | months | years',
+    fn: (v, params) => DataSourceParser.applyDateOffset(v, params, 'sub')
   },
   json: {
     name: 'json',
     label: 'JSON Raw',
     sublabel: '{obj} -> {"a":1}',
-    fn: (v) => JSON.stringify(v, null, 2)
+    tip: ':json (Format object as JSON string)',
+    fn: (v) => {
+      try {
+        const safeObj = DataSanitizer.sanitizeValue(v);
+        return JSON.stringify(safeObj, null, 2);
+      } catch {
+        return '[JSON_ERROR]';
+      }
+    }
   },
   add: {
-    name: 'add(1)',
+    name: 'add',
     label: 'Math: Add',
     sublabel: '10 -> 11',
+    tip: ':add(number) - e.g. :add(1)',
     fn: (v, params) => (parseFloat(v) || 0) + (parseFloat(params[0]) || 0)
   },
   sub: {
-    name: 'sub(1)',
+    name: 'sub',
     label: 'Math: Subtract',
     sublabel: '10 -> 9',
+    tip: ':sub(number) - e.g. :sub(1)',
     fn: (v, params) => (parseFloat(v) || 0) - (parseFloat(params[0]) || 0)
   },
   mul: {
-    name: 'mul(2)',
+    name: 'mul',
     label: 'Math: Multiply',
     sublabel: '10 -> 20',
+    tip: ':mul(number) - e.g. :mul(2)',
     fn: (v, params) => (parseFloat(v) || 0) * (parseFloat(params[0]) || 1)
   },
   div: {
-    name: 'div(2)',
+    name: 'div',
     label: 'Math: Divide',
     sublabel: '10 -> 5',
+    tip: ':div(number) - e.g. :div(2)',
     fn: (v, params) => {
       const divisor = parseFloat(params[0]) || 1;
       return divisor !== 0 ? (parseFloat(v) || 0) / divisor : v;
@@ -253,6 +326,13 @@ export class DataSourceParser {
   }
 
   /**
+   * Retorna a dica de uso de um formatador específico.
+   */
+  public static getFormatterTip(name: string): string {
+    return FORMATTERS[name]?.tip || 'No instructions available.';
+  }
+
+  /**
    * Identifica todas as tags de interpolação em um texto e as retorna estruturadas.
    * Útil para o mapeamento visual no VariableManager.
    */
@@ -312,8 +392,6 @@ export class DataSourceParser {
       (match, keyRaw, formattersStr, defaultValue) => {
         const key = keyRaw.trim();
         
-        // Prioridade 1: Dados do registro (row)
-        // Prioridade 2: Contexto global (index, total, date...)
         let value = data[key];
         if (value === undefined || value === null) {
           value = context[key];
@@ -365,25 +443,71 @@ export class DataSourceParser {
   }
 
   /**
+   * Tenta converter um valor para Date de forma segura e determinística.
+   */
+  public static parseDateSafe(value: any): Date | null {
+    if (!value) return null;
+    try {
+      const d = new Date(value);
+      if (!isNaN(d.getTime())) return d;
+      
+      // Fallback para strings que o JS as vezes falha (YYYY-MM-DD)
+      if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
+         return new Date(value + 'T00:00:00Z');
+      }
+      return null;
+    } catch { return null; }
+  }
+
+  /**
    * Helper para formatação de datas (Padrão Brasileiro).
    * @param value String de data ISO ou timestamp.
    * @param showTime Se deve incluir horas e minutos.
    */
   public static formatDate(value: any, showTime: boolean): string {
     try {
-      const date = new Date(value);
-      if (isNaN(date.getTime())) return String(value);
+      const date = this.parseDateSafe(value);
+      if (!date) return String(value);
 
       const options: Intl.DateTimeFormatOptions = {
         day: '2-digit',
         month: '2-digit',
         year: 'numeric',
+        timeZone: 'UTC' // Forçamos UTC para strings ISO sem tempo
       };
       if (showTime) {
         options.hour = '2-digit';
         options.minute = '2-digit';
+        delete options.timeZone; // Se tem tempo, usamos o local ou o do dado
       }
       return new Intl.DateTimeFormat('pt-BR', options).format(date);
+    } catch {
+      return String(value);
+    }
+  }
+
+  /**
+   * Aplica offset de data (adição ou subtração).
+   */
+  public static applyDateOffset(value: any, params: string[], mode: 'add' | 'sub'): string {
+    try {
+      const amount = parseInt(params[0]) || 0;
+      const unit = (params[1] || 'days').toLowerCase();
+      
+      const date = this.parseDateSafe(value);
+      if (!date) return String(value);
+
+      const sign = mode === 'add' ? 1 : -1;
+
+      if (unit.startsWith('day')) {
+        date.setUTCDate(date.getUTCDate() + (amount * sign));
+      } else if (unit.startsWith('month')) {
+        date.setUTCMonth(date.getUTCMonth() + (amount * sign));
+      } else if (unit.startsWith('year')) {
+        date.setUTCFullYear(date.getUTCFullYear() + (amount * sign));
+      }
+
+      return date.toISOString();
     } catch {
       return String(value);
     }

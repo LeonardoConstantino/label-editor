@@ -1,0 +1,32 @@
+# Task 88: Sistema de Logging & Telemetria Centralizado
+
+## Objetivo
+Refatorar o sistema de logs (`Logger.ts`) para suportar níveis de severidade dinâmicos, persistência via preferências do usuário e overrides via URL, eliminando a dependência de flags estáticas no `defaults.ts`.
+
+## Arquitetura Proposta
+- **Log Levels:** 
+  - `0 (SILENT)`: Nenhum log.
+  - `1 (ERROR)`: Apenas erros críticos. (Padrão de Produção)
+  - `2 (WARN)`: Erros e avisos.
+  - `3 (INFO)`: Fluxo principal do sistema.
+  - `4 (DEBUG)`: Detalhes técnicos, payloads e eventos.
+- **Persistence:** O nível de log será armazenado no `UserPreferences` (IndexedDB).
+- **Runtime Overrides:**
+  - Suporte a `?debug=level` na URL (ex: `?debug=4` ativa logs totais).
+  - Sequência de teclas `L-O-G-S` alterna entre SILENT e o nível anterior.
+
+## Escopo de Implementação
+- [ ] Refatorar `src/core/Logger.ts` para ser uma classe singleton com estado interno de nível.
+- [ ] Atualizar `src/domain/models/UserPreferences.ts` para incluir `logLevel: number`.
+- [ ] Implementar o "Boot Switch" no `main.ts` para configurar o Logger logo no início.
+- [ ] Adicionar seletor de "Log Level" no `PreferencesModal`.
+- [ ] Limpar as flags `DEBUG` do `src/constants/defaults.ts`.
+
+## Critérios de Aceite
+- [ ] Logs de nível DEBUG não aparecem no console se o nível global for INFO ou ERROR.
+- [ ] Mudar o nível nas configurações reflete instantaneamente no comportamento do console.
+- [ ] O parâmetro de URL `debug` força o nível desejado ignorando o banco de dados.
+- [ ] Zero impacto na performance quando o nível for SILENT.
+
+---
+**Esta task limpa o "ruído" do desenvolvimento e prepara o app para monitoramento profissional.**

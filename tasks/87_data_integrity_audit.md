@@ -11,10 +11,10 @@ Implementar uma camada de segurança rigorosa em todos os pontos de entrada de d
 - **Image/SVG Scrutiny:** Verificar se SVGs importados contêm scripts maliciosos.
 
 ## Critérios de Aceite
-- [ ] Implementação de um `DataSanitizer` centralizado usado por todos os serviços.
-- [ ] Suite de Testes Automatizados com "Malicious Payloads" (XSS, SQLi strings, Recursion depth).
-- [ ] Validação visual: O sistema deve sinalizar e neutralizar dados que contenham caracteres de controle ou tags HTML não permitidas.
-- [ ] Proteção contra "Bilion Laughs" em importações de SVG/XML.
+- [x] Implementação de um `DataSanitizer` centralizado usado por todos os serviços.
+- [x] Suite de Testes Automatizados com "Malicious Payloads" (XSS, SQLi strings, Recursion depth).
+- [x] Validação visual: O sistema deve sinalizar e neutralizar dados que contenham caracteres de controle ou tags HTML não permitidas.
+- [x] Proteção contra "Bilion Laughs" em importações de SVG/XML.
 - [ ] Zero uso de `eval()` ou `new Function()` em todo o código relacionado a dados.
 
 ## Suite de Testes (Exaustiva)

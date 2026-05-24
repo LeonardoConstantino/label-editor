@@ -33,6 +33,7 @@ Este Master Plan coordena a fase final de desenvolvimento, focando em estabilida
 | **24** | [Otimização de Lote & Qualidade (Web Workers)](./tasks/24_batch_perf.md) | 09 | [x] | 77 | `task/24-batch-workers` |
 | **83** | [Fidelidade de Fontes no Web Worker](./tasks/83_worker_font_fidelity.md) | 09 | [x] | 24 | `task/83-worker-fonts` |
 | **81** | [Encapsulamento de Stack via CSS Isolation](./tasks/81_css_isolation.md) | 09 | [x] | — | `task/81-css-isolation` |
+| **88** | [Sistema de Logging & Telemetria](./tasks/88_logging_system.md) | 08 | [ ] | — | `task/88-logging-system` |
 
 ### Fase B: Gestão de Projetos & UX (Retenção do Usuário)
 | ID | Task | Pri | Status | Deps | Branch |
@@ -70,7 +71,7 @@ Este Master Plan coordena a fase final de desenvolvimento, focando em estabilida
 | **42** | [BorderElement (Standalone Moldura)](./tasks/42_border_element.md) | 05 | [x] | 41 | `task/42-border-element` |
 | **43** | [Renderers Avançados (Shapes & Blending)](./tasks/43_adv_renderers.md) | 05 | [x] | 12 | `task/43-adv-renderers` |
 | **50** | [Metadados e Cálculos no Interpolador](./tasks/50_interpolator_metadata_math.md) | 05 | [x] | 34 | `task/50-interpolator-meta` |
-| **87** | [Auditoria de Segurança (Zero Trust)](./tasks/87_data_integrity_audit.md) | 09 | [ ] | 40 | `task/87-data-audit` |
+| **87** | [Auditoria de Segurança (Zero Trust)](./tasks/87_data_integrity_audit.md) | 09 | [x] | 40 | `task/87-data-audit` |
 | **84** | [Expansão e Robustez do DataSourceParser](./tasks/84_parser_enhancements.md) | 04 | [ ] | 87 | `task/84-parser-pro` |
 
 ### Fase D: Refinamentos Avançados & Estética
