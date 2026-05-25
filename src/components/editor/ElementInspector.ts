@@ -167,7 +167,11 @@ export class ElementInspector extends HTMLElement {
       const card = document.createElement('inspector-layer-card') as InspectorLayerCard;
       card.element = el;
       card.selected = selectedIds.includes(el.id);
-      card.hasOverflow = this.overflowWarnings.has(el.id);
+      
+      const warning = this.overflowWarnings.get(el.id);
+      card.hasOverflow = !!warning;
+      card.warningMessage = warning?.message || '';
+      
       container.appendChild(card);
     });
   }
@@ -178,7 +182,9 @@ export class ElementInspector extends HTMLElement {
       const el = label.elements.find(e => e.id === card.element?.id);
       if (el) {
         card.element = el;
-        card.hasOverflow = this.overflowWarnings.has(el.id);
+        const warning = this.overflowWarnings.get(el.id);
+        card.hasOverflow = !!warning;
+        card.warningMessage = warning?.message || '';
       }
     });
   }

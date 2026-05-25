@@ -3,7 +3,8 @@ import {
   TextElement, 
   RectangleElement, 
   ImageElement, 
-  BorderElement 
+  BorderElement,
+  CodeElement
 } from '../models/elements/SpecificElements';
 import { DEFAULTS } from '../../constants/defaults';
 
@@ -26,9 +27,8 @@ export class ElementValidator {
       errors.push('Opacidade deve estar entre 0 e 1.');
     }
     
-    // Permitir rotações negativas para facilitar a edição, mas alertar se estiver fora do intervalo comum
-    if (element.rotation < -180 || element.rotation > 180) {
-      errors.push('Rotação deve estar entre -180 e 180 graus.');
+    if (element.rotation < -360 || element.rotation > 360) {
+      errors.push('Rotação deve estar entre -360 e 360 graus.');
     }
 
     if (!element.id) errors.push('Elemento deve possuir um ID único.');
@@ -48,11 +48,14 @@ export class ElementValidator {
       case ElementType.BORDER:
         this.validateBorder(element as BorderElement, errors);
         break;
+      case ElementType.CODE:
+        this.validateCode(element as CodeElement, errors);
+        break;
     }
 
     // Validações de Dimensões (para elementos que as possuem)
     if ('dimensions' in element) {
-      const el = element as any; // Cast temporário para acessar dimensions de forma genérica
+      const el = element as any;
       if (el.dimensions.width <= 0) errors.push('Largura deve ser maior que zero.');
       if (el.dimensions.height <= 0) errors.push('Altura deve ser maior que zero.');
       
@@ -97,6 +100,15 @@ export class ElementValidator {
     if (el.width <= 0) errors.push('Espessura da moldura deve ser maior que zero.');
     if (!this.isValidHex(el.color)) errors.push('Cor da moldura inválida.');
     if (el.radius < 0) errors.push('Raio da moldura não pode ser negativo.');
+  }
+
+  private static validateCode(el: CodeElement, errors: string[]): void {
+    if (!this.isValidHex(el.color)) errors.push('Cor do código inválida.');
+    if (el.backgroundColor !== 'transparent' && !this.isValidHex(el.backgroundColor)) {
+      errors.push('Cor de fundo inválida.');
+    }
+    // A validação de formato rígido (EAN, UPC) foi movida para o OverflowValidator
+    // para gerar avisos (warnings) em vez de rejeições fatais.
   }
 
   private static isValidHex(color: string): boolean {

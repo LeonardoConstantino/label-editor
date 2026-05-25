@@ -89,6 +89,7 @@ export class Store {
       const current = this.state.currentLabel.elements[index];
       const newElement = this.mergeUpdates(current, updates as any);
 
+      // Validação de Integridade Física (Sistema)
       const validation = elementValidator.validate(newElement);
       if (!validation.isValid) {
         eventBus.emit('notify', { type: 'error', message: validation.errors[0] });
@@ -101,11 +102,14 @@ export class Store {
       this.performAction(() => {
         this.state.currentLabel!.elements[index] = newElement;
 
-        const result = overflowValidator.check(newElement, this.state.currentLabel!.config);
-        if (result.overflow) {
-          eventBus.emit('element:warning', { id, result });
+        // Sistema de Avisos (Overflow e Formato)
+        const overflowResult = overflowValidator.check(newElement, this.state.currentLabel!.config);
+        
+        if (overflowResult.overflow) {
+          eventBus.emit('element:warning', { id, result: overflowResult });
           UISM.play(UISM.enumPresets.WARNING);
         } else {
+          // Limpa avisos se tudo estiver OK
           eventBus.emit('element:warning:clear', { id });
         }
       }, { immediate: false, silent, description: `Alterou ${propName}` });

@@ -31,6 +31,7 @@ export class InspectorLayerCard extends HTMLElement {
   private _element: AnyElement | null = null;
   private _selected: boolean = false;
   private _hasOverflow: boolean = false;
+  private _warningMessage: string = '';
   private _sectionsRendered: boolean = false;
 
   constructor() {
@@ -74,6 +75,11 @@ export class InspectorLayerCard extends HTMLElement {
 
   set hasOverflow(val: boolean) {
     this._hasOverflow = val;
+    this.updateWarningTag();
+  }
+
+  set warningMessage(val: string) {
+    this._warningMessage = val;
     this.updateWarningTag();
   }
 
@@ -193,7 +199,7 @@ export class InspectorLayerCard extends HTMLElement {
           <span class="type-tag">${escapeHTML(el.type)}</span>
           <span class="layer-name" id="label-name">${escapeHTML(el.name || el.type)}</span>
           
-          <span class="warning-tag" id="warning-tag" style="display: ${this._hasOverflow ? 'inline' : 'none'}; color: var(--color-accent-warning)">⚠</span>
+          <span class="warning-tag" id="warning-tag" style="display: ${this._hasOverflow ? 'inline' : 'none'}; color: var(--color-accent-warning)" title="${escapeHTML(this._warningMessage)}">⚠</span>
           
           <div class="flex items-center gap-1">
             <button id="btn-toggle-lock" class="action-btn ${isLocked ? 'warning active' : ''}" title="${isLocked ? 'Unlock Layer' : 'Lock Layer'}">
@@ -386,7 +392,10 @@ export class InspectorLayerCard extends HTMLElement {
 
   private updateWarningTag(): void {
     const tag = this.shadowRoot?.getElementById('warning-tag');
-    if (tag) tag.style.display = this._hasOverflow ? 'inline' : 'none';
+    if (tag) {
+      tag.style.display = this._hasOverflow ? 'inline' : 'none';
+      tag.setAttribute('title', this._warningMessage);
+    }
   }
 
   private syncSections(): void {

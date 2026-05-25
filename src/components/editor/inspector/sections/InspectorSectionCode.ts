@@ -2,6 +2,7 @@ import { CodeElement } from '../../../../domain/models/elements/SpecificElements
 import { sharedSheet } from '../../../../utils/shared-styles';
 import { dispatchInspectorChange, resolveInspectorValue } from '../inspector-events';
 import { HelpContentProvider } from '../../../../utils/HelpContentProvider';
+import { CodeValidator } from '../../../../utils/CodeValidator';
 
 // Garantir registros
 import '../../../common/AppInput';
@@ -11,7 +12,7 @@ import '../../../common/UINumberScrubber';
 
 /**
  * InspectorSectionCode: Painel de Nível 3 para elementos de Código (QR/Barcode).
- * Utiliza Sincronização Atômica para manter o foco e performance (Task 58 Refinement).
+ * Utiliza Sincronização Atômica para manter o foco e performance (Task 58 Pro).
  */
 export class InspectorSectionCode extends HTMLElement {
   private _element: CodeElement | null = null;
@@ -58,6 +59,15 @@ export class InspectorSectionCode extends HTMLElement {
            flex-direction: column;
            gap: 12px;
         }
+        .validation-hint {
+          font-size: 9px;
+          color: var(--color-accent-warning);
+          margin-top: -8px;
+          margin-bottom: 4px;
+          display: none;
+          font-style: italic;
+        }
+        .validation-hint.error { color: var(--color-accent-danger); display: block; }
       </style>
 
       <div class="flex items-center justify-between mb-1">
@@ -69,6 +79,7 @@ export class InspectorSectionCode extends HTMLElement {
         <div class="row-ui">
           <app-input label="Content" data-prop="content" style="flex: 1"></app-input>
         </div>
+        <div id="hint-text" class="validation-hint"></div>
 
         <div class="row-ui">
           <app-select id="code-type" label="Format" data-prop="codeType" style="flex: 1"></app-select>
@@ -104,9 +115,9 @@ export class InspectorSectionCode extends HTMLElement {
       typeSelect.options = [
         { value: 'qrcode', label: 'QR Code', sublabel: 'Fast 2D Scan' },
         { value: 'code128', label: 'Code 128', sublabel: 'Standard Barcode' },
-        // { value: 'ean13', label: 'EAN-13', sublabel: 'Retail Code' },
-        // { value: 'upca', label: 'UPC-A', sublabel: 'US Retail' },
-        // { value: 'datamatrix', label: 'Data Matrix', sublabel: 'Industrial 2D' }
+        { value: 'ean13', label: 'EAN-13', sublabel: 'Retail (13 digits)' },
+        { value: 'upca', label: 'UPC-A', sublabel: 'US Retail (12 digits)' },
+        { value: 'datamatrix', label: 'Data Matrix', sublabel: 'Industrial 2D' }
       ];
     }
 
@@ -148,13 +159,26 @@ export class InspectorSectionCode extends HTMLElement {
     const el = this._element;
     const shadow = this.shadowRoot;
 
-    // Habilita/Desabilita ECC baseado no tipo de código
+    // 1. Validação Dinâmica da UI
+    const hint = shadow.getElementById('hint-text');
+    if (hint) {
+      const isValid = CodeValidator.isValid(el.content, el.codeType);
+      if (!isValid && !el.content.includes('{{')) {
+        hint.textContent = CodeValidator.getErrorMessage(el.codeType);
+        hint.classList.add('error');
+      } else {
+        hint.classList.remove('error');
+      }
+    }
+
+    // 2. Habilita/Desabilita ECC baseado no tipo de código
     const eccSelect = shadow.getElementById('error-ecc') as any;
     if (eccSelect) {
       if (el.codeType !== 'qrcode') eccSelect.setAttribute('disabled', '');
       else eccSelect.removeAttribute('disabled');
     }
 
+    // 3. Sincronização de Inputs
     const inputs = shadow.querySelectorAll<HTMLElement & { value?: any, checked?: boolean }>('[data-prop]');
     inputs.forEach(input => {
       const prop = input.getAttribute('data-prop');
