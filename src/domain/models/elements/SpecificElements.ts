@@ -1,4 +1,4 @@
-import { BaseElement, Dimensions, BorderStyle, TextOverflow, ImageFit, CompositeOperation } from './BaseElement';
+import { BaseElement, Dimensions, Position, BorderStyle, TextOverflow, ImageFit, CompositeOperation } from './BaseElement';
 
 export type TextAlign = 'left' | 'center' | 'right';
 export type VerticalAlign = 'top' | 'middle' | 'bottom';
@@ -54,4 +54,11 @@ export interface CodeElement extends BaseElement {
   backgroundColor: string;
   includeText: boolean; // Para barcodes: mostrar o texto legível abaixo
   errorCorrection: 'L' | 'M' | 'Q' | 'H'; // Apenas para QR
+}
+
+export interface LineElement extends BaseElement {
+  endPosition: Position; // Ponto final em mm
+  strokeWidth: number;   // Espessura em mm
+  color: string;
+  style: BorderStyle;
 }

@@ -17,6 +17,6 @@ Trazer a estética "Neon" e "Hardware" do Design System para dentro dos elemento
 - **Filtros de Imagem:** Adicionar suporte básico a `grayscale` e `contrast` para `ImageElement`.
 
 ## Critérios de Aceite
-- [ ] Retângulos e Imagens podem ter cantos arredondados.
-- [ ] Efeitos de sombra funcionam sem degradar a performance do Canvas.
-- [ ] Exportação de PDF preserva os efeitos visuais.
+- [x] Retângulos e Imagens podem ter cantos arredondados.
+- [x] Efeitos de sombra funcionam sem degradar a performance do Canvas.
+- [x] Exportação de PDF preserva os efeitos visuais.

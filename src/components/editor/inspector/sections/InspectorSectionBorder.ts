@@ -84,10 +84,10 @@ export class InspectorSectionBorder extends HTMLElement {
     const styleSelect = shadow.getElementById('border-style') as any;
     if (styleSelect) {
       styleSelect.options = [
-        { value: BorderStyle.SOLID, label: 'Solid', sublabel: 'Continuous line' },
-        { value: BorderStyle.DASHED, label: 'Dashed', sublabel: 'Long dashes' },
-        { value: BorderStyle.DOTTED, label: 'Dotted', sublabel: 'Round dots' },
-        { value: BorderStyle.DOUBLE, label: 'Double', sublabel: 'Two parallel lines' }
+        { value: BorderStyle.SOLID, label: 'Solid', sublabel: '──────' },
+        { value: BorderStyle.DASHED, label: 'Dashed', sublabel: '── ── ──' },
+        { value: BorderStyle.DOTTED, label: 'Dotted', sublabel: '· · · ·' },
+        { value: BorderStyle.DOUBLE, label: 'Double', sublabel: '══════' }
       ];
     }
   }

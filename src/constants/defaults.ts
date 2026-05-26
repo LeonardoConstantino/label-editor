@@ -104,5 +104,12 @@ export const DEFAULTS = {
     backgroundColor: 'transparent',
     includeText: false,
     errorCorrection: 'M' as const
+  },
+
+  [ElementType.LINE]: {
+    endPosition: { x: 50, y: 10 }, // Linha horizontal 40mm por padrão
+    strokeWidth: 0.5,
+    color: '#000000',
+    style: BorderStyle.SOLID
   }
 } as const;

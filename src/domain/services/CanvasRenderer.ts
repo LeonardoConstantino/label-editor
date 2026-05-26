@@ -6,6 +6,7 @@ import { RectangleRenderer } from './renderers/RectangleRenderer';
 import { ImageRenderer } from './renderers/ImageRenderer';
 import { BorderRenderer } from './renderers/BorderRenderer';
 import { CodeRenderer } from './renderers/CodeRenderer';
+import { LineRenderer } from './renderers/LineRenderer';
 import { UnitConverter } from '../../utils/units';
 import eventBus from '../../core/EventBus';
 
@@ -30,6 +31,7 @@ export class CanvasRenderer {
     this.renderers.set(ElementType.IMAGE, new ImageRenderer());
     this.renderers.set(ElementType.BORDER, new BorderRenderer());
     this.renderers.set(ElementType.CODE, new CodeRenderer());
+    this.renderers.set(ElementType.LINE, new LineRenderer());
   }
 
   /**
@@ -151,7 +153,26 @@ export class CanvasRenderer {
       return isNearEdge;
     }
 
+    if (element.type === ElementType.LINE) {
+      const el = element as any;
+      const x1 = el.position.x * scale;
+      const y1 = el.position.y * scale;
+      const x2 = el.endPosition.x * scale;
+      const y2 = el.endPosition.y * scale;
+      
+      const dist = this.distToSegment({ x: targetX, y: targetY }, { x: x1, y: y1 }, { x: x2, y: y2 });
+      return dist < 8; // Tolerância para clique
+    }
+
     return false;
+  }
+
+  private distToSegment(p: {x:number, y:number}, v: {x:number, y:number}, w: {x:number, y:number}) {
+    const l2 = (v.x - w.x)**2 + (v.y - w.y)**2;
+    if (l2 === 0) return Math.sqrt((p.x - v.x)**2 + (p.y - v.y)**2);
+    let t = ((p.x - v.x) * (w.x - v.x) + (p.y - v.y) * (w.y - v.y)) / l2;
+    t = Math.max(0, Math.min(1, t));
+    return Math.sqrt((p.x - (v.x + t * (w.x - v.x)))**2 + (p.y - (v.y + t * (w.y - v.y)))**2);
   }
 }
 

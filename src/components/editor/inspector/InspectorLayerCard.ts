@@ -16,6 +16,7 @@ import './sections/InspectorSectionImage';
 import './sections/InspectorSectionBorder';
 import './sections/InspectorSectionCode';
 import './sections/InspectorSectionEffects';
+import './sections/InspectorSectionLine';
 
 interface ActionIcon extends HTMLElement {
   name: string;
@@ -314,6 +315,8 @@ export class InspectorLayerCard extends HTMLElement {
       container.appendChild(createSection('inspector-section-border'));
     } else if (el.type === ElementType.CODE) {
       container.appendChild(createSection('inspector-section-code'));
+    } else if (el.type === ElementType.LINE) {
+      container.appendChild(createSection('inspector-section-line'));
     }
 
     container.appendChild(createSection('inspector-section-effects'));

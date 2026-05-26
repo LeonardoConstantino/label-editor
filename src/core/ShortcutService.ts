@@ -655,6 +655,16 @@ class ShortcutService {
       },
     );
 
+    this.manager.registerLongPress(
+      'l',
+      () => this.addElement(ElementType.LINE),
+      {
+        description: 'Adicionar Linha',
+        category: 'Toolbar',
+        duration: 300,
+      },
+    );
+
     this.manager.register(
       'shift+r',
       () =>

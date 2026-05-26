@@ -4,13 +4,14 @@ import {
   ImageElement, 
   RectangleElement, 
   BorderElement,
-  CodeElement
+  CodeElement,
+  LineElement
 } from './elements/SpecificElements';
 
 // Re-exportando para facilitar o acesso de outros componentes
 export { ElementType };
 
-export type AnyElement = TextElement | ImageElement | RectangleElement | BorderElement | CodeElement;
+export type AnyElement = TextElement | ImageElement | RectangleElement | BorderElement | CodeElement | LineElement;
 
 export interface CustomFont {
   id: string;

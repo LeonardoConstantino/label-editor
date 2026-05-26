@@ -131,6 +131,21 @@ export class EditorToolbar extends HTMLElement {
       </ui-tooltip>
 
       <ui-tooltip placement="bottom" delay="300">
+        <app-button slot="target" id="add-line" variant="secondary">
+          <ui-icon name="minus" style="transform: rotate(-45deg);"></ui-icon>
+        </app-button>
+        <div slot="content" class="tooltip-rich-panel">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-text-main text-[12px] font-semibold tracking-wide">Linha</span>
+            ${this.getShortcutHTML('l')}
+          </div>
+          <p class="text-text-muted text-[10px] leading-relaxed">
+            Adiciona um divisor tátil. Ajuste pontos e espessura no Inspector. <span class="text-accent-primary opacity-80 font-bold">(Long-press)</span>
+          </p>
+        </div>
+      </ui-tooltip>
+
+      <ui-tooltip placement="bottom" delay="300">
         <app-button slot="target" id="add-image" variant="secondary">
           <ui-icon name="image"></ui-icon>
         </app-button>
@@ -302,6 +317,10 @@ export class EditorToolbar extends HTMLElement {
 
     shadow.getElementById('add-rect')?.addEventListener('click', () => {
       eventBus.emit('element:add', ElementFactory.create(ElementType.RECTANGLE));
+    });
+
+    shadow.getElementById('add-line')?.addEventListener('click', () => {
+      eventBus.emit('element:add', ElementFactory.create(ElementType.LINE));
     });
 
     shadow.getElementById('add-border')?.addEventListener('click', () => {

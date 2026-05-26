@@ -82,7 +82,7 @@ Este Master Plan coordena a fase final de desenvolvimento, focando em estabilida
 | **49** | [Unificação de Estilo KBD (3D Prism)](./tasks/49_kbd_style_unification.md) | 03 | [x] | 22 | `task/49-kbd-style` |
 | **72** | [Padronização de Tooltips de Ajuda](./tasks/72_help_tooltips_standardization.md) | 03 | [/] | 46 | `task/72-help-tooltips` |
 | **38** | [Tipografia Avançada (Leading/Tracking)](./tasks/38_adv_typography.md) | 02 | [x] | — | `task/38-typography` |
-| **39** | [Efeitos Prism (Sombras/Glow)](./tasks/39_prism_effects.md) | 02 | [ ] | — | `task/39-prism-effects` |
+| **39** | [Efeitos Prism (Sombras/Glow)](./tasks/39_prism_effects.md) | 02 | [x] | — | `task/39-prism-effects` |
 
 ---
 

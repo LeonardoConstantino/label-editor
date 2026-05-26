@@ -222,6 +222,20 @@ export const InspectorHelpData: Record<string, HelpTooltipConfig> = {
       text: 'Use Offsets em zero com Blur alto para criar um efeito de brilho (Glow).',
       isSuccess: false
     }
+  },
+  line: {
+    title: 'Line Geometry',
+    icon: 'move',
+    commands: [
+      { label: 'Weight', desc: 'Define a espessura da linha.' },
+      { label: 'Points', desc: 'Ajuste fino de início e fim.' },
+      { label: 'Styles', desc: 'Sólido, tracejado ou pontilhado.' }
+    ],
+    proTip: {
+      icon: 'sparkles',
+      text: 'Combine com Prism Effects para criar divisores neon.',
+      isSuccess: true
+    }
   }
 };
 
