@@ -41,7 +41,14 @@ describe('TemplateManager', () => {
         letterSpacing: 0,
         textTransform: 'none',
         justify: false,
-        keepRatio: false
+        keepRatio: false,
+        effects: {
+          enabled: false,
+          color: '#000000',
+          blur: 1,
+          offsetX: 0,
+          offsetY: 0
+        }
       }
     ],
     createdAt: Date.now(),

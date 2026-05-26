@@ -65,6 +65,14 @@ export class CanvasRenderer {
     const x = element.position.x * scale;
     const y = element.position.y * scale;
 
+    // Task 39: Aplica Efeitos Prism (Sombras/Brilhos)
+    if (element.effects?.enabled) {
+      ctx.shadowColor = element.effects.color;
+      ctx.shadowBlur = element.effects.blur * scale;
+      ctx.shadowOffsetX = element.effects.offsetX * scale;
+      ctx.shadowOffsetY = element.effects.offsetY * scale;
+    }
+
     if (element.rotation && element.rotation !== 0) {
       let centerX = x;
       let centerY = y;

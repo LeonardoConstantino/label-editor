@@ -25,8 +25,8 @@ Adicionar um novo tipo de elemento `CodeElement` que suporte a geração dinâmi
    - No Inspector, permitir a troca do tipo de código e ajuste do nível de correção de erro (ECC) para QR Codes.
 
 ## Critérios de Aceite
-- [/] O elemento de código renderiza corretamente no Canvas e no PDF.
-- [/] A interpolação de variáveis no conteúdo do código funciona perfeitamente.
+- [x] O elemento de código renderiza corretamente no Canvas e no PDF.
+- [x] A interpolação de variáveis no conteúdo do código funciona perfeitamente.
 - [x] O sistema permanece fluido (60 FPS) ao arrastar um elemento de código.
 - [x] A arquitetura permite a adição de novos formatos de código com esforço mínimo.
 

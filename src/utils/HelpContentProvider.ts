@@ -208,6 +208,20 @@ export const InspectorHelpData: Record<string, HelpTooltipConfig> = {
       text: 'Fontes customizadas são salvas no arquivo da etiqueta automaticamente.',
       isSuccess: true
     }
+  },
+  effects: {
+    title: 'Prism Effects',
+    icon: 'sparkles',
+    commands: [
+      { label: 'Blur', desc: 'Desfoque da sombra ou brilho.' },
+      { label: 'Offsets', desc: 'Deslocamento horizontal e vertical.' },
+      { label: 'Presets', desc: 'Estilos rápidos como Neon ou Soft.' }
+    ],
+    proTip: {
+      icon: 'lightbulb',
+      text: 'Use Offsets em zero com Blur alto para criar um efeito de brilho (Glow).',
+      isSuccess: false
+    }
   }
 };
 

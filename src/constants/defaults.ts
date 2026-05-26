@@ -44,7 +44,14 @@ export const DEFAULTS = {
     opacity: 1,
     locked: false,
     visible: true,
-    keepRatio: false
+    keepRatio: false,
+    effects: {
+      enabled: false,
+      color: '#000000',
+      blur: 1,
+      offsetX: 0,
+      offsetY: 0
+    }
   },
 
   [ElementType.TEXT]: {

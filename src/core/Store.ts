@@ -371,6 +371,16 @@ export class Store {
   }
 
   public loadLabel(label: Label): void {
+    // Task 39: Self-Healing / Migração de Schema
+    // Garante que elementos antigos recebam novas propriedades (como 'effects')
+    label.elements = label.elements.map(el => {
+      return {
+        ...DEFAULTS.COMMON,
+        ...el,
+        effects: { ...DEFAULTS.COMMON.effects, ...(el.effects || {}) }
+      };
+    }) as AnyElement[];
+
     this.state.currentLabel = label;
     historyManager.clear();
     this.state.selectedElementIds = [];

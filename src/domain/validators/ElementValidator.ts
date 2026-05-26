@@ -34,6 +34,16 @@ export class ElementValidator {
     if (!element.id) errors.push('Elemento deve possuir um ID único.');
     if (!element.name) errors.push('Elemento deve possuir um nome.');
 
+    // Validação de Efeitos Prism (Task 39)
+    if (element.effects?.enabled) {
+      if (!this.isValidHex(element.effects.color)) {
+        errors.push('Cor do efeito Prism inválida.');
+      }
+      if (element.effects.blur < 0) {
+        errors.push('Desfoque do efeito não pode ser negativo.');
+      }
+    }
+
     // Validações Específicas por Tipo
     switch (element.type) {
       case ElementType.TEXT:

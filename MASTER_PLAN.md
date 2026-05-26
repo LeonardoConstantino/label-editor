@@ -67,7 +67,7 @@ Este Master Plan coordena a fase final de desenvolvimento, focando em estabilida
 | **79** | [Variable Manager (Data Pipeline)](./tasks/79-variable-manager.md) | 06 | [x] | 76 | `task/79-variable-manager` |
 | **85** | [Typeface Engine (Custom Font Manager)](./tasks/85_typeface_engine.md) | 06 | [x] | 76 | `task/85-typeface-engine` |
 | **52** | [Action Icon de Lock nos Cards de Camada](./tasks/52_ui_layer_lock.md) | 05 | [x] | 41 | `task/52-ui-layer-lock` |
-| **58** | [Elemento de Código (QR Code / Barcode)](./tasks/58_element_code.md) | 05 | [/] | 41 | `task/58-element-code` |
+| **58** | [Elemento de Código (QR Code / Barcode)](./tasks/58_element_code.md) | 05 | [x] | 41 | `task/58-element-code` |
 | **42** | [BorderElement (Standalone Moldura)](./tasks/42_border_element.md) | 05 | [x] | 41 | `task/42-border-element` |
 | **43** | [Renderers Avançados (Shapes & Blending)](./tasks/43_adv_renderers.md) | 05 | [x] | 12 | `task/43-adv-renderers` |
 | **50** | [Metadados e Cálculos no Interpolador](./tasks/50_interpolator_metadata_math.md) | 05 | [x] | 34 | `task/50-interpolator-meta` |

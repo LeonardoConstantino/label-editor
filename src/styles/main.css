@@ -391,6 +391,7 @@
     border-radius: 6px;
   }
   ui-number-scrubber::part(label) {
+    text-align: center;
     color: var(--color-text-muted);
     font-weight: 700;
     border-right: none;

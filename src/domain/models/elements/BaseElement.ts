@@ -56,8 +56,19 @@ export interface Dimensions {
 }
 
 /**
+ * PrismEffects: Propriedades de sombra e brilho tátil (Task 39).
+ */
+export interface PrismEffects {
+  enabled: boolean;
+  color: string;
+  blur: number;      // em mm
+  offsetX: number;   // em mm
+  offsetY: number;   // em mm
+}
+
+/**
  * BaseElement: Propriedades universais de todo elemento.
- * Sincronizado com definition_elements.md (v1.1) + Task 55
+ * Sincronizado com definition_elements.md (v1.1) + Task 55/39
  */
 export interface BaseElement {
   id: string;
@@ -70,4 +81,5 @@ export interface BaseElement {
   locked: boolean;
   visible: boolean;
   keepRatio: boolean; // Task 55: Vínculo de proporção
+  effects: PrismEffects; // Task 39: Efeitos Prism
 }

@@ -15,6 +15,7 @@ import './sections/InspectorSectionRect';
 import './sections/InspectorSectionImage';
 import './sections/InspectorSectionBorder';
 import './sections/InspectorSectionCode';
+import './sections/InspectorSectionEffects';
 
 interface ActionIcon extends HTMLElement {
   name: string;
@@ -314,6 +315,8 @@ export class InspectorLayerCard extends HTMLElement {
     } else if (el.type === ElementType.CODE) {
       container.appendChild(createSection('inspector-section-code'));
     }
+
+    container.appendChild(createSection('inspector-section-effects'));
 
     const footer = document.createElement('div');
     footer.style.marginTop = '16px';
