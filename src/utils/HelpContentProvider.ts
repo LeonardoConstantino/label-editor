@@ -236,6 +236,75 @@ export const InspectorHelpData: Record<string, HelpTooltipConfig> = {
       text: 'Combine com Prism Effects para criar divisores neon.',
       isSuccess: true
     }
+  },
+  pref_general: {
+    title: 'System Environment',
+    icon: 'settings',
+    commands: [
+      { label: 'Theme', desc: 'Alterna entre Dark, Light ou System.' },
+      { label: 'Unit', desc: 'Define a unidade base (mm, px, pt).' },
+      { label: 'DPI', desc: 'Resolução padrão para novos designs.' }
+    ],
+    proTip: {
+      icon: 'music',
+      text: 'O áudio tátil ajuda na percepção de encaixe (Snapping).',
+      isSuccess: false
+    }
+  },
+  pref_grid: {
+    title: 'Grid Calibration',
+    icon: 'rect',
+    commands: [
+      { label: 'Precision', desc: 'Ajusta o tamanho das células da grade.' },
+      { label: 'Chromatics', desc: 'Altera a cor e visibilidade do guia.' }
+    ],
+    proTip: {
+      icon: 'lightbulb',
+      text: 'Use cores contrastantes para designs complexos.',
+      isSuccess: false
+    }
+  },
+  pref_snapping: {
+    title: 'Magnetic Alignment',
+    icon: 'move',
+    commands: [
+      { label: 'Objects', desc: 'Alinha bordas com outras camadas.' },
+      { label: 'Canvas', desc: 'Atrai elementos para as bordas do papel.' },
+      { label: 'Threshold', desc: 'Sensibilidade da força de atração.' }
+    ],
+    proTip: {
+      icon: 'zap',
+      text: 'O Snapping garante precisão milimétrica sem esforço.',
+      isSuccess: true
+    }
+  },
+  pref_ui: {
+    title: 'Selection & Workspace',
+    icon: 'image',
+    commands: [
+      { label: 'Selection', desc: 'Customiza o visual do foco ativo.' },
+      { label: 'Auto Lock', desc: 'Trava camadas novas por segurança.' },
+      { label: 'Default Font', desc: 'Fonte inicial para novos textos.' }
+    ],
+    proTip: {
+      icon: 'eye',
+      text: 'A cor de seleção deve ser vibrante para fácil localização.',
+      isSuccess: false
+    }
+  },
+  pref_perf: {
+    title: 'Engine Performance',
+    icon: 'cpu',
+    commands: [
+      { label: 'Sensitivity', desc: 'Delay de gravação do histórico (Undo).' },
+      { label: 'Max Steps', desc: 'Profundidade máxima de memória do Undo.' },
+      { label: 'Log Level', desc: 'Nível de detalhes técnicos no console.' }
+    ],
+    proTip: {
+      icon: 'database',
+      text: 'Muitos passos de histórico consomem mais RAM no navegador.',
+      isSuccess: false
+    }
   }
 };
 

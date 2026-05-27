@@ -3,6 +3,7 @@ import eventBus from '../../core/EventBus';
 import { store, AppState } from '../../core/Store';
 import { UISM } from '../../core/UISoundManager';
 import { UserPreferences } from '../../domain/models/UserPreferences';
+import { HelpContentProvider } from '../../utils/HelpContentProvider';
 
 // Registrar componentes necessários
 import '../common/AppButton';
@@ -527,9 +528,12 @@ export class PreferencesModal extends HTMLElement {
         <main class="content-area">
           <!-- SECTION: GENERAL -->
           <section id="section-general" class="settings-section active">
-            <div class="section-header">
-              <ui-icon name="settings" class="text-accent-primary" style="--icon-size: 24px"></ui-icon>
-              <h2 class="section-title">System & Environment</h2>
+            <div class="section-header justify-between">
+              <div class="flex items-center gap-3">
+                <ui-icon name="settings" class="text-accent-primary" style="--icon-size: 24px"></ui-icon>
+                <h2 class="section-title">System & Environment</h2>
+              </div>
+              ${HelpContentProvider.buildTooltip('pref_general' as any)}
             </div>
             <div class="card-module">
               <div class="setting-row">
@@ -589,9 +593,12 @@ export class PreferencesModal extends HTMLElement {
 
           <!-- SECTION: GRID -->
           <section id="section-grid" class="settings-section">
-            <div class="section-header">
-              <ui-icon name="rect" class="text-accent-primary" style="--icon-size: 24px"></ui-icon>
-              <h2 class="section-title">Grid Engine</h2>
+            <div class="section-header justify-between">
+              <div class="flex items-center gap-3">
+                <ui-icon name="rect" class="text-accent-primary" style="--icon-size: 24px"></ui-icon>
+                <h2 class="section-title">Grid Engine</h2>
+              </div>
+              ${HelpContentProvider.buildTooltip('pref_grid' as any)}
             </div>
             <div class="card-module">
               <div class="grid-preview"><canvas id="grid-preview-canvas" class="grid-canvas"></canvas></div>
@@ -621,9 +628,12 @@ export class PreferencesModal extends HTMLElement {
 
           <!-- SECTION: SNAPPING -->
           <section id="section-snapping" class="settings-section">
-            <div class="section-header">
-              <ui-icon name="move" class="text-accent-primary" style="--icon-size: 24px"></ui-icon>
-              <h2 class="section-title">Magnetic Snapping</h2>
+            <div class="section-header justify-between">
+              <div class="flex items-center gap-3">
+                <ui-icon name="move" class="text-accent-primary" style="--icon-size: 24px"></ui-icon>
+                <h2 class="section-title">Magnetic Snapping</h2>
+              </div>
+              ${HelpContentProvider.buildTooltip('pref_snapping' as any)}
             </div>
             <div class="card-module">
               <div class="setting-row">
@@ -651,9 +661,12 @@ export class PreferencesModal extends HTMLElement {
 
           <!-- SECTION: UI & SELECTION -->
           <section id="section-ui" class="settings-section">
-            <div class="section-header">
-              <ui-icon name="image" class="text-accent-primary" style="--icon-size: 24px"></ui-icon>
-              <h2 class="section-title">Selection & UI</h2>
+            <div class="section-header justify-between">
+              <div class="flex items-center gap-3">
+                <ui-icon name="image" class="text-accent-primary" style="--icon-size: 24px"></ui-icon>
+                <h2 class="section-title">Selection & UI</h2>
+              </div>
+              ${HelpContentProvider.buildTooltip('pref_ui' as any)}
             </div>
             <div class="card-module">
               <div class="setting-row">
@@ -700,9 +713,12 @@ export class PreferencesModal extends HTMLElement {
 
           <!-- SECTION: PERFORMANCE -->
           <section id="section-perf" class="settings-section">
-            <div class="section-header">
-              <ui-icon name="cpu" class="text-accent-primary" style="--icon-size: 24px"></ui-icon>
-              <h2 class="section-title">Engine & History</h2>
+            <div class="section-header justify-between">
+              <div class="flex items-center gap-3">
+                <ui-icon name="cpu" class="text-accent-primary" style="--icon-size: 24px"></ui-icon>
+                <h2 class="section-title">Engine & History</h2>
+              </div>
+              ${HelpContentProvider.buildTooltip('pref_perf' as any)}
             </div>
             <div class="card-module">
               <div class="setting-row">
