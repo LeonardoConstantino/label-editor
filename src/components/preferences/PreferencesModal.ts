@@ -17,7 +17,7 @@ settingsSheet.replaceSync(`
   :host {
     display: block;
     width: 100%;
-    height: 68dvh;
+    height: 75dvh;
   }
 
   .settings-container {
@@ -25,11 +25,12 @@ settingsSheet.replaceSync(`
     height: 100%;
     background-color: #0a0c10;
     overflow: hidden;
+    border-radius: 12px;
   }
 
   /* Sidebar Styles */
   .sidebar {
-    width: 200px;
+    width: 220px;
     background-color: rgba(0, 0, 0, 0.4);
     border-right: 1px solid var(--color-border-ui);
     display: flex;
@@ -130,6 +131,8 @@ settingsSheet.replaceSync(`
     display: flex;
     flex-direction: column;
     gap: 4px;
+    flex: 1;
+    padding-right: 20px;
   }
 
   .setting-label {
@@ -273,6 +276,11 @@ settingsSheet.replaceSync(`
   }
 `);
 
+/**
+ * PreferencesModal: Matriz de calibração do sistema (Task 75).
+ * Implementa sincronização atômica para manter o foco e performance.
+ * Refinado com o roadmap realista (Task 75 Roadmap).
+ */
 export class PreferencesModal extends HTMLElement {
   private _preferences: UserPreferences | null = null;
   private _abortController: AbortController | null = null;
@@ -306,6 +314,7 @@ export class PreferencesModal extends HTMLElement {
     }, { signal });
 
     const root = this.shadowRoot!;
+    if (!root) return;
     
     // Sidebar Navigation
     root.querySelectorAll('.sidebar-item').forEach(item => {
@@ -338,10 +347,35 @@ export class PreferencesModal extends HTMLElement {
     root.addEventListener('app-input', (e: any) => {
       this.updateStore(e.target.getAttribute('data-prop'), e.detail.value);
     });
+
+    // Theme buttons listener
+    root.querySelectorAll('.segment-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        this.updateStore('theme', btn.getAttribute('data-val'));
+        UISM.play(UISM.enumPresets.TAP);
+      });
+    });
+
+    // Reset button listener
+    root.getElementById('btn-reset')?.addEventListener('click', async () => {
+      const { confirmDialog } = await import('../common/confirm');
+      const ok = await confirmDialog.ask('Reset Preferences', 'Restore all system settings to their default values? This action cannot be undone.', {
+        variant: 'danger',
+        confirmText: 'Reset System',
+        countdown: 3
+      });
+
+      if (ok) {
+        const { DEFAULT_PREFERENCES } = await import('../../domain/models/UserPreferences');
+        eventBus.emit('preferences:update', DEFAULT_PREFERENCES);
+        UISM.play(UISM.enumPresets.DELETE);
+      }
+    });
   }
 
   private switchSection(sectionId: string) {
     const root = this.shadowRoot!;
+    if (!root) return;
     
     // Atualiza Sidebar
     root.querySelectorAll('.sidebar-item').forEach(item => {
@@ -386,7 +420,7 @@ export class PreferencesModal extends HTMLElement {
     const prefs = this._preferences;
     const root = this.shadowRoot;
 
-    // Sincroniza inputs que não estão em foco
+    // Sincroniza inputs que não estão em foco (Atomic Sync)
     root.querySelectorAll<any>('[data-prop]').forEach(input => {
       const prop = input.getAttribute('data-prop') as keyof UserPreferences;
       const val = prefs[prop];
@@ -395,11 +429,15 @@ export class PreferencesModal extends HTMLElement {
       if (isFocused) return;
 
       if (input.type === 'checkbox') {
-        if (input.checked !== val) input.checked = val;
+        if (input.checked !== !!val) input.checked = !!val;
       } else if (input.tagName === 'APP-SELECT' || input.tagName === 'UI-NUMBER-SCRUBBER' || input.tagName === 'APP-INPUT') {
-        if (input.value !== val) input.value = val;
+        if (String(input.value) !== String(val)) {
+           input.value = val;
+        }
       } else {
-        if (input.value != val) input.value = val;
+        if (String(input.value) !== String(val)) {
+           input.value = val;
+        }
       }
     });
 
@@ -408,7 +446,7 @@ export class PreferencesModal extends HTMLElement {
       btn.classList.toggle('active', btn.getAttribute('data-val') === prefs.theme);
     });
 
-    // Preview
+    // Atualiza preview da grade
     this.drawGridPreview();
   }
 
@@ -419,9 +457,14 @@ export class PreferencesModal extends HTMLElement {
     const ctx = canvas.getContext('2d')!;
     const { gridSizeMM, gridColor, gridOpacity, showGrid } = this._preferences;
     
-    canvas.width = canvas.offsetWidth;
-    canvas.height = canvas.offsetHeight;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const rect = canvas.getBoundingClientRect();
+    if (rect.width === 0) return;
+
+    canvas.width = rect.width * (window.devicePixelRatio || 1);
+    canvas.height = rect.height * (window.devicePixelRatio || 1);
+    ctx.scale(window.devicePixelRatio || 1, window.devicePixelRatio || 1);
+    
+    ctx.clearRect(0, 0, rect.width, rect.height);
     
     if (!showGrid) return;
 
@@ -430,15 +473,30 @@ export class PreferencesModal extends HTMLElement {
     ctx.globalAlpha = gridOpacity;
     ctx.lineWidth = 0.5;
 
-    const step = gridSizeMM * 2;
-    for (let x = 0; x <= canvas.width; x += step) { ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); }
-    for (let y = 0; y <= canvas.height; y += step) { ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); }
+    const step = gridSizeMM * 3;
+    
+    for (let x = 0; x <= rect.width; x += step) {
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, rect.height);
+    }
+    for (let y = 0; y <= rect.height; y += step) {
+      ctx.moveTo(0, y);
+      ctx.lineTo(rect.width, y);
+    }
     ctx.stroke();
+
+    ctx.fillStyle = gridColor;
+    ctx.globalAlpha = Math.min(1, gridOpacity * 1.5);
+    for (let x = 0; x <= rect.width; x += step) {
+      for (let y = 0; y <= rect.height; y += step) {
+        ctx.fillRect(x - 0.5, y - 0.5, 1, 1);
+      }
+    }
   }
 
   private renderSkeleton() {
     if (!this.shadowRoot || !this._preferences) return;
-    const {audioEnabled, showGrid, gridSizeMM, gridColor, gridOpacity, snapToGrid, snapToObjects, snapToCanvas, snapThresholdMM, unit} = this._preferences;
+    const p = this._preferences;
 
     this.shadowRoot.innerHTML = `
       <div class="settings-container">
@@ -450,10 +508,19 @@ export class PreferencesModal extends HTMLElement {
             <ui-icon name="rect" style="--icon-size: 14px"></ui-icon> Grid Engine
           </div>
           <div class="sidebar-item" data-section="snapping">
-            <ui-icon name="move" style="--icon-size: 14px"></ui-icon> Magnetic Snapping
+            <ui-icon name="move" style="--icon-size: 14px"></ui-icon> Snapping & Guides
+          </div>
+          <div class="sidebar-item" data-section="ui">
+            <ui-icon name="image" style="--icon-size: 14px"></ui-icon> Selection & UI
           </div>
           <div class="sidebar-item" data-section="perf">
             <ui-icon name="cpu" style="--icon-size: 14px"></ui-icon> Performance
+          </div>
+          <div style="flex: 1"></div>
+          <div class="sidebar-footer" style="padding: 20px; border-top: 1px solid var(--color-border-ui)">
+            <app-button id="btn-reset" variant="secondary" style="width: 100%; --btn-padding: 8px">
+              Reset System
+            </app-button>
           </div>
         </aside>
 
@@ -485,7 +552,7 @@ export class PreferencesModal extends HTMLElement {
                 </div>
                 <div class="setting-control">
                   <label class="toggle-switch">
-                    <input type="checkbox" data-prop="audioEnabled" ${audioEnabled ? 'checked' : ''}>
+                    <input type="checkbox" data-prop="audioEnabled" ${p.audioEnabled ? 'checked' : ''}>
                     <span class="slider"></span>
                   </label>
                 </div>
@@ -496,7 +563,7 @@ export class PreferencesModal extends HTMLElement {
                   <span class="setting-desc">Default unit for all design calculations.</span>
                 </div>
                 <div class="setting-control">
-                  <app-select id="unit-select" data-prop="unit" value="${unit}" style="width: 140px"></app-select>
+                  <app-select id="unit-select" data-prop="unit" style="width: 140px"></app-select>
                 </div>
               </div>
               <div class="setting-row">
@@ -506,6 +573,15 @@ export class PreferencesModal extends HTMLElement {
                 </div>
                 <div class="setting-control">
                   <app-select id="dpi-select" data-prop="lastUsedDpi" style="width: 140px"></app-select>
+                </div>
+              </div>
+              <div class="setting-row">
+                <div class="setting-info">
+                  <span class="setting-label">Default Canvas Zoom</span>
+                  <span class="setting-desc">Preferred starting zoom level for the workspace.</span>
+                </div>
+                <div class="setting-control">
+                  <ui-number-scrubber data-prop="defaultZoom" min="0.1" max="5" step="0.1" unit="x" style="width: 140px"></ui-number-scrubber>
                 </div>
               </div>
             </div>
@@ -525,20 +601,20 @@ export class PreferencesModal extends HTMLElement {
                   <span class="setting-desc">Display a precise technical overlay on the canvas.</span>
                 </div>
                 <div class="setting-control">
-                  <label class="toggle-switch"><input type="checkbox" data-prop="showGrid" ${showGrid ? 'checked' : ''}><span class="slider"></span></label>
+                  <label class="toggle-switch"><input type="checkbox" data-prop="showGrid" ${p.showGrid ? 'checked' : ''}><span class="slider"></span></label>
                 </div>
               </div>
               <div class="setting-row">
                 <div class="setting-info"><span class="setting-label">Grid Precision</span><span class="setting-desc">Distance between lines in mm.</span></div>
-                <div class="setting-control"><ui-number-scrubber data-prop="gridSizeMM" value="${gridSizeMM}" min="1" max="50" step="1" unit="mm" style="width: 120px"></ui-number-scrubber></div>
+                <div class="setting-control"><ui-number-scrubber data-prop="gridSizeMM" value="${p.gridSizeMM}" min="1" max="50" step="1" unit="mm" style="width: 120px"></ui-number-scrubber></div>
               </div>
               <div class="setting-row">
                 <div class="setting-info"><span class="setting-label">Grid Chromatics</span><span class="setting-desc">Pick a color for your grid.</span></div>
-                <div class="setting-control"><app-input type="color" data-prop="gridColor" value="${gridColor}" style="width: 120px"></app-input></div>
+                <div class="setting-control"><app-input type="color" data-prop="gridColor" value="${p.gridColor}" style="width: 120px"></app-input></div>
               </div>
               <div class="setting-row">
                 <div class="setting-info"><span class="setting-label">Opacity</span><span class="setting-desc">Visibility intensity.</span></div>
-                <div class="setting-control"><input type="range" data-prop="gridOpacity" value="${gridOpacity}" min="0.05" max="1" step="0.05" style="width: 120px"></div>
+                <div class="setting-control"><input type="range" data-prop="gridOpacity" value="${p.gridOpacity}" min="0.05" max="1" step="0.05" style="width: 120px"></div>
               </div>
             </div>
           </section>
@@ -552,19 +628,72 @@ export class PreferencesModal extends HTMLElement {
             <div class="card-module">
               <div class="setting-row">
                 <div class="setting-info"><span class="setting-label">Snap to Grid</span><span class="setting-desc">Attract elements to grid lines.</span></div>
-                <div class="setting-control"><label class="toggle-switch"><input type="checkbox" data-prop="snapToGrid" ${snapToGrid ? 'checked' : ''}><span class="slider"></span></label></div>
+                <div class="setting-control"><label class="toggle-switch"><input type="checkbox" data-prop="snapToGrid" ${p.snapToGrid ? 'checked' : ''}><span class="slider"></span></label></div>
               </div>
               <div class="setting-row">
                 <div class="setting-info"><span class="setting-label">Snap to Objects</span><span class="setting-desc">Align with other layers.</span></div>
-                <div class="setting-control"><label class="toggle-switch"><input type="checkbox" data-prop="snapToObjects" ${snapToObjects ? 'checked' : ''}><span class="slider"></span></label></div>
+                <div class="setting-control"><label class="toggle-switch"><input type="checkbox" data-prop="snapToObjects" ${p.snapToObjects ? 'checked' : ''}><span class="slider"></span></label></div>
               </div>
               <div class="setting-row">
                 <div class="setting-info"><span class="setting-label">Snap to Canvas</span><span class="setting-desc">Pull towards board borders.</span></div>
-                <div class="setting-control"><label class="toggle-switch"><input type="checkbox" data-prop="snapToCanvas" ${snapToCanvas ? 'checked' : ''}><span class="slider"></span></label></div>
+                <div class="setting-control"><label class="toggle-switch"><input type="checkbox" data-prop="snapToCanvas" ${p.snapToCanvas ? 'checked' : ''}><span class="slider"></span></label></div>
               </div>
               <div class="setting-row">
                 <div class="setting-info"><span class="setting-label">Threshold</span><span class="setting-desc">Magnetic pull distance (mm).</span></div>
-                <div class="setting-control"><ui-number-scrubber data-prop="snapThresholdMM" value="${snapThresholdMM}" min="0.5" max="10" step="0.5" unit="mm" style="width: 120px"></ui-number-scrubber></div>
+                <div class="setting-control"><ui-number-scrubber data-prop="snapThresholdMM" value="${p.snapThresholdMM}" min="0.5" max="10" step="0.5" unit="mm" style="width: 120px"></ui-number-scrubber></div>
+              </div>
+              <div class="setting-row">
+                <div class="setting-info"><span class="setting-label">Guide Color</span><span class="setting-desc">Color for magnetic alignment lines.</span></div>
+                <div class="setting-control"><app-input type="color" data-prop="snapGuideColor" style="width: 120px"></app-input></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- SECTION: UI & SELECTION -->
+          <section id="section-ui" class="settings-section">
+            <div class="section-header">
+              <ui-icon name="image" class="text-accent-primary" style="--icon-size: 24px"></ui-icon>
+              <h2 class="section-title">Selection & UI</h2>
+            </div>
+            <div class="card-module">
+              <div class="setting-row">
+                <div class="setting-info">
+                  <span class="setting-label">Selection Color</span>
+                  <span class="setting-desc">Bounding box color for active elements.</span>
+                </div>
+                <div class="setting-control">
+                  <app-input type="color" data-prop="selectionColor" style="width: 120px"></app-input>
+                </div>
+              </div>
+              <div class="setting-row">
+                <div class="setting-info">
+                  <span class="setting-label">Selection Width</span>
+                  <span class="setting-desc">Thickness of the selection outline.</span>
+                </div>
+                <div class="setting-control">
+                  <ui-number-scrubber data-prop="selectionWidth" min="0.5" max="5" step="0.5" unit="px" style="width: 120px"></ui-number-scrubber>
+                </div>
+              </div>
+              <div class="setting-row">
+                <div class="setting-info">
+                  <span class="setting-label">Auto Lock</span>
+                  <span class="setting-desc">Lock layers automatically upon creation.</span>
+                </div>
+                <div class="setting-control">
+                  <label class="toggle-switch">
+                    <input type="checkbox" data-prop="autoLockOnCreation" ${p.autoLockOnCreation ? 'checked' : ''}>
+                    <span class="slider"></span>
+                  </label>
+                </div>
+              </div>
+              <div class="setting-row">
+                <div class="setting-info">
+                  <span class="setting-label">Default Font</span>
+                  <span class="setting-desc">Preferred font family for new text layers.</span>
+                </div>
+                <div class="setting-control">
+                  <app-select id="font-family-select" data-prop="defaultFontFamily" style="width: 160px"></app-select>
+                </div>
               </div>
             </div>
           </section>
@@ -587,6 +716,15 @@ export class PreferencesModal extends HTMLElement {
               </div>
               <div class="setting-row">
                 <div class="setting-info">
+                  <span class="setting-label">History Max Steps</span>
+                  <span class="setting-desc">Maximum number of undo states kept in memory.</span>
+                </div>
+                <div class="setting-control">
+                  <ui-number-scrubber data-prop="historyMaxSteps" min="10" max="200" step="5" style="width: 120px"></ui-number-scrubber>
+                </div>
+              </div>
+              <div class="setting-row">
+                <div class="setting-info">
                   <span class="setting-label">Log Level (Console)</span>
                   <span class="setting-desc">Configure technical logging verbosity in browser console.</span>
                 </div>
@@ -601,14 +739,6 @@ export class PreferencesModal extends HTMLElement {
     `;
 
     this.initWidgets();
-    
-    // Theme buttons listener
-    this.shadowRoot.querySelectorAll('.segment-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        this.updateStore('theme', btn.getAttribute('data-val'));
-        UISM.play(UISM.enumPresets.TAP);
-      });
-    });
   }
 
   private initWidgets() {
@@ -650,6 +780,17 @@ export class PreferencesModal extends HTMLElement {
         { value: '2', label: 'Warnings', sublabel: 'Stability alerts' },
         { value: '3', label: 'Standard (Info)', sublabel: 'General workflow' },
         { value: '4', label: 'Full Debug', sublabel: 'Technical payloads' }
+      ];
+    }
+
+    const fontSelect = root.getElementById('font-family-select') as any;
+    if (fontSelect) {
+      fontSelect.options = [
+        { value: 'Inter', label: 'Inter', sublabel: 'Sans-Serif (Default)' },
+        { value: 'JetBrains Mono', label: 'JetBrains Mono', sublabel: 'Monospace (Data)' },
+        { value: 'Arial', label: 'Arial', sublabel: 'System' },
+        { value: 'Times New Roman', label: 'Times New Roman', sublabel: 'Serif' },
+        { value: 'Geist', label: 'Geist', sublabel: 'Modern Sans' }
       ];
     }
   }

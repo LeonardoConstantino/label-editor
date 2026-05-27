@@ -90,6 +90,16 @@ export class HistoryManager {
     return this.maxSnapshots;
   }
 
+  public setMaxSize(size: number): void {
+    this.maxSnapshots = Math.max(10, Math.min(size, 500));
+    // Se o novo limite for menor, trunca o histórico
+    if (this.history.length > this.maxSnapshots) {
+      const diff = this.history.length - this.maxSnapshots;
+      this.history = this.history.slice(diff);
+      this.currentIndex = Math.max(0, this.currentIndex - diff);
+    }
+  }
+
   public getCurrentIndex(): number {
     return this.currentIndex;
   }

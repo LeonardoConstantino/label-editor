@@ -211,7 +211,15 @@ export class Store {
 
     eventBus.on('preferences:update', (prefs: Partial<UserPreferences>) => {
       this.state.preferences = { ...this.state.preferences, ...prefs };
+      
+      // Sincroniza componentes dependentes
+      if (prefs.historyMaxSteps !== undefined) {
+        historyManager.setMaxSize(prefs.historyMaxSteps);
+      }
+
+      eventBus.emit('preferences:change', this.state.preferences);
       this.emit();
+
       import('../domain/services/PreferenceManager').then(m => {
         m.preferenceManager.savePreferences(this.state.preferences);
       });

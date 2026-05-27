@@ -30,7 +30,6 @@ export class EditorCanvas extends HTMLElement {
   private artboard: HTMLDivElement;
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
-  private selectionOutlineBorderWidth = 1.5; // em pontos
   private unsubscribe: (() => void) | null = null;
 
   // Estado de Arraste (Drag-and-Drop)
@@ -322,13 +321,14 @@ export class EditorCanvas extends HTMLElement {
 
   private drawSnapGuides(guides: SnapResult['guides'], scale: number): void {
     if (guides.x.length === 0 && guides.y.length === 0) return;
+    const { snapGuideColor } = store.getState().preferences;
 
     this.ctx.save();
 
     // ═══════════════════════════════════════════════════════════
     // 1. Sombra/Glow das guias (profundidade)
     // ═══════════════════════════════════════════════════════════
-    this.ctx.shadowColor = '#f59e0b';
+    this.ctx.shadowColor = snapGuideColor;
     this.ctx.shadowBlur = 8;
     this.ctx.shadowOffsetX = 0;
     this.ctx.shadowOffsetY = 0;
@@ -337,7 +337,7 @@ export class EditorCanvas extends HTMLElement {
     // 2. Linha principal com animação de dash (movimento sutil)
     // ═══════════════════════════════════════════════════════════
     const dashOffset = (Date.now() / 50) % 12; // Animação suave
-    this.ctx.strokeStyle = '#f59e0b';
+    this.ctx.strokeStyle = snapGuideColor;
     this.ctx.lineWidth = 1.5;
     this.ctx.setLineDash([8, 4]);
     this.ctx.lineDashOffset = -dashOffset;
@@ -364,7 +364,7 @@ export class EditorCanvas extends HTMLElement {
     // 3. Linha secundária mais sutil (efeito de camada)
     // ═══════════════════════════════════════════════════════════
     this.ctx.shadowBlur = 0;
-    this.ctx.strokeStyle = 'rgba(245, 158, 11, 0.3)';
+    this.ctx.strokeStyle = `${snapGuideColor}4D`; // 30% alpha
     this.ctx.lineWidth = 3;
     this.ctx.setLineDash([]);
 
@@ -387,7 +387,7 @@ export class EditorCanvas extends HTMLElement {
     // ═══════════════════════════════════════════════════════════
     // 4. Indicadores nas extremidades (âncoras visuais)
     // ═══════════════════════════════════════════════════════════
-    this.ctx.fillStyle = '#f59e0b';
+    this.ctx.fillStyle = snapGuideColor;
     this.ctx.setLineDash([]);
 
     guides.x.forEach((x) => {
@@ -419,13 +419,14 @@ export class EditorCanvas extends HTMLElement {
 
   private drawSelectionOutline(el: any, scale: number, dpi: number): void {
     if (!el.dimensions) return;
+    const { selectionColor, selectionWidth } = store.getState().preferences;
 
     const x = el.position.x * scale;
     const y = el.position.y * scale;
     const w = el.dimensions.width * scale;
     const h = el.dimensions.height * scale;
     const borderWidth =
-      UnitConverter.ptToPx(this.selectionOutlineBorderWidth, dpi) *
+      UnitConverter.ptToPx(selectionWidth || 1.5, dpi) *
       (scale / UnitConverter.mmToPx(1, dpi));
 
     this.ctx.save();
@@ -433,7 +434,7 @@ export class EditorCanvas extends HTMLElement {
     // ═══════════════════════════════════════════════════════════
     // 1. Glow externo (destaque vibrante)
     // ═══════════════════════════════════════════════════════════
-    this.ctx.shadowColor = '#f43f5e';
+    this.ctx.shadowColor = selectionColor;
     this.ctx.shadowBlur = 12;
     this.ctx.shadowOffsetX = 0;
     this.ctx.shadowOffsetY = 0;
@@ -442,7 +443,7 @@ export class EditorCanvas extends HTMLElement {
     // 2. Borda principal animada
     // ═══════════════════════════════════════════════════════════
     const dashOffset = (Date.now() / 40) % 15;
-    this.ctx.strokeStyle = '#f43f5e';
+    this.ctx.strokeStyle = selectionColor;
     this.ctx.lineWidth = borderWidth;
     this.ctx.setLineDash([10, 5]);
     this.ctx.lineDashOffset = -dashOffset;
@@ -452,7 +453,7 @@ export class EditorCanvas extends HTMLElement {
     // 3. Borda interna sutil (profundidade)
     // ═══════════════════════════════════════════════════════════
     this.ctx.shadowBlur = 0;
-    this.ctx.strokeStyle = 'rgba(244, 63, 94, 0.3)';
+    this.ctx.strokeStyle = `${selectionColor}4D`; // 30% alpha
     this.ctx.lineWidth = borderWidth * 2;
     this.ctx.setLineDash([]);
     this.ctx.strokeRect(x, y, w, h);
@@ -469,7 +470,7 @@ export class EditorCanvas extends HTMLElement {
     ];
 
     this.ctx.fillStyle = '#ffffff';
-    this.ctx.strokeStyle = '#f43f5e';
+    this.ctx.strokeStyle = selectionColor;
     this.ctx.lineWidth = 2;
     this.ctx.setLineDash([]);
 
@@ -500,7 +501,7 @@ export class EditorCanvas extends HTMLElement {
       { x: x + w, y: y + h / 2 }, // Direita
     ];
 
-    this.ctx.fillStyle = '#f43f5e';
+    this.ctx.fillStyle = selectionColor;
     midPoints.forEach((point) => {
       this.ctx.beginPath();
       this.ctx.arc(point.x, point.y, 4, 0, Math.PI * 2);
