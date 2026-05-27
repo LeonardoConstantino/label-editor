@@ -29,7 +29,7 @@ Este Master Plan coordena a fase final de desenvolvimento, focando em estabilida
 | **70** | [Grande Auditoria de Integridade](./tasks/70_codebase_audit.md) | 09 | [ ] | 60 | `task/70-codebase-audit` |
 | **71** | [Mapeamento e Tipagem de Eventos (EventMap)](./tasks/71_event_orchestration.md) | 10 | [x] | — | `task/71-event-mapping` |
 | **74** | [System Status Bar (Telemetry & Dev Console)](./tasks/74-status-bar.md) | 07 | [x] | 46 | `task/74-status-bar` |
-| **75** | [System Preferences Modal (Calibration Matrix)](./tasks/75-settings-modal.md) | 07 | [/] | — | `task/75-settings-modal` |
+| **75** | [System Preferences Modal (Calibration Matrix)](./tasks/75-settings-modal.md) | 07 | [x] | — | `task/75-settings-modal` |
 | **24** | [Otimização de Lote & Qualidade (Web Workers)](./tasks/24_batch_perf.md) | 09 | [x] | 77 | `task/24-batch-workers` |
 | **83** | [Fidelidade de Fontes no Web Worker](./tasks/83_worker_font_fidelity.md) | 09 | [x] | 24 | `task/83-worker-fonts` |
 | **81** | [Encapsulamento de Stack via CSS Isolation](./tasks/81_css_isolation.md) | 09 | [x] | — | `task/81-css-isolation` |
@@ -83,6 +83,11 @@ Este Master Plan coordena a fase final de desenvolvimento, focando em estabilida
 | **72** | [Padronização de Tooltips de Ajuda](./tasks/72_help_tooltips_standardization.md) | 03 | [/] | 46 | `task/72-help-tooltips` |
 | **38** | [Tipografia Avançada (Leading/Tracking)](./tasks/38_adv_typography.md) | 02 | [x] | — | `task/38-typography` |
 | **39** | [Efeitos Prism (Sombras/Glow)](./tasks/39_prism_effects.md) | 02 | [x] | — | `task/39-prism-effects` |
+
+### Fase E: Manutenibilidade & Escala (Futuro)
+| ID | Task | Pri | Status | Deps | Branch |
+|----|------|-----|--------|------|--------|
+| **91** | [Refatoração Orchestrator: Preferences](./tasks/91_preferences_refactor.md) | 03 | [ ] | 75 | `task/91-preferences-refactor` |
 
 ---
 
