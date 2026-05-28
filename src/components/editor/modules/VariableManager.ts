@@ -367,7 +367,7 @@ export class VariableManager extends HTMLElement {
 
       <div class="header">
         <span class="header-title">Variable Manager</span>
-        ${HelpContentProvider.buildTooltip('variables', 'bottom')}
+        ${HelpContentProvider.buildTooltip('mod_variables', 'bottom')}
       </div>
 
       <div class="system-tray">

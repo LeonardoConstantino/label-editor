@@ -10,6 +10,7 @@ export interface HelpTooltipConfig {
 
 /**
  * InspectorHelpData: O Banco de Dados Estático de Ajuda para o Cockpit.
+ * Centralizado e padronizado para o Design System Tactile Prism (Task 72).
  */
 export const InspectorHelpData: Record<string, HelpTooltipConfig> = {
   transform: {
@@ -96,17 +97,17 @@ export const InspectorHelpData: Record<string, HelpTooltipConfig> = {
     }
   },
   setup: {
-    title: 'Document Setup',
+    title: 'Blueprint Engine',
     icon: 'settings',
     commands: [
-      { label: 'Presets', desc: 'Tamanhos de etiquetas do mercado.' },
+      { label: 'Canvas', desc: 'Dimensões físicas da etiqueta.' },
       { label: 'DPI', desc: 'Resolução (300 para impressão).' },
-      { label: 'Bleed', desc: 'Sangria para evitar bordas brancas.' }
+      { label: 'Presets', desc: 'Tamanhos comuns do mercado.' }
     ],
     proTip: {
       icon: 'database',
-      text: ' Designs são salvos localmente em tempo real.',
-      isSuccess: false
+      text: 'Designs são salvos localmente em tempo real no Vault.',
+      isSuccess: true
     }
   },
   layout: {
@@ -137,76 +138,6 @@ export const InspectorHelpData: Record<string, HelpTooltipConfig> = {
       icon: 'keyboard',
       text: 'Pressione <kbd class="kbd-prism">Ctrl</kbd>+<kbd class="kbd-prism">/</kbd> para o mapa completo de atalhos.',
       isSuccess: false
-    }
-  },
-  production: {
-    title: 'Production Studio',
-    icon: 'lightning',
-    commands: [
-      { label: 'CSV Link', desc: 'Mapeia colunas da planilha para o design.' },
-      { label: 'Paginator', desc: 'Navega pelos registros para Live Preview.' },
-      { label: 'Imposition', desc: 'Organiza etiquetas no A4 para impressão.' }
-    ],
-    proTip: {
-      icon: 'lightning',
-      text: 'O modo Production protege as variáveis {{var}} de edições acidentais.',
-      isSuccess: true
-    }
-  },
-  assets: {
-    title: 'Asset Library',
-    icon: 'image',
-    commands: [
-      { label: 'Bin', desc: 'Onde suas peças e logotipos ficam guardados.' },
-      { label: 'Drag-Drop', desc: 'Arraste uma peça diretamente para o Canvas.' }
-    ],
-    proTip: {
-      icon: 'sparkles',
-      text: 'Arquivos SVG mantêm a nitidez infinita durante o redimensionamento.',
-      isSuccess: false
-    }
-  },
-  history: {
-    title: 'Time Machine',
-    icon: 'clock',
-    commands: [
-      { label: 'Timeline', desc: 'Fita cronológica de todas as suas ações.' },
-      { label: 'Jump', desc: 'Clique em um nó para viajar no tempo.' },
-      { label: 'Memory', desc: 'Limpe o cache para liberar RAM no navegador.' }
-    ],
-    proTip: {
-      icon: 'cpu',
-      text: 'Novas edições após um salto no tempo criam um novo futuro alternativo.',
-      isSuccess: false
-    }
-  },
-  variables: {
-    title: 'Variable Manager',
-    icon: 'cpu',
-    commands: [
-      { label: 'Pipeline', desc: 'Visualiza o fluxo do dado bruto ao formatado.' },
-      { label: 'Formatters', desc: 'Aplica filtros como Moeda, Data ou Caixa Alta.' },
-      { label: 'Fallback', desc: 'Define um valor padrão caso o dado falte.' },
-      { label: 'Metadata', desc: 'Use {{index}}, {{total}}, {{date}} para informações dinâmicas.' }
-    ],
-    proTip: {
-      icon: 'lightning',
-      text: 'Alterar um formatador aqui atualiza todas as camadas que usam essa variável.',
-      isSuccess: true
-    }
-  },
-  typeface: {
-    title: 'Typeface Engine',
-    icon: 'text',
-    commands: [
-      { label: 'Inject', desc: 'Cole URLs do Google Fonts para expandir a biblioteca.' },
-      { label: 'Specimen', desc: 'Edite o texto do card para testar a fonte.' },
-      { label: 'Toggle', desc: 'Habilite/Desabilite fontes para otimizar performance.' }
-    ],
-    proTip: {
-      icon: 'sparkles',
-      text: 'Fontes customizadas são salvas no arquivo da etiqueta automaticamente.',
-      isSuccess: true
     }
   },
   effects: {
@@ -273,7 +204,7 @@ export const InspectorHelpData: Record<string, HelpTooltipConfig> = {
       { label: 'Threshold', desc: 'Sensibilidade da força de atração.' }
     ],
     proTip: {
-      icon: 'zap',
+      icon: 'sparkles',
       text: 'O Snapping garante precisão milimétrica sem esforço.',
       isSuccess: true
     }
@@ -304,6 +235,117 @@ export const InspectorHelpData: Record<string, HelpTooltipConfig> = {
       icon: 'database',
       text: 'Muitos passos de histórico consomem mais RAM no navegador.',
       isSuccess: false
+    }
+  },
+  layers_meta: {
+    title: 'Layer Management',
+    icon: 'layers',
+    commands: [
+      { label: 'Reorder', desc: 'Arraste para mudar a ordem visual.' },
+      { label: 'Lock', desc: 'Impede edições acidentais na camada.' },
+      { label: 'Visibility', desc: 'Oculta o elemento do canvas e export.' }
+    ],
+    proTip: {
+      icon: 'mouse-pointer',
+      text: 'Multi-seleção: Use os checkboxes ou arraste no canvas.',
+      isSuccess: false
+    }
+  },
+  layer_id: {
+    title: 'Layer Identity',
+    icon: 'tag',
+    commands: [
+      { label: 'Name', desc: 'Nome tático para identificação rápida.' },
+      { label: 'Z-Index', desc: 'Prioridade de profundidade na pilha.' }
+    ],
+    proTip: {
+      icon: 'lightbulb',
+      text: 'Nomes claros ajudam na organização de etiquetas complexas.',
+      isSuccess: false
+    }
+  },
+  mod_layers: {
+    title: 'Layer Properties',
+    icon: 'layers',
+    commands: [
+      { label: 'Transform', desc: 'Posição, escala e rotação.' },
+      { label: 'Style', desc: 'Cores, bordas e opacidade.' },
+      { label: 'Prism', desc: 'Efeitos de sombra e brilho.' }
+    ],
+    proTip: {
+      icon: 'sparkles',
+      text: 'Clique duas vezes em um elemento no Canvas para abrir esta aba.',
+      isSuccess: false
+    }
+  },
+  mod_assets: {
+    title: 'The Parts Bin',
+    icon: 'image',
+    commands: [
+      { label: 'Bin', desc: 'Biblioteca de SVGs e Logotipos.' },
+      { label: 'Uploads', desc: 'Suas imagens salvas no IndexedDB.' },
+      { label: 'Drop', desc: 'Arraste para injetar no Canvas.' }
+    ],
+    proTip: {
+      icon: 'link',
+      text: 'Imagens SVG não perdem qualidade ao serem esticadas.',
+      isSuccess: true
+    }
+  },
+  mod_history: {
+    title: 'Timeline Console',
+    icon: 'clock',
+    commands: [
+      { label: 'Snapshots', desc: 'Cada ação gera um ponto de restauração.' },
+      { label: 'Travel', desc: 'Salte para qualquer ponto no tempo.' },
+      { label: 'Clean', desc: 'Limpa memória sem perder o estado atual.' }
+    ],
+    proTip: {
+      icon: 'cpu',
+      text: 'O histórico é persistente até você recarregar a página.',
+      isSuccess: false
+    }
+  },
+  mod_variables: {
+    title: 'Data Pipeline',
+    icon: 'cpu',
+    commands: [
+      { label: 'Interpolate', desc: 'Injeta dados do CSV no design.' },
+      { label: 'Formatters', desc: 'Processamento de strings em tempo real.' },
+      { label: 'Metadata', desc: 'Contadores e datas automáticas.' }
+    ],
+    proTip: {
+      icon: 'lightning',
+      text: 'Um único formatador pode mudar milhares de etiquetas no lote.',
+      isSuccess: true
+    }
+  },
+  mod_typeface: {
+    title: 'Typeface Terminal',
+    icon: 'text',
+    commands: [
+      { label: 'Injection', desc: 'Conecta fontes do Google via URL.' },
+      { label: 'Specimen', desc: 'Preview interativo de cada família.' },
+      { label: 'Sync', desc: 'Carregamento binário para o PDF Worker.' }
+    ],
+    proTip: {
+      icon: 'pencil-ruler',
+      text: 'Mantenha apenas as fontes necessárias para otimizar o carregamento.',
+      isSuccess: false
+    }
+  },
+  mod_production: {
+    title: 'Production Studio',
+    icon: 'lightning',
+    commands: [
+      { label: 'Batching', desc: 'Geração massiva de PDF em background.' },
+      { label: 'Imposition', desc: 'Organização em folhas A4.' },
+      { label: 'Preview', desc: 'Verificação de cada registro do lote.' }
+    ],
+    proTip: {
+      icon: 'check-circle',
+      text: 'Use DPI 300 para garantir a leitura de códigos de barras.',
+      isSuccess: true
     }
   }
 };
@@ -340,7 +382,7 @@ export class HelpContentProvider {
     // Envelopa no Web Component ui-tooltip
     return `
       <ui-tooltip placement="${placement}" delay="200">
-        <button slot="target" class="text-text-muted hover:text-accent-primary hover:bg-accent-primary/10 w-5 h-5 flex items-center justify-center rounded transition-colors cursor-help" aria-label="Quick Help">
+        <button slot="target" class="text-text-muted hover:text-accent-primary hover:bg-accent-primary/10 w-5 h-5 flex items-center justify-center rounded transition-colors cursor-help" aria-label="Quick Help" style="pointer-events: auto !important; position: relative; z-index: 10;">
           <ui-icon name="help-circle" size="sm"></ui-icon>
         </button>
         

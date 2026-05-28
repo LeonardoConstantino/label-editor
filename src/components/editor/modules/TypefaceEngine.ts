@@ -346,7 +346,7 @@ export class TypefaceEngine extends HTMLElement {
 
       <div class="header">
         <span class="header-title">Typeface Engine</span>
-        ${HelpContentProvider.buildTooltip('typeface', 'bottom')}
+        ${HelpContentProvider.buildTooltip('mod_typeface', 'bottom')}
       </div>
 
       <div class="terminal-zone">

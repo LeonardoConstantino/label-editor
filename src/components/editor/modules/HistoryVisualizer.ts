@@ -370,7 +370,7 @@ export class HistoryVisualizer extends HTMLElement {
 
       <div class="header">
         <span class="header-title">Chronological Tape</span>
-        ${HelpContentProvider.buildTooltip('history', 'bottom')}
+        ${HelpContentProvider.buildTooltip('mod_history', 'bottom')}
       </div>
 
       <div id="history-container">

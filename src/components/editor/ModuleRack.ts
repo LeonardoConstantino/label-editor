@@ -3,6 +3,10 @@ import { SoundPreset, UISM } from '../../core/UISoundManager';
 import eventBus from '../../core/EventBus';
 import { store, AppState } from '../../core/Store';
 import { UIKeyboardShortcuts } from '../common/KeyboardShortcuts';
+import { HelpContentProvider } from '../../utils/HelpContentProvider';
+
+import '../common/icon';
+import '../common/tooltip';
 
 const destraqueCartucho: SoundPreset = {
   freq: 700,
@@ -110,6 +114,9 @@ export class ModuleRack extends HTMLElement {
       // Clique em um item do rack para trocar de módulo
       const item = target.closest('.rack-item');
       if (item) {
+        // Ignorar se o clique foi no botão de ajuda (Task 72)
+        if (target.closest('button[slot="target"]')) return;
+
         const id = item.getAttribute('data-id');
         if (id) {
           eventBus.emit('module:switch', { moduleId: id });
@@ -263,9 +270,9 @@ export class ModuleRack extends HTMLElement {
         .rack-item:hover { background: rgba(255,255,255,0.03); border-left-color: var(--color-accent-primary); }
         .rack-item.active { background: rgba(99, 102, 241, 0.05); border-left-color: var(--color-accent-primary); }
 
-        .item-text { display: flex; flex-direction: column; gap: 2px; pointer-events: none; }
-        .item-title { font-size: 12px; font-weight: 600; color: var(--color-text-main); }
-        .item-desc { font-size: 10px; color: var(--color-text-muted); }
+        .item-text { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+        .item-title { font-size: 11px; font-weight: 700; color: var(--color-text-main); pointer-events: none; }
+        .item-desc { font-size: 10px; color: var(--color-text-muted); opacity: 0.8; pointer-events: none; }
       </style>
 
       <div class="rack-container">
@@ -286,7 +293,10 @@ export class ModuleRack extends HTMLElement {
           <ui-icon name="settings" class="mt-0.5 text-accent-primary" style="pointer-events: none;"></ui-icon>
           <div class="item-text">
             <div class="flex items-center justify-between">
-               <span class="item-title">Blueprint Setup</span>
+               <div class="flex items-center gap-2">
+                 <span class="item-title">Blueprint Setup</span>
+                 ${HelpContentProvider.buildTooltip('setup' as any, 'bottom')}
+               </div>
                ${this.getShortcutHTML('ALT+1')}
             </div>
             <span class="item-desc">Canvas dimensions, DPI and background.</span>
@@ -297,7 +307,10 @@ export class ModuleRack extends HTMLElement {
           <ui-icon name="layers" class="mt-0.5 text-accent-primary" style="pointer-events: none;"></ui-icon>
           <div class="item-text">
             <div class="flex items-center justify-between">
-              <span class="item-title">Layer Properties</span>
+              <div class="flex items-center gap-2">
+                <span class="item-title">Layer Properties</span>
+                ${HelpContentProvider.buildTooltip('mod_layers' as any, 'bottom')}
+              </div>
               ${this.getShortcutHTML('ALT+2')}
             </div>
             <span class="item-desc">Detailed editing for selected elements.</span>
@@ -308,7 +321,10 @@ export class ModuleRack extends HTMLElement {
           <ui-icon name="image" class="mt-0.5 text-accent-primary" style="pointer-events: none;"></ui-icon>
           <div class="item-text">
             <div class="flex items-center justify-between">
-              <span class="item-title">Asset Library</span>
+              <div class="flex items-center gap-2">
+                <span class="item-title">Asset Library</span>
+                ${HelpContentProvider.buildTooltip('mod_assets' as any, 'bottom')}
+              </div>
               ${this.getShortcutHTML('ALT+3')}
             </div>
             <span class="item-desc">Project images, logos and reusable parts.</span>
@@ -319,7 +335,10 @@ export class ModuleRack extends HTMLElement {
           <ui-icon name="clock" class="mt-0.5 text-accent-primary" style="pointer-events: none;"></ui-icon>
           <div class="item-text">
             <div class="flex items-center justify-between">
-              <span class="item-title">Time Machine</span>
+              <div class="flex items-center gap-2">
+                <span class="item-title">Time Machine</span>
+                ${HelpContentProvider.buildTooltip('mod_history' as any, 'bottom')}
+              </div>
               ${this.getShortcutHTML('ALT+4')}
             </div>
             <span class="item-desc">Visual timeline and state restoration.</span>
@@ -330,7 +349,10 @@ export class ModuleRack extends HTMLElement {
           <ui-icon name="cpu" class="mt-0.5 text-accent-primary" style="pointer-events: none;"></ui-icon>
           <div class="item-text">
             <div class="flex items-center justify-between">
-              <span class="item-title">Variable Manager</span>
+              <div class="flex items-center gap-2">
+                <span class="item-title">Variable Manager</span>
+                ${HelpContentProvider.buildTooltip('mod_variables' as any, 'bottom')}
+              </div>
               ${this.getShortcutHTML('ALT+5')}
             </div>
             <span class="item-desc">Visual data pipeline and formatters.</span>
@@ -341,7 +363,10 @@ export class ModuleRack extends HTMLElement {
           <ui-icon name="text" class="mt-0.5 text-accent-primary" style="pointer-events: none;"></ui-icon>
           <div class="item-text">
             <div class="flex items-center justify-between">
-              <span class="item-title">Typeface Engine</span>
+              <div class="flex items-center gap-2">
+                <span class="item-title">Typeface Engine</span>
+                ${HelpContentProvider.buildTooltip('mod_typeface' as any, 'bottom')}
+              </div>
               ${this.getShortcutHTML('ALT+6')}
             </div>
             <span class="item-desc">Custom fonts and Google Fonts terminal.</span>
@@ -352,7 +377,10 @@ export class ModuleRack extends HTMLElement {
           <ui-icon name="lightning" class="mt-0.5 text-accent-success" style="pointer-events: none;"></ui-icon>
           <div class="item-text">
             <div class="flex items-center justify-between">
-              <span class="item-title">Production Studio</span>
+              <div class="flex items-center gap-2">
+                <span class="item-title">Production Studio</span>
+                ${HelpContentProvider.buildTooltip('mod_production' as any, 'bottom')}
+              </div>
               ${this.getShortcutHTML('ALT+P')}
             </div>
             <span class="item-desc">Batch processing and A4 layout export.</span>

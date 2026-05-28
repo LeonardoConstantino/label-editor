@@ -305,7 +305,7 @@ export class AssetLibrary extends HTMLElement {
 
       <div class="header">
         <span class="header-title">Asset Library</span>
-        ${HelpContentProvider.buildTooltip('assets', 'bottom')}
+        ${HelpContentProvider.buildTooltip('mod_assets', 'bottom')}
       </div>
 
       <div class="upload-zone">

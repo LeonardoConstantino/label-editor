@@ -138,7 +138,7 @@ export class ElementInspector extends HTMLElement {
           <span id="panel-title" class="inspector-title">LAYERS</span>
           <span id="unit-count" class="inspector-badge">0 UNITS</span>
         </div>
-        ${HelpContentProvider.buildTooltip('global', 'bottom')}
+        ${HelpContentProvider.buildTooltip('mod_layers', 'bottom')}
       </div>
       <div id="panel-content"></div>
     `;

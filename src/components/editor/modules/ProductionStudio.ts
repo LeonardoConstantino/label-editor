@@ -158,7 +158,7 @@ export class ProductionStudio extends HTMLElement {
 
       <div class="header">
         <span class="header-title">Production Studio</span>
-        ${HelpContentProvider.buildTooltip('production', 'bottom')}
+        ${HelpContentProvider.buildTooltip('mod_production', 'bottom')}
       </div>
 
       <div class="content">

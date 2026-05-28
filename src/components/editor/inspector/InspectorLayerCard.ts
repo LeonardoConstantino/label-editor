@@ -3,6 +3,7 @@ import { sharedSheet } from '../../../utils/shared-styles';
 import { dispatchInspectorAction, dispatchInspectorChange } from './inspector-events';
 import { escapeHTML } from '../../../utils/sanitize';
 import { InspectorSection, InspectorActionType } from './inspector.types';
+import { HelpContentProvider } from '../../../utils/HelpContentProvider';
 
 // Garantir registros
 import '../../common/icon';
@@ -204,6 +205,7 @@ export class InspectorLayerCard extends HTMLElement {
           <span class="warning-tag" id="warning-tag" style="display: ${this._hasOverflow ? 'inline' : 'none'}; color: var(--color-accent-warning)" title="${escapeHTML(this._warningMessage)}">⚠</span>
           
           <div class="flex items-center gap-1">
+            ${HelpContentProvider.buildTooltip('layers_meta')}
             <button id="btn-toggle-lock" class="action-btn ${isLocked ? 'warning active' : ''}" title="${isLocked ? 'Unlock Layer' : 'Lock Layer'}">
               <ui-icon name="${isLocked ? 'lock' : 'unlock'}" style="--icon-size: 13px; opacity: ${isLocked ? '1' : '0.4'};"></ui-icon>
             </button>
@@ -289,7 +291,10 @@ export class InspectorLayerCard extends HTMLElement {
 
     const idSection = document.createElement('div');
     idSection.innerHTML = `
-      <span class="label-prism">Identification</span>
+      <div class="flex items-center justify-between mb-1">
+        <span class="label-prism" style="margin:0">Identification</span>
+        ${HelpContentProvider.buildTooltip('layer_id')}
+      </div>
       <div class="row-ui">
         <app-input label="Layer Name" data-prop="name" value="${escapeHTML(this._element.name || '')}" style="flex:1"></app-input>
       </div>
