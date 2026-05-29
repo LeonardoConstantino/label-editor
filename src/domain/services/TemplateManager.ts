@@ -23,14 +23,14 @@ export class TemplateManager {
   /**
    * Inicializa o storage.
    */
-  async init(): Promise<void> {
+  public async init(): Promise<void> {
     await db.initialize();
   }
 
   /**
    * Salva a etiqueta atual no IndexedDB com geração de thumbnail.
    */
-  async saveCurrentLabel(): Promise<void> {
+  public async saveCurrentLabel(): Promise<void> {
     const currentLabel = store.getState().currentLabel;
     if (!currentLabel) return;
 
@@ -52,14 +52,14 @@ export class TemplateManager {
   /**
    * Retorna todos os templates salvos.
    */
-  async getTemplates(): Promise<Label[]> {
+  public async getTemplates(): Promise<Label[]> {
     return await db.getAll<Label>(this.STORE_NAME);
   }
 
   /**
    * Carrega um template pelo ID e injeta no Store.
    */
-  async loadTemplate(id: string): Promise<void> {
+  public async loadTemplate(id: string): Promise<void> {
     const label = await db.get<Label>(this.STORE_NAME, id);
     if (label) {
       this.injectFontsFromLabel(label);
@@ -70,14 +70,14 @@ export class TemplateManager {
   /**
    * Remove um template pelo ID.
    */
-  async deleteTemplate(id: string): Promise<void> {
+  public async deleteTemplate(id: string): Promise<void> {
     await db.delete(this.STORE_NAME, id);
   }
 
   /**
    * Duplica um template existente.
    */
-  async duplicateTemplate(id: string): Promise<void> {
+  public async duplicateTemplate(id: string): Promise<void> {
     const original = await db.get<Label>(this.STORE_NAME, id);
     if (!original) return;
 
@@ -96,7 +96,7 @@ export class TemplateManager {
    * Exporta uma etiqueta como um arquivo JSON (.label).
    * Se não passar label, usa a atual do store.
    */
-  async exportToFile(label?: Label): Promise<void> {
+  public async exportToFile(label?: Label): Promise<void> {
     const targetLabel = label || store.getState().currentLabel;
     if (!targetLabel) return;
 
@@ -121,7 +121,7 @@ export class TemplateManager {
   /**
    * Importa uma etiqueta de um arquivo JSON.
    */
-  async importFromFile(file: File): Promise<void> {
+  public async importFromFile(file: File): Promise<void> {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = async (e) => {
@@ -153,7 +153,7 @@ export class TemplateManager {
   /**
    * Inicializa um novo projeto limpo usando DEFAULTS.
    */
-  createNewProject(): void {
+  public createNewProject(): void {
     const newLabel: Label = {
       id: crypto.randomUUID(),
       name: 'Nova Etiqueta',
@@ -214,7 +214,7 @@ export class TemplateManager {
     });
   }
 
-  private injectFontsFromLabel(label: Label) {
+  private injectFontsFromLabel(label: Label): void {
     if (label.config.customFonts) {
       label.config.customFonts.forEach(f => {
         if (f.active && f.url) FontLoader.inject(f.url);

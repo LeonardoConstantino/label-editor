@@ -50,7 +50,7 @@ export class Logger {
   private persist: boolean;
   private maxEntries: number;
   private devMode: boolean;
-  private logFormat: Readonly<Record<'debug' | 'log' | 'info' | 'warn' | 'error', LogFormatConfig>>;
+  private readonly logFormat: Readonly<Record<'debug' | 'log' | 'info' | 'warn' | 'error', LogFormatConfig>>;
   private entries: LogEntry[];
   private activeGroups: string[];
 
@@ -81,12 +81,12 @@ export class Logger {
    * Verifica se o nível de log atual permite a exibição da mensagem.
    * Ex: Se setting=3 (INFO), logamos 1(ERROR), 2(WARN) e 3(INFO).
    */
-  shouldLog(level: LogLevelType): boolean {
+  public shouldLog(level: LogLevelType): boolean {
     if (this.level === LogLevel.SILENT) return false;
     return level <= this.level;
   }
 
-  format(namespace: string, msg: string): string {
+  public format(namespace: string, msg: string): string {
     const timestamp = new Intl.DateTimeFormat('pt-br', {
       hour: '2-digit', minute: '2-digit', second: '2-digit',
       day: '2-digit', month: '2-digit', hour12: false,
@@ -98,13 +98,13 @@ export class Logger {
   /**
    * Define o nível mínimo de log dinamicamente.
    */
-  setLevel(level: LogLevelType): void {
+  public setLevel(level: LogLevelType): void {
     this.level = level;
     // Se o nível for DEBUG, ativamos o devMode automaticamente para stack traces
     this.devMode = level === LogLevel.DEBUG;
   }
 
-  setDeveloperMode(enabled: boolean): void {
+  public setDeveloperMode(enabled: boolean): void {
     this.devMode = enabled;
   }
 
@@ -162,7 +162,7 @@ export class Logger {
     }
   }
 
-  debug(namespace: string, msg: string, ...args: unknown[]): void {
+  public debug(namespace: string, msg: string, ...args: unknown[]): void {
     if (this.shouldLog(LogLevel.DEBUG)) {
       console.debug(`%c${this.logFormat.debug.emoji} ${this.format(namespace, msg)}`, this.logFormat.debug.style, ...args);
       this._logStackTrace();
@@ -170,7 +170,7 @@ export class Logger {
     }
   }
 
-  log(namespace: string, msg: string, ...args: unknown[]): void {
+  public log(namespace: string, msg: string, ...args: unknown[]): void {
     if (this.shouldLog(LogLevel.DEBUG)) {
       console.debug(`%c${this.logFormat.log.emoji} ${this.format(namespace, msg)}`, this.logFormat.log.style, ...args);
       this._logStackTrace();
@@ -178,7 +178,7 @@ export class Logger {
     }
   }
 
-  info(namespace: string, msg: string, ...args: unknown[]): void {
+  public info(namespace: string, msg: string, ...args: unknown[]): void {
     if (this.shouldLog(LogLevel.INFO)) {
       console.info(`%c${this.logFormat.info.emoji} ${this.format(namespace, msg)}`, this.logFormat.info.style, ...args);
       this._logStackTrace();
@@ -186,7 +186,7 @@ export class Logger {
     }
   }
 
-  warn(namespace: string, msg: string, ...args: unknown[]): void {
+  public warn(namespace: string, msg: string, ...args: unknown[]): void {
     if (this.shouldLog(LogLevel.WARN)) {
       console.warn(`%c${this.logFormat.warn.emoji} ${this.format(namespace, msg)}`, this.logFormat.warn.style, ...args);
       this._logStackTrace();
@@ -194,7 +194,7 @@ export class Logger {
     }
   }
 
-  error(namespace: string, msg: string, ...args: unknown[]): void {
+  public error(namespace: string, msg: string, ...args: unknown[]): void {
     if (this.shouldLog(LogLevel.ERROR)) {
       console.error(`%c${this.logFormat.error.emoji} ${this.format(namespace, msg)}`, this.logFormat.error.style, ...args);
       this._logStackTrace();
@@ -202,28 +202,28 @@ export class Logger {
     }
   }
 
-  group(label: string): void {
+  public group(label: string): void {
     if (this.shouldLog(LogLevel.DEBUG)) {
       this.activeGroups.push(label);
       console.group(label);
     }
   }
 
-  groupCollapsed(label: string): void {
+  public groupCollapsed(label: string): void {
     if (this.shouldLog(LogLevel.DEBUG)) {
       this.activeGroups.push(label);
       console.groupCollapsed(label);
     }
   }
 
-  groupEnd(): void {
+  public groupEnd(): void {
     if (this.shouldLog(LogLevel.DEBUG)) {
       this.activeGroups.pop();
       console.groupEnd();
     }
   }
 
-  export(format: ExportFormat = 'json'): string {
+  public export(format: ExportFormat = 'json'): string {
     switch (format.toLowerCase() as ExportFormat) {
       case 'json': return JSON.stringify(this.entries, null, 2);
       case 'csv': {
@@ -247,14 +247,14 @@ export class Logger {
     }
   }
 
-  clear(): void {
+  public clear(): void {
     this.entries = [];
     if (this.persist && typeof localStorage !== 'undefined') {
       localStorage.removeItem(`${this.prefix}_logs`);
     }
   }
 
-  getEntries(): LogEntry[] {
+  public getEntries(): LogEntry[] {
     return [...this.entries];
   }
 }

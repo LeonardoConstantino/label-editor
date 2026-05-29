@@ -134,7 +134,7 @@ export class UISoundManager {
   /**
    * Presets de sons otimizados para interfaces modernas
    */
-  static readonly PRESETS: Record<PresetName, SoundPreset> = {
+  public static readonly PRESETS: Record<PresetName, SoundPreset> = {
     // Click básico: tom único com ruído branco muito suave (textura de "toque")
     click: {
       freq: [1200],
@@ -344,12 +344,12 @@ export class UISoundManager {
     },
   };
 
-  private context: AudioContext | null;
+  private readonly context: AudioContext | null;
   private enabled: boolean;
-  private throttleMs: number;
-  private logger: UISoundManagerOptions['logger'];
-  private lastPlayTime: Map<string, number>;
-  private activeSounds: Set<SoundNodes>;
+  private readonly throttleMs: number;
+  private readonly logger: UISoundManagerOptions['logger'];
+  private readonly lastPlayTime: Map<string, number>;
+  private readonly activeSounds: Set<SoundNodes>;
 
   /**
    * Cria gerenciador de sons UI com Web Audio API
@@ -357,6 +357,7 @@ export class UISoundManager {
   constructor(options: UISoundManagerOptions = {}) {
     const AudioContextClass =
       (window as any).AudioContext || (window as any).webkitAudioContext;
+    
     if (!AudioContextClass) {
       console.warn('Web Audio API não suportada');
       this.context = null;
@@ -368,14 +369,14 @@ export class UISoundManager {
       return;
     }
 
-    this.context = new AudioContextClass();
+    this.context = new AudioContextClass() as AudioContext;
     this.enabled = options.enabled ?? true;
     this.throttleMs = options.throttle ?? 50;
     this.logger = options.logger || console;
     this.lastPlayTime = new Map();
     this.activeSounds = new Set();
 
-    this.logger.info('UISoundManager', 'Instância criada com Web Audio API');
+    this.logger!.info('UISoundManager', 'Instância criada com Web Audio API');
   }
 
   /**
@@ -383,7 +384,7 @@ export class UISoundManager {
    * @param presetName - Nome do preset (ex: 'click', 'success', 'error')
    * @returns true se reproduzido, false se throttled/desabilitado
    */
-  play(presetName: string): boolean {
+  public play(presetName: string): boolean {
     if (!this.context || !this.enabled) return false;
 
     const preset = UISoundManager.PRESETS[presetName as PresetName];
@@ -417,7 +418,7 @@ export class UISoundManager {
    *   type: 'sine'
    * });
    */
-  playCustom(config: SoundPreset): boolean {
+  public playCustom(config: SoundPreset): boolean {
     if (!this.context || !this.enabled) return false;
 
     if (!config || typeof config.duration !== 'number') {
@@ -786,7 +787,7 @@ export class UISoundManager {
   /**
    * Silencia todos os sons
    */
-  mute(): void {
+  public mute(): void {
     this.logger!.debug('UISoundManager', 'Silenciando todos os sons');
     this.enabled = false;
   }
@@ -794,7 +795,7 @@ export class UISoundManager {
   /**
    * Habilita reprodução de sons
    */
-  unmute(): void {
+  public unmute(): void {
     this.logger!.debug('UISoundManager', 'Habilitando sons');
     this.enabled = true;
   }
@@ -802,7 +803,7 @@ export class UISoundManager {
   /**
    * Ativa ou desativa os sons.
    */
-  setEnabled(enabled: boolean): boolean {
+  public setEnabled(enabled: boolean): boolean {
     this.enabled = enabled;
     this.logger!.debug(
       'UISoundManager',
@@ -814,7 +815,7 @@ export class UISoundManager {
       this.activeSounds.forEach((soundNodes) => {
         soundNodes.sources.forEach((source) => {
           try {
-            source.stop();
+            if ('stop' in source) source.stop();
             source.disconnect();
           } catch (e) {}
         });
@@ -829,7 +830,7 @@ export class UISoundManager {
    * @param force - Se fornecido, define estado explicitamente (true = habilitado, false = desabilitado)
    * @returns Novo estado (true = habilitado)
    */
-  toggle(force?: boolean): boolean {
+  public toggle(force?: boolean): boolean {
     if (typeof force === 'boolean') {
       this.enabled = force;
     } else {
@@ -851,7 +852,7 @@ export class UISoundManager {
    * manager.enumPresets.CLICK // "click"
    * manager.enumPresets.SUCCESS // "success"
    */
-  get enumPresets(): Record<Uppercase<PresetName>, PresetName> {
+  public get enumPresets(): Record<Uppercase<PresetName>, PresetName> {
     return Object.keys(UISoundManager.PRESETS).reduce(
       (enum_, key) => {
         enum_[key.toUpperCase() as Uppercase<PresetName>] = key as PresetName;
@@ -866,7 +867,7 @@ export class UISoundManager {
    *
    * Interrompe sons ativos e fecha contexto de áudio
    */
-  destroy(): void {
+  public destroy(): void {
     this.logger!.debug(
       'UISoundManager',
       'Destruindo instância e liberando recursos',
@@ -878,7 +879,7 @@ export class UISoundManager {
     this.activeSounds.forEach((soundNodes) => {
       soundNodes.sources.forEach((source) => {
         try {
-          source.stop();
+          if ('stop' in source) source.stop();
           source.disconnect();
         } catch (e) {}
       });

@@ -14,12 +14,12 @@ export class IndexedDBStorage {
   private _db: IDBDatabase | null = null;
 
   constructor(
-    private dbName: string,
-    private version: number,
-    private stores: StoreConfig[]
+    private readonly dbName: string,
+    private readonly version: number,
+    private readonly stores: StoreConfig[]
   ) {}
 
-  async initialize(): Promise<void> {
+  public async initialize(): Promise<void> {
     if (this._db) return;
 
     return new Promise((resolve, reject) => {
@@ -50,7 +50,7 @@ export class IndexedDBStorage {
     });
   }
 
-  async getAll<T>(storeName: string): Promise<T[]> {
+  public async getAll<T>(storeName: string): Promise<T[]> {
     const db = await this.getDB();
     return new Promise((resolve, reject) => {
       const transaction = db.transaction([storeName], 'readonly');
@@ -61,7 +61,7 @@ export class IndexedDBStorage {
     });
   }
 
-  async get<T>(storeName: string, key: string | number): Promise<T | null> {
+  public async get<T>(storeName: string, key: string | number): Promise<T | null> {
     const db = await this.getDB();
     return new Promise((resolve, reject) => {
       const transaction = db.transaction([storeName], 'readonly');
@@ -72,7 +72,7 @@ export class IndexedDBStorage {
     });
   }
 
-  async put<T>(storeName: string, value: T): Promise<void> {
+  public async put<T>(storeName: string, value: T): Promise<void> {
     const db = await this.getDB();
     return new Promise((resolve, reject) => {
       const transaction = db.transaction([storeName], 'readwrite');
@@ -83,7 +83,7 @@ export class IndexedDBStorage {
     });
   }
 
-  async delete(storeName: string, key: string | number): Promise<void> {
+  public async delete(storeName: string, key: string | number): Promise<void> {
     const db = await this.getDB();
     return new Promise((resolve, reject) => {
       const transaction = db.transaction([storeName], 'readwrite');

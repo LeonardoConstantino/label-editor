@@ -21,6 +21,6 @@ Eliminar o uso de `as any` e tipagem fraca no gerenciamento de estado da Store, 
    - Garantir que o estado retornado por `getState()` seja imutável (usando `readonly` ou `DeepReadonly`).
 
 ## Critérios de Aceite
-- [ ] Método `mergeUpdates` na Store não utiliza `as any`.
-- [ ] O payload de eventos de atualização (`element:update`) está estritamente tipado.
-- [ ] `npm run build` passa sem erros na Store.
+- [x] Método `mergeUpdates` na Store não utiliza `as any`.
+- [x] O payload de eventos de atualização (`element:update`) está estritamente tipado.
+- [x] `npm run build` passa sem erros na Store.

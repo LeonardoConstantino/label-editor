@@ -20,6 +20,6 @@ Reforçar o encapsulamento em todas as classes do `core` e `services`, garantind
    - Onde o acesso externo é necessário, preferir Getters explícitos ao invés de propriedades públicas diretas.
 
 ## Critérios de Aceite
-- [ ] Redução de pelo menos 50% nas propriedades públicas em `src/core`.
-- [ ] Todas as classes auditadas possuem modificadores explícitos em 100% de seus membros.
-- [ ] `npm run build` passa confirmando que nenhum acesso ilegal foi introduzido.
+- [x] Redução de pelo menos 50% nas propriedades públicas em `src/core`.
+- [x] Todas as classes auditadas possuem modificadores explícitos em 100% de seus membros.
+- [x] `npm run build` passa confirmando que nenhum acesso ilegal foi introduzido.
