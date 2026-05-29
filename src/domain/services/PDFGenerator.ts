@@ -5,7 +5,6 @@ import { UnitConverter } from '../../utils/units';
 import { DEFAULTS } from '../../constants/defaults';
 import eventBus from '../../core/EventBus';
 import { FontTransfer } from '../../utils/FontTransfer';
-import { ElementType } from '../models/elements/BaseElement';
 
 export type PaperFormat = 'a4' | 'a3' | 'letter';
 export type PageOrientation = 'portrait' | 'landscape';
@@ -57,14 +56,15 @@ export class PDFGenerator {
    * @param dataList Lista de registros para injeção.
    * @param layout Opções de calibração física.
    */
-  public async generateLotePDFWorker(label: Label, dataList: any[], layout: BatchLayoutOptions): Promise<void> {
+  public async generateLotePDFWorker(label: Label, dataList: Record<string, unknown>[], layout: BatchLayoutOptions): Promise<void> {
     // 1. Identifica fontes únicas usadas no design
     const families = new Set<string>();
     label.elements.forEach(el => {
-      if (el.type === ElementType.TEXT) {
-        families.add((el as any).fontFamily || 'Inter');
+      if ('fontFamily' in el && typeof (el as any).fontFamily === 'string') {
+        families.add((el as any).fontFamily);
       }
     });
+    if (families.size === 0) families.add('Inter');
 
     // 2. Captura os buffers das fontes (binários) para garantir fidelidade no Worker
     const fontBuffers = await FontTransfer.getFontBuffers(Array.from(families));
@@ -117,7 +117,7 @@ export class PDFGenerator {
    */
   public async generateLotePDF(
     label: Label, 
-    dataList: Record<string, any>[], 
+    dataList: Record<string, unknown>[], 
     layout: BatchLayoutOptions = { 
       marginMM: 10, 
       gapMM: 5, 

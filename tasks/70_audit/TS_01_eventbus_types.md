@@ -25,6 +25,6 @@ Eliminar o uso de `any` no sistema de eventos central. Atualmente, o `EventBus` 
    - Rodar `tsc` e corrigir todos os erros de tipagem que surgirem nos componentes que consomem o EventBus.
 
 ## Critérios de Aceite
-- [ ] `npm run build` passa sem erros de tipagem no EventBus.
-- [ ] Zero ocorrências de `any` em `src/core/EventBus.ts`.
-- [ ] O sistema de eventos continua funcional (testado via manual hover/clique nos módulos).
+- [x] `npm run build` passa sem erros de tipagem no EventBus.
+- [x] Zero ocorrências de `any` em `src/core/EventBus.ts`.
+- [x] O sistema de eventos continua funcional (testado via manual hover/clique nos módulos).

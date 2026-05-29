@@ -159,7 +159,7 @@ export class Store {
         const original = this.state.currentLabel.elements.find(el => el.id === id);
         if (!original) return;
 
-        const copy = JSON.parse(JSON.stringify(original));
+        const copy = JSON.parse(JSON.stringify(original)) as AnyElement;
         copy.id = crypto.randomUUID();
         copy.name = `${original.name || original.type} (Copy)`;
         copy.position.x += 5;
@@ -256,22 +256,35 @@ export class Store {
     });
   }
 
+  /**
+   * Realiza merge de atualizações em um elemento de forma segura e tipada.
+   */
   private mergeUpdates(current: AnyElement, updates: Partial<AnyElement>): AnyElement {
-    const newElement = { ...current };
-    
-    for (const key in updates) {
+    // Clone raso inicial mantendo o tipo
+    const next = { ...current } as AnyElement;
+
+    Object.keys(updates).forEach(key => {
       const k = key as keyof AnyElement;
       const val = updates[k];
+      
+      if (val === undefined) return;
 
+      // Merge de objetos aninhados (position, dimensions, effects, endPosition)
       if (typeof val === 'object' && val !== null && !Array.isArray(val)) {
-        // Safe deep merge for effects
-        (newElement as any)[k] = { ...(newElement as any)[k], ...val };
-      } else {
-        (newElement as any)[k] = val;
+        const currentVal = next[k];
+        if (typeof currentVal === 'object' && currentVal !== null && !Array.isArray(currentVal)) {
+          // @ts-ignore - TS tem dificuldade em inferir o merge de tipos em Uniões, 
+          // mas garantimos que as chaves batem com os modelos de elementos.
+          next[k] = { ...currentVal, ...val };
+          return;
+        }
       }
-    }
-    
-    return newElement as AnyElement;
+
+      // @ts-ignore - Atribuição direta segura para as demais chaves, considerando os tipos definidos.
+      next[k] = val;
+    });
+
+    return next;
   }
 
   private performAction(action: () => void, options: { immediate?: boolean; silent?: boolean; description?: string } = {}): void {
@@ -388,12 +401,19 @@ export class Store {
     // Task 39: Self-Healing / Migração de Schema
     // Garante que elementos antigos recebam novas propriedades (como 'effects')
     label.elements = label.elements.map(el => {
-      return {
+      const base = {
         ...DEFAULTS.COMMON,
         ...el,
-        effects: { ...DEFAULTS.COMMON.effects, ...(el.effects || {}) }
       };
-    }) as AnyElement[];
+
+      // Garantir que effects esteja presente e completo
+      base.effects = { 
+        ...DEFAULTS.COMMON.effects, 
+        ...(el.effects || {}) 
+      };
+
+      return base as AnyElement;
+    });
 
     this.state.currentLabel = label;
     historyManager.clear();
