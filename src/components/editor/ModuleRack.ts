@@ -117,7 +117,7 @@ export class ModuleRack extends HTMLElement {
         // Ignorar se o clique foi no botão de ajuda (Task 72)
         if (target.closest('button[slot="target"]')) return;
 
-        const id = item.getAttribute('data-id');
+        const id = item.getAttribute('data-id') as AppState['activeModuleId'];
         if (id) {
           eventBus.emit('module:switch', { moduleId: id });
           this.close();

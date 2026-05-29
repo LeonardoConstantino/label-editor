@@ -1,6 +1,6 @@
-import { Label, AnyElement } from '../domain/models/Label';
+import { Label, AnyElement, CanvasConfig } from '../domain/models/Label';
 import { UserPreferences, DEFAULT_PREFERENCES } from '../domain/models/UserPreferences';
-import eventBus from './EventBus';
+import eventBus, { ElementUpdatePayload, ModuleSwitchPayload, ProductionDataUpdatePayload } from './EventBus';
 import { historyManager, HistorySnapshot } from '../domain/services/HistoryManager';
 import { UISM } from './UISoundManager';
 import { overflowValidator } from '../domain/services/OverflowValidator';
@@ -16,10 +16,10 @@ export interface AppState {
   canRedo: boolean;
   isDirty: boolean;
   preferences: UserPreferences;
-  activeModuleId: 'blueprint' | 'layers' | 'assets' | 'history' | 'variables' | 'batch';
+  activeModuleId: 'blueprint' | 'layers' | 'assets' | 'history' | 'variables' | 'batch' | 'typeface';
   
   // Production State
-  productionData: any[];
+  productionData: Record<string, unknown>[];
   productionPreviewIndex: number;
   productionSourceName: string;
   printConfig: BatchLayoutOptions;
@@ -31,7 +31,7 @@ export interface AppState {
  */
 export class Store {
   private state: AppState;
-  private snapshotTimer: any = null;
+  private snapshotTimer: ReturnType<typeof setTimeout> | null = null;
   private pendingDescription: string = 'Ação';
 
   constructor() {
@@ -81,13 +81,13 @@ export class Store {
       }, { immediate: true, description: `Adicionou ${element.type}` });
     });
 
-    eventBus.on('element:update', ({ id, updates, silent }: { id: string; updates: Partial<AnyElement>, silent?: boolean }) => {
+    eventBus.on('element:update', ({ id, updates, silent }: ElementUpdatePayload) => {
       if (!this.state.currentLabel) return;
       const index = this.state.currentLabel.elements.findIndex(el => el.id === id);
       if (index === -1) return;
 
       const current = this.state.currentLabel.elements[index];
-      const newElement = this.mergeUpdates(current, updates as any);
+      const newElement = this.mergeUpdates(current, updates);
 
       // Validação de Integridade Física (Sistema)
       const validation = elementValidator.validate(newElement);
@@ -124,7 +124,7 @@ export class Store {
           if (index === -1) return;
 
           const current = this.state.currentLabel!.elements[index];
-          const newElement = this.mergeUpdates(current, updates as any);
+          const newElement = this.mergeUpdates(current, updates);
 
           const validation = elementValidator.validate(newElement);
           if (validation.isValid) {
@@ -181,7 +181,7 @@ export class Store {
     eventBus.on('history:redo', () => this.redo());
     eventBus.on('history:jump', ({ index }) => this.jumpTo(index));
     
-    eventBus.on('label:config:update', (config: any) => {
+    eventBus.on('label:config:update', (config: CanvasConfig) => {
       this.performAction(() => {
         if (!this.state.currentLabel) return;
         
@@ -227,7 +227,7 @@ export class Store {
 
     eventBus.on('history:snapshot', (data) => this.takeSnapshot(true, data?.description));
 
-    eventBus.on('module:switch', ({ moduleId }: { moduleId: any }) => {
+    eventBus.on('module:switch', ({ moduleId }: ModuleSwitchPayload) => {
       this.state.activeModuleId = moduleId;
       this.emit();
     });
@@ -238,7 +238,7 @@ export class Store {
     });
 
     // --- PRODUCTION EVENTS ---
-    eventBus.on('production:data:update', ({ data, sourceName }) => {
+    eventBus.on('production:data:update', ({ data, sourceName }: ProductionDataUpdatePayload) => {
       this.state.productionData = data;
       this.state.productionSourceName = sourceName;
       this.state.productionPreviewIndex = 0;
@@ -256,16 +256,22 @@ export class Store {
     });
   }
 
-  private mergeUpdates(current: AnyElement, updates: any): AnyElement {
-    const newElement = { ...current } as any;
+  private mergeUpdates(current: AnyElement, updates: Partial<AnyElement>): AnyElement {
+    const newElement = { ...current };
+    
     for (const key in updates) {
-      if (typeof updates[key] === 'object' && updates[key] !== null && !Array.isArray(updates[key])) {
-        newElement[key] = { ...newElement[key], ...updates[key] };
+      const k = key as keyof AnyElement;
+      const val = updates[k];
+
+      if (typeof val === 'object' && val !== null && !Array.isArray(val)) {
+        // Safe deep merge for effects
+        (newElement as any)[k] = { ...(newElement as any)[k], ...val };
       } else {
-        newElement[key] = updates[key];
+        (newElement as any)[k] = val;
       }
     }
-    return newElement;
+    
+    return newElement as AnyElement;
   }
 
   private performAction(action: () => void, options: { immediate?: boolean; silent?: boolean; description?: string } = {}): void {

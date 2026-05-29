@@ -7,6 +7,24 @@ import type { UserPreferences } from '../domain/models/UserPreferences';
 import type { OverflowResult } from '../domain/services/OverflowValidator';
 
 /**
+ * Payload Types
+ */
+export interface ProductionDataUpdatePayload {
+  data: Record<string, unknown>[];
+  sourceName: string;
+}
+
+export interface ElementUpdatePayload {
+  id: string;
+  updates: Partial<AnyElement>;
+  silent?: boolean;
+}
+
+export interface ModuleSwitchPayload {
+  moduleId: AppState['activeModuleId'];
+}
+
+/**
  * EventMap: Definição rigorosa de todos os eventos do sistema e seus payloads.
  * Atua como o contrato central de comunicação do Label Forge OS.
  */
@@ -28,10 +46,10 @@ export interface EventMap {
   'ui:modal:open': { id: string };
   'ui:modal:close': { id: string };
   'ui:open:help': { tab?: string; source?: string };
-  'module:switch': { moduleId: string };
+  'module:switch': ModuleSwitchPayload;
 
   // Production & Batch
-  'production:data:update': { data: any[]; sourceName: string };
+  'production:data:update': ProductionDataUpdatePayload;
   'production:preview:index': { index: number };
   'production:print:open': {};
   'production:config:update': Partial<import('../domain/services/PDFGenerator').BatchLayoutOptions>;
@@ -42,7 +60,7 @@ export interface EventMap {
 
   // Element Manipulation
   'element:add': AnyElement;
-  'element:update': { id: string; updates: Partial<AnyElement>; silent?: boolean };
+  'element:update': ElementUpdatePayload;
   'elements:update': { id: string; updates: Partial<AnyElement> }[];
   'element:delete': string;
   'element:select': string | string[];
@@ -93,19 +111,19 @@ interface EmitAsyncOptions {
 /**
  * Tipo genérico para callbacks de eventos baseado no EventMap
  */
-type EventCallback<K extends keyof EventMap> = (data: EventMap[K]) => void | Promise<void>;
+export type EventCallback<K extends keyof EventMap> = (data: EventMap[K]) => void | Promise<void>;
 
 /**
  * Função de cleanup para remover listeners
  */
-type UnsubscribeFn = () => void;
+export type UnsubscribeFn = () => void;
 
 /**
  * EventBus: Orquestrador desacoplado e tipado.
  * Implementa Type Safety para garantir que eventos e payloads estejam sincronizados.
  */
 class EventBus {
-  private events: Map<keyof EventMap, Set<EventCallback<any>>>;
+  private events: Map<keyof EventMap, Set<EventCallback<keyof EventMap>>>;
   private maxListeners: number;
   private debug: boolean;
   private logger: typeof logger;
@@ -120,9 +138,9 @@ class EventBus {
   /**
    * Valida se o callback é uma função
    */
-  private _validateCallback(
+  private _validateCallback<K extends keyof EventMap>(
     callback: unknown,
-  ): asserts callback is EventCallback<any> {
+  ): asserts callback is EventCallback<K> {
     if (typeof callback !== 'function') {
       throw new TypeError('Callback must be a function');
     }
@@ -156,13 +174,13 @@ class EventBus {
     callback: EventCallback<K>, 
     options?: EventOptions
   ): UnsubscribeFn {
-    this._validateCallback(callback);
+    this._validateCallback<K>(callback);
 
     if (!this.events.has(event)) {
       this.events.set(event, new Set());
     }
 
-    const listeners = this.events.get(event)!;
+    const listeners = this.events.get(event) as Set<EventCallback<K>>;
 
     // Aviso de possível memory leak
     if (listeners.size >= this.maxListeners) {
@@ -173,7 +191,7 @@ class EventBus {
       }
     }
 
-    listeners.add(callback as EventCallback<any>);
+    listeners.add(callback);
     this._log('Registered', event, { listenerCount: listeners.size });
 
     // Cleanup automático com AbortSignal
@@ -198,7 +216,7 @@ class EventBus {
     callback: EventCallback<K>, 
     options?: EventOptions
   ): UnsubscribeFn {
-    this._validateCallback(callback);
+    this._validateCallback<K>(callback);
 
     const onceWrapper: EventCallback<K> = (data) => {
       callback(data);
@@ -214,8 +232,8 @@ class EventBus {
   off<K extends keyof EventMap>(event: K, callback: EventCallback<K>): void {
     if (!this.events.has(event)) return;
 
-    const listeners = this.events.get(event)!;
-    listeners.delete(callback as EventCallback<any>);
+    const listeners = this.events.get(event) as Set<EventCallback<K>>;
+    listeners.delete(callback);
 
     if (listeners.size === 0) {
       this.events.delete(event);
@@ -234,7 +252,7 @@ class EventBus {
     }
 
     this._log('Emit', event, data);
-    const listeners = this.events.get(event)!;
+    const listeners = this.events.get(event) as Set<EventCallback<K>>;
 
     for (const callback of listeners) {
       try {
@@ -265,7 +283,7 @@ class EventBus {
     }
 
     this._log('EmitAsync', event, data);
-    const listeners = this.events.get(event)!;
+    const listeners = this.events.get(event) as Set<EventCallback<K>>;
 
     const promises = Array.from(listeners).map(async (callback) => {
       try {

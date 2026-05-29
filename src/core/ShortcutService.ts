@@ -1,6 +1,6 @@
 import KeyboardShortcutManager from './KeyboardShortcutManager';
 import eventBus from './EventBus';
-import { store } from './Store';
+import { store, AppState } from './Store';
 import { UISM } from './UISoundManager';
 import { logger } from './Logger';
 import { templateManager } from '../domain/services/TemplateManager';
@@ -107,10 +107,11 @@ class ShortcutService {
   }
 
   private registerModuleNavigationShortcuts() {
-    const modules = [
+    const modules: AppState['activeModuleId'][] = [
       'blueprint',
       'layers',
       'assets',
+      'batch',
       'history',
       'variables',
       'typeface',
@@ -125,7 +126,6 @@ class ShortcutService {
         { description: `Ir para módulo ${id}`, category: 'Navegação' },
       );
     });
-
     this.manager.register('pageup', () => this.cycleModule('prev'), {
       description: 'Módulo anterior',
       context: () => this.noSelection(),
@@ -578,16 +578,17 @@ class ShortcutService {
   }
 
   private cycleModule(dir: 'next' | 'prev') {
-    const modules = [
+    const modules: AppState['activeModuleId'][] = [
       'blueprint',
       'layers',
       'assets',
+      'batch',
       'history',
       'variables',
       'typeface',
     ];
     const current = store.getState().activeModuleId;
-    let idx = modules.indexOf(current as any);
+    let idx = modules.indexOf(current);
     if (dir === 'next') idx = (idx + 1) % modules.length;
     else idx = (idx - 1 + modules.length) % modules.length;
     eventBus.emit('module:switch', { moduleId: modules[idx] });
