@@ -220,18 +220,59 @@ function resolveSize(raw: string | null): string {
 }
 
 /**
- * Remove vetores XSS básicos antes de inserir conteúdo SVG via innerHTML:
- *   • <script> blocks
- *   • event handlers inline com aspas (ex: onclick="...", onload='...')
- *
- * Nota: Esta sanitização cobre o caso de uso deste componente (catálogo
- * interno confiável + SVGs de slot). Para SVGs de fontes arbitrárias
- * e não confiáveis, considere DOMPurify com perfil SVG.
+ * Sanitiza o conteúdo interno de um SVG de forma rigorosa (Task SEC-02).
+ * Implementa uma whitelist estrita de tags permitidas e remove atributos de evento.
  */
 function sanitizeInnerSVG(raw: string): string {
-  return raw
-    .replace(/<script[\s\S]*?<\/script>/gi, '')
-    .replace(/\son\w+\s*=\s*["'][^"']*["']/gi, '');
+  if (!raw) return '';
+
+  // 1. Tags SVG seguras e permitidas
+  const ALLOWED_TAGS = new Set([
+    'svg', 'g', 'path', 'circle', 'rect', 'ellipse', 
+    'line', 'polyline', 'polygon', 'title', 'desc', 'defs', 'clipPath'
+  ]);
+
+  // Usamos DOMParser para processar a string de forma segura (não executa scripts)
+  try {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(`<svg xmlns="http://www.w3.org/2000/svg">${raw}</svg>`, 'image/svg+xml');
+    const svgRoot = doc.documentElement;
+
+    const sanitizeNode = (node: Node) => {
+      if (node.nodeType === Node.ELEMENT_NODE) {
+        const el = node as Element;
+        const tagName = el.tagName.toLowerCase();
+
+        // Remove tags não permitidas (XSS prevention)
+        if (!ALLOWED_TAGS.has(tagName)) {
+          el.remove();
+          return;
+        }
+
+        // Remove atributos de evento (ex: onclick, onmouseover)
+        const attrs = Array.from(el.attributes);
+        for (const attr of attrs) {
+          if (attr.name.toLowerCase().startsWith('on')) {
+            el.removeAttribute(attr.name);
+          }
+        }
+
+        // Processa filhos recursivamente
+        Array.from(el.childNodes).forEach(sanitizeNode);
+      }
+    };
+
+    Array.from(svgRoot.childNodes).forEach(sanitizeNode);
+    return svgRoot.innerHTML;
+  } catch (error) {
+    console.error('[ui-icon] Erro crítico na sanitização de SVG:', error);
+    // Fallback de emergência (RegEx agressiva)
+    return raw
+      .replace(/<script[\s\S]*?<\/script>/gi, '')
+      .replace(/<foreignObject[\s\S]*?<\/foreignObject>/gi, '')
+      .replace(/<animate[\s\S]*?\/>/gi, '')
+      .replace(/\son\w+\s*=\s*["'][^"']*["']/gi, '');
+  }
 }
 
 // ─────────────────────────────────────────────
