@@ -228,19 +228,19 @@ const STYLE: string = /* css */ `
   .header {
     display: flex;
     align-items: flex-start;
-    gap: .75rem;
+    gap: var(--spacing-3);
     padding: var(--_pad) var(--_pad) 0;
     flex-shrink: 0;
   }
 
   .icon-badge {
-    width: 2rem; height: 2rem;
+    width: var(--spacing-8); height: var(--spacing-8);
     border-radius: 50%;
     background: var(--_accent);
     color: var(--_fg);
     display: grid;
     place-items: center;
-    font-size: .85rem;
+    font-size: var(--text-2xs);
     font-weight: 700;
     flex-shrink: 0;
   }
@@ -249,17 +249,17 @@ const STYLE: string = /* css */ `
 
   .title-wrap { flex: 1; min-width: 0; }
 
-  .title { font-size: 1.1rem; font-weight: 700; color: var(--color-text-main); line-height: 1.3; }
+  .title { font-size: var(--text-lg); font-weight: 700; color: var(--color-text-main); line-height: 1.3; }
 
   .close-btn {
     all: unset;
     cursor: pointer;
-    width: 2rem; height: 2rem;
+    width: var(--spacing-8); height: var(--spacing-8);
     border-radius: 50%;
     display: grid;
     place-items: center;
     color: var(--color-text-muted);
-    font-size: 1.1rem;
+    font-size: var(--text-lg);
     flex-shrink: 0;
     transition: background .15s, color .15s;
     user-select: none;
@@ -274,7 +274,7 @@ const STYLE: string = /* css */ `
     flex: 1;
     padding: var(--_pad);
     overflow-y: auto;
-    font-size: .9375rem;
+    font-size: var(--text-base);
     line-height: 1.6;
     color: var(--color-text-muted);
     overscroll-behavior: contain;
@@ -282,7 +282,7 @@ const STYLE: string = /* css */ `
 
   /* ── Footer ─────────────────────────────────────────────────────────── */
   .footer {
-    padding: 1rem var(--_pad) var(--_pad);
+    padding: var(--spacing-4) var(--_pad) var(--_pad);
     border-top: 1px solid var(--_border);
     flex-shrink: 0;
   }

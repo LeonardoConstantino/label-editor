@@ -101,7 +101,7 @@ settingsSheet.replaceSync(`
 
   .section-title {
     font-family: var(--font-mono);
-    font-size: 18px;
+    font-size: var(--text-xl);
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.1em;
@@ -109,11 +109,11 @@ settingsSheet.replaceSync(`
   }
 
   .card-module {
-    background-color: rgba(255, 255, 255, 0.02);
+    background-color: color-mix(in srgb, var(--color-text-main), transparent 98%);
     border: 1px solid var(--color-border-ui);
     border-radius: 12px;
-    padding: 28px;
-    margin-bottom: 24px;
+    padding: var(--spacing-7);
+    margin-bottom: var(--spacing-6);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
   }
 
@@ -121,7 +121,7 @@ settingsSheet.replaceSync(`
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 20px;
+    margin-bottom: var(--spacing-5);
   }
 
   .setting-row:last-child {
@@ -131,21 +131,21 @@ settingsSheet.replaceSync(`
   .setting-info {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: var(--spacing-1);
     flex: 1;
-    padding-right: 20px;
+    padding-right: var(--spacing-5);
   }
 
   .setting-label {
     font-family: var(--font-mono);
-    font-size: 11px;
+    font-size: var(--text-sm);
     font-weight: 600;
     color: var(--color-text-main);
     text-transform: uppercase;
   }
 
   .setting-desc {
-    font-size: 10px;
+    font-size: var(--text-xs);
     color: var(--color-text-muted);
   }
 

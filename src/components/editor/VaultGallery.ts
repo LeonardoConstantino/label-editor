@@ -87,7 +87,7 @@ export class VaultGallery extends HTMLElement {
       .cartridge-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-        gap: 32px;
+        gap: var(--spacing-8);
         position: relative;
         z-index: 10;
       }
@@ -100,20 +100,20 @@ export class VaultGallery extends HTMLElement {
       }
     </style>
 
-    <div class="flex h-full w-full bg-[#0a0c10] overflow-hidden">
-      <aside id="sidebar" class="w-64 border-r border-border-ui bg-surface-solid/40 p-6 flex flex-col gap-6 backdrop-blur-md relative z-10 shadow-[10px_0_30px_rgba(0,0,0,0.5)]">
-        <div class="flex items-center gap-2 mb-2 pb-4 border-b border-white/5">
+    <div class="flex h-full w-full bg-canvas overflow-hidden">
+      <aside id="sidebar" class="w-64 border-r border-border-ui bg-surface-solid/40 flex flex-col backdrop-blur-md relative z-10 shadow-[10px_0_30px_rgba(0,0,0,0.5)]" style="padding: var(--spacing-6); gap: var(--spacing-6);">
+        <div class="flex items-center mb-2 pb-4 border-b border-white/5" style="gap: var(--spacing-2);">
           <ui-icon name="database" class="text-accent-primary drop-shadow-[0_0_8px_rgba(99,102,241,0.5)]"></ui-icon>
-          <h3 class="font-mono text-[11px] text-text-main uppercase tracking-[0.25em] font-bold">The Vault</h3>
+          <h3 class="font-mono text-text-main uppercase tracking-[0.25em] font-bold" style="font-size: var(--text-sm);">The Vault</h3>
         </div>
         
-        <div class="flex flex-col gap-4 mb-4">
+        <div class="flex flex-col mb-4" style="gap: var(--spacing-4);">
           <app-button id="vault-import-btn" variant="primary" style="width: 100%;">
             <ui-icon name="upload"></ui-icon> IMPORT .LABEL
           </app-button>
         </div>
 
-        <div class="flex flex-col gap-2">
+        <div class="flex flex-col" style="gap: var(--spacing-2);">
           <button id="filter-all" class="filter-btn text-left font-sans text-sm px-4 py-2.5 rounded-lg border transition-all duration-300 cursor-pointer" data-filter="all">
             <div class="flex items-center gap-2 pointer-events-none">
               <ui-icon name="grid" size="sm"></ui-icon>
@@ -129,10 +129,10 @@ export class VaultGallery extends HTMLElement {
           </button>
         </div>
 
-        <div class="mt-auto p-4 bg-black/40 rounded-xl border border-border-ui shadow-inner relative overflow-hidden">
+        <div class="mt-auto bg-black/40 rounded-xl border border-border-ui shadow-inner relative overflow-hidden" style="padding: var(--spacing-4);">
           <div class="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-transparent via-accent-primary/50 to-transparent"></div>
-          <p class="text-[10px] text-text-muted leading-relaxed font-mono">
-            <strong class="text-accent-primary uppercase tracking-widest flex items-center gap-1 mb-1">
+          <p class="text-text-muted leading-relaxed font-mono" style="font-size: var(--text-xs);">
+            <strong class="text-accent-primary uppercase tracking-widest flex items-center mb-1" style="gap: var(--spacing-1);">
               <div class="w-1.5 h-1.5 rounded-full bg-accent-success animate-pulse"></div> Online
             </strong>
             All designs are securely stored in your local cartrige bays.

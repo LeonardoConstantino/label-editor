@@ -189,9 +189,9 @@ export class UiDataGateway extends HTMLElement {
           width: 100%;
           height: 100%;
           min-height: 240px;
-          background: #050608;
+          background: color-mix(in srgb, var(--color-canvas), black 30%);
           border: 1px solid var(--color-border-ui);
-          border-radius: 12px;
+          border-radius: var(--spacing-3);
           display: flex;
           flex-direction: column;
           overflow: hidden;
@@ -201,7 +201,7 @@ export class UiDataGateway extends HTMLElement {
 
         .gateway-container.is-dragging {
           border-color: var(--color-accent-primary);
-          box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
+          box-shadow: 0 0 20px color-mix(in srgb, var(--color-accent-primary), transparent 80%);
         }
 
         /* MODO NOTEPAD (BASE) */
@@ -219,15 +219,15 @@ export class UiDataGateway extends HTMLElement {
           outline: none;
           color: var(--color-text-main);
           font-family: var(--font-mono);
-          font-size: 11px;
+          font-size: var(--text-sm);
           line-height: 1.6;
           resize: none;
-          padding: 16px;
+          padding: var(--spacing-4);
           transition: background 0.2s;
         }
         
         textarea:focus {
-          background: rgba(255, 255, 255, 0.02);
+          background: color-mix(in srgb, var(--color-text-main), transparent 98%);
         }
 
         textarea::placeholder {
@@ -240,9 +240,9 @@ export class UiDataGateway extends HTMLElement {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 10px 16px;
-          background: rgba(0, 0, 0, 0.4);
-          border-top: 1px solid rgba(255,255,255,0.05);
+          padding: var(--spacing-2_5) var(--spacing-4);
+          background: color-mix(in srgb, black, transparent 60%);
+          border-top: 1px solid color-mix(in srgb, var(--color-text-main), transparent 95%);
           flex-shrink: 0;
         }
 
@@ -251,12 +251,12 @@ export class UiDataGateway extends HTMLElement {
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          gap: 8px;
+          gap: var(--spacing-2);
           height: 32px; /* Aumentei um pouco para respirar */
-          padding: 0 16px;
-          border-radius: 6px;
+          padding: 0 var(--spacing-4);
+          border-radius: var(--spacing-1_5);
           font-family: var(--font-sans);
-          font-size: 10px;
+          font-size: var(--text-xs);
           font-weight: 700;
           text-transform: uppercase;
           letter-spacing: 0.05em;

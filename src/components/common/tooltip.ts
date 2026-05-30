@@ -59,10 +59,10 @@ balloonStyles.replaceSync(`
     position: fixed;
     z-index: 10001;
     max-width: 320px;
-    padding: 12px;
-    border-radius: 8px;
+    padding: var(--spacing-3);
+    border-radius: var(--spacing-2);
     font-family: var(--font-sans, 'Inter', sans-serif);
-    font-size: 11px;
+    font-size: var(--text-sm);
     font-weight: 500;
     line-height: 1.5;
     pointer-events: none;
@@ -101,7 +101,7 @@ balloonStyles.replaceSync(`
 
   [part="arrow"] {
     position: absolute;
-    width: 8px; height: 8px;
+    width: var(--spacing-2); height: var(--spacing-2);
     background: inherit;
     border: inherit;
     border-top: none; border-left: none;
@@ -114,7 +114,7 @@ balloonStyles.replaceSync(`
 
   [part="content"] {
     display: block;
-    padding: 8px;
+    padding: var(--spacing-2);
     text-shadow: 0 1px 2px rgba(0,0,0,0.5);
   }
 
@@ -122,9 +122,9 @@ balloonStyles.replaceSync(`
   [part="content"] .tooltip-header {
     display: flex;
     align-items: center;
-    gap: 8px;
-    margin-bottom: 12px;
-    padding-bottom: 8px;
+    gap: var(--spacing-2);
+    margin-bottom: var(--spacing-3);
+    padding-bottom: var(--spacing-2);
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   }
 
@@ -134,7 +134,7 @@ balloonStyles.replaceSync(`
 
   [part="content"] .tooltip-header span {
     font-family: var(--font-mono, 'JetBrains Mono', monospace);
-    font-size: 10px;
+    font-size: var(--text-xs);
     text-transform: uppercase;
     letter-spacing: 0.05em;
     color: var(--color-text-muted, #94a3b8);
@@ -142,7 +142,7 @@ balloonStyles.replaceSync(`
   }
 
   [part="content"] .tooltip-section {
-    margin-bottom: 12px;
+    margin-bottom: var(--spacing-3);
   }
 
   [part="content"] .tooltip-section:last-child {

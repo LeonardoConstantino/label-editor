@@ -317,52 +317,52 @@ export class VariableManager extends HTMLElement {
     this.shadowRoot.innerHTML = `
       <style>
         :host { display: flex; flex-direction: column; height: 100%; background: var(--color-canvas); font-family: var(--font-sans); }
-        .header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--color-border-ui); background: var(--color-surface); backdrop-filter: blur(8px); z-index: 10; }
-        .header-title { font-family: var(--font-mono); font-size: 11px; font-weight: 700; color: var(--color-text-main); text-transform: uppercase; letter-spacing: 0.15em; }
+        .header { display: flex; align-items: center; justify-content: space-between; padding: var(--spacing-4) var(--spacing-5); border-bottom: 1px solid var(--color-border-ui); background: var(--color-surface); backdrop-filter: blur(8px); z-index: 10; }
+        .header-title { font-family: var(--font-mono); font-size: var(--text-sm); font-weight: 700; color: var(--color-text-main); text-transform: uppercase; letter-spacing: 0.15em; }
         
         .system-tray {
-          padding: 16px 20px;
-          background: rgba(99, 102, 241, 0.03);
+          padding: var(--spacing-4) var(--spacing-5);
+          background: color-mix(in srgb, var(--color-accent-primary), transparent 97%);
           border-bottom: 1px solid var(--color-border-ui);
           display: flex;
           flex-direction: column;
-          gap: 10px;
+          gap: var(--spacing-2_5);
         }
-        .system-badges { display: flex; flex-wrap: wrap; gap: 8px; }
+        .system-badges { display: flex; flex-wrap: wrap; gap: var(--spacing-2); }
         .sys-badge {
-          font-family: var(--font-mono); font-size: 10px; font-weight: bold;
+          font-family: var(--font-mono); font-size: var(--text-xs); font-weight: bold;
           color: var(--color-accent-primary);
-          background: rgba(99, 102, 241, 0.1);
-          padding: 4px 8px; border-radius: 6px; border: 1px solid rgba(99, 102, 241, 0.2);
+          background: color-mix(in srgb, var(--color-accent-primary), transparent 90%);
+          padding: var(--spacing-1) var(--spacing-2); border-radius: var(--spacing-1_5); border: 1px solid color-mix(in srgb, var(--color-accent-primary), transparent 80%);
           cursor: pointer; transition: all 0.2s;
         }
-        .sys-badge:hover { background: rgba(99, 102, 241, 0.2); border-color: var(--color-accent-primary); transform: translateY(-1px); }
+        .sys-badge:hover { background: color-mix(in srgb, var(--color-accent-primary), transparent 80%); border-color: var(--color-accent-primary); transform: translateY(-1px); }
 
-        #vars-container { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 24px; }
-        .var-card { background: rgba(255,255,255,0.02); border: 1px solid var(--color-border-ui); border-radius: 12px; padding: 16px; margin-bottom: 8px; }
-        .var-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-        .var-tag { font-family: var(--font-mono); font-size: 12px; color: var(--color-accent-primary); background: rgba(99, 102, 241, 0.1); padding: 4px 8px; border-radius: 6px; border: 1px solid rgba(99, 102, 241, 0.2); }
-        .usage-badge { font-family: var(--font-mono); font-size: 8px; color: var(--color-text-muted); padding: 2px 6px; border-radius: 4px; background: rgba(255,255,255,0.05); }
-        .pipeline-area { position: relative; padding-left: 20px; display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
-        .pipeline-line { position: absolute; left: 3px; top: 8px; bottom: 8px; width: 2px; background: var(--color-border-ui); opacity: 0.3; }
-        .pipeline-step { display: flex; align-items: center; gap: 12px; position: relative; min-height: 24px; }
-        .step-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--color-border-ui); border: 2px solid #161920; position: absolute; left: -20px; z-index: 2; }
+        #vars-container { flex: 1; overflow-y: auto; padding: var(--spacing-5); display: flex; flex-direction: column; gap: var(--spacing-6); }
+        .var-card { background: color-mix(in srgb, var(--color-text-main), transparent 98%); border: 1px solid var(--color-border-ui); border-radius: 12px; padding: var(--spacing-4); margin-bottom: var(--spacing-2); }
+        .var-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--spacing-4); }
+        .var-tag { font-family: var(--font-mono); font-size: var(--text-sm); color: var(--color-accent-primary); background: color-mix(in srgb, var(--color-accent-primary), transparent 90%); padding: var(--spacing-1) var(--spacing-2); border-radius: var(--spacing-1_5); border: 1px solid color-mix(in srgb, var(--color-accent-primary), transparent 80%); }
+        .usage-badge { font-family: var(--font-mono); font-size: var(--text-tiny); color: var(--color-text-muted); padding: var(--spacing-0_5) var(--spacing-1_5); border-radius: var(--spacing-1); background: color-mix(in srgb, var(--color-text-main), transparent 95%); }
+        .pipeline-area { position: relative; padding-left: var(--spacing-5); display: flex; flex-direction: column; gap: var(--spacing-3); margin-bottom: var(--spacing-5); }
+        .pipeline-line { position: absolute; left: 3px; top: var(--spacing-2); bottom: var(--spacing-2); width: 2px; background: var(--color-border-ui); opacity: 0.3; }
+        .pipeline-step { display: flex; align-items: center; gap: var(--spacing-3); position: relative; min-height: 24px; }
+        .step-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--color-border-ui); border: 2px solid var(--color-surface-solid); position: absolute; left: -20px; z-index: 2; }
         .step-dot.active { background: var(--color-accent-primary); box-shadow: 0 0 8px var(--color-accent-primary); }
         .step-dot.plus { background: var(--color-text-muted); }
         .step-dot.success { background: var(--color-accent-success); box-shadow: 0 0 8px var(--color-accent-success); }
-        .step-label { font-family: var(--font-mono); font-size: 9px; color: var(--color-text-muted); text-transform: uppercase; }
-        .formatter-block { display: flex; align-items: center; gap: 8px; background: var(--color-surface-elevated); border: 1px solid var(--color-border-ui); padding: 4px 8px; border-radius: 6px; transition: all 0.2s; }
+        .step-label { font-family: var(--font-mono); font-size: var(--text-2xs); color: var(--color-text-muted); text-transform: uppercase; }
+        .formatter-block { display: flex; align-items: center; gap: var(--spacing-2); background: var(--color-surface-elevated); border: 1px solid var(--color-border-ui); padding: var(--spacing-1) var(--spacing-2); border-radius: var(--spacing-1_5); transition: all 0.2s; }
         .formatter-block:hover { border-color: var(--color-accent-primary); }
-        .formatter-name { font-family: var(--font-mono); font-size: 10px; color: var(--color-text-main); }
-        .btn-remove-formatter { background: transparent; border: none; color: var(--color-text-muted); cursor: pointer; font-size: 14px; padding: 0 4px; }
+        .formatter-name { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--color-text-main); }
+        .btn-remove-formatter { background: transparent; border: none; color: var(--color-text-muted); cursor: pointer; font-size: 14px; padding: 0 var(--spacing-1); }
         .btn-remove-formatter:hover { color: var(--color-accent-danger); }
         .add-area { opacity: 0.7; transition: opacity 0.2s; }
         .add-area:hover { opacity: 1; }
-        .fallback-area { margin-top: 16px; padding-top: 16px; border-top: 1px dashed var(--color-border-ui); }
-        .empty-state { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px; }
-        .empty-title { font-family: var(--font-mono); font-size: 11px; font-weight: 700; color: var(--color-text-main); margin-bottom: 8px; }
-        .empty-desc { font-size: 10px; color: var(--color-text-muted); max-width: 200px; line-height: 1.4; }
-        .pipeline-dynamic-steps { display: flex; flex-direction: column; gap: 12px; }
+        .fallback-area { margin-top: var(--spacing-4); padding-top: var(--spacing-4); border-top: 1px dashed var(--color-border-ui); }
+        .empty-state { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: var(--spacing-10); }
+        .empty-title { font-family: var(--font-mono); font-size: var(--text-sm); font-weight: 700; color: var(--color-text-main); margin-bottom: var(--spacing-2); }
+        .empty-desc { font-size: var(--text-xs); color: var(--color-text-muted); max-width: 200px; line-height: 1.4; }
+        .pipeline-dynamic-steps { display: flex; flex-direction: column; gap: var(--spacing-3); }
       </style>
 
       <div class="header">

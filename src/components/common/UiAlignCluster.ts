@@ -93,7 +93,7 @@ sheet.replaceSync(/* css */ `
   }
   .cluster-label {
     font-family: var(--font-mono);
-    font-size: 10px;
+    font-size: var(--text-xs);
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.08em;
@@ -103,8 +103,8 @@ sheet.replaceSync(/* css */ `
   .cluster-board {
     background-color: color-mix(in srgb, var(--color-canvas), transparent 20%);
     border: 1px solid var(--color-border-ui);
-    border-radius: 8px;
-    padding: 6px;
+    border-radius: var(--spacing-2);
+    padding: var(--spacing-1_5);
     box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.5);
     display: flex;
     flex-direction: column;
@@ -116,7 +116,7 @@ sheet.replaceSync(/* css */ `
   .cluster-divider {
     width: 1px; height: 20px;
     background-color: var(--color-border-ui);
-    margin: 0 2px; flex-shrink: 0;
+    margin: 0 var(--spacing-0_5); flex-shrink: 0;
   }
 
   .pad-btn {
@@ -141,15 +141,15 @@ sheet.replaceSync(/* css */ `
   }
 
   .options-row {
-    margin-top: 8px; padding: 4px 8px;
+    margin-top: var(--spacing-2); padding: var(--spacing-1) var(--spacing-2);
     display: flex; align-items: center; justify-content: space-between;
     background: color-mix(in srgb, var(--color-text-main), transparent 98%); 
-    border-radius: 4px;
+    border-radius: var(--spacing-1);
   }
 
   .checkbox-label {
-    display: flex; align-items: center; gap: 8px;
-    font-family: var(--font-mono); font-size: 9px;
+    display: flex; align-items: center; gap: var(--spacing-2);
+    font-family: var(--font-mono); font-size: var(--text-2xs);
     color: var(--color-text-muted); cursor: pointer;
   }
 `);

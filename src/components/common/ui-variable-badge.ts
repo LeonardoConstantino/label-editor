@@ -60,12 +60,12 @@ TEMPLATE.innerHTML = `
     [part="root"] {
       display: inline-flex;
       align-items: center;
-      gap: 4px;
-      padding: 3px 8px;
-      border-radius: 4px;
+      gap: var(--spacing-1);
+      padding: var(--spacing-0_5) var(--spacing-2);
+      border-radius: var(--spacing-1);
       border: 1px solid transparent;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 10px;
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
       font-weight: 500;
       text-transform: uppercase;
       letter-spacing: 0.08em;

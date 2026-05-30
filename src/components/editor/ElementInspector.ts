@@ -126,12 +126,12 @@ export class ElementInspector extends HTMLElement {
     if (!this.shadowRoot) return;
     this.shadowRoot.innerHTML = `
       <style>
-        :host { display: flex; flex-direction: column; flex: 1; min-height: 0; gap: 16px; padding: 0; box-sizing: border-box; color: var(--color-text-main); font-family: var(--font-sans); }
-        #panel-content { display: flex; flex-direction: column; gap: 12px; flex: 1; padding: 0 8px 120px 8px; overflow-y: scroll; }
-        .inspector-header-mini { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: rgba(0,0,0,0.2); border-bottom: 1px solid var(--color-border-ui); }
-        .inspector-title-group { display: flex; align-items: baseline; gap: 8px; }
-        .inspector-title { font-family: var(--font-mono); font-size: 10px; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.1em; }
-        .inspector-badge { font-family: var(--font-mono); font-size: 9px; color: var(--color-accent-primary); background: rgba(99, 102, 241, 0.1); padding: 1px 4px; border-radius: 4px; border: 1px solid rgba(99, 102, 241, 0.2); }
+        :host { display: flex; flex-direction: column; flex: 1; min-height: 0; gap: var(--spacing-4); padding: 0; box-sizing: border-box; color: var(--color-text-main); font-family: var(--font-sans); }
+        #panel-content { display: flex; flex-direction: column; gap: var(--spacing-3); flex: 1; padding: 0 var(--spacing-2) 120px var(--spacing-2); overflow-y: scroll; }
+        .inspector-header-mini { display: flex; align-items: center; justify-content: space-between; padding: var(--spacing-2) var(--spacing-3); background: color-mix(in srgb, var(--color-canvas), black 20%); border-bottom: 1px solid var(--color-border-ui); }
+        .inspector-title-group { display: flex; align-items: baseline; gap: var(--spacing-2); }
+        .inspector-title { font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 700; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.1em; }
+        .inspector-badge { font-family: var(--font-mono); font-size: var(--text-2xs); color: var(--color-accent-primary); background: color-mix(in srgb, var(--color-accent-primary), transparent 90%); padding: 1px var(--spacing-1); border-radius: var(--spacing-1); border: 1px solid color-mix(in srgb, var(--color-accent-primary), transparent 80%); }
       </style>
       <div class="inspector-header-mini">
         <div class="inspector-title-group">

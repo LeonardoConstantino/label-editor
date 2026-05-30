@@ -118,7 +118,7 @@ export class UIKeyboardShortcuts extends HTMLElement {
     });
 
     if (type === 'longpress') {
-      return `${kbds[0]} <span class="font-mono text-[8px] text-accent-primary uppercase tracking-widest ml-1.5 opacity-80 border border-accent-primary/30 px-1 py-px rounded bg-accent-primary/10">Segure</span>`;
+      return `${kbds[0]} <span class="font-mono text-tiny text-accent-primary uppercase tracking-widest ml-1.5 opacity-80 border border-accent-primary/30 px-1 py-px rounded bg-accent-primary/10">Segure</span>`;
     }
 
     if (type === 'sequence') {
@@ -265,6 +265,7 @@ export class UIKeyboardShortcuts extends HTMLElement {
     let html = '';
 
     for (const [category, items] of Object.entries(grouped)) {
+    console.log('category :', category);
       html += `
         <div class="masonry-item bg-surface-solid/50 border border-border-ui rounded-xl p-5 shadow-panel">
           
@@ -280,7 +281,7 @@ export class UIKeyboardShortcuts extends HTMLElement {
               <div class="flex items-center text-[12px] group">
                 <span class="text-text-main group-hover:text-white transition-colors">${escapeHTML(this.getDescription(s))}</span>
                 <span class="dot-leader"></span>
-                <span class="shrink-0 flex items-center justify-end">${this.formatKey((s.sequence || s.key)!, s.type)}</span>
+                <span class="shrink-0 flex items-center justify-end">${category === 'Easter Egg' ? "" : this.formatKey((s.sequence || s.key)!, s.type)}</span>
               </div>
             `,
               )

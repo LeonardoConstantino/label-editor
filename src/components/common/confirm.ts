@@ -127,7 +127,7 @@ TEMPLATE.innerHTML = `
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 1rem;
+    padding: var(--spacing-4);
     visibility: hidden;
     pointer-events: none;
   }
@@ -161,7 +161,7 @@ TEMPLATE.innerHTML = `
     box-shadow: var(--uc-panel-shadow);
     max-width: var(--uc-panel-max-width);
     width: 100%;
-    padding: 1.5rem;
+    padding: var(--spacing-6);
     transform: scale(.93) translateY(8px);
     opacity: 0;
     transition:
@@ -179,7 +179,7 @@ TEMPLATE.innerHTML = `
   #header {
     display: flex;
     align-items: flex-start;
-    gap: 1rem;
+    gap: var(--spacing-4);
   }
 
   #icon-wrapper {
@@ -204,13 +204,13 @@ TEMPLATE.innerHTML = `
 
   #texts {
     flex: 1;
-    padding-top: .15rem;
+    padding-top: var(--spacing-0_5);
     min-width: 0;
   }
 
   #title {
-    margin: 0 0 .35rem;
-    font-size: 1rem;
+    margin: 0 0 var(--spacing-1_5);
+    font-size: var(--text-base);
     font-weight: 700;
     color: var(--uc-color-title);
     letter-spacing: -.015em;
@@ -219,17 +219,18 @@ TEMPLATE.innerHTML = `
 
   #message {
     margin: 0;
-    font-size: .875rem;
+    font-size: var(--text-base);
     color: var(--uc-color-message);
     line-height: 1.6;
     word-break: break-word;
+    opacity: 0.8;
   }
 
   /* ── Divisor sutil ─────────────────────────────────────── */
   #divider {
     height: 1px;
     background: var(--uc-panel-border);
-    margin: 1.25rem 0 1rem;
+    margin: var(--spacing-5) 0 var(--spacing-4);
     opacity: .6;
   }
 
@@ -237,16 +238,16 @@ TEMPLATE.innerHTML = `
   #footer {
     display: flex;
     justify-content: flex-end;
-    gap: .625rem;
+    gap: var(--spacing-2_5);
   }
 
   /* ── Base dos botões ───────────────────────────────────── */
   button {
     font-family: inherit;
-    font-size: .875rem;
+    font-size: var(--text-sm);
     font-weight: 600;
     border-radius: var(--uc-btn-radius);
-    padding: .5rem 1.125rem;
+    padding: var(--spacing-2) var(--spacing-4);
     cursor: pointer;
     transition:
       background  140ms ease,

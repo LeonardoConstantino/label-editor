@@ -233,14 +233,14 @@ export class AppSelect extends HTMLElement {
         :host { display: block; position: relative; font-family: var(--font-sans); }
         
         .select-label {
-          font-family: var(--font-mono); font-size: 10px; color: var(--color-text-muted);
-          text-transform: uppercase; margin-bottom: 4px; display: block;
+          font-family: var(--font-mono); font-size: var(--text-xs); color: var(--color-text-muted);
+          text-transform: uppercase; margin-bottom: var(--spacing-1); display: block;
         }
 
         .select-trigger {
           background: var(--color-surface-elevated); border: 1px solid var(--color-border-ui);
-          border-radius: 8px; padding: 6px 12px; color: var(--color-text-main);
-          font-size: 11px; display: flex; align-items: center; justify-content: space-between;
+          border-radius: var(--spacing-2); padding: var(--spacing-1_5) var(--spacing-3); color: var(--color-text-main);
+          font-size: var(--text-sm); display: flex; align-items: center; justify-content: space-between;
           cursor: pointer; transition: all 0.2s var(--ease-spring); user-select: none;
           min-height: 32px; outline: none;
         }
@@ -251,22 +251,22 @@ export class AppSelect extends HTMLElement {
 
         .select-trigger.open {
           border-color: var(--color-accent-primary);
-          box-shadow: 0 0 15px rgba(99, 102, 241, 0.2);
+          box-shadow: 0 0 15px color-mix(in srgb, var(--color-accent-primary), transparent 80%);
         }
 
-        .arrow { font-size: 8px; opacity: 0.5; transition: transform 0.3s; pointer-events: none; }
+        .arrow { font-size: var(--text-tiny); opacity: 0.5; transition: transform 0.3s; pointer-events: none; }
         .open .arrow { transform: rotate(180deg); }
 
         .select-dropdown {
-          position: absolute; top: calc(100% + 4px); left: 0; width: 100%;
-          min-width: 160px; background: #1a1d24; border: 1px solid var(--color-border-ui);
-          border-radius: 8px; z-index: 50; max-height: 200px; overflow-y: auto;
+          position: absolute; top: calc(100% + var(--spacing-1)); left: 0; width: 100%;
+          min-width: 160px; background: var(--color-surface-solid); border: 1px solid var(--color-border-ui);
+          border-radius: var(--spacing-2); z-index: 50; max-height: 200px; overflow-y: auto;
           display: none; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
         }
 
         .select-option {
-          padding: 8px 12px; font-size: 11px; cursor: pointer; transition: all 0.15s;
-          display: flex; flex-direction: column; gap: 2px; outline: none;
+          padding: var(--spacing-2) var(--spacing-3); font-size: var(--text-sm); cursor: pointer; transition: all 0.15s;
+          display: flex; flex-direction: column; gap: var(--spacing-0_5); outline: none;
         }
 
         .select-option:hover, .select-option:focus-visible {
@@ -275,15 +275,15 @@ export class AppSelect extends HTMLElement {
 
         .select-option.selected {
           color: var(--color-accent-primary); font-weight: 600;
-          background: rgba(99, 102, 241, 0.1);
+          background: color-mix(in srgb, var(--color-accent-primary), transparent 90%);
         }
 
         .select-option.selected:hover, .select-option.selected:focus-visible { color: white; background: var(--color-accent-primary); }
 
-        .sublabel { font-size: 9px; opacity: 0.6; pointer-events: none; }
+        .sublabel { font-size: var(--text-2xs); opacity: 0.6; pointer-events: none; }
 
         .select-dropdown::-webkit-scrollbar { width: 4px; }
-        .select-dropdown::-webkit-scrollbar-thumb { background: var(--color-border-ui); border-radius: 2px; }
+        .select-dropdown::-webkit-scrollbar-thumb { background: var(--color-border-ui); border-radius: var(--spacing-0_5); }
       </style>
 
       ${this._label ? `<span class="select-label">${this._label}</span>` : ''}

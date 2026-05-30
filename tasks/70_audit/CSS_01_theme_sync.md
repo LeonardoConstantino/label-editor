@@ -20,5 +20,5 @@ Sincronizar todos os componentes com o sistema de temas Prism, eliminando valore
    - Garantir que o contraste permanece correto após a substituição.
 
 ## Critérios de Aceite
-- [ ] Zero ocorrências de cores fixas (hex/rgb) em componentes de UI comuns.
-- [ ] Componentes respondem corretamente à troca de tema (Dark/Light).
+- [x] Zero ocorrências de cores fixas (hex/rgb) em componentes de UI comuns.
+- [x] Componentes respondem corretamente à troca de tema (Dark/Light).

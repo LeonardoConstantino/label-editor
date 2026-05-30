@@ -216,7 +216,7 @@ export class UINumberScrubber extends HTMLElement {
           height: 32px;
           background-color: var(--color-surface-solid);
           border: 1px solid var(--color-border-ui);
-          border-radius: 6px;
+          border-radius: var(--spacing-1_5);
           overflow: hidden;
           transition: all 0.2s var(--ease-spring);
         }
@@ -233,13 +233,13 @@ export class UINumberScrubber extends HTMLElement {
           position: absolute;
           top: 0; left: 0; bottom: 0;
           width: var(--progress);
-          background: linear-gradient(90deg, rgba(99,102,241,0.05) 0%, rgba(99,102,241,0.15) 100%);
+          background: linear-gradient(90deg, color-mix(in srgb, var(--color-accent-primary), transparent 95%) 0%, color-mix(in srgb, var(--color-accent-primary), transparent 85%) 100%);
           pointer-events: none;
-          border-right: 1px solid rgba(99,102,241,0.3);
+          border-right: 1px solid color-mix(in srgb, var(--color-accent-primary), transparent 70%);
           z-index: 0;
         }
 
-        .scrubber-wrapper:not(.is-disabled):hover { border-color: rgba(255, 255, 255, 0.2); }
+        .scrubber-wrapper:not(.is-disabled):hover { border-color: color-mix(in srgb, var(--color-text-main), transparent 80%); }
         
         .scrubber-wrapper:focus-within:not(.is-disabled) {
           border-color: var(--color-accent-primary);
@@ -249,7 +249,7 @@ export class UINumberScrubber extends HTMLElement {
         .scrubber-wrapper.is-scrubbing {
           border-color: var(--color-accent-primary);
           transform: scale(0.98);
-          background: rgba(99, 102, 241, 0.05);
+          background: color-mix(in srgb, var(--color-accent-primary), transparent 95%);
         }
 
         .scrubber-label {
@@ -260,11 +260,11 @@ export class UINumberScrubber extends HTMLElement {
           justify-content: center;
           width: 32px;
           height: 100%;
-          background: rgba(255, 255, 255, 0.03);
+          background: color-mix(in srgb, var(--color-text-main), transparent 97%);
           border-right: 1px solid var(--color-border-ui);
           color: var(--color-text-muted);
           font-family: var(--font-mono);
-          font-size: 10px;
+          font-size: var(--text-xs);
           font-weight: bold;
           cursor: ew-resize;
           user-select: none;
@@ -281,18 +281,18 @@ export class UINumberScrubber extends HTMLElement {
           outline: none;
           color: var(--color-text-main);
           font-family: var(--font-mono);
-          font-size: 11px;
+          font-size: var(--text-sm);
           text-align: right;
-          padding-right: 4px;
+          padding-right: var(--spacing-1);
         }
 
         .scrubber-unit {
           position: relative;
           z-index: 1;
-          color: rgba(148, 163, 184, 0.4);
+          color: color-mix(in srgb, var(--color-text-muted), transparent 60%);
           font-family: var(--font-mono);
-          font-size: 9px;
-          padding-right: 8px;
+          font-size: var(--text-2xs);
+          padding-right: var(--spacing-2);
           pointer-events: none;
         }
       </style>

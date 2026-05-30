@@ -179,6 +179,7 @@ export class AppCockpit extends HTMLElement {
           display: flex;
           flex-direction: column;
           min-height: 0;
+          padding-top: var(--spacing-3);
           transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
           transform-origin: center top;
         }
