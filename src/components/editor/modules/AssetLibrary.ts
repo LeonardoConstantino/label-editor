@@ -248,24 +248,28 @@ export class AssetLibrary extends HTMLElement {
       return;
     }
 
-    grid.innerHTML = filtered.map(asset => `
-      <div class="asset-item" draggable="true" data-id="${asset.id}">
-        <div class="asset-preview">
-          <img src="${asset.src}" alt="${asset.name}" loading="lazy">
+    grid.innerHTML = filtered.map(asset => {
+      const safeId = DataSanitizer.escapeHTML(asset.id);
+      const safeName = DataSanitizer.escapeHTML(asset.name);
+      return `
+        <div class="asset-item" draggable="true" data-id="${safeId}">
+          <div class="asset-preview">
+            <img src="${asset.src}" alt="${safeName}" loading="lazy">
+          </div>
+          <div class="asset-overlay">
+             <span class="asset-name">${safeName}</span>
+             <div class="flex gap-1">
+               <button class="btn-action btn-edit-asset" data-id="${safeId}" title="Edit Image">
+                  <ui-icon name="edit" size="xs" style="transform: scale(0.8)"></ui-icon>
+               </button>
+               <button class="btn-action btn-delete-asset" data-id="${safeId}" title="Delete">
+                  <ui-icon name="trash" size="xs"></ui-icon>
+               </button>
+             </div>
+          </div>
         </div>
-        <div class="asset-overlay">
-           <span class="asset-name">${asset.name}</span>
-           <div class="flex gap-1">
-             <button class="btn-action btn-edit-asset" data-id="${asset.id}" title="Edit Image">
-                <ui-icon name="edit" size="xs" style="transform: scale(0.8)"></ui-icon>
-             </button>
-             <button class="btn-action btn-delete-asset" data-id="${asset.id}" title="Delete">
-                <ui-icon name="trash" size="xs"></ui-icon>
-             </button>
-           </div>
-        </div>
-      </div>
-    `).join('');
+      `;
+    }).join('');
   }
 
   private renderSkeleton() {

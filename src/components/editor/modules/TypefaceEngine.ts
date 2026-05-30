@@ -5,6 +5,7 @@ import { UISM } from '../../../core/UISoundManager';
 import { CustomFont } from '../../../domain/models/Label';
 import { HelpContentProvider } from '../../../utils/HelpContentProvider';
 import { FontLoader } from '../../../utils/FontLoader';
+import { DataSanitizer } from '../../../core/DataSanitizer';
 
 // Importar sub-componentes se necessário
 import { confirmDialog } from '../../common/confirm';
@@ -196,33 +197,37 @@ export class TypefaceEngine extends HTMLElement {
     const allFonts = [...this._systemFonts, ...customFonts];
 
     // Diferenciação simples (nativas vs custom)
-    container.innerHTML = allFonts.map(f => `
-      <div class="font-card ${f.active ? 'active' : 'inactive'}">
-        
-        <div class="font-card-header">
-          <span class="font-name">${f.name}</span>
-          <div class="flex items-center gap-4"> <!-- Aumentei o gap -->
-            
-            ${f.url ? `
-              <button class="btn-delete-font" data-id="${f.id}" title="Remove font">
-                <ui-icon name="trash" class="w-3.5 h-3.5"></ui-icon>
-              </button>
-            ` : '<span class="text-[8px] text-text-muted opacity-40 uppercase font-mono tracking-widest bg-white/5 px-2 py-1 rounded">System</span>'}
-            
-            <!-- APLIQUEI O NOSSO CHECKBOX GLOBAL TÁTIL AQUI -->
-            <input type="checkbox" class="font-toggle" data-id="${f.id}" ${f.active ? 'checked' : ''} title="Habilitar/Desabilitar Fonte">
-          
+    container.innerHTML = allFonts.map(f => {
+      const safeName = DataSanitizer.escapeHTML(f.name);
+      const safeId = DataSanitizer.escapeHTML(f.id);
+
+      return `
+        <div class="font-card ${f.active ? 'active' : 'inactive'}">
+
+          <div class="font-card-header">
+            <span class="font-name">${safeName}</span>
+            <div class="flex items-center gap-4"> <!-- Aumentei o gap -->
+
+              ${f.url ? `
+                <button class="btn-delete-font" data-id="${safeId}" title="Remove font">
+                  <ui-icon name="trash" class="w-3.5 h-3.5"></ui-icon>
+                </button>
+              ` : '<span class="text-[8px] text-text-muted opacity-40 uppercase font-mono tracking-widest bg-white/5 px-2 py-1 rounded">System</span>'}
+
+              <!-- APLIQUEI O NOSSO CHECKBOX GLOBAL TÁTIL AQUI -->
+              <input type="checkbox" class="font-toggle" data-id="${safeId}" ${f.active ? 'checked' : ''} title="Habilitar/Desabilitar Fonte">
+
+            </div>
+          </div>
+
+          <div class="specimen-box" style="font-family: '${safeName}', sans-serif">
+            <div class="specimen-text" contenteditable="true" spellcheck="false" title="Clique para testar o seu texto">
+              The quick brown fox jumps over the lazy dog
+            </div>
           </div>
         </div>
-
-        <div class="specimen-box" style="font-family: '${f.name}', sans-serif">
-          <div class="specimen-text" contenteditable="true" spellcheck="false" title="Clique para testar o seu texto">
-            The quick brown fox jumps over the lazy dog
-          </div>
-        </div>
-
-      </div>
-    `).join('');
+      `;
+    }).join('');
   }
 
   private renderSkeleton() {

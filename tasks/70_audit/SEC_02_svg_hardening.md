@@ -20,5 +20,5 @@ Garantir que a inserção de ícones SVG via `innerHTML` seja segura contra scri
    - Testar a inserção de um SVG "envenenado" e verificar se o componente o neutraliza.
 
 ## Critérios de Aceite
-- [ ] Ícones continuam renderizando corretamente.
-- [ ] Tags não-SVG são removidas do payload antes da injeção no Shadow DOM.
+- [x] Ícones continuam renderizando corretamente.
+- [x] Tags não-SVG são removidas do payload antes da injeção no Shadow DOM.

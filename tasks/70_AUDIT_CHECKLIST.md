@@ -25,6 +25,7 @@ Este checklist coordena a Grande Auditoria de Integridade. O progresso será mar
 - [x] **XSS Audit (innerHTML):** Uso de innerHTML em templates dinâmicos sem escape.
 - [x] **Data Sanitizer Depth:** Validado e implementado escape de HTML nativo (Task SEC-01).
 - [x] **External Source Validation:** Auditoria no `DataSourceParser` completa.
+- [x] **SVG Hardening:** Implementada whitelist rigorosa via DOMParser no componente de ícones (Task SEC-02).
 - [ ] **Input Sanitization:** Auditoria no `ElementInspector` e inputs de usuário.
 
 ## 🔹 Fase 4: Cobertura de Testes (Vitest)
