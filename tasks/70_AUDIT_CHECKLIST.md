@@ -5,15 +5,15 @@ Este checklist coordena a Grande Auditoria de Integridade. O progresso será mar
 ## 📋 Status Geral
 - **Início:** 2026-05-28
 - **Postura:** Arquiteto de Sistemas Críticos (Tolerância Zero)
-- **Progresso:** 40% ▓▓▓▓░░░░░░
+- **Progresso:** 50% ▓▓▓▓▓░░░░░
 
 ---
 
 ## 🔹 Fase 1: TypeScript & Integridade Estrutural
-- [x] **Varredura de `any` explícito:** Encontrado em EventBus, Store e Renderers.
-- [x] **Varredura de `as any` (Casts):** Abuso em renderização e gerenciamento de estado.
-- [x] **Encapsulamento:** Muitos campos públicos na Store e Services.
-- [x] **Contratos de Interface:** Falta de Generics no sistema de eventos.
+- [x] **Varredura de `any` explícito:** Encontrado e corrigido em EventBus, Store e Renderers.
+- [x] **Varredura de `as any` (Casts):** Corrigido em Store e PDFGenerator (Task TS-02).
+- [x] **Encapsulamento:** Aplicado `private`, `public` e `readonly` em Core/Services (Task TS-03).
+- [x] **Contratos de Interface:** Sistema de eventos agora usa Generics estritos (Task TS-01).
 
 ## 🔹 Fase 2: CSS & Estética (Prism System)
 - [x] **Hardcoded Colors:** Muitos hexadecimais em badges e modais.
@@ -23,7 +23,7 @@ Este checklist coordena a Grande Auditoria de Integridade. O progresso será mar
 
 ## 🔹 Fase 3: Segurança (Zero Trust Pipeline)
 - [x] **XSS Audit (innerHTML):** Uso de innerHTML em templates dinâmicos sem escape.
-- [x] **Data Sanitizer Depth:** Validado, mas falta escape de HTML nativo.
+- [x] **Data Sanitizer Depth:** Validado e implementado escape de HTML nativo (Task SEC-01).
 - [x] **External Source Validation:** Auditoria no `DataSourceParser` completa.
 - [ ] **Input Sanitization:** Auditoria no `ElementInspector` e inputs de usuário.
 

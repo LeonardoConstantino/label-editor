@@ -22,6 +22,6 @@ Implementar escape de HTML obrigatório no pipeline de processamento de dados ex
    - Adicionar casos de teste com payloads XSS comuns (`<script>`, `onload=...`, `javascript:...`).
 
 ## Critérios de Aceite
-- [ ] Strings processadas pelo DataSanitizer não contêm tags HTML brutas.
-- [ ] Testes de segurança passam com 100% de sucesso.
-- [ ] Nenhuma regressão na exibição de dados legítimos.
+- [x] Strings processadas pelo DataSanitizer não contêm tags HTML brutas.
+- [x] Testes de segurança passam com 100% de sucesso.
+- [x] Nenhuma regressão na exibição de dados legítimos.

@@ -32,7 +32,7 @@ export class DataSanitizer {
 
   /**
    * Sanitiza um valor de dado bruto vindo de CSV/JSON.
-   * Foca em integridade física (tamanho, caracteres de controle).
+   * Foca em integridade física (tamanho, caracteres de controle) e segurança (XSS).
    */
   public static sanitizeValue(value: any, depth: number = 1): any {
     if (value === null || value === undefined) return '';
@@ -48,7 +48,8 @@ export class DataSanitizer {
       // eslint-disable-next-line no-control-regex
       value = value.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');
 
-      return value;
+      // 3. Mandatory HTML Escape (Task SEC-01)
+      return this.escapeHTML(value);
     }
 
     if (typeof value === 'object') {

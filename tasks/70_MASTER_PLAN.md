@@ -30,7 +30,7 @@ Este arquivo coordena a execução de tarefas por múltiplos agentes para a audi
 ### Fase 2: Blindagem de Dados (SEC-AUDIT)
 | ID | Task | Status | Dependências | Branch Sugerida |
 |----|------|--------|--------------|-----------------|
-| **SEC-01** | [DataSanitizer Pro: HTML Escape](./70_audit/SEC_01_sanitizer_pro.md) | [ ] | — | `audit/SEC-01-sanitizer` |
+| **SEC-01** | [DataSanitizer Pro: HTML Escape](./70_audit/SEC_01_sanitizer_pro.md) | [x] | — | `audit/SEC-01-sanitizer` |
 | **SEC-02** | [Blindagem de Injeção SVG (Icon Component)](./70_audit/SEC_02_svg_hardening.md) | [ ] | SEC-01 | `audit/SEC-02-svg-xss` |
 | **SEC-03** | [Refatoração innerHTML -> textContent](./70_audit/SEC_03_dom_injection.md) | [ ] | SEC-01 | `audit/SEC-03-dom-safe` |
 

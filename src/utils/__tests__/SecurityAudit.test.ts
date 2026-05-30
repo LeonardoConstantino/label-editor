@@ -56,14 +56,13 @@ describe('Security Audit: Data Integrity (Task 87)', () => {
   });
 
   describe('DataSourceParser: Integrated Security', () => {
-    it('should automatically sanitize manual input objects', async () => {
+    it('should automatically sanitize and escape manual input objects', async () => {
       // simulate manual text processing in UiDataGateway
       const rawRow = { nome: "<script>dangerous</script>", large: "A".repeat(1024 * 600) };
       const sanitized = DataSanitizer.sanitizeValue(rawRow);
       
-      // Note: sanitizeValue does NOT escape HTML for the value (that's for UI), 
-      // but it DOES escape HTML for the keys.
-      expect(sanitized.nome).toBe("<script>dangerous</script>");
+      // Task SEC-01: sanitizeValue now MUST escape HTML for the value
+      expect(sanitized.nome).toBe("&lt;script&gt;dangerous&lt;/script&gt;");
       expect(sanitized.large).toContain("[TRUNCATED]");
     });
 
