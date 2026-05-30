@@ -5,7 +5,7 @@ Este checklist coordena a Grande Auditoria de Integridade. O progresso será mar
 ## 📋 Status Geral
 - **Início:** 2026-05-28
 - **Postura:** Arquiteto de Sistemas Críticos (Tolerância Zero)
-- **Progresso:** 50% ▓▓▓▓▓░░░░░
+- **Progresso:** 65% ▓▓▓▓▓▓▓░░░
 
 ---
 
@@ -22,11 +22,11 @@ Este checklist coordena a Grande Auditoria de Integridade. O progresso será mar
 - [ ] **Shared Styles Adoption:** Validação do uso de `shared-styles.ts` em todos os componentes.
 
 ## 🔹 Fase 3: Segurança (Zero Trust Pipeline)
-- [x] **XSS Audit (innerHTML):** Uso de innerHTML em templates dinâmicos sem escape.
+- [x] **XSS Audit (innerHTML):** Removidos vetores dinâmicos em AssetLibrary, TypefaceEngine e outros (Task SEC-03).
 - [x] **Data Sanitizer Depth:** Validado e implementado escape de HTML nativo (Task SEC-01).
 - [x] **External Source Validation:** Auditoria no `DataSourceParser` completa.
 - [x] **SVG Hardening:** Implementada whitelist rigorosa via DOMParser no componente de ícones (Task SEC-02).
-- [ ] **Input Sanitization:** Auditoria no `ElementInspector` e inputs de usuário.
+- [x] **Input Sanitization:** Auditoria no `ElementInspector` e inputs de usuário completa.
 
 ## 🔹 Fase 4: Cobertura de Testes (Vitest)
 - [x] **Mapeamento de Funções Críticas:** 70% da lógica sem testes unitários.

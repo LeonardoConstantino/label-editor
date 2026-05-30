@@ -24,7 +24,7 @@ settingsSheet.replaceSync(`
   .settings-container {
     display: flex;
     height: 100%;
-    background-color: #0a0c10;
+    background-color: var(--color-canvas);
     overflow: hidden;
     border-radius: 12px;
   }
@@ -32,7 +32,7 @@ settingsSheet.replaceSync(`
   /* Sidebar Styles */
   .sidebar {
     width: 220px;
-    background-color: rgba(0, 0, 0, 0.4);
+    background-color: color-mix(in srgb, black, transparent 60%);
     border-right: 1px solid var(--color-border-ui);
     display: flex;
     flex-direction: column;

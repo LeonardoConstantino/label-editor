@@ -340,7 +340,7 @@ export class MicroImageEditor extends HTMLElement {
 
     this.shadowRoot.innerHTML = `
       <style>
-        :host { display: flex; height: 600px; background: #0a0c10; color: white; font-family: var(--font-sans); }
+        :host { display: flex; height: 600px; background: var(--color-canvas); color: white; font-family: var(--font-sans); }
         
         .panel-controls { 
           width: 280px; border-right: 1px solid var(--color-border-ui); 

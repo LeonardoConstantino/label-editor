@@ -277,19 +277,19 @@ export class AssetLibrary extends HTMLElement {
 
     this.shadowRoot.innerHTML = `
       <style>
-        :host { display: flex; flex-direction: column; height: 100%; background: #0a0c10; font-family: var(--font-sans); }
-        .header { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border-bottom: 1px solid var(--color-border-ui); background: rgba(0,0,0,0.2); }
+        :host { display: flex; flex-direction: column; height: 100%; background: var(--color-canvas); font-family: var(--font-sans); }
+        .header { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border-bottom: 1px solid var(--color-border-ui); background: color-mix(in srgb, var(--color-canvas), black 20%); }
         .header-title { font-family: var(--font-mono); font-size: 10px; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.1em; }
-        .upload-zone { padding: 20px; border-bottom: 1px solid var(--color-border-ui); background: linear-gradient(to bottom, #050608, #0a0c10); }
+        .upload-zone { padding: 20px; border-bottom: 1px solid var(--color-border-ui); background: linear-gradient(to bottom, var(--color-surface-solid), var(--color-canvas)); }
         .drop-target { border: 1px dashed var(--color-border-ui); border-radius: 12px; height: 80px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: var(--color-text-muted); cursor: pointer; transition: all 0.3s; }
-        .drop-target:hover { border-color: var(--color-accent-primary); background: rgba(99, 102, 241, 0.05); color: var(--color-text-main); }
+        .drop-target:hover { border-color: var(--color-accent-primary); background: color-mix(in srgb, var(--color-accent-primary), transparent 95%); color: var(--color-text-main); }
         .drop-target ui-icon { --icon-size: 20px; opacity: 0.5; }
         .filter-bar { display: flex; gap: 8px; padding: 12px 20px; overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid var(--color-border-ui); }
-        .filter-pill { padding: 4px 12px; border-radius: 20px; background: rgba(255,255,255,0.03); border: 1px solid var(--color-border-ui); color: var(--color-text-muted); font-family: var(--font-mono); font-size: 9px; text-transform: uppercase; cursor: pointer; white-space: nowrap; transition: all 0.2s; }
-        .filter-pill:hover { background: rgba(255,255,255,0.08); }
-        .filter-pill.active { background: var(--color-accent-primary); border-color: var(--color-accent-primary); color: white; box-shadow: 0 0 10px var(--color-accent-primary-alpha); }
+        .filter-pill { padding: 4px 12px; border-radius: 20px; background: color-mix(in srgb, var(--color-text-main), transparent 97%); border: 1px solid var(--color-border-ui); color: var(--color-text-muted); font-family: var(--font-mono); font-size: 9px; text-transform: uppercase; cursor: pointer; white-space: nowrap; transition: all 0.2s; }
+        .filter-pill:hover { background: color-mix(in srgb, var(--color-text-main), transparent 92%); }
+        .filter-pill.active { background: var(--color-accent-primary); border-color: var(--color-accent-primary); color: white; box-shadow: 0 0 10px color-mix(in srgb, var(--color-accent-primary), transparent 80%); }
         #asset-grid { flex: 1; overflow-y: auto; padding: 20px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; align-content: start; }
-        .asset-item { aspect-ratio: 1; background: #050608; border: 1px solid var(--color-border-ui); border-radius: 10px; overflow: hidden; position: relative; cursor: grab; transition: all 0.3s var(--ease-spring); }
+        .asset-item { aspect-ratio: 1; background: var(--color-surface-solid); border: 1px solid var(--color-border-ui); border-radius: 10px; overflow: hidden; position: relative; cursor: grab; transition: all 0.3s var(--ease-spring); }
         .asset-item:hover { transform: scale(1.05); border-color: var(--color-accent-primary); box-shadow: 0 5px 15px rgba(0,0,0,0.4); }
         .asset-item.is-dragging { opacity: 0.4; transform: scale(0.9); }
         .asset-preview { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; padding: 10px; }
@@ -299,9 +299,9 @@ export class AssetLibrary extends HTMLElement {
         .asset-name { font-size: 8px; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 60%; }
         
         .btn-action { width: 22px; height: 22px; border: none; border-radius: 4px; cursor: pointer; display: grid; place-items: center; transition: all 0.2s; }
-        .btn-edit-asset { background: rgba(99, 102, 241, 0.2); color: var(--color-accent-primary); }
+        .btn-edit-asset { background: color-mix(in srgb, var(--color-accent-primary), transparent 80%); color: var(--color-accent-primary); }
         .btn-edit-asset:hover { background: var(--color-accent-primary); color: white; }
-        .btn-delete-asset { background: rgba(244, 63, 94, 0.2); color: var(--color-accent-danger); }
+        .btn-delete-asset { background: color-mix(in srgb, var(--color-accent-danger), transparent 80%); color: var(--color-accent-danger); }
         .btn-delete-asset:hover { background: var(--color-accent-danger); color: white; }
         .empty-state { grid-column: 1 / -1; padding: 40px 0; text-align: center; color: var(--color-text-muted); font-size: 11px; }
         #asset-upload-input { display: none; }

@@ -93,7 +93,10 @@ balloonStyles.replaceSync(`
   /* Variantes com Glow Neon */
   :host([variant="primary"]) { border-color: var(--color-accent-primary); box-shadow: 0 0 20px rgba(99, 102, 241, 0.2); }
   :host([variant="success"]) { border-color: var(--color-accent-success); box-shadow: 0 0 20px rgba(16, 185, 129, 0.2); }
-  :host([variant="warning"]) { border-color: #f59e0b; box-shadow: 0 0 20px rgba(245, 158, 11, 0.2); }
+  :host([variant="warning"]) { 
+    border-color: var(--color-accent-warning); 
+    box-shadow: 0 0 20px color-mix(in srgb, var(--color-accent-warning), transparent 80%); 
+  }
   :host([variant="error"])   { border-color: var(--color-accent-danger); box-shadow: 0 0 20px rgba(244, 63, 94, 0.2); }
 
   [part="arrow"] {

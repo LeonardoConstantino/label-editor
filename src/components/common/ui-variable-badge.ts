@@ -82,45 +82,45 @@ TEMPLATE.innerHTML = `
     /* ── Estados base ── */
     :host([state="default"]) [part="root"],
     :host(:not([state]))     [part="root"] {
-      background-color: rgba(99, 102, 241, 0.10);
-      border-color:     rgba(99, 102, 241, 0.20);
-      color:            #6366f1;
+      background-color: color-mix(in srgb, var(--color-accent-primary), transparent 90%);
+      border-color:     color-mix(in srgb, var(--color-accent-primary), transparent 80%);
+      color:            var(--color-accent-primary);
     }
 
     :host([state="missing"]) [part="root"] {
-      background-color: rgba(244, 63, 94, 0.10);
-      border-color:     rgba(244, 63, 94, 0.20);
-      color:            #f43f5e;
+      background-color: color-mix(in srgb, var(--color-accent-danger), transparent 90%);
+      border-color:     color-mix(in srgb, var(--color-accent-danger), transparent 80%);
+      color:            var(--color-accent-danger);
       opacity: 0.65;
     }
 
     :host([state="used"]) [part="root"] {
-      background-color: rgba(16, 185, 129, 0.10);
-      border-color:     rgba(16, 185, 129, 0.25);
-      color:            #10b981;
+      background-color: color-mix(in srgb, var(--color-accent-success), transparent 90%);
+      border-color:     color-mix(in srgb, var(--color-accent-success), transparent 75%);
+      color:            var(--color-accent-success);
     }
 
     /* ── Hover ── */
     :host([state="default"]:hover) [part="root"],
     :host(:not([state]):hover)     [part="root"] {
-      background-color: rgba(99, 102, 241, 0.18);
-      border-color:     rgba(99, 102, 241, 0.45);
-      box-shadow: 0 0 10px rgba(99, 102, 241, 0.20);
+      background-color: color-mix(in srgb, var(--color-accent-primary), transparent 82%);
+      border-color:     color-mix(in srgb, var(--color-accent-primary), transparent 55%);
+      box-shadow: 0 0 10px color-mix(in srgb, var(--color-accent-primary), transparent 80%);
       transform: translateY(-1px);
     }
 
     :host([state="missing"]:hover) [part="root"] {
-      background-color: rgba(244, 63, 94, 0.18);
-      border-color:     rgba(244, 63, 94, 0.45);
-      box-shadow: 0 0 10px rgba(244, 63, 94, 0.20);
+      background-color: color-mix(in srgb, var(--color-accent-danger), transparent 82%);
+      border-color:     color-mix(in srgb, var(--color-accent-danger), transparent 55%);
+      box-shadow: 0 0 10px color-mix(in srgb, var(--color-accent-danger), transparent 80%);
       transform: translateY(-1px);
       opacity: 0.85;
     }
 
     :host([state="used"]:hover) [part="root"] {
-      background-color: rgba(16, 185, 129, 0.18);
-      border-color:     rgba(16, 185, 129, 0.45);
-      box-shadow: 0 0 10px rgba(16, 185, 129, 0.20);
+      background-color: color-mix(in srgb, var(--color-accent-success), transparent 82%);
+      border-color:     color-mix(in srgb, var(--color-accent-success), transparent 55%);
+      box-shadow: 0 0 10px color-mix(in srgb, var(--color-accent-success), transparent 80%);
       transform: translateY(-1px);
     }
 
@@ -132,11 +132,11 @@ TEMPLATE.innerHTML = `
 
     /* ── Focus-visible (acessibilidade teclado) ── */
     :host(:focus-visible) [part="root"] {
-      outline: 2px solid #6366f1;
+      outline: 2px solid var(--color-accent-primary);
       outline-offset: 2px;
     }
-    :host([state="missing"]:focus-visible) [part="root"] { outline-color: #f43f5e; }
-    :host([state="used"]:focus-visible)    [part="root"] { outline-color: #10b981; }
+    :host([state="missing"]:focus-visible) [part="root"] { outline-color: var(--color-accent-danger); }
+    :host([state="used"]:focus-visible)    [part="root"] { outline-color: var(--color-accent-success); }
 
     /* ── Ícone (oculto por padrão, visível no hover/focus/feedback) ── */
     [part="icon"] {
@@ -157,10 +157,10 @@ TEMPLATE.innerHTML = `
 
     /* ── Feedback: copiado ── */
     :host([data-copied]) [part="root"] {
-      background-color: rgba(16, 185, 129, 0.15) !important;
-      border-color:     rgba(16, 185, 129, 0.50) !important;
-      color:            #10b981 !important;
-      box-shadow: 0 0 12px rgba(16, 185, 129, 0.25) !important;
+      background-color: color-mix(in srgb, var(--color-accent-success), transparent 85%) !important;
+      border-color:     color-mix(in srgb, var(--color-accent-success), transparent 50%) !important;
+      color:            var(--color-accent-success) !important;
+      box-shadow: 0 0 12px color-mix(in srgb, var(--color-accent-success), transparent 75%) !important;
       transform: scale(1.04) !important;
     }
 
@@ -171,10 +171,10 @@ TEMPLATE.innerHTML = `
 
     /* ── Feedback: erro ── */
     :host([data-error]) [part="root"] {
-      background-color: rgba(244, 63, 94, 0.15) !important;
-      border-color:     rgba(244, 63, 94, 0.50) !important;
-      color:            #f43f5e !important;
-      box-shadow: 0 0 12px rgba(244, 63, 94, 0.25) !important;
+      background-color: color-mix(in srgb, var(--color-accent-danger), transparent 85%) !important;
+      border-color:     color-mix(in srgb, var(--color-accent-danger), transparent 50%) !important;
+      color:            var(--color-accent-danger) !important;
+      box-shadow: 0 0 12px color-mix(in srgb, var(--color-accent-danger), transparent 75%) !important;
       opacity: 1 !important;
     }
 

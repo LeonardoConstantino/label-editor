@@ -101,8 +101,8 @@ sheet.replaceSync(/* css */ `
   }
   
   .cluster-board {
-    background-color: rgba(10, 12, 16, 0.8);
-    border: 1px solid var(--color-border-ui, #262a33);
+    background-color: color-mix(in srgb, var(--color-canvas), transparent 20%);
+    border: 1px solid var(--color-border-ui);
     border-radius: 8px;
     padding: 6px;
     box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.5);
@@ -115,7 +115,7 @@ sheet.replaceSync(/* css */ `
 
   .cluster-divider {
     width: 1px; height: 20px;
-    background-color: var(--color-border-ui, #262a33);
+    background-color: var(--color-border-ui);
     margin: 0 2px; flex-shrink: 0;
   }
 
@@ -123,15 +123,15 @@ sheet.replaceSync(/* css */ `
     width: var(--_btn-size); height: var(--_btn-size);
     display: flex; align-items: center; justify-content: center;
     background-color: transparent; border: 1px solid transparent;
-    border-radius: var(--_btn-radius); color: var(--color-text-muted, #6b7280);
+    border-radius: var(--_btn-radius); color: var(--color-text-muted);
     cursor: pointer; user-select: none;
     transition: all 0.2s var(--ease-spring);
   }
 
   .pad-btn:hover {
-    background-color: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.1);
-    color: var(--color-text-main, #e5e7eb);
+    background-color: color-mix(in srgb, var(--color-text-main), transparent 95%);
+    border-color: color-mix(in srgb, var(--color-text-main), transparent 90%);
+    color: var(--color-text-main);
   }
   
   .pad-btn:active {
@@ -143,7 +143,8 @@ sheet.replaceSync(/* css */ `
   .options-row {
     margin-top: 8px; padding: 4px 8px;
     display: flex; align-items: center; justify-content: space-between;
-    background: rgba(255,255,255,0.02); border-radius: 4px;
+    background: color-mix(in srgb, var(--color-text-main), transparent 98%); 
+    border-radius: 4px;
   }
 
   .checkbox-label {

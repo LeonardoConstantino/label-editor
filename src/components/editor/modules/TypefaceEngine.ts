@@ -235,8 +235,8 @@ export class TypefaceEngine extends HTMLElement {
 
     this.shadowRoot.innerHTML = `
       <style>
-        :host { display: flex; flex-direction: column; height: 100%; background: #0a0c10; font-family: var(--font-sans); }
-        .header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--color-border-ui); background: rgba(22, 25, 32, 0.5); backdrop-filter: blur(8px); z-index: 10; }
+        :host { display: flex; flex-direction: column; height: 100%; background: var(--color-canvas); font-family: var(--font-sans); }
+        .header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--color-border-ui); background: var(--color-surface); backdrop-filter: blur(8px); z-index: 10; }
         .header-title { font-family: var(--font-mono); font-size: 11px; font-weight: 700; color: var(--color-text-main); text-transform: uppercase; letter-spacing: 0.15em; }
         
         /* -------------------------------------------
@@ -244,7 +244,7 @@ export class TypefaceEngine extends HTMLElement {
            ------------------------------------------- */
         .terminal-zone {
           padding: 24px 20px;
-          background: #050608;
+          background: color-mix(in srgb, var(--color-canvas), black 30%);
           border-bottom: 1px solid var(--color-border-ui);
           display: flex;
           flex-direction: column;
@@ -314,8 +314,8 @@ export class TypefaceEngine extends HTMLElement {
            THE SPECIMEN BOX (Live Preview)
            ------------------------------------------- */
         .specimen-box {
-          background: #050608;
-          border: 1px solid rgba(255,255,255,0.03);
+          background: color-mix(in srgb, var(--color-canvas), black 30%);
+          border: 1px solid color-mix(in srgb, var(--color-text-main), transparent 97%);
           border-radius: 8px;
           padding: 16px;
           min-height: 48px;

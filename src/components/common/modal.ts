@@ -91,11 +91,11 @@ interface VariantToken {
 }
 
 const VARIANT_MAP: Record<ModalVariant, VariantToken> = {
-  default: { accent: '#6366f1', fg: '#fff', icon: null },
-  success: { accent: '#16a34a', fg: '#fff', icon: '✓' },
-  danger: { accent: '#dc2626', fg: '#fff', icon: '!' },
-  warning: { accent: '#d97706', fg: '#fff', icon: '⚠' },
-  info: { accent: '#0284c7', fg: '#fff', icon: 'i' },
+  default: { accent: 'var(--color-accent-primary)', fg: '#fff', icon: null },
+  success: { accent: 'var(--color-accent-success)', fg: '#fff', icon: '✓' },
+  danger: { accent: 'var(--color-accent-danger)', fg: '#fff', icon: '!' },
+  warning: { accent: 'var(--color-accent-warning)', fg: '#fff', icon: '⚠' },
+  info: { accent: 'var(--color-accent-primary)', fg: '#fff', icon: 'i' },
 } as const;
 
 const SIZE_MAP: Record<ModalSize, string> = {
@@ -125,15 +125,15 @@ function isAnimation(v: string | null): v is ModalAnimation {
 const STYLE: string = /* css */ `
   :host {
     display: contents;
-    --_bg       : var(--modal-bg,       #ffffff);
-    --_border   : var(--modal-border,   rgba(0,0,0,.1));
-    --_shadow   : var(--modal-shadow,   0 20px 60px rgba(0,0,0,.22));
+    --_bg       : var(--modal-bg,       var(--color-surface-solid));
+    --_border   : var(--modal-border,   var(--color-border-ui));
+    --_shadow   : var(--modal-shadow,   var(--shadow-panel));
     --_radius   : var(--modal-radius,   0.875rem);
     --_pad      : var(--modal-padding,  1.75rem);
     --_overlay  : var(--modal-backdrop, rgba(0,0,0,.5));
-    --_accent   : var(--modal-accent,   #6366f1);
+    --_accent   : var(--modal-accent,   var(--color-accent-primary));
     --_fg       : var(--modal-accent-fg,#ffffff);
-    --_font     : var(--modal-font,     system-ui, sans-serif);
+    --_font     : var(--modal-font,     var(--font-sans));
     --_dur      : var(--modal-duration, 280ms);
     --_ease     : var(--modal-easing,   cubic-bezier(.4,0,.2,1));
     --_z        : var(--modal-z,        1000);
@@ -249,7 +249,7 @@ const STYLE: string = /* css */ `
 
   .title-wrap { flex: 1; min-width: 0; }
 
-  .title { font-size: 1.1rem; font-weight: 700; color: #111; line-height: 1.3; }
+  .title { font-size: 1.1rem; font-weight: 700; color: var(--color-text-main); line-height: 1.3; }
 
   .close-btn {
     all: unset;
@@ -258,7 +258,7 @@ const STYLE: string = /* css */ `
     border-radius: 50%;
     display: grid;
     place-items: center;
-    color: #888;
+    color: var(--color-text-muted);
     font-size: 1.1rem;
     flex-shrink: 0;
     transition: background .15s, color .15s;
@@ -266,7 +266,7 @@ const STYLE: string = /* css */ `
     -webkit-user-select: none;
   }
 
-  .close-btn:hover         { background: rgba(0,0,0,.07); color: #222; }
+  .close-btn:hover         { background: color-mix(in srgb, var(--color-text-main), transparent 90%); color: var(--color-text-main); }
   .close-btn:focus-visible { outline: 2px solid var(--_accent); outline-offset: 2px; }
 
   /* ── Body ───────────────────────────────────────────────────────────── */
@@ -276,7 +276,7 @@ const STYLE: string = /* css */ `
     overflow-y: auto;
     font-size: .9375rem;
     line-height: 1.6;
-    color: #374151;
+    color: var(--color-text-muted);
     overscroll-behavior: contain;
   }
 

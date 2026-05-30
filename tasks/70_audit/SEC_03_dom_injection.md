@@ -20,6 +20,6 @@ Substituir o uso de `innerHTML` por `textContent` ou manipulação direta de DOM
    - Manter `innerHTML` APENAS para templates estáticos definidos no próprio arquivo (ex: estrutura inicial do Shadow DOM).
 
 ## Critérios de Aceite
-- [ ] Redução drástica no uso de `innerHTML` em tempo de execução.
-- [ ] Nenhuma quebra visual nos componentes refatorados.
-- [ ] Verificação manual de que mensagens dinâmicas não executam HTML.
+- [x] Redução drástica no uso de `innerHTML` em tempo de execução.
+- [x] Nenhuma quebra visual nos componentes refatorados.
+- [x] Verificação manual de que mensagens dinâmicas não executam HTML.

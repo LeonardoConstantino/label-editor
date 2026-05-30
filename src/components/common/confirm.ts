@@ -95,21 +95,21 @@ TEMPLATE.innerHTML = `
     --uc-z-index: 9999;
     --uc-backdrop-color: rgba(0, 0, 0, .55);
     --uc-backdrop-blur: 6px;
-    --uc-panel-bg: #1c1c22;
-    --uc-panel-border: #2e2e38;
+    --uc-panel-bg: var(--color-surface-solid);
+    --uc-panel-border: var(--color-border-ui);
     --uc-panel-radius: 16px;
-    --uc-panel-shadow: 0 24px 64px rgba(0,0,0,.6), 0 4px 16px rgba(0,0,0,.4);
+    --uc-panel-shadow: var(--shadow-panel), 0 4px 16px rgba(0,0,0,0.4);
     --uc-panel-max-width: 420px;
-    --uc-font-family: system-ui, -apple-system, sans-serif;
-    --uc-color-title: #f0f0f5;
-    --uc-color-message: #9090a8;
+    --uc-font-family: var(--font-sans);
+    --uc-color-title: var(--color-text-main);
+    --uc-color-message: var(--color-text-muted);
     --uc-btn-radius: 10px;
     --uc-btn-cancel-bg: transparent;
-    --uc-btn-cancel-color: #9090a8;
-    --uc-btn-cancel-border: #2e2e38;
-    --uc-color-danger: #ef4444;
-    --uc-color-warning: #f59e0b;
-    --uc-color-info: #3b82f6;
+    --uc-btn-cancel-color: var(--color-text-muted);
+    --uc-btn-cancel-border: var(--color-border-ui);
+    --uc-color-danger: var(--color-accent-danger);
+    --uc-color-warning: var(--color-accent-warning);
+    --uc-color-info: var(--color-accent-primary);
     --uc-transition-duration: 280ms;
 
     /* interno — calculado via JS */
