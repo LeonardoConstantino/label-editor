@@ -14,7 +14,7 @@ export class UnitConverter {
    */
   public static mmToPx(mm: number, dpi: number = 300): number {
     if (!this.isFiniteNumber(mm) || !this.isFiniteNumber(dpi)) {
-      throw new Error('Invalid input values for mmToPx');
+      return 0;
     }
 
     return (mm / this.MM_PER_INCH) * dpi;
@@ -25,7 +25,7 @@ export class UnitConverter {
    */
   public static pxToMm(px: number, dpi: number = 300): number {
     if (!this.isFiniteNumber(px) || !this.isFiniteNumber(dpi)) {
-      throw new Error('Invalid input values for pxToMm');
+      return 0;
     }
 
     return (px / dpi) * this.MM_PER_INCH;
@@ -37,7 +37,7 @@ export class UnitConverter {
    */
   public static mmToPt(mm: number): number {
     if (!this.isFiniteNumber(mm)) {
-      throw new Error('Invalid input value for mmToPt');
+      return 0;
     }
 
     return (mm / this.MM_PER_INCH) * this.PT_PER_INCH;
@@ -48,7 +48,7 @@ export class UnitConverter {
    */
   public static ptToMm(pt: number): number {
     if (!this.isFiniteNumber(pt)) {
-      throw new Error('Invalid input value for ptToMm');
+      return 0;
     }
 
     return (pt / this.PT_PER_INCH) * this.MM_PER_INCH;
@@ -59,7 +59,7 @@ export class UnitConverter {
    */
   public static ptToPx(pt: number, dpi: number = 300): number {
     if (!this.isFiniteNumber(pt) || !this.isFiniteNumber(dpi)) {
-      throw new Error('Invalid input values for ptToPx');
+      return 0;
     }
 
     return this.mmToPx(this.ptToMm(pt), dpi);

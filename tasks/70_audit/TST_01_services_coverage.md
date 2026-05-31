@@ -24,5 +24,5 @@ Garantir a precisão matemática do editor através de testes unitários exausti
    - Atingir >90% de cobertura nestes dois arquivos.
 
 ## Critérios de Aceite
-- [ ] `npm test` passa para todos os novos casos.
-- [ ] Cobertura de código verificada para LayoutService e SnapService.
+- [x] `npm test` passa para todos os novos casos.
+- [x] Cobertura de código verificada para LayoutService e SnapService.
