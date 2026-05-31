@@ -178,7 +178,7 @@ export class VaultGallery extends HTMLElement {
         </div>
         <div class="text-center">
           <span class="block font-mono text-[11px] uppercase tracking-widest font-bold mb-1">New Blueprint</span>
-          <span class="text-[9px] font-sans opacity-60">Initialize empty workspace</span>
+          <span class="text-2xs font-sans opacity-60">Initialize empty workspace</span>
         </div>
     `;
     newBtn.onclick = () => {
@@ -245,7 +245,7 @@ export class VaultGallery extends HTMLElement {
             
             <!-- INVENTORY COUNTER (Task 68) - RICH TOOLTIP -->
             <ui-tooltip placement="bottom" delay="200">
-              <div slot="target" class="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-accent-primary/10 border border-accent-primary/20 text-[9px] font-mono font-bold text-accent-primary uppercase tracking-tight cursor-help transition-all hover:bg-accent-primary/20">
+              <div slot="target" class="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-accent-primary/10 border border-accent-primary/20 text-2xs font-mono font-bold text-accent-primary uppercase tracking-tight cursor-help transition-all hover:bg-accent-primary/20">
                 <ui-icon name="grid" size="sm"></ui-icon>
                 ${summary.total} UNITS
               </div>
@@ -261,11 +261,11 @@ export class VaultGallery extends HTMLElement {
           </div>
 
           <div class="flex items-center justify-between">
-            <span class="px-2 py-1 rounded bg-black/40 border border-white/5 text-[9px] font-mono text-text-muted uppercase tracking-widest shadow-inner flex items-center gap-1" title="Label dimensions in millimeters">
+            <span class="px-2 py-1 rounded bg-black/40 border border-white/5 text-2xs font-mono text-text-muted uppercase tracking-widest shadow-inner flex items-center gap-1" title="Label dimensions in millimeters">
             <ui-icon name="pencil-ruler" size="xs"></ui-icon>
               ${label.config.widthMM} × ${label.config.heightMM}mm
             </span>
-            <span class="font-mono text-[9px] text-text-muted/50 uppercase flex items-center gap-1" title="Last updated: ${time}">
+            <span class="font-mono text-2xs text-text-muted/50 uppercase flex items-center gap-1" title="Last updated: ${time}">
               <ui-icon name="clock" size="xs"></ui-icon>
               ${timeAgo}
             </span>
@@ -305,7 +305,7 @@ export class VaultGallery extends HTMLElement {
     if (counts.border > 0) rows += createRow('rect', 'Borders', counts.border);
 
     if (total === 0) {
-      rows = '<div class="text-[9px] text-text-muted italic opacity-60 py-1">No layers detected</div>';
+      rows = '<div class="text-2xs text-text-muted italic opacity-60 py-1">No layers detected</div>';
     }
 
     return { total, rows };

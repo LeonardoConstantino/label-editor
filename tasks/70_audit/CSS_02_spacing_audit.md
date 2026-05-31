@@ -20,5 +20,5 @@ Centralizar definições de padding, margin e font-size, garantindo que o design
    - Mover regras repetitivas para classes utilitárias em `shared-styles.ts`.
 
 ## Critérios de Aceite
-- [ ] Layout consistente entre Cockpit, Inspector e Modais.
-- [ ] Redução de código CSS duplicado nos componentes.
+- [x] Layout consistente entre Cockpit, Inspector e Modais.
+- [x] Redução de código CSS duplicado nos componentes.

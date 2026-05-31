@@ -5,7 +5,7 @@ Este checklist coordena a Grande Auditoria de Integridade. O progresso será mar
 ## 📋 Status Geral
 - **Início:** 2026-05-28
 - **Postura:** Arquiteto de Sistemas Críticos (Tolerância Zero)
-- **Progresso:** 75% ▓▓▓▓▓▓▓▓░░
+- **Progresso:** 80% ▓▓▓▓▓▓▓▓░░
 
 ---
 
@@ -24,7 +24,8 @@ Este checklist coordena a Grande Auditoria de Integridade. O progresso será mar
 
 ## 🔹 Fase 3: CSS & Estética (Prism System)
 - [x] **Hardcoded Colors:** Removidos hex/rgba manuais de badges, modais e módulos (Task CSS-01).
-- [x] **Spacing & Typography:** Valores fixos em Shadow DOMs corrigidos para escala Tailwind.
+- [x] **Spacing & Typography:** Valores fixos em Shadow DOMs corrigidos para escala Tailwind (Task CSS-02).
+
 - [ ] **Shadow DOM Isolation:** Verificação de vazamento de estilos ou redundâncias.
 - [ ] **Shared Styles Adoption:** Validação do uso de `shared-styles.ts` em todos os componentes.
 
