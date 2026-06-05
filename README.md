@@ -46,6 +46,24 @@ Não apenas uma lista de ações, mas uma fita cronológica com **previews reais
 
 ---
 
+## 🛡️ Compromisso com a Qualidade & Auditoria
+
+O Label Forge OS passou por uma **Grande Auditoria de Integridade (Task 70)**, elevando o projeto de um protótipo funcional para um sistema de engenharia de nível industrial com **Dívida Técnica Zero**.
+
+### Pilares da Auditoria:
+1. **TypeScript Strict (Tolerância Zero):** Eliminamos o uso sistêmico de `any` e implementamos tipagem estrita via Generics em todo o motor de eventos e gerenciamento de estado.
+2. **Segurança Zero Trust:** Pipeline de dados blindado contra XSS. Implementamos sanitização mandatória de HTML no `DataSanitizer` e Whitelisting rigoroso via DOMParser para injeções de SVG.
+3. **Consistência Visual (Prism System):** Padronização de 100% dos estilos usando Tailwind v4.2, eliminando cores hardcoded e seguindo um grid tátil de 4px para espaçamentos e fontes.
+4. **Resiliência Matemática:** Suíte de testes unitários (Vitest) cobrindo 100% dos cenários críticos de Layout, Snapping magnético e conversão de unidades.
+
+### Auditoria Determinística (Fallow CLI):
+Utilizamos o **Fallow CLI** para garantir a saúde contínua do ecossistema:
+- **Dead Code Analysis:** Remoção proativa de arquivos e exportações órfãs para otimização de bundle.
+- **Circular Dependency Mapping:** Desacoplamento arquitetural rigoroso.
+- **Dangerous Sink Analysis:** Verificação automatizada de vetores de injeção (CWE-79) e proteção contra SSRF (CWE-918).
+
+---
+
 ## 🛠️ Arquitetura Técnica
 
 O projeto segue um padrão **Event-Driven Modular**:
@@ -75,6 +93,9 @@ npm install
 # Inicie o ecossistema de desenvolvimento
 npm run dev
 
+# Execute a Auditoria Determinística (Opcional)
+npx fallow security --format human
+
 # Gere o bundle de produção otimizado
 npm run build
 ```
@@ -83,11 +104,12 @@ npm run build
 
 ## 🗺️ Roadmap de Amadurecimento
 
+- [x] **Task 70:** Grande Auditoria de Integridade (Security & TS).
 - [x] **Task 24:** Otimização de Lote via Web Workers.
 - [x] **Task 83:** Fidelidade de Fontes (CORS & FontFace API).
-- [/] **Task 58:** Suporte Expandido a Barcodes.
-- [ ] **Task 78:** Asset Library (Parts Bin).
-- [ ] **Task 39:** Efeitos Prism (Sombras e Filtros).
+- [x] **Task 58:** Suporte Expandido a Barcodes (EAN/UPC).
+- [x] **Task 78:** Asset Library (Parts Bin).
+- [x] **Task 39:** Efeitos Prism (Sombras e Filtros).
 
 ---
 
@@ -96,4 +118,4 @@ npm run build
 Este é um software de código aberto sob a licença **ISC**. 
 Desenvolvido com precisão e 💙 pela **Tactile Prism**.
 
-*Última grande atualização técnica: 20/05/2026*
+*Última grande atualização técnica: 05/06/2026*

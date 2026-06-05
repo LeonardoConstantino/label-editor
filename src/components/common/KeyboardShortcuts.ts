@@ -265,7 +265,6 @@ export class UIKeyboardShortcuts extends HTMLElement {
     let html = '';
 
     for (const [category, items] of Object.entries(grouped)) {
-    console.log('category :', category);
       html += `
         <div class="masonry-item bg-surface-solid/50 border border-border-ui rounded-xl p-5 shadow-panel">
           

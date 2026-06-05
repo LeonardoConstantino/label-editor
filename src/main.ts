@@ -1,7 +1,7 @@
-import { store } from './core/Store';
+import { AppState, store } from './core/Store';
 import { ElementType } from './domain/models/elements/BaseElement';
 import eventBus from './core/EventBus';
-import { logger } from './core/Logger';
+import { logger, LogLevelType } from './core/Logger';
 import './styles/main.css';
 
 import { templateManager } from './domain/services/TemplateManager';
@@ -10,7 +10,7 @@ import { shortcutService } from './core/ShortcutService';
 import { Label } from './domain/models/Label';
 import { DEFAULTS } from './constants/defaults';
 import { UISM } from './core/UISoundManager';
-import { ToastManager } from './components/common/toast';
+import { ToastManager, ToastOptions } from './components/common/toast';
 import { getOSInfo } from './utils/os-detection';
 import './components/editor/EditorCanvas';
 import './components/editor/Toolbar';
@@ -32,19 +32,20 @@ import helpData from './assets/data/helpData';
 import { InspectorHelpData } from './utils/HelpContentProvider';
 import { StatusBar } from './components/editor/StatusBar';
 import { FORMATTERS } from './domain/services/DataSourceParser';
+import { UserPreferences } from './domain/models/UserPreferences';
 
 // Global Notification Listener
-eventBus.on('notify', (options: any) => {
+eventBus.on('notify', (options: ToastOptions) => {
   ToastManager.show(options);
 });
 
 // Help Center Listener
 eventBus.on('ui:open:help', (options: any = {}) => {
   localStorage.setItem('has_seen_guide', 'true');
-  const modal = document.getElementById('help-center-modal') as any;
+  const modal = document.getElementById('help-center-modal');
   const helpCenter = modal?.querySelector('ui-help-center') as any;
   if (modal && helpCenter) {
-    if (options.tab) helpCenter.setTab(options.tab);
+    if (options.tab) helpCenter?.setTab(options.tab);
     modal.setAttribute('open', '');
     UISM.play(UISM.enumPresets.OPEN);
   }
@@ -73,7 +74,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (debugOverride !== null) {
     const level = parseInt(debugOverride, 10);
     if (!isNaN(level)) {
-      logger.setLevel(level as any);
+      logger.setLevel(level as LogLevelType);
       logger.info('Main', `Debug level forced via URL: ${level}`);
     }
   }
@@ -85,7 +86,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Se não houver override via URL, aplica a preferência do usuário (Task 88)
   if (debugOverride === null) {
-    logger.setLevel(prefs.logLevel as any);
+    logger.setLevel(prefs.logLevel as LogLevelType);
   }
 
   // 3. Inicializa o som com base na preferência e contorna autoplay-block
@@ -101,7 +102,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.addEventListener('keydown', playTestSound, { once: true });
 
   // 4. Reage a mudanças de preferências em tempo real (Centralizado)
-  eventBus.on('preferences:change', (updatedPrefs: any) => {
+  eventBus.on('preferences:change', (updatedPrefs: UserPreferences) => {
     if (updatedPrefs.audioEnabled !== undefined) {
       UISM.toggle(updatedPrefs.audioEnabled);
     }
@@ -171,7 +172,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 3. Se nada foi carregado, mostra Welcome ou Blank
   if (!loadedFromSession) {
     if (!hasSeenGuide) {
-      const welcomeModal = document.getElementById('welcome-modal') as any;
+      const welcomeModal = document.getElementById('welcome-modal');
       if (welcomeModal) welcomeModal.setAttribute('open', '');
       store.loadLabel(defaultLabel);
     } else {
@@ -193,7 +194,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   eventBus.emit('preferences:update', prefs);
 
   // Monitora mudança de projeto para salvar última sessão no LocalStorage (como índice)
-  eventBus.on('state:change', (state: any) => {
+  eventBus.on('state:change', (state: AppState) => {
     if (state.currentLabel?.id) {
       localStorage.setItem('last_active_project', state.currentLabel.id);
     }

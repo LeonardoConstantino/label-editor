@@ -1,3 +1,5 @@
+import { LogLevelType } from "../../core/Logger";
+
 export interface UserPreferences {
   // --- GENERAL ---
   theme: 'dark' | 'light' | 'system';
@@ -26,7 +28,7 @@ export interface UserPreferences {
   // --- PERFORMANCE & ENGINE ---
   historySensitivity: number; // ms
   historyMaxSteps: number;    // Task 75 Roadmap
-  logLevel: number; // 0=Silent, 1=Error, 2=Warn, 3=Info, 4=Debug
+  logLevel: LogLevelType; // 0=Silent, 1=Error, 2=Warn, 3=Info, 4=Debug
   
   // --- CREATION DEFAULTS ---
   autoLockOnCreation: boolean; // Task 75 Roadmap

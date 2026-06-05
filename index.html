@@ -9,12 +9,9 @@
       // Previne FOUC (Flash of Unstyled Content) aplicando tema window.matchMedia antes do carregamento do CSS
       (function() {
         try {
-          let theme;
-          if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-            theme = 'dark';
-          } else {
-            theme = 'light';
-          }
+          const theme = 
+            window.matchMedia('(prefers-color-scheme: dark)').matches
+              ? 'dark' : 'light';
           document.documentElement.setAttribute('data-theme', theme);
         } catch (e) {
           console.error('Error applying theme:', e);
@@ -40,7 +37,7 @@
         >
           <div
             slot="target"
-            class="flex items-center justify-between gap-3 pl-3 pr-5 h-6 font-mono text-[9px] uppercase tracking-[0.05em] text-text-muted tabular-nums w-full mt-auto shrink-0 select-none"
+            class="flex items-center justify-between gap-3 pl-3 pr-5 h-6 font-mono text-2xs uppercase tracking-[0.05em] text-text-muted tabular-nums w-full mt-auto shrink-0 select-none"
           >
             <div class="flex items-center gap-3">
               <span
@@ -163,7 +160,7 @@
             <ui-icon name="command-line" size="xs"></ui-icon>
             Telemetry Dashboard
           </span>
-          <span class="text-accent-success animate-pulse font-mono text-[9px]"
+          <span class="text-accent-success animate-pulse font-mono text-2xs"
             >ACTIVE</span
           >
         </div>
@@ -192,7 +189,7 @@
         </div>
 
         <div
-          class="mt-3 pt-2 border-t border-white/5 flex gap-2 items-start text-[9px] text-accent-primary/80"
+          class="mt-3 pt-2 border-t border-white/5 flex gap-2 items-start text-2xs text-accent-primary/80"
         >
           <ui-icon
             name="cpu"

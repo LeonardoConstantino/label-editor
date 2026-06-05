@@ -26,7 +26,7 @@ Este Master Plan coordena a fase final de desenvolvimento, focando em estabilida
 | **51** | [Correção de Atalhos em Inputs (Focus Protection)](./tasks/51_keyboard_fix.md) | 09 | [x] | 23 | `task/51-keyboard-fix` |
 | **54** | [Zoom Visual e Respiro do Canvas (Gutter)](./tasks/54_canvas_zoom_fix.md) | 09 | [x] | 21 | `task/54-canvas-zoom` |
 | **60** | [Definição de Code Style (GEMINI.md)](./tasks/60_code_style_definition.md) | 08 | [x] | — | `task/60-code-style` |
-| **70** | [Grande Auditoria de Integridade](./tasks/70_codebase_audit.md) | 09 | [ ] | 60 | `task/70-codebase-audit` |
+| **70** | [Grande Auditoria de Integridade](./tasks/70_codebase_audit.md) | 09 | [x] | 60 | `task/70-codebase-audit` |
 | **71** | [Mapeamento e Tipagem de Eventos (EventMap)](./tasks/71_event_orchestration.md) | 10 | [x] | — | `task/71-event-mapping` |
 | **74** | [System Status Bar (Telemetry & Dev Console)](./tasks/74-status-bar.md) | 07 | [x] | 46 | `task/74-status-bar` |
 | **75** | [System Preferences Modal (Calibration Matrix)](./tasks/75-settings-modal.md) | 07 | [x] | — | `task/75-settings-modal` |

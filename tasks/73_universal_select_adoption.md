@@ -20,7 +20,7 @@ Unificar a estética de todos os seletores do aplicativo utilizando o novo compo
 6. **Sincronização:** Garantir que o `syncValues` de cada componente atualize o `AppSelect` corretamente quando o estado mudar externamente.
 
 ## Critérios de Aceite
-- [ ] Zero selects nativos visíveis em todo o aplicativo.
-- [ ] Todas as seleções via `AppSelect` refletem corretamente na Store e no Canvas.
-- [ ] O componente `AppSelect` lida corretamente com listas longas (ex: Fontes) via scroll interno.
-- [ ] A navegação por teclado e foco funciona de forma consistente em todos os novos seletores.
+- [x] Zero selects nativos visíveis em todo o aplicativo.
+- [x] Todas as seleções via `AppSelect` refletem corretamente na Store e no Canvas.
+- [x] O componente `AppSelect` lida corretamente com listas longas (ex: Fontes) via scroll interno.
+- [x] A navegação por teclado e foco funciona de forma consistente em todos os novos seletores.

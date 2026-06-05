@@ -186,7 +186,7 @@ function renderQuickStartGuide(data) {
               <ui-icon name="image" class="w-8 h-8 text-white/10 mb-2 group-hover:text-accent-primary/50 transition-colors"></ui-icon>
               
               <!-- Texto da descrição da imagem centralizado -->
-              <span class="font-mono text-[9px] text-text-muted uppercase tracking-wider text-center px-4 max-w-[80%]">
+              <span class="font-mono text-2xs text-text-muted uppercase tracking-wider text-center px-4 max-w-[80%]">
                 ${section.imageDescription}
               </span>
             </div>
