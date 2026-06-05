@@ -20,11 +20,11 @@
 // ─────────────────────────────────────────────
 // Declaração Global do Custom Element
 // ─────────────────────────────────────────────
-declare global {
-  interface HTMLElementTagNameMap {
-    'ui-icon': UIIcon;
-  }
-}
+// declare global {
+//   interface HTMLElementTagNameMap {
+//     'ui-icon': UIIcon;
+//   }
+// }
 
 // ─────────────────────────────────────────────
 // CATÁLOGO INTERNO — ícones mais comuns de UI
@@ -295,8 +295,8 @@ const SANITIZED_ICONS: Readonly<Record<string, string>> = Object.freeze(
 // ─────────────────────────────────────────────
 // Template estático (reutilizado via cloneNode)
 // ─────────────────────────────────────────────
-const TEMPLATE = document.createElement('template');
-TEMPLATE.innerHTML = `
+const ICONTEMPLATE = document.createElement('template');
+ICONTEMPLATE.innerHTML = `
   <style>
     :host {
       /* Layout */
@@ -371,7 +371,7 @@ class UIIcon extends HTMLElement {
   constructor() {
     super();
     this.#shadow = this.attachShadow({ mode: 'open' });
-    this.#shadow.appendChild(TEMPLATE.content.cloneNode(true));
+    this.#shadow.appendChild(ICONTEMPLATE.content.cloneNode(true));
     this.#container = this.#shadow.getElementById(
       'icon-container',
     ) as HTMLSpanElement;

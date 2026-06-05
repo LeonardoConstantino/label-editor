@@ -45,8 +45,8 @@ const ARIA_STATE_LABEL: Record<string, string> = {
 
 // ── Template ─────────────────────────────────────────────────────────────────
 
-const TEMPLATE = document.createElement('template');
-TEMPLATE.innerHTML = `
+const UIBADGETEMPLATE = document.createElement('template');
+UIBADGETEMPLATE.innerHTML = `
   <style>
     :host {
       display: inline-flex;
@@ -219,7 +219,7 @@ class UiVariableBadge extends HTMLElement {
   constructor() {
     super();
     this.#shadow = this.attachShadow({ mode: 'open' });
-    this.#shadow.appendChild(TEMPLATE.content.cloneNode(true));
+    this.#shadow.appendChild(UIBADGETEMPLATE.content.cloneNode(true));
 
     // Cache centralizado — única query por elemento
     this.#rootEl = this.#shadow.querySelector<HTMLElement>('[part="root"]')!;

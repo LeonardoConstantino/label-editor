@@ -14,4 +14,4 @@ export const sharedSheet = sheet;
  * sharedStyles: String original para compatibilidade com injeção direta via <style>
  * em componentes que ainda não foram migrados.
  */
-const sharedStyles = mainStyles;
+// const sharedStyles = mainStyles;
