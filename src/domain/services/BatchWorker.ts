@@ -4,7 +4,7 @@ import { canvasRenderer } from './CanvasRenderer';
 /**
  * Protocolo de mensagens do Worker
  */
-export interface WorkerTask {
+interface WorkerTask {
   label: any;
   dataList: any[];
   layout: any;

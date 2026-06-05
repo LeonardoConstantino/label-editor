@@ -73,7 +73,7 @@ export interface ToastDismissedDetail {
  * Evento tipado emitido quando um toast é dispensado (timeout ou clique).
  * Atravessa o shadow boundary: `bubbles: true, composed: true`.
  */
-export type ToastDismissedEvent = CustomEvent<ToastDismissedDetail>;
+type ToastDismissedEvent = CustomEvent<ToastDismissedDetail>;
 
 /** Contrato da API singleton `ToastManager`. */
 export interface IToastManager {

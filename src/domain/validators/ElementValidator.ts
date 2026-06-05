@@ -8,7 +8,7 @@ import {
 } from '../models/elements/SpecificElements';
 import { DEFAULTS } from '../../constants/defaults';
 
-export interface ValidationResult {
+interface ValidationResult {
   isValid: boolean;
   errors: string[];
 }

@@ -78,7 +78,7 @@ export interface SoundPreset {
 /**
  * Nomes de presets disponíveis
  */
-export type PresetName =
+type PresetName =
   | 'click'
   | 'tap'
   | 'success'
@@ -107,7 +107,7 @@ export type PresetName =
 /**
  * Opções de inicialização do UISoundManager
  */
-export interface UISoundManagerOptions {
+interface UISoundManagerOptions {
   /** Ativa/desativa sons (padrão: true) */
   enabled?: boolean;
   /** Intervalo mínimo entre sons do mesmo preset em ms (padrão: 50) */

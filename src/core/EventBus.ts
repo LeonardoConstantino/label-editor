@@ -111,12 +111,12 @@ interface EmitAsyncOptions {
 /**
  * Tipo genérico para callbacks de eventos baseado no EventMap
  */
-export type EventCallback<K extends keyof EventMap> = (data: EventMap[K]) => void | Promise<void>;
+type EventCallback<K extends keyof EventMap> = (data: EventMap[K]) => void | Promise<void>;
 
 /**
  * Função de cleanup para remover listeners
  */
-export type UnsubscribeFn = () => void;
+type UnsubscribeFn = () => void;
 
 /**
  * EventBus: Orquestrador desacoplado e tipado.

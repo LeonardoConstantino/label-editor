@@ -61,7 +61,7 @@ export type ModalVariant =
   | 'info';
 export type ModalSize = 'sm' | 'md' | 'lg' | 'xl' | 'fullscreen';
 export type ModalAnimation = 'fade' | 'scale' | 'slide' | 'flip';
-export type ModalEventName =
+type ModalEventName =
   | 'ui-modal:open'
   | 'ui-modal:close'
   | 'ui-modal:cancel';
