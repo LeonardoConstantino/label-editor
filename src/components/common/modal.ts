@@ -484,16 +484,6 @@ export class UiModal extends HTMLElement {
     this.removeAttribute('open');
   }
 
-  /** Alterna o estado do modal. */
-  toggle(): void {
-    this.#isVisible ? this.close() : this.open();
-  }
-
-  /** `true` quando o modal está visível (ou abrindo). */
-  get isOpen(): boolean {
-    return this.#isVisible;
-  }
-
   // ── Getters / setters refletidos ───────────────────────────────────────────
 
   get variant(): ModalVariant {

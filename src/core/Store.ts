@@ -29,7 +29,7 @@ export interface AppState {
  * Store: Gerenciador de estado centralizado com suporte a Histórico Otimizado (Task 59)
  * e Visualizador de Histórico (Task 80).
  */
-export class Store {
+class Store {
   private state: AppState;
   private snapshotTimer: ReturnType<typeof setTimeout> | null = null;
   private pendingDescription: string = 'Ação';

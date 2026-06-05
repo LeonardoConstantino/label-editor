@@ -191,7 +191,7 @@ export class UiAlignCluster extends HTMLElement {
         <span class="cluster-label">Power Layout</span>
         ${HelpContentProvider.buildTooltip('layout', 'left')}
       </div>
-      <span class="font-mono text-[9px] text-accent-primary bg-accent-primary/10 px-1.5 rounded border border-accent-primary/20">MULTI</span>
+      <span class="font-mono text-2xs text-accent-primary bg-accent-primary/10 px-1.5 rounded border border-accent-primary/20">MULTI</span>
     `;
 
     const board = document.createElement('div');

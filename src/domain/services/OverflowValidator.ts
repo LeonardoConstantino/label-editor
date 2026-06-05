@@ -15,7 +15,7 @@ export interface OverflowResult {
  * OverflowValidator: Valida se elementos estão dentro dos limites físicos da etiqueta (mm)
  * e agora também valida integridade de formato para elementos complexos (ex: Barcodes).
  */
-export class OverflowValidator {
+class OverflowValidator {
   /**
    * Verifica se um elemento extrapola os limites ou possui erros de formato.
    */

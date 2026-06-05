@@ -10,7 +10,7 @@ export interface HistorySnapshot {
 /**
  * HistoryManager: Gerencia snapshots do canvas e do estado dos elementos.
  */
-export class HistoryManager {
+class HistoryManager {
   private history: HistorySnapshot[] = [];
   private currentIndex: number = -1;
   private maxSnapshots: number = 50;

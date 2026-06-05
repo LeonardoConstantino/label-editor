@@ -212,10 +212,10 @@ export class TypefaceEngine extends HTMLElement {
                 <button class="btn-delete-font" data-id="${safeId}" title="Remove font">
                   <ui-icon name="trash" class="w-3.5 h-3.5"></ui-icon>
                 </button>
-              ` : '<span class="text-[8px] text-text-muted opacity-40 uppercase font-mono tracking-widest bg-white/5 px-2 py-1 rounded">System</span>'}
+              ` : '<span class="text-tiny text-text-muted opacity-40 uppercase font-mono tracking-widest bg-white/5 px-2 py-1 rounded">System</span>'}
 
               <!-- APLIQUEI O NOSSO CHECKBOX GLOBAL TÁTIL AQUI -->
-              <input type="checkbox" class="font-toggle" data-id="${safeId}" ${f.active ? 'checked' : ''} title="Habilitar/Desabilitar Fonte">
+              <input type="checkbox" class="font-toggle" data-id="${safeId}" ${f.active ? 'checked' : ''} ${f.url ? '' : 'disabled'} title="${f.url ? 'Toggle font active state' : 'System fonts cannot be deactivated'}">
 
             </div>
           </div>

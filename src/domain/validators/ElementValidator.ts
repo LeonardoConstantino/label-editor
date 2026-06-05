@@ -16,7 +16,7 @@ export interface ValidationResult {
 /**
  * ElementValidator: Garante a integridade dos dados dos elementos antes da persistência ou renderização.
  */
-export class ElementValidator {
+class ElementValidator {
   private static readonly HEX_COLOR_REGEX = /^#([A-Fa-f0-9]{3,4}|[A-Fa-f0-9]{6}|[A-Fa-f0-9]{8})$/;
 
   public static validate(element: AnyElement): ValidationResult {

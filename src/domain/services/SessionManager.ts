@@ -7,7 +7,7 @@ import { logger } from '../../core/Logger';
  * SessionManager: Gerencia a persistência automática (Auto-save) da sessão ativa.
  * Garante que o trabalho seja restaurado após um crash ou F5 involuntário.
  */
-export class SessionManager {
+class SessionManager {
   private readonly STORE_NAME = 'sessions';
   private readonly SESSION_KEY = 'current_session';
   private autoSaveTimer: any = null;

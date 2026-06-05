@@ -1,25 +1,29 @@
-# Task 05: Refatoração de Sinks HTML (CWE-79)
+# Task 05: Refatoração de Sinks HTML (CWE-79) [DET-SEC]
 
 ## Objetivo
-Corrigir candidatos a "Dangerous HTML sink" identificados pelo Fallow em componentes de UI que injetam dados não-literais no DOM.
+Resolver os 23 candidatos a "Dangerous HTML sink" identificados deterministicamente pelo Fallow. O foco é garantir que nenhum dado controlado pelo usuário toque o DOM sem escape rigoroso.
 
-## Arquivos de Entrada
-- `src/components/common/KeyboardShortcuts.ts`
-- `src/components/common/UiAlignCluster.ts`
-- `src/components/common/ui-variable-badge.ts`
-- `src/components/editor/modules/VariableManager.ts`
-- `src/components/common/ui-hud-tips.ts`
-- `src/components/editor/VaultGallery.ts`
-- `src/components/preview/DataSourceInput.ts`
-- `src/components/common/toast.ts`
+## Arquivos e Sinks (Fallow Report)
+- `src/components/common/icon.ts:506`: `svg.innerHTML = content` (Embora sanitizado, o Fallow alerta o uso de innerHTML).
+- `src/components/editor/modules/AssetLibrary.ts:241`: `grid.innerHTML = filtered.map(...)`.
+- `src/components/common/KeyboardShortcuts.ts:238, 294`: Injeção de teclas e sequências.
+- `src/components/common/UiAlignCluster.ts:189, 232`: Headers e botões.
+- `src/components/common/ui-variable-badge.ts:339`: Nome da variável no tooltip.
+- `src/components/editor/inspector/InspectorLayerCard.ts:167, 185`: Labels de camadas.
+- `src/components/editor/modules/HistoryVisualizer.ts:133`: Descrição do snapshot.
+- `src/components/editor/modules/TypefaceEngine.ts:121`: Listagem de fontes.
+- `src/components/editor/modules/VariableManager.ts:214, 242`: Pipeline de dados.
+- `src/components/common/toast.ts:474`: Corpo da mensagem (usar textContent).
+- `src/components/common/ui-hud-tips.ts:581, 592`: Motor de parse de dicas.
+- `src/components/editor/VaultGallery.ts:184, 194`: Previews de cartuchos.
+- `src/components/preview/DataSourceInput.ts:269, 362`: Header da tabela de preview.
 
 ## Detalhamento da Execução
-1. **Auditoria de Sink:** Para cada arquivo listado, localizar a linha onde `innerHTML` ou `TEMPLATE.innerHTML` recebe uma variável não escapada.
-2. **Refatoração para textContent:** Onde o conteúdo for apenas texto (ex: badges, labels), substituir `innerHTML` por `textContent`.
-3. **Escaping Mandatório:** Onde HTML estrutural for necessário (ex: `KeyboardShortcuts.ts` formatando teclas `<kbd>`), garantir que a variável interna (o nome da tecla) passe por `DataSanitizer.escapeHTML()` antes da interpolação.
-4. **Resgate de ui-hud-tips:** O motor de dicas que utiliza `parseTip()` deve garantir que as tags geradas são seguras e o conteúdo injetado está limpo.
+1. **Refatoração Seletiva:** Substituir `innerHTML` por `.textContent` onde for texto puro (ex: toasts, badges, nomes de variáveis).
+2. **Escaping Rigoroso:** Onde HTML estrutural for necessário, garantir que todos os dados dinâmicos interpolados passem por `DataSanitizer.escapeHTML()`.
+3. **Template Guard:** Preferir o uso de `TEMPLATE.content.cloneNode()` para estruturas estáticas.
 
 ## Critérios de Aceite
-- [ ] Substituição de `innerHTML` por `textContent` em pelo menos 60% dos sinks reportados.
-- [ ] Uso de `escapeHTML` em todos os sinks remanescentes que exigem HTML estrutural.
-- [ ] `fallow security` reporta zero candidatos de nível crítico para estes arquivos.
+- [ ] `fallow security` reporta zero candidatos de nível crítico para os arquivos acima.
+- [ ] `npm test` passa sem regressões.
+- [ ] Verificação manual de que caracteres como `<` e `>` não executam código na UI.

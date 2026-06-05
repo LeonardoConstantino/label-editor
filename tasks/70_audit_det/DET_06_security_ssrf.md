@@ -1,21 +1,20 @@
-# Task 06: Proteção contra SSRF (CWE-918)
+# Task 06: Proteção contra SSRF (CWE-918) [DET-SEC]
 
 ## Objetivo
-Auditar as chamadas de rede dinâmicas (`fetch`) identificadas pelo Fallow, garantindo que URLs externas não sejam controladas pelo usuário sem validação de host (Allowlist).
+Auditar e blindar as chamadas de rede dinâmicas (`fetch`) identificadas pelo Fallow. Garantir que as URLs de fontes externas solicitadas não permitam ataques de Server-Side Request Forgery (ou injeção de host malicioso no cliente).
 
-## Arquivos de Entrada
-- `src/utils/FontTransfer.ts`
-- `src/domain/services/BatchWorker.ts`
+## Arquivos e Sinks (Fallow Report)
+- `src/utils/FontTransfer.ts`: Linha 45 (`fetch(url)`).
+- `src/domain/services/BatchWorker.ts`: Linha 82 (`fetch(url)` dentro do worker).
 
 ## Detalhamento da Execução
-1. **Rastreio de Origem:** No `FontTransfer.ts`, as URLs de fontes vêm do `config.customFonts`. No `BatchWorker.ts`, as fontes são injetadas para fidelidade 100%.
-2. **Implementação de Whitelist:**
-   - Criar constante `ALLOWED_URL_PREFIXES` (ex: `fonts.gstatic.com`, `fonts.googleapis.com`, caminhos locais).
-   - Adicionar função de validação antes de cada `fetch()`.
-3. **Tratamento de Erro:** Se a URL for suspeita, disparar log de segurança e abortar a requisição.
+1. **Política de Hosts:** Definir uma lista de hosts confiáveis (Allowlist) para carregamento de fontes (ex: `fonts.gstatic.com`, `fonts.googleapis.com`, `leonardoconstantino.github.io`).
+2. **Implementação do Guardião:**
+   - Criar uma função utilitária `validateUrl(url: string): boolean` que verifica se o host da URL pertence à Allowlist.
+   - Invocar esta função antes de qualquer chamada `fetch()`.
+3. **Log de Segurança:** Se uma URL inválida for detectada, disparar log de erro e abortar a operação silenciosamente (evitando DoS por crash).
 
 ## Critérios de Aceite
-- [ ] Implementação de validação de URL em `FontTransfer.ts`.
-- [ ] Implementação de validação de URL em `BatchWorker.ts`.
-- [ ] `fallow security` reporta que os sinks de fetch agora possuem guardiões de validação.
-- [ ] `npm test` passa, confirmando que fontes legítimas continuam carregando.
+- [ ] Chamadas de fetch protegidas por validação de host.
+- [ ] Fontes legítimas continuam carregando normalmente.
+- [ ] `fallow security` reporta que os sinks de rede agora possuem verificação.

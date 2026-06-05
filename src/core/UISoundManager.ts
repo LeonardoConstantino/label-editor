@@ -130,7 +130,7 @@ interface SoundNodes {
   noiseGain?: GainNode;
 }
 
-export class UISoundManager {
+class UISoundManager {
   /**
    * Presets de sons otimizados para interfaces modernas
    */

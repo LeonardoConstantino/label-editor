@@ -6,7 +6,7 @@
 /**
  * Níveis de log disponíveis (Task 88 Hierarchy)
  */
-export const LogLevel = {
+const LogLevel = {
   SILENT: 0,
   ERROR: 1,
   WARN: 2,
@@ -44,7 +44,7 @@ type ExportFormat = 'json' | 'csv' | 'text';
 /**
  * Logger: O motor de telemetria do Label Forge OS.
  */
-export class Logger {
+class Logger {
   private level: LogLevelType;
   private prefix: string;
   private persist: boolean;

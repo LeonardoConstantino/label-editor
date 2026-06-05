@@ -2,7 +2,7 @@ import { db } from '../../core/Database';
 import { UserPreferences, DEFAULT_PREFERENCES } from '../models/UserPreferences';
 import eventBus from '../../core/EventBus';
 
-export class PreferenceManager {
+class PreferenceManager {
   private readonly STORE_NAME = 'preferences';
   private readonly PREF_ID = 'global';
 

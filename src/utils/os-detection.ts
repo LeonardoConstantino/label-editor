@@ -1,13 +1,13 @@
-export let metaKey: string = 'Ctrl'; // Label para exibição
-export let metaKeyName: string = 'Control'; // Nome para eventos de teclado (event.key)
-export let isMac: boolean = false;
-export let isMobile: boolean = false;
+let metaKey: string = 'Ctrl'; // Label para exibição
+let metaKeyName: string = 'Control'; // Nome para eventos de teclado (event.key)
+let isMac: boolean = false;
+let isMobile: boolean = false;
 
 /**
  * Detecta o sistema operacional e ajusta as variáveis globais
  * Deve ser chamado no init() da aplicação
  */
-export const detectOS = (): void => {
+const detectOS = (): void => {
   if (typeof navigator !== 'undefined') {
     // Verifica se é Mac (macOS, iPhone, iPad)
     // navigator.platform é deprecated mas ainda o método mais confiável cross-browser para isso
@@ -29,7 +29,7 @@ export const detectOS = (): void => {
 /**
  * Verifica se o dispositivo atual é um dispositivo móvel.
  */
-export const detectIsMobile = (): void => {
+const detectIsMobile = (): void => {
   // Verifica se o user agent contém 'Mobi' ou 'Android' ou se a largura da janela é menor ou igual a 768 pixels.
   isMobile =
     /Mobi|Android/i.test(navigator.userAgent) || window.innerWidth <= 768;

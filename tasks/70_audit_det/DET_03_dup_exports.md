@@ -1,20 +1,18 @@
-# Task 03: Resolução de Exportações Duplicadas (AlignAction)
+# Task 03: Resolução de Exportações Duplicadas (AlignAction) [DET-ARCH]
 
 ## Objetivo
-Resolver a ambiguidade na exportação do tipo `AlignAction`, que está definido e exportado simultaneamente no `UiAlignCluster.ts` e no `LayoutService.ts`.
+Resolver a ambiguidade na exportação do tipo `AlignAction`, que está definido e exportado simultaneamente no `UiAlignCluster.ts` e no `LayoutService.ts`, o que confunde o compilador e ferramentas de análise.
 
 ## Arquivos de Entrada
 - `src/components/common/UiAlignCluster.ts`
 - `src/domain/services/LayoutService.ts`
 
 ## Detalhamento da Execução
-1. **Unificação de Contrato:** Identificar qual arquivo deve ser a fonte de verdade para tipos de layout.
-2. **Refatoração:**
-   - Mover a definição de `AlignAction` para o `LayoutService.ts` (ou um novo arquivo de tipos compartilhados).
-   - Atualizar o `UiAlignCluster.ts` para importar o tipo do novo local.
-3. **Consistência:** Verificar se as strings literais coincidem entre os arquivos.
+1. **Unificação:** Mover a definição do type `AlignAction` para o `LayoutService.ts`, que é o proprietário da lógica de alinhamento.
+2. **Importação:** Atualizar o `UiAlignCluster.ts` para importar `AlignAction` de `../../domain/services/LayoutService`.
+3. **Consistência de Valores:** Garantir que todas as 10 ações (Left, Center, Right, Top, Middle, Bottom, DistHorizontal, DistVertical, etc.) estão sincronizadas.
 
 ## Critérios de Aceite
-- [ ] O tipo `AlignAction` é definido em apenas um local.
-- [ ] `fallow dead-code` reporta zero "Duplicate exports".
-- [ ] `npm run build` passa sem erros de importação.
+- [ ] Tipo `AlignAction` exportado de apenas UM local.
+- [ ] `fallow dead-code` reporta zero duplicate exports.
+- [ ] `npm run build` passa sem erros.

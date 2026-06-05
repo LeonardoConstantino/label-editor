@@ -34,10 +34,10 @@ declare global {
 // #renderIcon, garantindo consistência e eliminando a detecção frágil
 // de formato via string (.startsWith('<svg')).
 //
-// Para ícones com viewBox diferente de "0 0 24 24", use o slot com um
+// For ícones com viewBox diferente de "0 0 24 24", use o slot com um
 // <svg> completo — essa é a escape hatch intencional da API.
 // ─────────────────────────────────────────────
-export const ICONS: Readonly<Record<string, string>> = {
+const ICONS: Readonly<Record<string, string>> = {
   // Ações Genéricas
   close:
     '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>',

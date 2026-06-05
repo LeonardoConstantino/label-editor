@@ -8,7 +8,7 @@ import eventBus from '../../core/EventBus';
 import { logger } from '../../core/Logger';
 import { FontLoader } from '../../utils/FontLoader';
 
-export class TemplateManager {
+class TemplateManager {
   private readonly STORE_NAME = 'templates';
 
   constructor() {

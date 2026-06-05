@@ -40,7 +40,7 @@ export interface BatchLayoutOptions {
  * PDFGenerator: O motor de saída final do Label Forge OS.
  * Suporta geração massiva multi-página com imposição dinâmica e processamento via Web Workers.
  */
-export class PDFGenerator {
+class PDFGenerator {
   /** Mapeamento de dimensões físicas dos papéis suportados (mm) */
   private readonly PAPER_SIZES: Record<PaperFormat, { w: number, h: number }> = {
     'a4': { w: 210, h: 297 },
