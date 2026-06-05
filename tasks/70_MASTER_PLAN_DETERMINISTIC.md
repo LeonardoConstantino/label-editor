@@ -20,7 +20,7 @@ Este plano coordena a resolução dos achados técnicos identificados pela ferra
 | ID | Task | Status | Dependências | Branch |
 |----|------|--------|--------------|--------|
 | **01** | [Remoção de Arquivos e Assets Mortos](./70_audit_det/DET_01_unused_files.md) | [x] | — | `audit/DET-01-unused` |
-| **02** | [Cleanup de Exportações e Membros Órfãos](./70_audit_det/DET_02_dead_exports.md) | [ ] | 01 | `audit/DET-02-exports` |
+| **02** | [Cleanup de Exportações e Membros Órfãos](./70_audit_det/DET_02_dead_exports.md) | [x] | 01 | `audit/DET-02-exports` |
 
 ### Fase 2: Integridade Arquitetural [DET-ARCH]
 | ID | Task | Status | Dependências | Branch |

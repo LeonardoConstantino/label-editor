@@ -27,6 +27,6 @@ Remover a visibilidade pública de símbolos que são usados apenas internamente
 3. **PWA Register:** Como o arquivo foi renomeado para `.disabled`, as exportações `registerSW` e `updateServiceWorker` não contam como ativas.
 
 ## Critérios de Aceite
-- [ ] `fallow dead-code` reporta 0 unused exports para os arquivos acima.
-- [ ] Redução de pelo menos 40 membros de classe órfãos.
-- [ ] `npm run build` passa com sucesso.
+- [x] `fallow dead-code` reporta 0 unused exports para os arquivos acima.
+- [x] Redução de pelo menos 40 membros de classe órfãos.
+- [x] `npm run build` passa com sucesso.

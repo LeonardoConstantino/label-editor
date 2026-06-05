@@ -4,18 +4,9 @@
 
 import { HelpContentProvider } from '../../utils/HelpContentProvider';
 import { sharedSheet } from '../../utils/shared-styles';
+import { AlignAction } from '../../domain/services/LayoutService';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
-
-export type AlignAction =
-  | 'alignLeft'
-  | 'alignCenter'
-  | 'alignRight'
-  | 'alignTop'
-  | 'alignMiddle'
-  | 'alignBottom'
-  | 'distributeHorizontal'
-  | 'distributeVertical';
 
 interface PadConfig {
   action: AlignAction;
