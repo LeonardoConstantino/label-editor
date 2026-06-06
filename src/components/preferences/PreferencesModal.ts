@@ -451,6 +451,7 @@ export class PreferencesModal extends HTMLElement {
     this.drawGridPreview();
   }
 
+  // TODO: Tornar src\components\editor\EditorCanvas.ts responsável por desenhar a grade, usando as preferências do usuário. Isso garante que a prévia e a grade real estejam sempre sincronizadas, eliminando discrepâncias e melhorando a experiência do usuário.
   private drawGridPreview() {
     const canvas = this.shadowRoot?.querySelector('#grid-preview-canvas') as HTMLCanvasElement;
     if (!canvas || !this._preferences) return;
@@ -498,6 +499,7 @@ export class PreferencesModal extends HTMLElement {
   private renderSkeleton() {
     if (!this.shadowRoot || !this._preferences) return;
     const p = this._preferences;
+    // TODO: Investigar motivo do theme não ser aplicado corretamente em toda a ui.
 
     this.shadowRoot.innerHTML = `
       <div class="settings-container">

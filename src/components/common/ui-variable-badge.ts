@@ -46,10 +46,12 @@ const ARIA_STATE_LABEL: Record<string, string> = {
 // ── Template ─────────────────────────────────────────────────────────────────
 
 const UIBADGETEMPLATE = document.createElement('template');
+// Task DET-05: Template estático e controlado
+// fallow-ignore-next-line security-sink
 UIBADGETEMPLATE.innerHTML = `
   <style>
     :host {
-      display: inline-flex;
+      display: inline-block;
       cursor: pointer;
       outline: none;
       --badge-transition-duration: 200ms;

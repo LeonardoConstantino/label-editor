@@ -5,7 +5,6 @@ import { UISM } from '../../../core/UISoundManager';
 import { CustomFont } from '../../../domain/models/Label';
 import { HelpContentProvider } from '../../../utils/HelpContentProvider';
 import { FontLoader } from '../../../utils/FontLoader';
-import { DataSanitizer } from '../../../core/DataSanitizer';
 
 // Importar sub-componentes se necessário
 import { confirmDialog } from '../../common/confirm';
@@ -196,38 +195,68 @@ export class TypefaceEngine extends HTMLElement {
     const customFonts = label.config.customFonts || [];
     const allFonts = [...this._systemFonts, ...customFonts];
 
-    // Diferenciação simples (nativas vs custom)
-    container.innerHTML = allFonts.map(f => {
-      const safeName = DataSanitizer.escapeHTML(f.name);
-      const safeId = DataSanitizer.escapeHTML(f.id);
+    // Task DET-05: Usar fragmento para evitar innerHTML dinâmico
+    const fragment = document.createDocumentFragment();
 
-      return `
-        <div class="font-card ${f.active ? 'active' : 'inactive'}">
+    allFonts.forEach(f => {
+      const card = document.createElement('div');
+      card.className = `font-card ${f.active ? 'active' : 'inactive'}`;
 
-          <div class="font-card-header">
-            <span class="font-name">${safeName}</span>
-            <div class="flex items-center gap-4"> <!-- Aumentei o gap -->
+      const header = document.createElement('div');
+      header.className = 'font-card-header';
 
-              ${f.url ? `
-                <button class="btn-delete-font" data-id="${safeId}" title="Remove font">
-                  <ui-icon name="trash" class="w-3.5 h-3.5"></ui-icon>
-                </button>
-              ` : '<span class="text-tiny text-text-muted opacity-40 uppercase font-mono tracking-widest bg-white/5 px-2 py-1 rounded">System</span>'}
+      const nameSpan = document.createElement('span');
+      nameSpan.className = 'font-name';
+      nameSpan.textContent = f.name; // ✅ Seguro
 
-              <!-- APLIQUEI O NOSSO CHECKBOX GLOBAL TÁTIL AQUI -->
-              <input type="checkbox" class="font-toggle" data-id="${safeId}" ${f.active ? 'checked' : ''} ${f.url ? '' : 'disabled'} title="${f.url ? 'Toggle font active state' : 'System fonts cannot be deactivated'}">
+      const actions = document.createElement('div');
+      actions.className = 'flex items-center gap-4';
 
-            </div>
-          </div>
+      if (f.url) {
+        const btnDelete = document.createElement('button');
+        btnDelete.className = 'btn-delete-font';
+        btnDelete.setAttribute('data-id', f.id);
+        btnDelete.title = 'Remove font';
+        btnDelete.innerHTML = '<ui-icon name="trash" class="w-3.5 h-3.5"></ui-icon>';
+        actions.appendChild(btnDelete);
+      } else {
+        const systemSpan = document.createElement('span');
+        systemSpan.className = 'text-tiny text-text-muted opacity-40 uppercase font-mono tracking-widest bg-white/5 px-2 py-1 rounded';
+        systemSpan.textContent = 'System';
+        actions.appendChild(systemSpan);
+      }
 
-          <div class="specimen-box" style="font-family: '${safeName}', sans-serif">
-            <div class="specimen-text" contenteditable="true" spellcheck="false" title="Clique para testar o seu texto">
-              The quick brown fox jumps over the lazy dog
-            </div>
-          </div>
-        </div>
-      `;
-    }).join('');
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.className = 'font-toggle';
+      checkbox.setAttribute('data-id', f.id);
+      checkbox.checked = f.active !== false;
+      checkbox.disabled = !f.url;
+      checkbox.title = f.url ? 'Toggle font active state' : 'System fonts cannot be deactivated';
+      actions.appendChild(checkbox);
+
+      header.appendChild(nameSpan);
+      header.appendChild(actions);
+
+      const specimenBox = document.createElement('div');
+      specimenBox.className = 'specimen-box';
+      specimenBox.style.fontFamily = `'${f.name}', sans-serif`;
+
+      const specimenText = document.createElement('div');
+      specimenText.className = 'specimen-text';
+      specimenText.contentEditable = 'true';
+      specimenText.spellcheck = false;
+      specimenText.title = 'Clique para testar o seu texto';
+      specimenText.textContent = 'The quick brown fox jumps over the lazy dog';
+      
+      specimenBox.appendChild(specimenText);
+      card.appendChild(header);
+      card.appendChild(specimenBox);
+      fragment.appendChild(card);
+    });
+
+    container.innerHTML = '';
+    container.appendChild(fragment);
   }
 
   private renderSkeleton() {

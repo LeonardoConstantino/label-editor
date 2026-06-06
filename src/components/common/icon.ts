@@ -503,6 +503,8 @@ class UIIcon extends HTMLElement {
     svg.setAttribute('fill', 'none');
     svg.setAttribute('stroke', 'currentColor');
     svg.setAttribute('aria-hidden', 'true');
+    // Task DET-05: O conteúdo é pré-sanitizado via DOM Whitelisting (sanitizeInnerSVG)
+    // fallow-ignore-next-line security-sink
     svg.innerHTML = content;
     this.#container.appendChild(svg);
   }

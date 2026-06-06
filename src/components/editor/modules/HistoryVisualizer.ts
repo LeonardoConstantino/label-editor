@@ -4,7 +4,6 @@ import { historyManager, HistorySnapshot } from '../../../domain/services/Histor
 import { UISM } from '../../../core/UISoundManager';
 import { AppState } from '../../../core/Store';
 import { formatDate } from '../../../utils/utils';
-import { escapeHTML } from '../../../utils/sanitize';
 import { HelpContentProvider } from '../../../utils/HelpContentProvider';
 import { confirmDialog } from '../../common/confirm';
 
@@ -122,8 +121,13 @@ export class HistoryVisualizer extends HTMLElement {
     const container = this.shadowRoot?.getElementById('history-container');
     if (!container) return;
 
-    // Geramos o HTML base
-    let html = '';
+    if (history.length === 0) {
+      container.innerHTML = '<div class="p-8 text-center text-text-muted text-[10px] font-mono">NO HISTORY DATA</div>';
+      return;
+    }
+
+    // Task DET-05: Usar fragmento para evitar innerHTML dinâmico
+    const fragment = document.createDocumentFragment();
     
     // Invertemos para mostrar o mais recente no topo
     const reversedHistory = [...history].reverse();
@@ -136,29 +140,54 @@ export class HistoryVisualizer extends HTMLElement {
       const isFuture = originalIndex > currentIndex;
       const thumb = await this.getThumbnail(snapshot);
       
-      // const dateStr = new Date(snapshot.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
       const dateStr = snapshot.timestamp ? `${formatDate(new Date(snapshot.timestamp).toISOString(), { onlyTime: true })} ~ ${formatDate(new Date(snapshot.timestamp).toISOString(), { isRelative: true })}` : '';
 
-      html += `
-        <div class="history-node ${isCurrent ? 'active' : ''} ${isFuture ? 'future-branch' : ''}" data-index="${originalIndex}">
-          <div class="node-line">
-            <div class="node-dot"></div>
-          </div>
-          <div class="node-card">
-            <div class="node-thumb">
-              <img src="${thumb}" alt="Preview">
-              ${isFuture ? '<div class="glitch-overlay"></div>' : ''}
-            </div>
-            <div class="node-info">
-              <span class="node-desc">${escapeHTML(snapshot.description)}</span>
-              <span class="node-time">${dateStr}</span>
-            </div>
-          </div>
-        </div>
-      `;
+      const node = document.createElement('div');
+      node.className = `history-node ${isCurrent ? 'active' : ''} ${isFuture ? 'future-branch' : ''}`;
+      node.setAttribute('data-index', String(originalIndex));
+
+      const line = document.createElement('div');
+      line.className = 'node-line';
+      const dot = document.createElement('div');
+      dot.className = 'node-dot';
+      line.appendChild(dot);
+
+      const card = document.createElement('div');
+      card.className = 'node-card';
+
+      const thumbContainer = document.createElement('div');
+      thumbContainer.className = 'node-thumb';
+      const img = document.createElement('img');
+      img.src = thumb;
+      img.alt = 'Preview';
+      thumbContainer.appendChild(img);
+      if (isFuture) {
+        const glitch = document.createElement('div');
+        glitch.className = 'glitch-overlay';
+        thumbContainer.appendChild(glitch);
+      }
+
+      const info = document.createElement('div');
+      info.className = 'node-info';
+      const desc = document.createElement('span');
+      desc.className = 'node-desc';
+      desc.textContent = snapshot.description; // ✅ Seguro
+      const time = document.createElement('span');
+      time.className = 'node-time';
+      time.textContent = dateStr; // ✅ Seguro
+
+      info.appendChild(desc);
+      info.appendChild(time);
+      card.appendChild(thumbContainer);
+      card.appendChild(info);
+
+      node.appendChild(line);
+      node.appendChild(card);
+      fragment.appendChild(node);
     }
 
-    container.innerHTML = html || '<div class="p-8 text-center text-text-muted text-[10px] font-mono">NO HISTORY DATA</div>';
+    container.innerHTML = '';
+    container.appendChild(fragment);
   }
 
   private render() {

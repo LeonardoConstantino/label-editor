@@ -212,6 +212,7 @@ export class ProductionStudio extends HTMLElement {
           <span class="label-prism">Required by Template</span>
           <div class="badge-list">
             ${this._labelPlaceholders.map(p => {
+              // TODO: Variáveis de contexto sao marcadas como 'missing', mesmo quando utilizadas. Precisamos de uma forma melhor de identificar variáveis de dados vs variáveis de contexto.
               const isAvailable = dataFields.includes(p);
               return `<span class="variable-badge ${isAvailable ? '' : 'missing'}">
                 {{${DataSanitizer.escapeHTML(p)}}} ${isAvailable ? '' : '⚠️'}

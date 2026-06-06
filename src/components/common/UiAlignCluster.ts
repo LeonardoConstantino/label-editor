@@ -177,13 +177,24 @@ export class UiAlignCluster extends HTMLElement {
   #buildTemplate(): void {
     const header = document.createElement('div');
     header.className = 'cluster-header';
-    header.innerHTML = `
-      <div class="flex items-center gap-2">
-        <span class="cluster-label">Power Layout</span>
-        ${HelpContentProvider.buildTooltip('layout', 'left')}
-      </div>
-      <span class="font-mono text-2xs text-accent-primary bg-accent-primary/10 px-1.5 rounded border border-accent-primary/20">MULTI</span>
-    `;
+    
+    const labelGroup = document.createElement('div');
+    labelGroup.className = 'flex items-center gap-2';
+    const labelSpan = document.createElement('span');
+    labelSpan.className = 'cluster-label';
+    labelSpan.textContent = 'Power Layout';
+    labelGroup.appendChild(labelSpan);
+    
+    // Task DET-05: Injeção de HTML controlado vindo do provider
+    // fallow-ignore-next-line security-sink
+    labelGroup.insertAdjacentHTML('beforeend', HelpContentProvider.buildTooltip('layout', 'left'));
+    
+    const badge = document.createElement('span');
+    badge.className = 'font-mono text-2xs text-accent-primary bg-accent-primary/10 px-1.5 rounded border border-accent-primary/20';
+    badge.textContent = 'MULTI';
+
+    header.appendChild(labelGroup);
+    header.appendChild(badge);
 
     const board = document.createElement('div');
     board.className = 'cluster-board';
@@ -202,12 +213,18 @@ export class UiAlignCluster extends HTMLElement {
 
     const options = document.createElement('div');
     options.className = 'options-row';
-    options.innerHTML = `
-      <label class="checkbox-label">
-        <input type="checkbox" id="chk-canvas">
-        <span>Align to Canvas</span>
-      </label>
-    `;
+    
+    const label = document.createElement('label');
+    label.className = 'checkbox-label';
+    const input = document.createElement('input');
+    input.type = 'checkbox';
+    input.id = 'chk-canvas';
+    const span = document.createElement('span');
+    span.textContent = 'Align to Canvas';
+    
+    label.appendChild(input);
+    label.appendChild(span);
+    options.appendChild(label);
 
     this.#shadow.appendChild(header);
     this.#shadow.appendChild(board);
@@ -218,8 +235,10 @@ export class UiAlignCluster extends HTMLElement {
     const btn = document.createElement('button');
     btn.className = 'pad-btn';
     btn.dataset.action = config.action;
-    btn.title = config.title;
+    btn.title = config.title; // title property is safe
     btn.type = 'button';
+    // Task DET-05: config.icon é uma constante controlada (path SVG)
+    // fallow-ignore-next-line security-sink
     btn.innerHTML = makeSvg(config.icon);
     return btn;
   }

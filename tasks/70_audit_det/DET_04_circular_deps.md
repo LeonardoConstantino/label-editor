@@ -17,6 +17,6 @@ Quebrar os 13 ciclos de dependência identificados pelo Fallow em torno do `Canv
 4. **Verificação de Símbolos:** Garantir que nenhuma classe concreta é importada nos arquivos de definição de tipo.
 
 ## Critérios de Aceite
-- [ ] `fallow dead-code` reporta 0 circular dependencies.
-- [ ] O projeto compila via `npm run build`.
-- [ ] O renderizador continua funcionando corretamente no canvas.
+- [x] `fallow dead-code` reporta 0 circular dependencies.
+- [x] O projeto compila via `npm run build`.
+- [x] O renderizador continua funcionando corretamente no canvas.

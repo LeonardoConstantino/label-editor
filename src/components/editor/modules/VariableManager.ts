@@ -211,14 +211,58 @@ export class VariableManager extends HTMLElement {
         card = document.createElement('div');
         card.className = 'var-card';
         card.setAttribute('data-key', v.key);
-        card.innerHTML = this.getCardTemplate(v);
-        container.appendChild(card);
         
-        const sel = card.querySelector('.add-formatter-select') as any;
-        if (sel) {
-          sel.options = formatterOptions;
-          sel.value = 'none';
-        }
+        // Task DET-05: Construção imperativa para evitar innerHTML dinâmico
+        const header = document.createElement('div');
+        header.className = 'var-header';
+
+        const tagSpan = document.createElement('span');
+        tagSpan.className = 'var-tag';
+        tagSpan.textContent = `{{ ${v.key} }}`;
+
+        const usageSpan = document.createElement('span');
+        usageSpan.className = 'usage-badge';
+        usageSpan.textContent = `${v.tags.length} ${v.tags.length === 1 ? 'USAGE' : 'USAGES'}`;
+
+        header.appendChild(tagSpan);
+        header.appendChild(usageSpan);
+
+        const pipelineArea = document.createElement('div');
+        pipelineArea.className = 'pipeline-area';
+        const pipelineLine = document.createElement('div');
+        pipelineLine.className = 'pipeline-line';
+        pipelineArea.appendChild(pipelineLine);
+
+        const pipelineMid = document.createElement('div');
+        pipelineMid.className = 'pipeline-dynamic-steps';
+        pipelineMid.id = `pipeline-mid-${v.key}`;
+        pipelineArea.appendChild(pipelineMid);
+
+        const addArea = document.createElement('div');
+        addArea.className = 'add-area';
+        const sel = document.createElement('app-select') as any;
+        sel.className = 'add-formatter-select';
+        sel.setAttribute('data-key', v.key);
+        sel.options = formatterOptions;
+        sel.value = 'none';
+        addArea.appendChild(sel);
+
+        const fallbackArea = document.createElement('div');
+        fallbackArea.className = 'fallback-area';
+        const fallbackInput = document.createElement('app-input');
+        fallbackInput.className = 'fallback-input';
+        fallbackInput.setAttribute('data-key', v.key);
+        fallbackInput.setAttribute('label', 'Fallback Value');
+        fallbackInput.setAttribute('placeholder', 'Ex: N/A');
+        fallbackInput.setAttribute('value', v.tags[0].tag.fallback || '');
+        fallbackArea.appendChild(fallbackInput);
+
+        card.appendChild(header);
+        card.appendChild(pipelineArea);
+        card.appendChild(addArea);
+        card.appendChild(fallbackArea);
+        
+        container.appendChild(card);
       }
 
       this.syncCardData(card, v);
@@ -239,19 +283,43 @@ export class VariableManager extends HTMLElement {
       const newFmts = baseTag.formatters;
 
       if (JSON.stringify(currentFmts) !== JSON.stringify(newFmts)) {
-        pipelineMid.innerHTML = newFmts.map(f => {
+        // Task DET-05: Usar fragmento para evitar innerHTML dinâmico no pipeline
+        const fragment = document.createDocumentFragment();
+
+        newFmts.forEach(f => {
           const safeF = DataSanitizer.escapeHTML(f);
           const tip = DataSourceParser.getFormatterTip(f.split('(')[0].trim());
-          return `
-            <div class="pipeline-step">
-              <div class="step-dot active"></div>
-              <div class="formatter-block" data-fmt="${safeF}" title="${DataSanitizer.escapeHTML(tip)}">
-                <span class="formatter-name">:${safeF}</span>
-                <button class="btn-remove-formatter" data-key="${safeKey}" data-formatter="${safeF}">×</button>
-              </div>
-            </div>
-          `;
-        }).join('');
+          
+          const step = document.createElement('div');
+          step.className = 'pipeline-step';
+          
+          const dot = document.createElement('div');
+          dot.className = 'step-dot active';
+          
+          const block = document.createElement('div');
+          block.className = 'formatter-block';
+          block.setAttribute('data-fmt', safeF);
+          block.title = tip; // title is safe
+
+          const nameSpan = document.createElement('span');
+          nameSpan.className = 'formatter-name';
+          nameSpan.textContent = `:${safeF}`;
+
+          const btnRemove = document.createElement('button');
+          btnRemove.className = 'btn-remove-formatter';
+          btnRemove.setAttribute('data-key', safeKey);
+          btnRemove.setAttribute('data-formatter', safeF);
+          btnRemove.textContent = '×';
+
+          block.appendChild(nameSpan);
+          block.appendChild(btnRemove);
+          step.appendChild(dot);
+          step.appendChild(block);
+          fragment.appendChild(step);
+        });
+
+        pipelineMid.innerHTML = '';
+        pipelineMid.appendChild(fragment);
       }
     }
 

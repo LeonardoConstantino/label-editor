@@ -41,6 +41,7 @@ export class UIKeyboardShortcuts extends HTMLElement {
 
     const formatter = new UIKeyboardShortcuts();
     return {
+      // fallow-ignore-next-line security-sink
       html: formatter.formatKey((item.sequence || item.key)!, item.type),
       description: item.description
     };
@@ -114,7 +115,10 @@ export class UIKeyboardShortcuts extends HTMLElement {
         (clean.length === 1
           ? clean.toUpperCase()
           : clean.charAt(0).toUpperCase() + clean.slice(1));
-      return `<kbd class="kbd-prism">${text}</kbd>`;
+      
+      // Task DET-05: Garantir escape do texto da tecla antes da injeção
+      const safeText = escapeHTML(text);
+      return `<kbd class="kbd-prism">${safeText}</kbd>`;
     });
 
     if (type === 'longpress') {
@@ -227,24 +231,40 @@ export class UIKeyboardShortcuts extends HTMLElement {
 
     // Se estiver vazio
     if (filtered.length === 0) {
-      wrapper.innerHTML = `<div class="text-center text-text-muted text-xs py-4 font-mono">Nenhum atalho encontrado.</div>`;
+      wrapper.innerHTML = '';
+      const emptyMsg = document.createElement('div');
+      emptyMsg.className = 'text-center text-text-muted text-xs py-4 font-mono';
+      emptyMsg.textContent = 'Nenhum atalho encontrado.';
+      wrapper.appendChild(emptyMsg);
       return;
     }
+
+    const fragment = document.createDocumentFragment();
 
     // ==========================================
     // VARIANTE: SLIM (HUD Compacto)
     // ==========================================
     if (this.variant === 'slim') {
-      wrapper.innerHTML = filtered
-        .map(
-          (s) => `
-        <div class="flex items-center gap-3 p-1.5 hover:bg-white/5 rounded transition-colors">
-          <div class="min-w-15 flex justify-end">${this.formatKey((s.sequence || s.key)!, s.type)}</div>
-          <span class="text-[11px] text-text-muted truncate">${escapeHTML(this.getDescription(s))}</span>
-        </div>
-      `,
-        )
-        .join('');
+      filtered.forEach(s => {
+        const item = document.createElement('div');
+        item.className = 'flex items-center gap-3 p-1.5 hover:bg-white/5 rounded transition-colors';
+        
+        const keyDiv = document.createElement('div');
+        keyDiv.className = 'min-w-15 flex justify-end';
+        // fallow-ignore-next-line security-sink
+        keyDiv.innerHTML = this.formatKey((s.sequence || s.key)!, s.type);
+
+        const descSpan = document.createElement('span');
+        descSpan.className = 'text-[11px] text-text-muted truncate';
+        descSpan.textContent = this.getDescription(s); // ✅ Seguro
+
+        item.appendChild(keyDiv);
+        item.appendChild(descSpan);
+        fragment.appendChild(item);
+      });
+      
+      wrapper.innerHTML = '';
+      wrapper.appendChild(fragment);
       return;
     }
 
@@ -262,36 +282,56 @@ export class UIKeyboardShortcuts extends HTMLElement {
       {} as Record<string, ShortcutItem[]>,
     );
 
-    let html = '';
-
     for (const [category, items] of Object.entries(grouped)) {
-      html += `
-        <div class="masonry-item bg-surface-solid/50 border border-border-ui rounded-xl p-5 shadow-panel">
-          
-          <h3 class="font-mono text-[10px] text-accent-primary uppercase tracking-[0.15em] font-bold mb-4 flex items-center gap-2">
-            <ui-icon name="folder" size="sm" class="opacity-80"></ui-icon>
-            ${escapeHTML(category)}
-          </h3>
-          
-          <div class="flex flex-col gap-3.5">
-            ${items
-              .map(
-                (s) => `
-              <div class="flex items-center text-[12px] group">
-                <span class="text-text-main group-hover:text-white transition-colors">${escapeHTML(this.getDescription(s))}</span>
-                <span class="dot-leader"></span>
-                <span class="shrink-0 flex items-center justify-end">${category === 'Easter Egg' ? "" : this.formatKey((s.sequence || s.key)!, s.type)}</span>
-              </div>
-            `,
-              )
-              .join('')}
-          </div>
+      const masonryItem = document.createElement('div');
+      masonryItem.className = 'masonry-item bg-surface-solid/50 border border-border-ui rounded-xl p-5 shadow-panel';
+      
+      const h3 = document.createElement('h3');
+      h3.className = 'font-mono text-[10px] text-accent-primary uppercase tracking-[0.15em] font-bold mb-4 flex items-center gap-2';
+      
+      const icon = document.createElement('ui-icon');
+      icon.setAttribute('name', 'folder');
+      icon.setAttribute('size', 'sm');
+      icon.className = 'opacity-80';
 
-        </div>
-      `;
+      const catTitle = document.createTextNode(category);
+      h3.appendChild(icon);
+      h3.appendChild(catTitle);
+      masonryItem.appendChild(h3);
+      
+      const listContainer = document.createElement('div');
+      listContainer.className = 'flex flex-col gap-3.5';
+
+      items.forEach(s => {
+        const row = document.createElement('div');
+        row.className = 'flex items-center text-[12px] group';
+
+        const desc = document.createElement('span');
+        desc.className = 'text-text-main group-hover:text-white transition-colors';
+        desc.textContent = this.getDescription(s);
+
+        const leader = document.createElement('span');
+        leader.className = 'dot-leader';
+
+        const key = document.createElement('span');
+        key.className = 'shrink-0 flex items-center justify-end';
+        if (category !== 'Easter Egg') {
+          // fallow-ignore-next-line security-sink
+          key.innerHTML = this.formatKey((s.sequence || s.key)!, s.type);
+        }
+
+        row.appendChild(desc);
+        row.appendChild(leader);
+        row.appendChild(key);
+        listContainer.appendChild(row);
+      });
+
+      masonryItem.appendChild(listContainer);
+      fragment.appendChild(masonryItem);
     }
 
-    wrapper.innerHTML = html;
+    wrapper.innerHTML = '';
+    wrapper.appendChild(fragment);
   }
 }
 

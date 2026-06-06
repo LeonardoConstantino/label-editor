@@ -2,7 +2,6 @@ import { store, AppState } from '../../core/Store';
 import { UISM } from '../../core/UISoundManager';
 import { canvasRenderer } from '../../domain/services/CanvasRenderer';
 import { PaperFormat, pdfGenerator } from '../../domain/services/PDFGenerator';
-import { escapeHTML } from '../../utils/sanitize';
 import '../common/AppButton';
 import '../common/icon';
 import '../common/UINumberScrubber';
@@ -349,38 +348,71 @@ export class DataSourceInput extends HTMLElement {
 
   private updateDataSummary(): void {
     const box = this.shadowRoot!.getElementById('data-summary-box')!;
-    if (!this.dataList.length) return;
+    if (!this.dataList.length) {
+      box.innerHTML = '';
+      return;
+    }
 
     const headers = Object.keys(this.dataList[0]);
     const displayHeaders = headers.slice(0, 4);
 
-    box.innerHTML = `
-      <div class="flex flex-col gap-3 animate-in fade-in duration-500">
-        <h4 class="font-mono text-[10px] text-text-muted uppercase tracking-[0.2em] mb-1">Data Preview (First 3)</h4>
-        <div class="overflow-x-auto border border-border-ui/30 rounded-lg">
-          <table class="data-mini-table">
-            <thead>
-              <tr>${displayHeaders.map((h) => `<th>${escapeHTML(h)}</th>`).join('')}${headers.length > 4 ? '<th>...</th>' : ''}</tr>
-            </thead>
-            <tbody>
-              ${this.dataList
-                .slice(0, 3)
-                .map(
-                  (row) => `
-                <tr>
-                  ${displayHeaders.map((h) => `<td>${escapeHTML(String(row[h]))}</td>`).join('')}
-                  ${headers.length > 4 ? '<td class="text-text-muted">...</td>' : ''}
-                </tr>
-              `,
-                )
-                .join('')}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    `;
+    // Task DET-05: Usar manipulação direta de DOM para garantir segurança
+    const fragment = document.createDocumentFragment();
 
+    const container = document.createElement('div');
+    container.className = 'flex flex-col gap-3 animate-in fade-in duration-500';
+
+    const title = document.createElement('h4');
+    title.className = 'font-mono text-[10px] text-text-muted uppercase tracking-[0.2em] mb-1';
+    title.textContent = 'Data Preview (First 3)';
+
+    const tableWrapper = document.createElement('div');
+    tableWrapper.className = 'overflow-x-auto border border-border-ui/30 rounded-lg';
+
+    const table = document.createElement('table');
+    table.className = 'data-mini-table';
+
+    const thead = document.createElement('thead');
+    const headerRow = document.createElement('tr');
+    displayHeaders.forEach(h => {
+      const th = document.createElement('th');
+      th.textContent = h;
+      headerRow.appendChild(th);
+    });
+    if (headers.length > 4) {
+      const th = document.createElement('th');
+      th.textContent = '...';
+      headerRow.appendChild(th);
     }
+    thead.appendChild(headerRow);
+
+    const tbody = document.createElement('tbody');
+    this.dataList.slice(0, 3).forEach(row => {
+      const tr = document.createElement('tr');
+      displayHeaders.forEach(h => {
+        const td = document.createElement('td');
+        td.textContent = String(row[h] ?? '');
+        tr.appendChild(td);
+      });
+      if (headers.length > 4) {
+        const td = document.createElement('td');
+        td.className = 'text-text-muted';
+        td.textContent = '...';
+        tr.appendChild(td);
+      }
+      tbody.appendChild(tr);
+    });
+
+    table.appendChild(thead);
+    table.appendChild(tbody);
+    tableWrapper.appendChild(table);
+    container.appendChild(title);
+    container.appendChild(tableWrapper);
+    fragment.appendChild(container);
+
+    box.innerHTML = '';
+    box.appendChild(fragment);
+  }
 
   private renderSkeleton(): void {
     if (!this.shadowRoot) return;

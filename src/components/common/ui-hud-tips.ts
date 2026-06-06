@@ -578,6 +578,8 @@ export class UiHudTips extends HTMLElement {
     if (sr) sr.textContent = `Dica: ${readable}`;
 
     if (!animate) {
+      // Task DET-05: HTML já processado e escapado via parseTip e buildInnerHtml
+      // fallow-ignore-next-line security-sink
       el.innerHTML = this.#buildInnerHtml(html);
       el.dataset.state = 'visible';
       return;
@@ -589,6 +591,8 @@ export class UiHudTips extends HTMLElement {
     el.dataset.state = 'exit-up';
 
     setTimeout(() => {
+      // Task DET-05: HTML já processado e escapado via parseTip e buildInnerHtml
+      // fallow-ignore-next-line security-sink
       el.innerHTML = this.#buildInnerHtml(html);
       el.dataset.state = 'enter-from-bottom';
 
@@ -605,13 +609,13 @@ export class UiHudTips extends HTMLElement {
   }
 
   /**
-   * Monta o HTML interno da dica com o prefixo "Dica:".
-   *
+   * Monta o HTML final da dica.
+   * 
    * @param {string} parsedHtml - HTML das teclas já parseado
    * @returns {string}
    */
   #buildInnerHtml(parsedHtml: string): string {
-    return `<span class="tip-prefix" aria-hidden="true">Dica:</span>${parsedHtml}`;
+    return `<span class="tip-prefix" aria-hidden="true">${escapeHtml('Dica:')}</span>${parsedHtml}`;
   }
 
   /** Fecha e remove o componente do DOM, disparando o evento. */

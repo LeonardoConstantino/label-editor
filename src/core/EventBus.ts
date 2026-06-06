@@ -28,7 +28,7 @@ export interface ModuleSwitchPayload {
  * EventMap: Definição rigorosa de todos os eventos do sistema e seus payloads.
  * Atua como o contrato central de comunicação do Label Forge OS.
  */
-export interface EventMap {
+interface EventMap {
   // Store & State
   'state:change': AppState;
   'history:undo': { source?: string };

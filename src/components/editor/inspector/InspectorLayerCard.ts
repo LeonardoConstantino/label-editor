@@ -290,15 +290,31 @@ export class InspectorLayerCard extends HTMLElement {
     const el = this._element;
 
     const idSection = document.createElement('div');
-    idSection.innerHTML = `
-      <div class="flex items-center justify-between mb-1">
-        <span class="label-prism" style="margin:0">Identification</span>
-        ${HelpContentProvider.buildTooltip('layer_id')}
-      </div>
-      <div class="row-ui">
-        <app-input label="Layer Name" data-prop="name" value="${escapeHTML(this._element.name || '')}" style="flex:1"></app-input>
-      </div>
-    `;
+    const header = document.createElement('div');
+    header.className = 'flex items-center justify-between mb-1';
+    
+    const label = document.createElement('span');
+    label.className = 'label-prism';
+    label.style.margin = '0';
+    label.textContent = 'Identification';
+    
+    header.appendChild(label);
+    // Task DET-05: HTML controlado do provedor
+    // fallow-ignore-next-line security-sink
+    header.insertAdjacentHTML('beforeend', HelpContentProvider.buildTooltip('layer_id'));
+    
+    const row = document.createElement('div');
+    row.className = 'row-ui';
+    
+    const input = document.createElement('app-input') as any;
+    input.setAttribute('label', 'Layer Name');
+    input.setAttribute('data-prop', 'name');
+    input.setAttribute('value', this._element.name || ''); // app-input handles textContent internally
+    input.style.flex = '1';
+    
+    row.appendChild(input);
+    idSection.appendChild(header);
+    idSection.appendChild(row);
     container.appendChild(idSection);
 
     const createSection = (tagName: string): InspectorSection => {

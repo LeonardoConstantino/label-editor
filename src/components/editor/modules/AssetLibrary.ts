@@ -248,28 +248,60 @@ export class AssetLibrary extends HTMLElement {
       return;
     }
 
-    grid.innerHTML = filtered.map(asset => {
-      const safeId = DataSanitizer.escapeHTML(asset.id);
-      const safeName = DataSanitizer.escapeHTML(asset.name);
-      return `
-        <div class="asset-item" draggable="true" data-id="${safeId}">
-          <div class="asset-preview">
-            <img src="${asset.src}" alt="${safeName}" loading="lazy">
-          </div>
-          <div class="asset-overlay">
-             <span class="asset-name">${safeName}</span>
-             <div class="flex gap-1">
-               <button class="btn-action btn-edit-asset" data-id="${safeId}" title="Edit Image">
-                  <ui-icon name="edit" size="xs" style="transform: scale(0.8)"></ui-icon>
-               </button>
-               <button class="btn-action btn-delete-asset" data-id="${safeId}" title="Delete">
-                  <ui-icon name="trash" size="xs"></ui-icon>
-               </button>
-             </div>
-          </div>
-        </div>
-      `;
-    }).join('');
+    // Task DET-05: Usar fragmento para evitar innerHTML dinâmico
+    const fragment = document.createDocumentFragment();
+
+    filtered.forEach(asset => {
+      const item = document.createElement('div');
+      item.className = 'asset-item';
+      item.draggable = true;
+      item.setAttribute('data-id', asset.id);
+
+      const preview = document.createElement('div');
+      preview.className = 'asset-preview';
+      
+      const img = document.createElement('img');
+      img.src = asset.src;
+      img.alt = asset.name;
+      img.loading = 'lazy';
+      preview.appendChild(img);
+
+      const overlay = document.createElement('div');
+      overlay.className = 'asset-overlay';
+
+      const nameSpan = document.createElement('span');
+      nameSpan.className = 'asset-name';
+      nameSpan.textContent = asset.name; // ✅ Seguro
+
+      const actions = document.createElement('div');
+      actions.className = 'flex gap-1';
+
+      const btnEdit = document.createElement('button');
+      btnEdit.className = 'btn-action btn-edit-asset';
+      btnEdit.setAttribute('data-id', asset.id);
+      btnEdit.title = 'Edit Image';
+      btnEdit.innerHTML = '<ui-icon name="edit" size="xs" style="transform: scale(0.8)"></ui-icon>';
+
+      const btnDel = document.createElement('button');
+      btnDel.className = 'btn-action btn-delete-asset';
+      btnDel.setAttribute('data-id', asset.id);
+      btnDel.title = 'Delete';
+      btnDel.innerHTML = '<ui-icon name="trash" size="xs"></ui-icon>';
+
+      actions.appendChild(btnEdit);
+      actions.appendChild(btnDel);
+
+      overlay.appendChild(nameSpan);
+      overlay.appendChild(actions);
+
+      item.appendChild(preview);
+      item.appendChild(overlay);
+
+      fragment.appendChild(item);
+    });
+
+    grid.innerHTML = '';
+    grid.appendChild(fragment);
   }
 
   private renderSkeleton() {

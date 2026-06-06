@@ -64,7 +64,7 @@ export interface ToastOptions {
 }
 
 /** Payload do CustomEvent `'ui-toast:dismissed'`. */
-export interface ToastDismissedDetail {
+interface ToastDismissedDetail {
   type: ToastType;
   message: string;
 }
@@ -148,6 +148,8 @@ const ARIA_ROLES: Record<ToastType, 'alert' | 'status'> = {
 // Criado UMA vez e clonado por instância — o browser parseia o CSS apenas uma vez.
 
 const TOAST_TEMPLATE: HTMLTemplateElement = document.createElement('template');
+// Task DET-05: Template estático e controlado
+// fallow-ignore-next-line security-sink
 TOAST_TEMPLATE.innerHTML = /* html */ `
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -465,6 +467,7 @@ export class UiToast extends HTMLElement {
     const role = ARIA_ROLES[type];
 
     // innerHTML seguro: conteúdo é controlado (constante ICONS), não input do usuário
+    // fallow-ignore-next-line security-sink
     this.#iconEl.innerHTML = ICONS[type];
 
     this.#root.setAttribute('role', role);

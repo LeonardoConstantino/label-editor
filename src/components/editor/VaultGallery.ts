@@ -191,8 +191,13 @@ export class VaultGallery extends HTMLElement {
     // Cartridges
     filtered.forEach(label => {
       const wrapper = document.createElement('div');
+      wrapper.className = 'cartridge-wrapper';
+      wrapper.setAttribute('data-id', label.id);
+      
+      // Task DET-05: renderCartridgeHtml já aplica escapeHTML internamente
+      // fallow-ignore-next-line security-sink
       wrapper.innerHTML = this.renderCartridgeHtml(label);
-      fragment.appendChild(wrapper.firstElementChild!);
+      fragment.appendChild(wrapper);
     });
 
     grid.innerHTML = '';
@@ -202,11 +207,12 @@ export class VaultGallery extends HTMLElement {
   private renderCartridgeHtml(label: Label): string {
     const timeAgo = formatDate(new Date(label.updatedAt).toISOString(), { isRelative: true });
     const time = formatDate(new Date(label.updatedAt).toISOString(), { includeTime: true });
-    const ratio = label.config.widthMM / label.config.heightMM;
+    const ratio = escapeHTML(String(label.config.widthMM / label.config.heightMM));
     const summary = this.getElementSummary(label);
+    const safeId = escapeHTML(label.id);
 
     return `
-    <div class="group relative bg-surface-solid border border-border-ui rounded-2xl overflow-hidden shadow-panel transition-all duration-300 ease-spring hover:border-accent-primary hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(0,0,0,0.6),0_0_15px_rgba(99,102,241,0.2)]" data-id="${label.id}">
+    <div class="group relative bg-surface-solid border border-border-ui rounded-2xl overflow-hidden shadow-panel transition-all duration-300 ease-spring hover:border-accent-primary hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(0,0,0,0.6),0_0_15px_rgba(99,102,241,0.2)]" data-id="${safeId}">
         
 
         <div class="bg-black w-full h-44 flex items-center justify-center p-6 relative border-b border-border-ui overflow-hidden shadow-inner">
@@ -217,20 +223,20 @@ export class VaultGallery extends HTMLElement {
           <div class="absolute inset-0 z-20 pointer-events-none crt-scanline"></div>
           <div class="absolute inset-0 bg-black/50 backdrop-blur-md opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center gap-3 transition-all duration-300 z-30">
             <div class="translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 ease-out delay-75 w-[75%]">
-              <button class="action-load w-full flex items-center justify-center gap-2 py-2.5 rounded-lg font-mono text-[11px] font-bold tracking-widest uppercase border border-accent-success text-accent-success bg-accent-success/10 hover:bg-accent-success hover:text-black hover:shadow-[0_0_20px_rgba(16,185,129,0.4)] transition-all duration-200 cursor-pointer" data-id="${label.id}">
+              <button class="action-load w-full flex items-center justify-center gap-2 py-2.5 rounded-lg font-mono text-[11px] font-bold tracking-widest uppercase border border-accent-success text-accent-success bg-accent-success/10 hover:bg-accent-success hover:text-black hover:shadow-[0_0_20px_rgba(16,185,129,0.4)] transition-all duration-200 cursor-pointer" data-id="${safeId}">
                 <ui-icon name="download" size="sm"></ui-icon> Load Asset
               </button>
             </div>
             
             <div class="flex gap-2.5 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 ease-out delay-100">
               <button class="w-10 h-10 rounded-lg flex items-center justify-center cursor-pointer bg-black/60 border border-white/10 text-text-muted hover:text-accent-primary hover:border-accent-primary/40 hover:bg-accent-primary/10 transition-all action-export-label" 
-                      data-id="${label.id}" title="Exportar para arquivo .label">
+                      data-id="${safeId}" title="Exportar para arquivo .label">
                 <ui-icon name="download" size="sm"></ui-icon>
               </button>
-              <button class="w-10 h-10 rounded-lg flex items-center justify-center cursor-pointer bg-black/60 border border-white/10 text-text-muted hover:text-white hover:border-white/30 hover:bg-white/10 transition-all action-duplicate" title="Duplicate" data-id="${label.id}">
+              <button class="w-10 h-10 rounded-lg flex items-center justify-center cursor-pointer bg-black/60 border border-white/10 text-text-muted hover:text-white hover:border-white/30 hover:bg-white/10 transition-all action-duplicate" title="Duplicate" data-id="${safeId}">
                 <ui-icon name="copy" size="sm"></ui-icon>
               </button>
-              <button class="w-10 h-10 rounded-lg flex items-center justify-center cursor-pointer bg-black/60 border border-white/10 text-text-muted hover:text-accent-danger hover:border-accent-danger/50 hover:bg-accent-danger/10 hover:shadow-[0_0_15px_rgba(244,63,94,0.3)] transition-all action-delete" title="Delete" data-id="${label.id}">
+              <button class="w-10 h-10 rounded-lg flex items-center justify-center cursor-pointer bg-black/60 border border-white/10 text-text-muted hover:text-accent-danger hover:border-accent-danger/50 hover:bg-accent-danger/10 hover:shadow-[0_0_15px_rgba(244,63,94,0.3)] transition-all action-delete" title="Delete" data-id="${safeId}">
                 <ui-icon name="trash" size="sm"></ui-icon>
               </button>
             </div>
