@@ -2,7 +2,7 @@ import { CanvasTextConfig, drawText } from 'canvas-txt';
 import { IRenderer } from './IRenderer';
 import { TextElement } from '../../models/elements/SpecificElements';
 import { TextOverflow } from '../../models/elements/BaseElement';
-import { RenderContext } from '../CanvasRenderer';
+import { RenderContext } from './renderer-types';
 import { DataSourceParser } from '../DataSourceParser';
 import { UnitConverter } from '../../../utils/units';
 import { DataSanitizer } from '../../../core/DataSanitizer';

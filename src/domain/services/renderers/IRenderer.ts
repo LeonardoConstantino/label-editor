@@ -1,5 +1,5 @@
 import { BaseElement } from '../../models/elements/BaseElement';
-import { RenderContext } from '../CanvasRenderer';
+import { RenderContext } from './renderer-types';
 
 /**
  * Interface comum para todos os renderers de elementos.

@@ -1,7 +1,7 @@
 import bwipjs from 'bwip-js';
 import { IRenderer } from './IRenderer';
 import { CodeElement } from '../../models/elements/SpecificElements';
-import { RenderContext } from '../CanvasRenderer';
+import { RenderContext } from './renderer-types';
 import { DataSourceParser } from '../DataSourceParser';
 import { CodeValidator } from '../../../utils/CodeValidator';
 import { logger } from '../../../core/Logger';

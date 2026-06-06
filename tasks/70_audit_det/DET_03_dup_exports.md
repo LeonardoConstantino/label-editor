@@ -13,6 +13,6 @@ Resolver a ambiguidade na exportação do tipo `AlignAction`, que está definido
 3. **Consistência de Valores:** Garantir que todas as 10 ações (Left, Center, Right, Top, Middle, Bottom, DistHorizontal, DistVertical, etc.) estão sincronizadas.
 
 ## Critérios de Aceite
-- [ ] Tipo `AlignAction` exportado de apenas UM local.
-- [ ] `fallow dead-code` reporta zero duplicate exports.
-- [ ] `npm run build` passa sem erros.
+- [x] Tipo `AlignAction` exportado de apenas UM local.
+- [x] `fallow dead-code` reporta zero duplicate exports.
+- [x] `npm run build` passa sem erros.

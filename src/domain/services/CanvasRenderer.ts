@@ -9,15 +9,7 @@ import { CodeRenderer } from './renderers/CodeRenderer';
 import { LineRenderer } from './renderers/LineRenderer';
 import { UnitConverter } from '../../utils/units';
 import eventBus from '../../core/EventBus';
-
-export interface RenderContext {
-  ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D;
-  scale: number; // mm -> px (incluindo previewScale se houver)
-  dpi: number;
-  data?: Record<string, any>;
-  context?: Record<string, any>; // Task 50: System context (index, total, date)
-  images?: Map<string, ImageBitmap | HTMLImageElement>;
-}
+import { RenderContext } from './renderers/renderer-types';
 
 /**
  * CanvasRenderer: Orquestrador da renderização utilizando o padrão Strategy.

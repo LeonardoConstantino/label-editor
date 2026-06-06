@@ -1,6 +1,6 @@
 import { IRenderer } from './IRenderer';
 import { RectangleElement } from '../../models/elements/SpecificElements';
-import { RenderContext } from '../CanvasRenderer';
+import { RenderContext } from './renderer-types';
 import { UnitConverter } from '../../../utils/units';
 
 /**

@@ -1,6 +1,6 @@
 import { IRenderer } from './IRenderer';
 import { LineElement } from '../../models/elements/SpecificElements';
-import { RenderContext } from '../CanvasRenderer';
+import { RenderContext } from './renderer-types';
 import { BorderStyle } from '../../models/elements/BaseElement';
 import { UnitConverter } from '../../../utils/units';
 
