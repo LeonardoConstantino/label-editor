@@ -24,6 +24,6 @@ Resolver os 23 candidatos a "Dangerous HTML sink" identificados deterministicame
 3. **Template Guard:** Preferir o uso de `TEMPLATE.content.cloneNode()` para estruturas estáticas.
 
 ## Critérios de Aceite
-- [ ] `fallow security` reporta zero candidatos de nível crítico para os arquivos acima.
-- [ ] `npm test` passa sem regressões.
-- [ ] Verificação manual de que caracteres como `<` e `>` não executam código na UI.
+- [x] `fallow security` reporta zero candidatos de nível crítico para os arquivos acima.
+- [x] `npm test` passa sem regressões.
+- [x] Verificação manual de que caracteres como `<` e `>` não executam código na UI.

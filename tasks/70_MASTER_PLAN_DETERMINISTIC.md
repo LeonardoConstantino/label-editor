@@ -26,12 +26,12 @@ Este plano coordena a resolução dos achados técnicos identificados pela ferra
 | ID | Task | Status | Dependências | Branch |
 |----|------|--------|--------------|--------|
 | **03** | [Resolução de Exportações Duplicadas (AlignAction)](./70_audit_det/DET_03_dup_exports.md) | [x] | — | `audit/DET-03-dupes` |
-| **04** | [Desacoplamento de Ciclos do CanvasRenderer](./70_audit_det/DET_04_circular_deps.md) | [ ] | — | `audit/DET-04-cycles` |
+| **04** | [Desacoplamento de Ciclos do CanvasRenderer](./70_audit_det/DET_04_circular_deps.md) | [x] | — | `audit/DET-04-cycles` |
 
 ### Fase 3: Blindagem de Sinks de Segurança [DET-SEC]
 | ID | Task | Status | Dependências | Branch |
 |----|------|--------|--------------|--------|
-| **05** | [Refatoração de Sinks HTML (CWE-79)](./70_audit_det/DET_05_security_sinks.md) | [ ] | — | `audit/DET-05-sec-html` |
+| **05** | [Refatoração de Sinks HTML (CWE-79)](./70_audit_det/DET_05_security_sinks.md) | [x] | — | `audit/DET-05-sec-html` |
 | **06** | [Proteção contra SSRF (CWE-918)](./70_audit_det/DET_06_security_ssrf.md) | [ ] | — | `audit/DET-06-sec-ssrf` |
 
 ---

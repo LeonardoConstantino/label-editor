@@ -332,53 +332,6 @@ export class VariableManager extends HTMLElement {
     }
   }
 
-  private getCardTemplate(v: GroupedVariable) {
-    const safeKey = DataSanitizer.escapeHTML(v.key);
-    return `
-      <div class="var-header">
-        <span class="var-tag">{{${safeKey}}}</span>
-        <span class="usage-badge">...</span>
-      </div>
-
-      <div class="pipeline-area">
-        <div class="pipeline-line"></div>
-        
-        <div class="pipeline-step">
-          <div class="step-dot"></div>
-          <div class="step-label">RAW INPUT</div>
-        </div>
-
-        <div class="pipeline-dynamic-steps"></div>
-
-        <div class="pipeline-step">
-          <div class="step-dot plus"></div>
-          <div class="add-area">
-            <app-select 
-              class="add-formatter-select" 
-              data-key="${safeKey}" 
-              placeholder="+ ADD FORMATTER"
-              style="width: 140px; --select-height: 24px;"
-            ></app-select>
-          </div>
-        </div>
-
-        <div class="pipeline-step">
-          <div class="step-dot success"></div>
-          <div class="step-label text-accent-success">FORMATTED OUTPUT</div>
-        </div>
-      </div>
-
-      <div class="fallback-area">
-        <app-input 
-          class="fallback-input" 
-          data-key="${safeKey}" 
-          label="Fallback Value" 
-          placeholder="Ex: N/A"
-        ></app-input>
-      </div>
-    `;
-  }
-
   private renderSkeleton() {
     if (!this.shadowRoot) return;
 
@@ -451,7 +404,7 @@ export class VariableManager extends HTMLElement {
             <span class="sys-badge" slot="target" data-copy="{{date}}">{{date}}</span>
           </ui-tooltip>
         </div>
-        <p class="text-[9px] text-text-muted italic">Click to copy or type them in any text layer.</p>
+        <p class="text-2xs text-text-muted italic">Click to copy or type them in any text layer.</p>
       </div>
 
       <div id="vars-container"></div>

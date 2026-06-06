@@ -111,8 +111,8 @@ Cada item do array `Label[]` deve ser renderizado como um "Cartucho". A mágica 
       ${label.name}
     </h4>
     <div class="flex items-center justify-between">
-      <kbd class="kbd-prism shadow-none text-[8px]">${label.config.widthMM} × ${label.config.heightMM}mm</kbd>
-      <span class="font-mono text-[9px] text-text-muted/60">
+      <kbd class="kbd-prism shadow-none text-tiny">${label.config.widthMM} × ${label.config.heightMM}mm</kbd>
+      <span class="font-mono text-2xs text-text-muted/60">
         ${formatTime(label.updatedAt)} <!-- Ex: 2h ago -->
       </span>
     </div>

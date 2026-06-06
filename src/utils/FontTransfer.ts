@@ -1,5 +1,6 @@
 import { logger } from '../core/Logger';
 import { db } from '../core/Database';
+import { SecurityPolicy } from '../core/SecurityPolicy';
 
 /**
  * FontData: Estrutura de transporte de binários de fonte.
@@ -70,6 +71,8 @@ export class FontTransfer {
             logger.debug('FontTransfer', `Restored from IDB: ${info.family} (${info.weight})`);
           } else {
             // C) Download (Caso de uso inicial)
+            SecurityPolicy.validateUrl(info.url); // ✅ SSRF Protection (Task DET-06)
+            // fallow-ignore-next-line security-sink
             const response = await fetch(info.url);
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             buffer = await response.arrayBuffer();
@@ -146,6 +149,8 @@ export class FontTransfer {
    */
   private static async fetchAndParseManual(url: string, map: Map<string, any[]>) {
     try {
+      SecurityPolicy.validateUrl(url); // ✅ SSRF Protection (Task DET-06)
+      // fallow-ignore-next-line security-sink
       const response = await fetch(url);
       const text = await response.text();
       this.parseCssText(text, map);

@@ -1,5 +1,6 @@
 import { jsPDF } from 'jspdf';
 import { canvasRenderer } from './CanvasRenderer';
+import { SecurityPolicy } from '../../core/SecurityPolicy';
 
 /**
  * Protocolo de mensagens do Worker
@@ -68,6 +69,8 @@ self.onmessage = async (e: MessageEvent<WorkerTask>) => {
     for (const el of label.elements) {
       if (el.type === 'image' && el.src && !imageCache.has(el.src)) {
         try {
+          SecurityPolicy.validateUrl(el.src); // ✅ SSRF Protection (Task DET-06)
+          // fallow-ignore-next-line security-sink
           const response = await fetch(el.src);
           const blob = await response.blob();
           const bitmap = await createImageBitmap(blob);
