@@ -15,6 +15,6 @@ Auditar e blindar as chamadas de rede dinâmicas (`fetch`) identificadas pelo Fa
 3. **Log de Segurança:** Se uma URL inválida for detectada, disparar log de erro e abortar a operação silenciosamente (evitando DoS por crash).
 
 ## Critérios de Aceite
-- [ ] Chamadas de fetch protegidas por validação de host.
-- [ ] Fontes legítimas continuam carregando normalmente.
-- [ ] `fallow security` reporta que os sinks de rede agora possuem verificação.
+- [x] Chamadas de fetch protegidas por validação de host.
+- [x] Fontes legítimas continuam carregando normalmente.
+- [x] `fallow security` reporta que os sinks de rede agora possuem verificação.

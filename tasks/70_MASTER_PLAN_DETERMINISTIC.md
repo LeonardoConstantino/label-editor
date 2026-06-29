@@ -32,7 +32,7 @@ Este plano coordena a resolução dos achados técnicos identificados pela ferra
 | ID | Task | Status | Dependências | Branch |
 |----|------|--------|--------------|--------|
 | **05** | [Refatoração de Sinks HTML (CWE-79)](./70_audit_det/DET_05_security_sinks.md) | [x] | — | `audit/DET-05-sec-html` |
-| **06** | [Proteção contra SSRF (CWE-918)](./70_audit_det/DET_06_security_ssrf.md) | [ ] | — | `audit/DET-06-sec-ssrf` |
+| **06** | [Proteção contra SSRF (CWE-918)](./70_audit_det/DET_06_security_ssrf.md) | [x] | — | `audit/DET-06-sec-ssrf` |
 
 ---
 ## Notas de Orquestração
