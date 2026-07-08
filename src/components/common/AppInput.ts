@@ -1,5 +1,6 @@
 import { UISM } from '../../core/UISoundManager';
 import { sharedSheet } from '../../utils/shared-styles';
+import { bridgeTheme } from '../../utils/theme-bridge';
 
 /**
  * AppInput: Campo de entrada técnico com label integrada.
@@ -8,6 +9,7 @@ import { sharedSheet } from '../../utils/shared-styles';
 export class AppInput extends HTMLElement {
   private input: HTMLInputElement;
   private labelElement: HTMLElement;
+  private _themeCleanup: (() => void)  | null = null; // <-- novo
 
   constructor() {
     super();
@@ -49,9 +51,14 @@ export class AppInput extends HTMLElement {
   }
 
   connectedCallback(): void {
+    this._themeCleanup = bridgeTheme(this); // <-- conecta observer
     this.setupBaseStyles();
     this.render();
     this.setupEvents();
+  }
+
+  disconnectedCallback(): void {
+    this._themeCleanup?.(); // <-- limpa observer ao sair do DOM
   }
 
   attributeChangedCallback(name: string, oldVal: string, newVal: string): void {

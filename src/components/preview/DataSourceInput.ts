@@ -9,6 +9,7 @@ import '../common/ui-variable-badge';
 import '../common/UiDataGateway';
 import '../common/AppSelect';
 import { sharedSheet } from '../../utils/shared-styles';
+import { bridgeTheme } from '../../utils/theme-bridge';
 
 /**
  * DataSourceInput: Production Cockpit (Fiel e Robusto)
@@ -16,6 +17,7 @@ import { sharedSheet } from '../../utils/shared-styles';
  */
 export class DataSourceInput extends HTMLElement {
   private _abortController: AbortController | null = null;
+  private _themeCleanup: (() => void) | null = null;
   private dataList: Record<string, any>[] = [];
   private _isProcessing = false;
   private _progress = 0;
@@ -36,12 +38,14 @@ export class DataSourceInput extends HTMLElement {
   }
 
   connectedCallback(): void {
+    this._themeCleanup = bridgeTheme(this);
     this.renderSkeleton();
     this.setupListeners();
     this.syncAll();
   }
 
   disconnectedCallback() {
+    this._themeCleanup?.();
     this._abortController?.abort();
   }
 
@@ -484,7 +488,7 @@ export class DataSourceInput extends HTMLElement {
                 <ui-number-scrubber id="cfg-gap" label="GAP" min="0" max="50" step="1" unit="mm"></ui-number-scrubber>
                 <ui-number-scrubber id="cfg-margin" label="MAR" min="0" max="100" step="1" unit="mm"></ui-number-scrubber>
                 <ui-number-scrubber id="cfg-bleed" label="BLD" min="0" max="10" step="0.5" unit="mm"></ui-number-scrubber>
-                <div class="flex items-center justify-between bg-black/20 rounded-lg p-2 px-4 border border-border-ui/50 col-span-2">
+                <div class="flex items-center justify-between bg-surface-elevated rounded-lg p-2 px-4 border border-border-ui/50 col-span-2">
                    <span class="label-prism" style="margin:0; font-size: 10px;">Render Crop Marks</span>
                    <input type="checkbox" id="cfg-crop">
                 </div>

@@ -1,4 +1,5 @@
 import { sharedSheet } from '../../../utils/shared-styles';
+import { bridgeTheme } from '../../../utils/theme-bridge';
 import eventBus from '../../../core/EventBus';
 import { store } from '../../../core/Store';
 import { db } from '../../../core/Database';
@@ -17,6 +18,7 @@ import '../../common/AppButton';
 export class MicroImageEditor extends HTMLElement {
   private _asset: Asset | null = null;
   private _abortController: AbortController | null = null;
+  private _themeCleanup: (() => void) | null = null;
   
   // Canvases
   private _previewCanvas: HTMLCanvasElement | null = null;
@@ -54,6 +56,7 @@ export class MicroImageEditor extends HTMLElement {
   }
 
   connectedCallback() {
+    this._themeCleanup = bridgeTheme(this);
     this.renderSkeleton();
     this.setupListeners();
     this.syncUI();
@@ -61,6 +64,7 @@ export class MicroImageEditor extends HTMLElement {
   }
 
   disconnectedCallback() {
+    this._themeCleanup?.();
     this._abortController?.abort();
   }
 
@@ -340,17 +344,17 @@ export class MicroImageEditor extends HTMLElement {
 
     this.shadowRoot.innerHTML = `
       <style>
-        :host { display: flex; height: 600px; background: var(--color-canvas); color: white; font-family: var(--font-sans); }
+        :host { display: flex; height: 600px; background: var(--color-canvas); color: var(--color-text-main); font-family: var(--font-sans); }
         
         .panel-controls { 
           width: 280px; border-right: 1px solid var(--color-border-ui); 
           padding: 24px; display: flex; flex-direction: column; gap: 24px;
-          background: rgba(0,0,0,0.2);
+          background: var(--color-surface);
         }
 
         .panel-preview { 
           flex: 1; display: flex; align-items: center; justify-content: center; 
-          background: #050608; overflow: hidden; padding: 32px;
+          background: var(--color-canvas); overflow: hidden; padding: 32px;
           position: relative;
         }
 

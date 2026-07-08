@@ -22,6 +22,7 @@
  */
 
 import { sharedSheet } from '../../utils/shared-styles';
+import { bridgeTheme } from '../../utils/theme-bridge';
 
 // ---------------------------------------------------------------------------
 // Constantes
@@ -99,7 +100,7 @@ styles.replaceSync(/* css */`
     padding: 0 8px 0 4px;
     border-radius: 6px;
     border: 1px solid var(--border-ui, #262a33);
-    background: var(--bg-black-20, rgba(0,0,0,0.2));
+    background: var(--color-surface-elevated, rgba(0,0,0,0.2));
     cursor: pointer;
     flex-shrink: 0;
     transition: border-color 200ms ease, box-shadow 200ms ease;
@@ -238,6 +239,7 @@ styles.replaceSync(/* css */`
 // ---------------------------------------------------------------------------
 
 export class AppColorPicker extends HTMLElement {
+  private _themeCleanup: (() => void) | null = null; // <-- novo
 
   // ── Campos privados ──────────────────────────────────────────────────────
   #shadow: ShadowRoot;
@@ -271,13 +273,15 @@ export class AppColorPicker extends HTMLElement {
 
   connectedCallback(): void {
     this.#controller = new AbortController();
+    this._themeCleanup = bridgeTheme(this); // <-- conecta observer
     this.#setupListeners();
     this.#syncFromAttributes();
   }
 
-  disconnectedCallback(): void {
+disconnectedCallback(): void {
     this.#controller?.abort();
     this.#controller = null;
+    this._themeCleanup?.(); // <-- limpa observer ao sair do DOM
   }
 
   attributeChangedCallback(name: string, oldVal: string, newVal: string): void {

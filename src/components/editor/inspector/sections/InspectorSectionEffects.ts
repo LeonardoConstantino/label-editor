@@ -1,5 +1,6 @@
 import { AnyElement } from '../../../../domain/models/Label';
 import { sharedSheet } from '../../../../utils/shared-styles';
+import { bridgeTheme } from '../../../../utils/theme-bridge';
 import { dispatchInspectorChange, resolveInspectorValue } from '../inspector-events';
 import { UISM } from '../../../../core/UISoundManager';
 import { HelpContentProvider } from '../../../../utils/HelpContentProvider';
@@ -15,6 +16,7 @@ import '../../../common/icon';
  */
 export class InspectorSectionEffects extends HTMLElement {
   private _element: AnyElement | null = null;
+  private _themeCleanup: (() => void) | null = null;
 
   constructor() {
     super();
@@ -34,9 +36,14 @@ export class InspectorSectionEffects extends HTMLElement {
   }
 
   connectedCallback(): void {
+    this._themeCleanup = bridgeTheme(this);
     this.render();
     this.setupListeners();
     this.syncValues();
+  }
+
+  disconnectedCallback(): void {
+    this._themeCleanup?.();
   }
 
   private render(): void {

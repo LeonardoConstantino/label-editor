@@ -1,5 +1,6 @@
 import { AnyElement, ElementType } from '../../../domain/models/Label';
 import { sharedSheet } from '../../../utils/shared-styles';
+import { bridgeTheme } from '../../../utils/theme-bridge';
 import { dispatchInspectorAction, dispatchInspectorChange } from './inspector-events';
 import { escapeHTML } from '../../../utils/sanitize';
 import { InspectorSection, InspectorActionType } from './inspector.types';
@@ -36,6 +37,7 @@ export class InspectorLayerCard extends HTMLElement {
   private _hasOverflow: boolean = false;
   private _warningMessage: string = '';
   private _sectionsRendered: boolean = false;
+  private _themeCleanup: (() => void) | null = null;
 
   constructor() {
     super();
@@ -87,9 +89,14 @@ export class InspectorLayerCard extends HTMLElement {
   }
 
   connectedCallback(): void {
+    this._themeCleanup = bridgeTheme(this); // <-- conecta observer
     if (!this.shadowRoot?.innerHTML) {
       this.render();
     }
+  }
+
+  disconnectedCallback(): void {
+    this._themeCleanup?.(); // <-- limpa observer ao sair do DOM
   }
 
   private render(): void {

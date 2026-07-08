@@ -1,6 +1,7 @@
 import { ImageElement } from '../../../../domain/models/elements/SpecificElements';
 import { ImageFit, CompositeOperation } from '../../../../domain/models/elements/BaseElement';
 import { sharedSheet } from '../../../../utils/shared-styles';
+import { bridgeTheme } from '../../../../utils/theme-bridge';
 import { dispatchInspectorChange, resolveInspectorValue } from '../inspector-events';
 import { HelpContentProvider } from '../../../../utils/HelpContentProvider';
 
@@ -18,6 +19,7 @@ interface InputWithMetadata extends HTMLElement {
  */
 export class InspectorSectionImage extends HTMLElement {
   private _element: ImageElement | null = null;
+  private _themeCleanup: (() => void) | null = null;
 
   constructor() {
     super();
@@ -33,9 +35,14 @@ export class InspectorSectionImage extends HTMLElement {
   }
 
   connectedCallback(): void {
+    this._themeCleanup = bridgeTheme(this);
     this.render();
     this.setupListeners();
     this.syncValues();
+  }
+
+  disconnectedCallback(): void {
+    this._themeCleanup?.();
   }
 
   private render(): void {

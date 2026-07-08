@@ -1,4 +1,5 @@
 import { sharedSheet } from '../../utils/shared-styles';
+import { bridgeTheme } from '../../utils/theme-bridge';
 import eventBus from '../../core/EventBus';
 import { store, AppState } from '../../core/Store';
 import { debounce } from '../../utils/utils';
@@ -25,6 +26,7 @@ export class AppCockpit extends HTMLElement {
   private _activeModuleId: string = 'blueprint';
   private _currentThumbnail: string = '';
   private _abortController: AbortController | null = null;
+  private _themeCleanup: (() => void) | null = null;
 
   constructor() {
     super();
@@ -35,6 +37,7 @@ export class AppCockpit extends HTMLElement {
   }
 
   connectedCallback() {
+    this._themeCleanup = bridgeTheme(this); // <-- conecta observer
     this.render();
     this.setupListeners();
     this.syncModule(store.getState().activeModuleId);
@@ -42,6 +45,7 @@ export class AppCockpit extends HTMLElement {
   }
 
   disconnectedCallback() {
+    this._themeCleanup?.(); // <-- limpa observer ao sair do DOM
     this._abortController?.abort();
   }
 

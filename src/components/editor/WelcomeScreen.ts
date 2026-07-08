@@ -3,12 +3,15 @@ import { templateManager } from '../../domain/services/TemplateManager';
 import eventBus from '../../core/EventBus';
 import '../common/icon';
 import { sharedSheet } from '../../utils/shared-styles';
+import { bridgeTheme } from '../../utils/theme-bridge';
 
 /**
  * WelcomeScreen: Tela inicial do Label Forge OS.
  * Exibida quando não há projetos ativos detectados.
  */
 export class WelcomeScreen extends HTMLElement {
+  private _themeCleanup: (() => void) | null = null;
+
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
@@ -18,8 +21,13 @@ export class WelcomeScreen extends HTMLElement {
   }
 
   connectedCallback(): void {
+    this._themeCleanup = bridgeTheme(this); // <-- conecta observer
     this.render();
     this.setupEvents();
+  }
+
+  disconnectedCallback(): void {
+    this._themeCleanup?.();
   }
 
   private render(): void {
@@ -57,7 +65,7 @@ export class WelcomeScreen extends HTMLElement {
         }
       </style>
 
-      <div class="p-8 flex flex-col items-center text-center relative overflow-hidden rounded-2xl bg-[#0a0c10]">
+      <div class="p-8 flex flex-col items-center text-center relative overflow-hidden rounded-2xl bg-canvas">
         
         <!-- Fundo de Grid Técnico (Subliminar) -->
         <div class="absolute inset-0 pointer-events-none opacity-[0.03]" style="background-image: linear-gradient(var(--color-border-ui) 1px, transparent 1px), linear-gradient(90deg, var(--color-border-ui) 1px, transparent 1px); background-size: 20px 20px;"></div>
@@ -72,12 +80,12 @@ export class WelcomeScreen extends HTMLElement {
           <ui-icon name="layers" size="lg" class="text-accent-primary drop-shadow-[0_0_8px_rgba(99,102,241,0.8)]"></ui-icon>
         </div>
 
-        <h2 class="font-sans text-3xl font-bold mb-2 tracking-tight relative z-10 text-transparent bg-clip-text bg-linear-to-b from-white to-white/70">
+        <h2 class="font-sans text-3xl font-bold mb-2 tracking-tight relative z-10 text-text-main">
           Label Forge OS
         </h2>
         <p class="text-sm text-text-muted mb-10 max-w-md leading-relaxed relative z-10">
           Bem-vindo ao seu ambiente de precisão técnica. <br>
-          <span class="mt-2 inline-flex items-center px-2 py-1 bg-black/40 border border-white/5 rounded font-mono text-[9px] uppercase tracking-widest text-accent-success/80">
+          <span class="mt-2 inline-flex items-center px-2 py-1 bg-surface-elevated border border-border-ui rounded font-mono text-2xs uppercase tracking-widest text-accent-success/80">
             System Status: Ready for Input <span class="cursor-blink"></span>
           </span>
         </p>
@@ -88,35 +96,35 @@ export class WelcomeScreen extends HTMLElement {
           <!-- AÇÃO 1: NOVO BLUEPRINT (O Protagonista) -->
           <!-- Usa fundo levemente indigo e borda acesa por padrão -->
           <button id="action-new" class="action-card group flex flex-col items-center justify-center gap-4 p-8 bg-surface-solid border border-accent-primary/40 rounded-2xl cursor-pointer shadow-[0_10px_30px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.1)] hover:border-accent-primary hover:bg-accent-primary/10 hover:shadow-[0_15px_40px_rgba(0,0,0,0.6),0_0_20px_rgba(99,102,241,0.2)]">
-            <div class="w-14 h-14 rounded-2xl bg-[#050608] border border-accent-primary/50 flex items-center justify-center transition-all duration-400 group-hover:scale-110 group-hover:bg-accent-primary/20 group-hover:border-accent-primary shadow-inner">
+            <div class="w-14 h-14 rounded-2xl bg-surface-elevated border border-accent-primary/50 flex items-center justify-center transition-all duration-400 group-hover:scale-110 group-hover:bg-accent-primary/20 group-hover:border-accent-primary shadow-inner">
               <ui-icon name="file-plus" class="text-accent-primary"></ui-icon>
             </div>
             <div class="flex flex-col gap-1.5">
               <span class="font-mono text-[11px] text-text-main uppercase tracking-[0.15em] font-bold">New Blueprint</span>
-              <span class="text-[9px] text-accent-primary/70 uppercase tracking-wider font-mono">Start from scratch</span>
+              <span class="text-2xs text-accent-primary/70 uppercase tracking-wider font-mono">Start from scratch</span>
             </div>
           </button>
 
           <!-- AÇÃO 2: OPEN VAULT (Acesso Secundário) -->
           <!-- Escuro por padrão, acorda no hover -->
-          <button id="action-vault" class="action-card group flex flex-col items-center justify-center gap-4 p-8 bg-black/40 border border-white/5 rounded-2xl cursor-pointer shadow-inner hover:border-white/20 hover:bg-surface-solid hover:shadow-[0_15px_30px_rgba(0,0,0,0.5)]">
-            <div class="w-14 h-14 rounded-2xl bg-surface-solid border border-white/5 flex items-center justify-center transition-all duration-400 group-hover:scale-110 group-hover:border-white/30 group-hover:bg-black/40 shadow-inner">
+          <button id="action-vault" class="action-card group flex flex-col items-center justify-center gap-4 p-8 bg-surface-elevated border border-border-ui rounded-2xl cursor-pointer shadow-inner hover:border-white/20 hover:bg-surface-solid hover:shadow-[0_15px_30px_rgba(0,0,0,0.5)]">
+            <div class="w-14 h-14 rounded-2xl bg-surface-solid border border-border-ui flex items-center justify-center transition-all duration-400 group-hover:scale-110 group-hover:border-white/30 group-hover:bg-surface-elevated shadow-inner">
               <ui-icon name="package" class="text-text-muted group-hover:text-text-main transition-colors"></ui-icon>
             </div>
             <div class="flex flex-col gap-1.5">
               <span class="font-mono text-[11px] text-text-muted group-hover:text-text-main uppercase tracking-[0.15em] font-bold transition-colors">Open Vault</span>
-              <span class="text-[9px] text-text-muted/50 uppercase tracking-wider font-mono">Load saved assets</span>
+              <span class="text-2xs text-text-muted/50 uppercase tracking-wider font-mono">Load saved assets</span>
             </div>
           </button>
 
           <!-- AÇÃO 3: IMPORT FILE (Acesso Secundário) -->
-          <button id="action-import" class="action-card group flex flex-col items-center justify-center gap-4 p-8 bg-black/40 border border-white/5 rounded-2xl cursor-pointer shadow-inner hover:border-white/20 hover:bg-surface-solid hover:shadow-[0_15px_30px_rgba(0,0,0,0.5)]">
-            <div class="w-14 h-14 rounded-2xl bg-surface-solid border border-white/5 flex items-center justify-center transition-all duration-400 group-hover:scale-110 group-hover:border-white/30 group-hover:bg-black/40 shadow-inner">
+          <button id="action-import" class="action-card group flex flex-col items-center justify-center gap-4 p-8 bg-surface-elevated border border-border-ui rounded-2xl cursor-pointer shadow-inner hover:border-white/20 hover:bg-surface-solid hover:shadow-[0_15px_30px_rgba(0,0,0,0.5)]">
+            <div class="w-14 h-14 rounded-2xl bg-surface-solid border border-border-ui flex items-center justify-center transition-all duration-400 group-hover:scale-110 group-hover:border-white/30 group-hover:bg-surface-elevated shadow-inner">
               <ui-icon name="upload-cloud" class="text-text-muted group-hover:text-text-main transition-colors"></ui-icon>
             </div>
             <div class="flex flex-col gap-1.5">
               <span class="font-mono text-[11px] text-text-muted group-hover:text-text-main uppercase tracking-[0.15em] font-bold transition-colors">Import File</span>
-              <span class="text-[9px] text-text-muted/50 uppercase tracking-wider font-mono">External .label data</span>
+              <span class="text-2xs text-text-muted/50 uppercase tracking-wider font-mono">External .label data</span>
             </div>
           </button>
 

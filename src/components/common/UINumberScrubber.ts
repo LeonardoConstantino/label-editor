@@ -1,5 +1,6 @@
 import { UISM } from '../../core/UISoundManager';
 import { sharedSheet } from '../../utils/shared-styles';
+import { bridgeTheme } from '../../utils/theme-bridge';
 
 /**
  * ui-number-scrubber
@@ -11,6 +12,7 @@ export class UINumberScrubber extends HTMLElement {
   #input!: HTMLInputElement;
   #wrapper!: HTMLDivElement;
   #controller: AbortController | null = null;
+  private _themeCleanup: (() => void) | null = null;
 
   // Estado de Arraste
   #isDragging = false;
@@ -60,6 +62,7 @@ export class UINumberScrubber extends HTMLElement {
   }
 
   connectedCallback() {
+    this._themeCleanup = bridgeTheme(this); // <-- conecta observer
     this.#render();
     this.#setupEventListeners();
     this.#updateProgress();
@@ -67,6 +70,7 @@ export class UINumberScrubber extends HTMLElement {
   }
 
   disconnectedCallback() {
+    this._themeCleanup?.(); // <-- limpa observer ao sair do DOM
     this.#controller?.abort();
   }
 

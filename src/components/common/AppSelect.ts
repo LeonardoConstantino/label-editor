@@ -1,5 +1,6 @@
-import { sharedSheet } from '../../utils/shared-styles';
 import { UISM } from '../../core/UISoundManager';
+import { sharedSheet } from '../../utils/shared-styles';
+import { bridgeTheme } from '../../utils/theme-bridge';
 
 export interface SelectOption {
   value: string;
@@ -17,6 +18,7 @@ export class AppSelect extends HTMLElement {
   private _label: string = '';
   private _isOpen: boolean = false;
   private _abortController: AbortController | null = null;
+  private _themeCleanup: (() => void) | null = null; // <-- novo
 
   constructor() {
     super();
@@ -62,12 +64,14 @@ export class AppSelect extends HTMLElement {
   }
 
   connectedCallback() {
+    this._themeCleanup = bridgeTheme(this); // <-- conecta observer
     this.render();
     this.setupListeners();
   }
 
   disconnectedCallback() {
     this._abortController?.abort();
+    this._themeCleanup?.();
   }
 
   private toggle() {

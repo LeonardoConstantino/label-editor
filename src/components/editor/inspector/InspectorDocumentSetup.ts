@@ -1,6 +1,7 @@
 import { Label } from '../../../domain/models/Label';
 import { UserPreferences } from '../../../domain/models/UserPreferences';
 import { sharedSheet } from '../../../utils/shared-styles';
+import { bridgeTheme } from '../../../utils/theme-bridge';
 import { dispatchInspectorChange, dispatchInspectorAction, resolveInspectorValue } from './inspector-events';
 import { escapeHTML } from '../../../utils/sanitize';
 import { LABEL_PRESETS } from '../../../constants/defaults';
@@ -25,6 +26,7 @@ export class InspectorDocumentSetup extends HTMLElement {
   private _labelConfig: Label['config'] | null = null;
   private _preferences: UserPreferences | null = null;
   private _thumbnailUrl: string = '';
+  private _themeCleanup: (() => void) | null = null;
 
   constructor() {
     super();
@@ -51,12 +53,17 @@ export class InspectorDocumentSetup extends HTMLElement {
   }
 
   connectedCallback(): void {
+    this._themeCleanup = bridgeTheme(this); // <-- conecta observer
     this.render();
     this.setupSelects();
     this.setupListeners();
     this.syncValues();
     this.syncDigitalTwin();
     this.updateDigitalTwinVisuals();
+  }
+
+  disconnectedCallback(): void {
+    this._themeCleanup?.(); // <-- limpa observer ao sair do DOM
   }
 
   private render(): void {
@@ -74,7 +81,7 @@ export class InspectorDocumentSetup extends HTMLElement {
         
         .monitor-container {
           position: relative; width: 100%; height: 180px; 
-          background: #0a0c10; border: 1px solid var(--color-border-ui);
+          background: var(--color-canvas); border: 1px solid var(--color-border-ui);
           border-radius: 12px; display: flex; align-items: center; 
           justify-content: center; margin-bottom: 24px; overflow: hidden;
           cursor: pointer; transition: all 0.3s var(--ease-spring);

@@ -1,5 +1,6 @@
 import { CodeElement } from '../../../../domain/models/elements/SpecificElements';
 import { sharedSheet } from '../../../../utils/shared-styles';
+import { bridgeTheme } from '../../../../utils/theme-bridge';
 import { dispatchInspectorChange, resolveInspectorValue } from '../inspector-events';
 import { HelpContentProvider } from '../../../../utils/HelpContentProvider';
 import { CodeValidator } from '../../../../utils/CodeValidator';
@@ -16,6 +17,7 @@ import '../../../common/UINumberScrubber';
  */
 export class InspectorSectionCode extends HTMLElement {
   private _element: CodeElement | null = null;
+  private _themeCleanup: (() => void) | null = null;
 
   constructor() {
     super();
@@ -31,9 +33,14 @@ export class InspectorSectionCode extends HTMLElement {
   }
 
   connectedCallback(): void {
+    this._themeCleanup = bridgeTheme(this);
     this.renderSkeleton();
     this.setupListeners();
     this.syncValues();
+  }
+
+  disconnectedCallback(): void {
+    this._themeCleanup?.();
   }
 
   private renderSkeleton() {

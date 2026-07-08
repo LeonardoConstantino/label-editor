@@ -1,6 +1,7 @@
 import { BorderElement } from '../../../../domain/models/elements/SpecificElements';
 import { BorderStyle } from '../../../../domain/models/elements/BaseElement';
 import { sharedSheet } from '../../../../utils/shared-styles';
+import { bridgeTheme } from '../../../../utils/theme-bridge';
 import { dispatchInspectorChange, resolveInspectorValue } from '../inspector-events';
 import { escapeHTML } from '../../../../utils/sanitize';
 import { HelpContentProvider } from '../../../../utils/HelpContentProvider';
@@ -16,6 +17,7 @@ import '../../../common/UINumberScrubber';
  */
 export class InspectorSectionBorder extends HTMLElement {
   private _element: BorderElement | null = null;
+  private _themeCleanup: (() => void) | null = null;
 
   constructor() {
     super();
@@ -35,9 +37,14 @@ export class InspectorSectionBorder extends HTMLElement {
   }
 
   connectedCallback(): void {
+    this._themeCleanup = bridgeTheme(this);
     this.render();
     this.setupListeners();
     this.syncValues();
+  }
+
+  disconnectedCallback(): void {
+    this._themeCleanup?.();
   }
 
   private render(): void {

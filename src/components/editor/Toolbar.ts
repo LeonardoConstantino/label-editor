@@ -7,6 +7,7 @@ import { ElementFactory } from '../../domain/models/elements/ElementFactory';
 import { templateManager } from '../../domain/services/TemplateManager';
 import { UIKeyboardShortcuts } from '../common/KeyboardShortcuts';
 import { sharedSheet } from '../../utils/shared-styles';
+import { bridgeTheme } from '../../utils/theme-bridge';
 import '../common/AppButton';
 import '../common/icon';
 import '../common/tooltip';
@@ -16,6 +17,7 @@ import '../common/tooltip';
  */
 export class EditorToolbar extends HTMLElement {
   private unsubscribe: (() => void) | null = null;
+  private _themeCleanup: (() => void) | null = null;
 
   constructor() {
     super();
@@ -26,12 +28,14 @@ export class EditorToolbar extends HTMLElement {
   }
 
   connectedCallback(): void {
+    this._themeCleanup = bridgeTheme(this); // <-- conecta observer
     this.render();
     this.setupListeners();
     this.updateUI(); // Estado inicial
   }
 
   disconnectedCallback(): void {
+    this._themeCleanup?.();
     if (this.unsubscribe) this.unsubscribe();
   }
 

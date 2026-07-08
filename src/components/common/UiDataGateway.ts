@@ -1,4 +1,5 @@
 import { sharedSheet } from '../../utils/shared-styles';
+import { bridgeTheme } from '../../utils/theme-bridge';
 import { UISM } from '../../core/UISoundManager';
 import { dataSourceParser } from '../../domain/services/DataSourceParser';
 import { DataSanitizer } from '../../core/DataSanitizer';
@@ -11,6 +12,7 @@ import eventBus from '../../core/EventBus';
 export class UiDataGateway extends HTMLElement {
   private _isDragging = false;
   private _abortController: AbortController | null = null;
+  private _themeCleanup: (() => void) | null = null;
 
   constructor() {
     super();
@@ -21,11 +23,13 @@ export class UiDataGateway extends HTMLElement {
   }
 
   connectedCallback() {
+    this._themeCleanup = bridgeTheme(this); // <-- conecta observer
     this.render();
     this.setupListeners();
   }
 
   disconnectedCallback() {
+    this._themeCleanup?.(); // <-- limpa observer ao sair do DOM
     this._abortController?.abort();
   }
 
@@ -214,7 +218,8 @@ export class UiDataGateway extends HTMLElement {
 
         textarea {
           flex: 1;
-          background: transparent;
+          background: var(--color-surface-elevated);
+          border-radius: var(--spacing-2);
           border: none;
           outline: none;
           color: var(--color-text-main);
@@ -241,7 +246,7 @@ export class UiDataGateway extends HTMLElement {
           align-items: center;
           justify-content: space-between;
           padding: var(--spacing-2_5) var(--spacing-4);
-          background: color-mix(in srgb, black, transparent 60%);
+          background: color-mix(in srgb, var(--color-surface-elevated), transparent 60%);
           border-top: 1px solid color-mix(in srgb, var(--color-text-main), transparent 95%);
           flex-shrink: 0;
         }

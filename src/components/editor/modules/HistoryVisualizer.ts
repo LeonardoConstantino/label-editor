@@ -1,4 +1,5 @@
 import { sharedSheet } from '../../../utils/shared-styles';
+import { bridgeTheme } from '../../../utils/theme-bridge';
 import eventBus from '../../../core/EventBus';
 import { historyManager, HistorySnapshot } from '../../../domain/services/HistoryManager';
 import { UISM } from '../../../core/UISoundManager';
@@ -13,6 +14,7 @@ import { confirmDialog } from '../../common/confirm';
 export class HistoryVisualizer extends HTMLElement {
   private _abortController: AbortController | null = null;
   private _thumbnails: Map<number, string> = new Map();
+  private _themeCleanup: (() => void) | null = null;
 
   constructor() {
     super();
@@ -23,12 +25,14 @@ export class HistoryVisualizer extends HTMLElement {
   }
 
   connectedCallback() {
+    this._themeCleanup = bridgeTheme(this);
     this.render();
     this.setupListeners();
     this.syncHistory();
   }
 
   disconnectedCallback() {
+    this._themeCleanup?.();
     this._abortController?.abort();
   }
 
@@ -199,7 +203,7 @@ export class HistoryVisualizer extends HTMLElement {
           display: flex;
           flex-direction: column;
           height: 100%;
-          background: #0a0c10;
+          background: var(--color-canvas);
           font-family: var(--font-sans);
           overflow: hidden; /* Mantém tudo dentro do host */
         }
@@ -210,7 +214,7 @@ export class HistoryVisualizer extends HTMLElement {
           justify-content: space-between;
           padding: 16px 20px;
           border-bottom: 1px solid var(--color-border-ui);
-          background: rgba(22, 25, 32, 0.5); /* Leve translúcido */
+          background: var(--color-surface); /* Leve translúcido */
           backdrop-filter: blur(8px);
           z-index: 10;
         }
@@ -266,7 +270,7 @@ export class HistoryVisualizer extends HTMLElement {
           height: 10px;
           border-radius: 50%;
           background: var(--color-border-ui);
-          border: 2px solid #0a0c10;
+          border: 2px solid var(--color-canvas);
           position: absolute;
           top: 18px; /* Alinha com o meio da miniatura */
           z-index: 2;
@@ -282,7 +286,7 @@ export class HistoryVisualizer extends HTMLElement {
 
         .history-node.active .node-dot {
           background: var(--color-accent-success);
-          border-color: #0a0c10;
+          border-color: var(--color-canvas);
           box-shadow: 0 0 15px var(--color-accent-success);
           transform: scale(1.4);
         }
@@ -303,7 +307,7 @@ export class HistoryVisualizer extends HTMLElement {
         .node-thumb {
           width: 72px;
           height: 48px; /* Aspect Ratio Wide para parecer película de filme */
-          background: #000;
+          background: var(--color-surface-solid);
           border: 1px solid var(--color-border-ui);
           border-radius: 6px;
           overflow: hidden;
@@ -392,7 +396,8 @@ export class HistoryVisualizer extends HTMLElement {
         .footer {
           padding: 16px 20px;
           border-top: 1px solid var(--color-border-ui);
-          background: rgba(22, 25, 32, 0.8);
+          background: var(--color-surface); /* Leve translúcido */
+          backdrop-filter: blur(8px);
           z-index: 10;
         }
       </style>

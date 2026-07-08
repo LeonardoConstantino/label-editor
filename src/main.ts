@@ -101,21 +101,38 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.addEventListener('click', playTestSound, { once: true });
   document.addEventListener('keydown', playTestSound, { once: true });
 
+  // Helper para resolver o tema de acordo com as preferências
+  const systemThemeMedia = window.matchMedia('(prefers-color-scheme: dark)');
+  const resolveAndApplyTheme = (theme: 'dark' | 'light' | 'system') => {
+    const activeTheme = theme === 'system' 
+      ? (systemThemeMedia.matches ? 'dark' : 'light') 
+      : theme;
+    document.documentElement.setAttribute('data-theme', activeTheme);
+  };
+
   // 4. Reage a mudanças de preferências em tempo real (Centralizado)
   eventBus.on('preferences:change', (updatedPrefs: UserPreferences) => {
     if (updatedPrefs.audioEnabled !== undefined) {
       UISM.toggle(updatedPrefs.audioEnabled);
     }
     if (updatedPrefs.theme) {
-      document.documentElement.setAttribute('data-theme', updatedPrefs.theme);
+      resolveAndApplyTheme(updatedPrefs.theme);
     }
     if (updatedPrefs.logLevel !== undefined && debugOverride === null) {
       logger.setLevel(updatedPrefs.logLevel);
     }
   });
 
+  // Reage a mudanças no tema do sistema operacional
+  systemThemeMedia.addEventListener('change', () => {
+    const currentPrefs = store.getState().preferences;
+    if (currentPrefs?.theme === 'system') {
+      resolveAndApplyTheme('system');
+    }
+  });
+
   // Atualiza o tema inicial
-  document.documentElement.setAttribute('data-theme', prefs.theme);
+  resolveAndApplyTheme(prefs.theme);
 
   await templateManager.init();
   shortcutService.init(isMac);
