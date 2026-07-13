@@ -19,6 +19,6 @@ Este plano coordena a execução de tarefas para finalizar o backlog de dívidas
 
 | ID | Task | Status | Dependências | Branch |
 |----|------|--------|--------------|--------|
-| **TACT-01** | [Otimização do CanvasRenderer (Desenho da Grade)](./tasks/tactical/TACT_01_grid_renderer.md) | [ ] | — | `task/TACT-01-grid` |
-| **TACT-02** | [Correção do Theme Sync (PreferencesModal)](./tasks/tactical/TACT_02_theme_sync.md) | [ ] | — | `task/TACT-02-theme` |
+| **TACT-01** | [Otimização do CanvasRenderer (Desenho da Grade)](./tasks/tactical/TACT_01_grid_renderer.md) | [x] | — | `task/TACT-01-grid` |
+| **TACT-02** | [Correção do Theme Sync (PreferencesModal)](./tasks/tactical/TACT_02_theme_sync.md) | [x] | — | `task/TACT-02-theme` |
 | **TACT-03** | [Refatoração da Lógica de Variáveis (VariableManager)](./tasks/tactical/TACT_03_var_logic.md) | [ ] | — | `task/TACT-03-vars` |

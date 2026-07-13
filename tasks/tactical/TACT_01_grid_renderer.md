@@ -13,6 +13,6 @@ Delegar a responsabilidade de desenhar a grade do editor para o `EditorCanvas.ts
 3. **Sincronização:** Utilizar as preferências do usuário (`UserPreferences`) para definir espaçamento e visibilidade da grade.
 
 ## Critérios de Aceite
-- [ ] A grade é renderizada via `EditorCanvas.ts`.
-- [ ] Prévia e grade real estão perfeitamente alinhadas.
-- [ ] `npm run build` passa com sucesso.
+- [x] A grade é renderizada via `EditorCanvas.ts`.
+- [x] Prévia e grade real estão perfeitamente alinhadas.
+- [x] `npm run build` passa com sucesso.

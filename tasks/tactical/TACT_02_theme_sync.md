@@ -11,5 +11,5 @@ Investigar e corrigir a falha na aplicação do tema Prism em partes da UI dentr
 2. **Correção:** Garantir que todos os estilos injetados no Shadow DOM utilizem `adoptedStyleSheets` ou classes que herdam do sistema de temas.
 
 ## Critérios de Aceite
-- [ ] O tema é aplicado corretamente em 100% dos elementos do modal.
-- [ ] A mudança de tema ocorre instantaneamente sem necessidade de refresh.
+- [x] O tema é aplicado corretamente em 100% dos elementos do modal.
+- [x] A mudança de tema ocorre instantaneamente sem necessidade de refresh.
