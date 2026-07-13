@@ -1,36 +1,43 @@
 import { UISM } from '../../core/UISoundManager';
 import { sharedSheet } from '../../utils/shared-styles';
+import { bridgeTheme } from '../../utils/theme-bridge';
 
 /**
  * AppButton: Botão tátil seguindo o Design System Tactile Prism.
- */
+*/
 export class AppButton extends HTMLElement {
   private button: HTMLButtonElement;
-
+  private _themeCleanup: (() => void) | null = null; // <-- novo
+  
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
     this.button = document.createElement('button');
-
+    
     if (this.shadowRoot) {
       this.shadowRoot.adoptedStyleSheets = [sharedSheet];
     }
   }
-
+  
   static get observedAttributes() {
     return ['variant', 'disabled'];
   }
-
+  
   connectedCallback(): void {
+    this._themeCleanup = bridgeTheme(this); // <-- conecta observer
     this.setupBaseStyles();
     this.render();
     this.setupEvents();
   }
 
+  disconnectedCallback(): void {
+    this._themeCleanup?.(); // <-- limpa observer ao sair do DOM
+  }
+  
   attributeChangedCallback(): void {
     this.render();
   }
-
+  
   private setupBaseStyles(): void {
     if (!this.shadowRoot) return;
     this.shadowRoot.innerHTML = `

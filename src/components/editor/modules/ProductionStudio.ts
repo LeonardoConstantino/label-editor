@@ -1,4 +1,5 @@
 import { sharedSheet } from '../../../utils/shared-styles';
+import { bridgeTheme } from '../../../utils/theme-bridge';
 import eventBus from '../../../core/EventBus';
 import { store, AppState } from '../../../core/Store';
 import { UISM } from '../../../core/UISoundManager';
@@ -20,6 +21,7 @@ import '../../common/ui-variable-badge';
 export class ProductionStudio extends HTMLElement {
   private _abortController: AbortController | null = null;
   private _labelPlaceholders: string[] = [];
+  private _themeCleanup: (() => void) | null = null;
 
   constructor() {
     super();
@@ -30,12 +32,14 @@ export class ProductionStudio extends HTMLElement {
   }
 
   connectedCallback() {
+    this._themeCleanup = bridgeTheme(this);
     this.render();
     this.setupListeners();
     this.refreshLabelPlaceholders();
   }
 
   disconnectedCallback() {
+    this._themeCleanup?.();
     this._abortController?.abort();
   }
 
@@ -127,7 +131,7 @@ export class ProductionStudio extends HTMLElement {
     this.shadowRoot.innerHTML = `
       <style>
         :host { display: flex; flex-direction: column; height: 100%; background: var(--color-canvas); font-family: var(--font-sans); }
-        .header { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border-bottom: 1px solid var(--color-border-ui); background: rgba(0,0,0,0.2); }
+        .header { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border-bottom: 1px solid var(--color-border-ui); background: color-mix(in srgb, var(--color-text-main), transparent 95%); }
         .header-title { font-family: var(--font-mono); font-size: 10px; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.1em; }
         .header-description { font-size: 12px; color: var(--color-text-muted); }
         .content { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 24px; }
@@ -144,7 +148,7 @@ export class ProductionStudio extends HTMLElement {
 
         .btn-nav {
           width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--color-border-ui);
-          background: rgba(255,255,255,0.03); color: white; cursor: pointer; display: grid; place-items: center;
+          background: color-mix(in srgb, var(--color-text-main), transparent 97%); color: var(--color-text-main); cursor: pointer; display: grid; place-items: center;
           transition: all 0.2s;
         }
         .btn-nav:hover { background: var(--color-accent-primary); border-color: var(--color-accent-primary); box-shadow: 0 0 10px var(--color-accent-primary); }
@@ -153,7 +157,7 @@ export class ProductionStudio extends HTMLElement {
         .variable-section { display: flex; flex-direction: column; gap: 8px; }
         .badge-list { display: flex; flex-wrap: wrap; gap: 8px; }
 
-        .action-area { margin-top: auto; padding: 20px; border-top: 1px solid var(--color-border-ui); background: rgba(0,0,0,0.1); }
+        .action-area { margin-top: auto; padding: 20px; border-top: 1px solid var(--color-border-ui); background: color-mix(in srgb, var(--color-text-main), transparent 95%); }
       </style>
 
       <div class="header">

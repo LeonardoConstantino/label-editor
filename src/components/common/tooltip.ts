@@ -4,6 +4,7 @@
  */
 
 import { sharedSheet } from "../../utils/shared-styles";
+import { bridgeTheme } from '../../utils/theme-bridge';
 
 /**
  * @element ui-tooltip
@@ -69,11 +70,11 @@ balloonStyles.replaceSync(`
     user-select: none;
 
     /* Tactile Prism: Glassmorphism */
-    background: rgba(22, 25, 32, 0.95);
+    background: var(--color-surface-solid);
     backdrop-filter: blur(12px);
     border: 1px solid var(--color-border-ui, #262a33);
     color: var(--color-text-main, #ffffff);
-    box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.8), 0 0 20px rgba(99, 102, 241, 0.1);
+    box-shadow: var(--shadow-panel), 0 0 20px rgba(99, 102, 241, 0.1);
 
     /* Física de Mola */
     opacity: 0;
@@ -115,7 +116,7 @@ balloonStyles.replaceSync(`
   [part="content"] {
     display: block;
     padding: var(--spacing-2);
-    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    text-shadow: none;
   }
 
   /* Estilos internos para conteúdo rico */
@@ -125,7 +126,7 @@ balloonStyles.replaceSync(`
     gap: var(--spacing-2);
     margin-bottom: var(--spacing-3);
     padding-bottom: var(--spacing-2);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid var(--color-border-ui);
   }
 
   [part="content"] .tooltip-header ui-icon {
@@ -174,8 +175,8 @@ balloonStyles.replaceSync(`
   [part="content"] .math-note {
     margin-top: 12px;
     padding: 8px;
-    background: rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: color-mix(in srgb, var(--color-text-main), transparent 95%);
+    border: 1px solid var(--color-border-ui);
     border-radius: 4px;
     display: flex;
     gap: 8px;
@@ -197,6 +198,7 @@ balloonStyles.replaceSync(`
 
 class TooltipBalloon extends HTMLElement {
   #shadow: ShadowRoot;
+  private _themeCleanup: (() => void) | null = null;
 
   constructor() {
     super();
@@ -212,6 +214,14 @@ class TooltipBalloon extends HTMLElement {
       <span part="content"></span>
     `;
     this.#shadow.appendChild(container);
+  }
+
+  connectedCallback(): void {
+    this._themeCleanup = bridgeTheme(this); // <-- conecta observer
+  }
+
+  disconnectedCallback(): void {
+    this._themeCleanup?.(); // <-- limpa observer ao sair do DOM
   }
 
   setContent(content: string | DocumentFragment): void {
@@ -711,6 +721,7 @@ class UiTooltip extends HTMLElement {
   #targetSlot: HTMLSlotElement;
   #contentSlot: HTMLSlotElement;
   #instance: TooltipInstance | null = null;
+  private _themeCleanup: (() => void) | null = null;
 
   static observedAttributes = [
     'trigger',
@@ -732,12 +743,14 @@ class UiTooltip extends HTMLElement {
   }
 
   connectedCallback(): void {
+    this._themeCleanup = bridgeTheme(this); // <-- conecta observer
     this.#targetSlot.addEventListener('slotchange', () => this.#init());
     this.#init();
   }
 
   disconnectedCallback(): void {
     this.#instance?.destroy();
+    this._themeCleanup?.();
   }
 
   attributeChangedCallback(

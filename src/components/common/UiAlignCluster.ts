@@ -3,8 +3,9 @@
  */
 
 import { HelpContentProvider } from '../../utils/HelpContentProvider';
-import { sharedSheet } from '../../utils/shared-styles';
 import { AlignAction } from '../../domain/services/LayoutService';
+import { sharedSheet } from '../../utils/shared-styles';
+import { bridgeTheme } from '../../utils/theme-bridge';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
@@ -149,6 +150,7 @@ export class UiAlignCluster extends HTMLElement {
   #shadow: ShadowRoot;
   #controller: AbortController | null = null;
   #toCanvas: boolean = false;
+  private _themeCleanup: (() => void) | null = null;
 
   constructor() {
     super();
@@ -160,6 +162,7 @@ export class UiAlignCluster extends HTMLElement {
     this.#shadow.adoptedStyleSheets = [sharedSheet, sheet];
     this.#controller = new AbortController();
     const { signal } = this.#controller;
+    this._themeCleanup = bridgeTheme(this); // <-- conecta observer
 
     const board = this.#shadow.querySelector('.cluster-board');
     board?.addEventListener('click', this.#handleClick, { signal });
@@ -172,6 +175,7 @@ export class UiAlignCluster extends HTMLElement {
   disconnectedCallback(): void {
     this.#controller?.abort();
     this.#controller = null;
+    this._themeCleanup?.(); // <-- limpa observer ao sair do DOM
   }
 
   #buildTemplate(): void {

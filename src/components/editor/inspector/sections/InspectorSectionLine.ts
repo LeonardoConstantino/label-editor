@@ -1,6 +1,7 @@
 import { LineElement } from '../../../../domain/models/elements/SpecificElements';
 import { BorderStyle } from '../../../../domain/models/elements/BaseElement';
 import { sharedSheet } from '../../../../utils/shared-styles';
+import { bridgeTheme } from '../../../../utils/theme-bridge';
 import { dispatchInspectorChange, resolveInspectorValue } from '../inspector-events';
 import { HelpContentProvider } from '../../../../utils/HelpContentProvider';
 
@@ -14,6 +15,7 @@ import '../../../common/AppSelect';
  */
 export class InspectorSectionLine extends HTMLElement {
   private _element: LineElement | null = null;
+  private _themeCleanup: (() => void) | null = null;
 
   constructor() {
     super();
@@ -29,9 +31,14 @@ export class InspectorSectionLine extends HTMLElement {
   }
 
   connectedCallback(): void {
+    this._themeCleanup = bridgeTheme(this);
     this.renderSkeleton();
     this.setupListeners();
     this.syncValues();
+  }
+
+  disconnectedCallback(): void {
+    this._themeCleanup?.();
   }
 
   private renderSkeleton() {

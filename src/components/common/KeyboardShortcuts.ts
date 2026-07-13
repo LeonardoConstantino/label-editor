@@ -1,5 +1,6 @@
-import { sharedSheet } from "../../utils/shared-styles";
 import { escapeHTML } from "../../utils/sanitize";
+import { sharedSheet } from "../../utils/shared-styles";
+import { bridgeTheme } from '../../utils/theme-bridge';
 
 export interface ShortcutItem {
   type: 'shortcut' | 'longpress' | "sequence";
@@ -15,6 +16,7 @@ export interface ShortcutItem {
 export class UIKeyboardShortcuts extends HTMLElement {
   private static shortcutsData: ShortcutItem[] = [];
   private searchQuery: string = '';
+  private _themeCleanup: (() => void) | null = null; // <-- novo
 
   constructor() {
     super();
@@ -73,8 +75,13 @@ export class UIKeyboardShortcuts extends HTMLElement {
   }
 
   connectedCallback() {
+    this._themeCleanup = bridgeTheme(this); // <-- conecta observer
     this.render();
     this.setupEvents();
+  }
+
+  disconnectedCallback(): void {
+    this._themeCleanup?.(); // <-- limpa observer ao sair do DOM
   }
 
   private setupEvents() {
@@ -192,7 +199,7 @@ export class UIKeyboardShortcuts extends HTMLElement {
           <div class="mb-6 relative">
             <ui-icon name="search" size="sm" class="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted"></ui-icon>
             <input type="text" id="search-input" placeholder="Buscar atalhos..." autocomplete="off"
-                   class="w-full bg-black/20 border border-border-ui rounded-lg pl-10 pr-4 py-2.5 text-sm font-sans text-text-main placeholder:text-text-muted outline-none focus:border-accent-primary focus:shadow-[0_0_12px_rgba(99,102,241,0.2)] transition-all">
+                   class="w-full bg-surface-elevated border border-border-ui rounded-lg pl-10 pr-4 py-2.5 text-sm font-sans text-text-main placeholder:text-text-muted outline-none focus:border-accent-primary focus:shadow-[0_0_12px_rgba(99,102,241,0.2)] transition-all">
           </div>
         `
             : ''
@@ -307,7 +314,7 @@ export class UIKeyboardShortcuts extends HTMLElement {
         row.className = 'flex items-center text-[12px] group';
 
         const desc = document.createElement('span');
-        desc.className = 'text-text-main group-hover:text-white transition-colors';
+        desc.className = 'text-text-main group-hover:text-text-muted transition-colors';
         desc.textContent = this.getDescription(s);
 
         const leader = document.createElement('span');

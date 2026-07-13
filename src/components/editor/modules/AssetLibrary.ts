@@ -1,4 +1,5 @@
 import { sharedSheet } from '../../../utils/shared-styles';
+import { bridgeTheme } from '../../../utils/theme-bridge';
 import eventBus from '../../../core/EventBus';
 import { db } from '../../../core/Database';
 import { UISM } from '../../../core/UISoundManager';
@@ -30,6 +31,7 @@ export class AssetLibrary extends HTMLElement {
   private _abortController: AbortController | null = null;
   private _assets: Asset[] = [];
   private _activeCategory: string = 'all';
+  private _themeCleanup: (() => void) | null = null;
 
   constructor() {
     super();
@@ -40,12 +42,14 @@ export class AssetLibrary extends HTMLElement {
   }
 
   connectedCallback() {
+    this._themeCleanup = bridgeTheme(this);
     this.renderSkeleton();
     this.loadAssets();
     this.setupListeners();
   }
 
   disconnectedCallback() {
+    this._themeCleanup?.();
     this._abortController?.abort();
   }
 

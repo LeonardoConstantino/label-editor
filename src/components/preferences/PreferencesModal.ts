@@ -1,7 +1,8 @@
 import { sharedSheet } from '../../utils/shared-styles';
+import { bridgeTheme } from '../../utils/theme-bridge';
 import eventBus from '../../core/EventBus';
 import { store, AppState } from '../../core/Store';
-import { UISM } from '../../core/UISoundManager';
+import { UISM, SoundPreset } from '../../core/UISoundManager';
 import { UserPreferences } from '../../domain/models/UserPreferences';
 import { HelpContentProvider } from '../../utils/HelpContentProvider';
 
@@ -12,6 +13,22 @@ import '../common/AppSelect';
 import '../common/UINumberScrubber';
 import '../common/icon';
 import '../common/tooltip';
+
+const temaBrilho: SoundPreset = {
+  sweep: {
+    from: 400,
+    to: 1200
+  },
+  duration: 0.14,
+  type: 'sine',
+  volume: 0.04,
+  envelope: {
+    attack: 0.02,
+    decay: 0.12,
+    sustain: 0,
+    release: 0.01
+  }
+};
 
 const settingsSheet = new CSSStyleSheet();
 settingsSheet.replaceSync(`
@@ -32,7 +49,7 @@ settingsSheet.replaceSync(`
   /* Sidebar Styles */
   .sidebar {
     width: 220px;
-    background-color: color-mix(in srgb, black, transparent 60%);
+    background-color: var(--color-surface);
     border-right: 1px solid var(--color-border-ui);
     display: flex;
     flex-direction: column;
@@ -57,7 +74,7 @@ settingsSheet.replaceSync(`
   }
 
   .sidebar-item:hover {
-    background-color: rgba(99, 102, 241, 0.03);
+    background-color: color-mix(in srgb, var(--color-accent-primary), transparent 97%);
     color: var(--color-text-main);
   }
 
@@ -109,12 +126,12 @@ settingsSheet.replaceSync(`
   }
 
   .card-module {
-    background-color: color-mix(in srgb, var(--color-text-main), transparent 98%);
+    background-color: var(--color-surface-solid);
     border: 1px solid var(--color-border-ui);
     border-radius: 12px;
     padding: var(--spacing-7);
     margin-bottom: var(--spacing-6);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    box-shadow: var(--shadow-panel);
   }
 
   .setting-row {
@@ -158,7 +175,7 @@ settingsSheet.replaceSync(`
   /* Segmented Control */
   .segmented-control {
     display: flex;
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: color-mix(in srgb, var(--color-text-main), transparent 95%);
     padding: 4px;
     border-radius: 8px;
     border: 1px solid var(--color-border-ui);
@@ -186,7 +203,7 @@ settingsSheet.replaceSync(`
   /* Grid Preview */
   .grid-preview {
     height: 100px;
-    background-color: #0f1115;
+    background-color: var(--color-canvas);
     border: 1px solid var(--color-border-ui);
     border-radius: 8px;
     margin-bottom: 20px;
@@ -247,7 +264,7 @@ settingsSheet.replaceSync(`
     position: absolute;
     cursor: pointer;
     top: 0; left: 0; right: 0; bottom: 0;
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: color-mix(in srgb, var(--color-text-main), transparent 90%);
     transition: .4s;
     border-radius: 20px;
     border: 1px solid var(--color-border-ui);
@@ -285,6 +302,7 @@ settingsSheet.replaceSync(`
 export class PreferencesModal extends HTMLElement {
   private _preferences: UserPreferences | null = null;
   private _abortController: AbortController | null = null;
+  private _themeCleanup: (() => void) | null = null;
 
   constructor() {
     super();
@@ -295,6 +313,7 @@ export class PreferencesModal extends HTMLElement {
   }
 
   connectedCallback() {
+    this._themeCleanup = bridgeTheme(this);
     this._preferences = store.getState().preferences;
     this.renderSkeleton();
     this.setupListeners();
@@ -302,6 +321,7 @@ export class PreferencesModal extends HTMLElement {
   }
 
   disconnectedCallback() {
+    this._themeCleanup?.();
     this._abortController?.abort();
   }
 
@@ -353,7 +373,7 @@ export class PreferencesModal extends HTMLElement {
     root.querySelectorAll('.segment-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         this.updateStore('theme', btn.getAttribute('data-val'));
-        UISM.play(UISM.enumPresets.TAP);
+        UISM.playCustom(temaBrilho);
       });
     });
 
@@ -499,7 +519,6 @@ export class PreferencesModal extends HTMLElement {
   private renderSkeleton() {
     if (!this.shadowRoot || !this._preferences) return;
     const p = this._preferences;
-    // TODO: Investigar motivo do theme não ser aplicado corretamente em toda a ui.
 
     this.shadowRoot.innerHTML = `
       <div class="settings-container">

@@ -1,4 +1,5 @@
 import { sharedSheet } from '../../utils/shared-styles';
+import { bridgeTheme } from '../../utils/theme-bridge';
 import { SoundPreset, UISM } from '../../core/UISoundManager';
 import eventBus from '../../core/EventBus';
 import { store, AppState } from '../../core/Store';
@@ -72,6 +73,7 @@ const cancelamentoClick: SoundPreset = {
 export class ModuleRack extends HTMLElement {
   private _isOpen = false;
   private _abortController: AbortController | null = null;
+  private _themeCleanup: (() => void) | null = null;
 
   constructor() {
     super();
@@ -82,12 +84,14 @@ export class ModuleRack extends HTMLElement {
   }
 
   connectedCallback() {
+    this._themeCleanup = bridgeTheme(this); // <-- conecta observer
     this.render();
     this.setupListeners();
     this.updateActiveUI(store.getState().activeModuleId);
   }
 
   disconnectedCallback() {
+    this._themeCleanup?.();
     this._abortController?.abort();
   }
   
@@ -217,7 +221,7 @@ export class ModuleRack extends HTMLElement {
         :host { display: block; position: relative; z-index: 1000; }
         
         .rack-container {
-          background: #050608;
+          background: var(--color-surface-solid);
           border-bottom: 1px solid var(--color-border-ui);
           padding: 12px 16px;
         }
@@ -227,7 +231,7 @@ export class ModuleRack extends HTMLElement {
           align-items: center;
           justify-content: space-between;
           width: 100%;
-          background: rgba(255,255,255,0.03);
+          background: color-mix(in srgb, var(--color-text-main), transparent 97%);
           border: 1px solid var(--color-border-ui);
           border-radius: 8px;
           padding: 8px 12px;
@@ -252,12 +256,12 @@ export class ModuleRack extends HTMLElement {
 
         .rack-menu {
           position: absolute; top: 100%; left: 0; width: 100%;
-          background: rgba(10, 12, 16, 0.95);
+          background: var(--color-surface-solid);
           backdrop-filter: blur(20px);
           border-bottom: 1px solid var(--color-border-ui);
           max-height: 0; overflow: hidden;
           transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-          box-shadow: 0 30px 60px rgba(0,0,0,0.9);
+          box-shadow: var(--shadow-panel);
           opacity: 0;
           z-index: 50;
         }
@@ -267,7 +271,7 @@ export class ModuleRack extends HTMLElement {
           display: flex; gap: 14px; padding: 12px 24px; cursor: pointer;
           transition: all 0.2s; border-left: 3px solid transparent;
         }
-        .rack-item:hover { background: rgba(255,255,255,0.03); border-left-color: var(--color-accent-primary); }
+        .rack-item:hover { background: color-mix(in srgb, var(--color-accent-primary), transparent 97%); border-left-color: var(--color-accent-primary); }
         .rack-item.active { background: rgba(99, 102, 241, 0.05); border-left-color: var(--color-accent-primary); }
 
         .item-text { display: flex; flex-direction: column; gap: 2px; flex: 1; }

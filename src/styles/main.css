@@ -19,6 +19,7 @@
   --color-canvas: #0f1115; /* Fundo profundo do editor */
   --color-surface: rgba(22, 25, 32, 0.85); /* Vidro escuro para painéis */
   --color-surface-solid: #161920; /* Fundo sólido para modais/inputs */
+  --color-surface-elevated: #1e222b; /* Fundo levemente elevado */
   --color-border-ui: #262a33; /* Bordas sutis */
 
   --color-text-main: #f8fafc; /* Slate 50 */
@@ -70,11 +71,21 @@
    LIGHT MODE (The Clinical Lab Mode)
    ========================================= */
 [data-theme='light']  {
+  color-scheme: light; /* CRUCIAL: Muda a renderização nativa do browser */
+
     /* Fundos: Cinza claro com nuances de profundidade */
     --color-canvas: #f8fafc; /* Slate 50 - base respirável */
     --color-surface: rgba(241, 245, 249, 0.75); /* Slate 100 com transparência (efeito vidro) */
     --color-surface-solid: #f1f5f9; /* Slate 100 sólido para modais */
+    --color-surface-elevated: #e2e8f0; /* Fundo levemente elevado */
     --color-border-ui: #e2e8f0; /* Slate 200 - bordas discretas */
+
+    /* HUD Tips light mode overrides */
+    --hud-ghost-bg: rgba(0, 0, 0, 0.05);
+    --hud-focus-bg: var(--color-surface-solid);
+    --hud-border-ghost: var(--color-border-ui);
+    --hud-border-focus: var(--color-accent-primary);
+    --hud-glow-color: rgba(99, 102, 241, 0.1);
 
     /* Textos: Inversão com contraste confortável */
     --color-text-main: #0f172a; /* Slate 900 */
@@ -104,6 +115,8 @@
     scrollbar-width: thin; /* Deixa a barra fina */
     /* Cor do Thumb (carrinho) e Cor do Track (fundo) */
     scrollbar-color: var(--color-border-ui) transparent;
+    /* Transições suaves para cor e fundo */
+    transition: background-color 0.2s var(--ease-spring), color 0.2s var(--ease-spring);
   }
 
   /* ==========================================
@@ -183,9 +196,10 @@
   /* O Canvas Infinito com Dot Grid Sutil e Técnico */
   .canvas-workspace {
     z-index: 0;
+    background-color: transparent;
     background-image: radial-gradient(
       circle,
-      rgba(38, 42, 51, 0.4) 1px,
+      rgba(38, 42, 51, 0.8) 1px,
       transparent 1px
     );
     background-size: 24px 24px;
@@ -206,14 +220,14 @@
   /* Toolbar Flutuante (Pílula) */
   .toolbar-pill {
     @apply absolute top-6 left-6 z-50 flex items-center gap-2 p-2 rounded-2xl border border-border-ui shadow-panel;
-    background-color: rgba(22, 25, 32, 0.85);
+    background-color: var(--color-surface);
     backdrop-filter: blur(16px);
   }
 
   /* Painel Lateral Glassmorphic */
   .panel-glass {
     @apply absolute top-0 right-0 h-full w-85 z-40 p-2 pb-0 pr-px flex flex-col shrink-0;
-    background-color: rgba(22, 25, 32, 0.75);
+    background-color: var(--color-surface);
     backdrop-filter: blur(24px);
     border-left: 1px solid var(--color-border-ui);
     box-shadow: -10px 0 40px rgba(0, 0, 0, 0.5);
@@ -226,7 +240,8 @@
    ========================================== */
 @layer components {
   .input-prism {
-    @apply w-full bg-black/20 border border-border-ui text-text-main rounded-lg px-3 py-2 text-sm font-sans placeholder:text-text-muted outline-none transition-all duration-200;
+    @apply w-full border border-border-ui text-text-main rounded-lg px-3 py-2 text-sm font-sans placeholder:text-text-muted outline-none transition-all duration-200;
+    background-color: color-mix(in srgb, var(--color-text-main), transparent 97%);
   }
   .input-prism:focus,
   .input-prism:focus-within {
@@ -416,10 +431,10 @@
   }
 
   ui-number-scrubber::part(wrapper) {
-    background-color: rgba(10, 12, 16, 0.6);
+    background-color: var(--color-surface-solid);
     box-shadow:
-      inset 0 2px 6px rgba(0, 0, 0, 0.4),
-      0 1px 0 rgba(255, 255, 255, 0.05);
+      inset 0 2px 6px rgba(0, 0, 0, 0.15),
+      0 1px 0 rgba(255, 255, 255, 0.02);
     border-radius: 6px;
   }
   ui-number-scrubber::part(label) {
@@ -427,8 +442,8 @@
     color: var(--color-text-muted);
     font-weight: 700;
     border-right: none;
-    box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.05);
-    background: rgba(255, 255, 255, 0.02);
+    box-shadow: inset -1px 0 0 rgba(0, 0, 0, 0.05);
+    background: color-mix(in srgb, var(--color-text-main), transparent 98%);
   }
   ui-number-scrubber:hover::part(label) {
     color: var(--color-text-main);
@@ -468,7 +483,7 @@
     font-size: var(--text-xs);
   }
   .inspector-badge {
-    @apply font-mono text-text-muted/50 bg-black/20 rounded uppercase;
+    @apply font-mono text-text-muted/50 bg-surface-elevated rounded uppercase;
     font-size: var(--text-2xs);
     padding: var(--spacing-0_5) var(--spacing-1_5);
   }
@@ -593,7 +608,7 @@
   }
 
   .drop-zone {
-    @apply w-full h-44 border-2 border-dashed border-border-ui rounded-2xl flex flex-col items-center justify-center gap-3 transition-all cursor-pointer bg-black/10 relative overflow-hidden;
+    @apply w-full h-44 border-2 border-dashed border-border-ui rounded-2xl flex flex-col items-center justify-center gap-3 transition-all cursor-pointer bg-surface-elevated relative overflow-hidden;
   }
   .drop-zone:hover {
     @apply border-accent-primary/50 bg-accent-primary/5;
@@ -661,8 +676,15 @@
   }
 
   /* 3. A Tecla Física (HUD Key) para atalhos de teclado */
+  /* Tokens de sombra do kbd — somente aqui, não no @theme global */
   .kbd-prism,
   kbd.kbd-prism {
+    --kbd-shadow-inset: rgba(255, 255, 255, 0.1);
+    --kbd-shadow-bottom: #0a0c10;
+    --kbd-shadow-depth: rgba(0, 0, 0, 0.5);
+    --kbd-shadow-inset-hover: rgba(99, 102, 241, 0.2);
+    --kbd-shadow-depth-hover: rgba(99, 102, 241, 0.2);
+
     @apply inline-flex items-center justify-center font-bold text-text-muted uppercase tracking-wider select-none;
     font-size: var(--text-2xs);
     font-family: geist-mono, monospace;
@@ -670,27 +692,35 @@
     border: 1px solid var(--color-border-ui);
     border-radius: var(--spacing-1);
     padding: var(--spacing-0_5) var(--spacing-1_5);
-    /* O Juice: Sombras para dar efeito 3D (luz em cima, sombra embaixo) */
     box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.1),
-      0 2px 0 #0a0c10,
-      0 3px 4px rgba(0, 0, 0, 0.5);
+      inset 0 1px 0 var(--kbd-shadow-inset),
+      0 2px 0 var(--kbd-shadow-bottom),
+      0 3px 4px var(--kbd-shadow-depth);
     transform: translateY(-1px);
     transition: all 0.2s var(--ease-spring);
+  }
+
+  [data-theme='light'] .kbd-prism,
+  [data-theme='light'] kbd.kbd-prism {
+    --kbd-shadow-inset: rgba(255, 255, 255, 0.8);   /* luz real no light */
+    --kbd-shadow-bottom: #c8d0dc;                    /* sombra cinza, não preta */
+    --kbd-shadow-depth: rgba(15, 23, 42, 0.12);      /* sutil */
+    --kbd-shadow-inset-hover: rgba(99, 102, 241, 0.1);
+    --kbd-shadow-depth-hover: rgba(99, 102, 241, 0.15);
   }
 
   .kbd-prism:hover {
     @apply text-accent-primary border-accent-primary/30;
     box-shadow:
-      inset 0 1px 0 rgba(99, 102, 241, 0.2),
-      0 2px 0 #0a0c10,
-      0 4px 12px rgba(99, 102, 241, 0.2);
+      inset 0 1px 0 var(--kbd-shadow-inset-hover),
+      0 2px 0 var(--kbd-shadow-bottom),
+      0 4px 12px var(--kbd-shadow-depth-hover);
   }
 
   .kbd-prism:active {
     transform: translateY(1px);
     box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.05),
+      inset 0 1px 0 var(--kbd-shadow-inset),
       0 0 0 var(--color-border-ui);
   }
 
@@ -702,7 +732,7 @@
     @apply flex items-center justify-between p-4 cursor-pointer font-mono text-[10px] text-text-muted uppercase tracking-wider hover:bg-white/5 transition-colors select-none;
   }
   .prism-details .details-content {
-    @apply p-5 pt-0 text-sm text-text-muted leading-relaxed border-t border-white/5 bg-black/20;
+    @apply p-5 pt-3 text-sm text-text-muted leading-relaxed border-t border-white/5 bg-surface-elevated;
   }
 }
 

@@ -38,8 +38,9 @@
  *   [t → e → s → t]   → sequência de teclas (separador →)
  */
 
-import { sharedSheet } from '../../utils/shared-styles.js';
 import { UIKeyboardShortcuts } from './KeyboardShortcuts';
+import { sharedSheet } from '../../utils/shared-styles.js';
+import { bridgeTheme } from '../../utils/theme-bridge';
 
 // ─────────────────────────────────────────────
 // Constructable Stylesheet exclusiva do componente
@@ -404,6 +405,7 @@ export class UiHudTips extends HTMLElement {
   // ── Campos privados ──────────────────────────
   #shadow;
   #controller = new AbortController();
+  private _themeCleanup: (() => void) | null = null;
 
   /** @type {string[]} */
   #tips: string[] = [];
@@ -447,6 +449,7 @@ export class UiHudTips extends HTMLElement {
   connectedCallback() {
     const sig = this.#controller.signal;
     const banner = this.#shadow.querySelector('.hud-banner');
+    this._themeCleanup = bridgeTheme(this); // <-- conecta observer
 
     // Lê variável CSS de intervalo (se definida externamente)
     const cssInterval = parseInt(
@@ -488,6 +491,7 @@ export class UiHudTips extends HTMLElement {
   disconnectedCallback() {
     this.#controller.abort();
     this.#stopRotation();
+    this._themeCleanup?.(); // <-- limpa observer ao sair do DOM
   }
 
   // ─────────────────────────────────────────────

@@ -1,4 +1,5 @@
 import { sharedSheet } from '../../../utils/shared-styles';
+import { bridgeTheme } from '../../../utils/theme-bridge';
 import eventBus from '../../../core/EventBus';
 import { store, AppState } from '../../../core/Store';
 import { UISM } from '../../../core/UISoundManager';
@@ -27,6 +28,7 @@ interface GroupedVariable {
 export class VariableManager extends HTMLElement {
   private _abortController: AbortController | null = null;
   private _variables: GroupedVariable[] = [];
+  private _themeCleanup: (() => void) | null = null;
 
   constructor() {
     super();
@@ -37,12 +39,14 @@ export class VariableManager extends HTMLElement {
   }
 
   connectedCallback() {
+    this._themeCleanup = bridgeTheme(this);
     this.renderSkeleton();
     this.setupListeners();
     this.scanVariables();
   }
 
   disconnectedCallback() {
+    this._themeCleanup?.();
     this._abortController?.abort();
   }
 

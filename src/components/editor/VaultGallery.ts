@@ -8,6 +8,7 @@ import '../common/AppButton';
 import '../common/icon';
 import '../common/tooltip';
 import { sharedSheet } from '../../utils/shared-styles';
+import { bridgeTheme } from '../../utils/theme-bridge';
 import eventBus from '../../core/EventBus';
 
 /**
@@ -19,6 +20,7 @@ export class VaultGallery extends HTMLElement {
   private filter: 'all' | 'recent' = 'all';
   private abortController: AbortController | null = null;
   private isSkeletonRendered = false;
+  private _themeCleanup: (() => void) | null = null;
 
   constructor() {
     super();
@@ -29,10 +31,12 @@ export class VaultGallery extends HTMLElement {
   }
 
   connectedCallback(): void {
+    this._themeCleanup = bridgeTheme(this); // <-- conecta observer
     this.loadAndRender();
   }
 
   disconnectedCallback(): void {
+    this._themeCleanup?.();
     this.cleanup();
   }
 
@@ -129,7 +133,7 @@ export class VaultGallery extends HTMLElement {
           </button>
         </div>
 
-        <div class="mt-auto bg-black/40 rounded-xl border border-border-ui shadow-inner relative overflow-hidden" style="padding: var(--spacing-4);">
+        <div class="mt-auto bg-surface-elevated rounded-xl border border-border-ui shadow-inner relative overflow-hidden" style="padding: var(--spacing-4);">
           <div class="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-transparent via-accent-primary/50 to-transparent"></div>
           <p class="text-text-muted leading-relaxed font-mono" style="font-size: var(--text-xs);">
             <strong class="text-accent-primary uppercase tracking-widest flex items-center mb-1" style="gap: var(--spacing-1);">
@@ -170,7 +174,7 @@ export class VaultGallery extends HTMLElement {
     // Novo Blueprint Card
     const newBtn = document.createElement('button');
     newBtn.id = 'btn-new-template';
-    newBtn.className = 'w-full h-full min-h-65 rounded-2xl border-2 border-dashed border-border-ui bg-black/20 flex flex-col items-center justify-center gap-5 text-text-muted hover:text-accent-primary hover:border-accent-primary/50 hover:bg-accent-primary/5 hover:shadow-[inset_0_0_30px_rgba(99,102,241,0.05)] transition-all duration-500 cursor-pointer group';
+    newBtn.className = 'w-full h-full min-h-65 rounded-2xl border-2 border-dashed border-border-ui bg-surface-elevated flex flex-col items-center justify-center gap-5 text-text-muted hover:text-accent-primary hover:border-accent-primary/50 hover:bg-accent-primary/5 hover:shadow-[inset_0_0_30px_rgba(99,102,241,0.05)] transition-all duration-500 cursor-pointer group';
     newBtn.innerHTML = `
         <div class="w-16 h-16 rounded-full bg-surface-solid border border-border-ui flex items-center justify-center group-hover:scale-110 group-hover:shadow-[0_0_20px_rgba(99,102,241,0.3)] transition-all duration-(--ease-spring) relative">
           <ui-icon name="plus" size="sm"></ui-icon>
@@ -215,13 +219,13 @@ export class VaultGallery extends HTMLElement {
     <div class="group relative bg-surface-solid border border-border-ui rounded-2xl overflow-hidden shadow-panel transition-all duration-300 ease-spring hover:border-accent-primary hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(0,0,0,0.6),0_0_15px_rgba(99,102,241,0.2)]" data-id="${safeId}">
         
 
-        <div class="bg-black w-full h-44 flex items-center justify-center p-6 relative border-b border-border-ui overflow-hidden shadow-inner">
+        <div class="bg-surface-elevated w-full h-44 flex items-center justify-center p-6 relative border-b border-border-ui overflow-hidden shadow-inner">
           <img src="${label.thumbnail || ''}" 
               class="bg-white shadow-[0_8px_30px_rgba(0,0,0,0.8)] transition-transform duration-500 group-hover:scale-[1.03] z-10" 
               style="aspect-ratio: ${ratio}; max-width: 100%; max-height: 100%;" />
 
           <div class="absolute inset-0 z-20 pointer-events-none crt-scanline"></div>
-          <div class="absolute inset-0 bg-black/50 backdrop-blur-md opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center gap-3 transition-all duration-300 z-30">
+          <div class="absolute inset-0 bg-surface/80 backdrop-blur-md opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center gap-3 transition-all duration-300 z-30">
             <div class="translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 ease-out delay-75 w-[75%]">
               <button class="action-load w-full flex items-center justify-center gap-2 py-2.5 rounded-lg font-mono text-[11px] font-bold tracking-widest uppercase border border-accent-success text-accent-success bg-accent-success/10 hover:bg-accent-success hover:text-black hover:shadow-[0_0_20px_rgba(16,185,129,0.4)] transition-all duration-200 cursor-pointer" data-id="${safeId}">
                 <ui-icon name="download" size="sm"></ui-icon> Load Asset
@@ -229,14 +233,14 @@ export class VaultGallery extends HTMLElement {
             </div>
             
             <div class="flex gap-2.5 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 ease-out delay-100">
-              <button class="w-10 h-10 rounded-lg flex items-center justify-center cursor-pointer bg-black/60 border border-white/10 text-text-muted hover:text-accent-primary hover:border-accent-primary/40 hover:bg-accent-primary/10 transition-all action-export-label" 
+              <button class="w-10 h-10 rounded-lg flex items-center justify-center cursor-pointer bg-surface-elevated border border-white/10 text-text-muted hover:text-accent-primary hover:border-accent-primary/40 hover:bg-accent-primary/10 transition-all action-export-label" 
                       data-id="${safeId}" title="Exportar para arquivo .label">
                 <ui-icon name="download" size="sm"></ui-icon>
               </button>
-              <button class="w-10 h-10 rounded-lg flex items-center justify-center cursor-pointer bg-black/60 border border-white/10 text-text-muted hover:text-white hover:border-white/30 hover:bg-white/10 transition-all action-duplicate" title="Duplicate" data-id="${safeId}">
+              <button class="w-10 h-10 rounded-lg flex items-center justify-center cursor-pointer bg-surface-elevated border border-white/10 text-text-muted hover:text-white hover:border-white/30 hover:bg-white/10 transition-all action-duplicate" title="Duplicate" data-id="${safeId}">
                 <ui-icon name="copy" size="sm"></ui-icon>
               </button>
-              <button class="w-10 h-10 rounded-lg flex items-center justify-center cursor-pointer bg-black/60 border border-white/10 text-text-muted hover:text-accent-danger hover:border-accent-danger/50 hover:bg-accent-danger/10 hover:shadow-[0_0_15px_rgba(244,63,94,0.3)] transition-all action-delete" title="Delete" data-id="${safeId}">
+              <button class="w-10 h-10 rounded-lg flex items-center justify-center cursor-pointer bg-surface-elevated border border-white/10 text-text-muted hover:text-accent-danger hover:border-accent-danger/50 hover:bg-accent-danger/10 hover:shadow-[0_0_15px_rgba(244,63,94,0.3)] transition-all action-delete" title="Delete" data-id="${safeId}">
                 <ui-icon name="trash" size="sm"></ui-icon>
               </button>
             </div>
@@ -267,7 +271,7 @@ export class VaultGallery extends HTMLElement {
           </div>
 
           <div class="flex items-center justify-between">
-            <span class="px-2 py-1 rounded bg-black/40 border border-white/5 text-2xs font-mono text-text-muted uppercase tracking-widest shadow-inner flex items-center gap-1" title="Label dimensions in millimeters">
+            <span class="px-2 py-1 rounded bg-surface-elevated border border-white/5 text-2xs font-mono text-text-muted uppercase tracking-widest shadow-inner flex items-center gap-1" title="Label dimensions in millimeters">
             <ui-icon name="pencil-ruler" size="xs"></ui-icon>
               ${label.config.widthMM} × ${label.config.heightMM}mm
             </span>

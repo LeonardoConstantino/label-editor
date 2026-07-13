@@ -4,6 +4,7 @@ import { canvasRenderer } from '../../domain/services/CanvasRenderer';
 import { SoundPreset, UISM } from '../../core/UISoundManager';
 import { UnitConverter } from '../../utils/units';
 import { sharedSheet } from '../../utils/shared-styles';
+import { bridgeTheme } from '../../utils/theme-bridge';
 import { snapService, SnapResult } from '../../domain/services/SnapService';
 import { ElementFactory } from '../../domain/models/elements/ElementFactory';
 import { ElementType } from '../../domain/models/Label';
@@ -26,6 +27,7 @@ const gridSnapFeedback: SoundPreset = {
  * Agora com suporte a Drag-and-Drop e Smart Snapping (Task 63).
  */
 export class EditorCanvas extends HTMLElement {
+  private _themeCleanup: (() => void) | null = null;
   private workspace: HTMLDivElement;
   private artboard: HTMLDivElement;
   private canvas: HTMLCanvasElement;
@@ -58,12 +60,14 @@ export class EditorCanvas extends HTMLElement {
   }
 
   connectedCallback(): void {
+    this._themeCleanup = bridgeTheme(this); // <-- conecta observer
     this.render();
     this.setupListeners();
     this.redraw();
   }
 
   disconnectedCallback(): void {
+    this._themeCleanup?.(); // <-- limpa observer ao sair do DOM
     if (this.unsubscribe) this.unsubscribe();
     // Limpa listeners globais
     window.removeEventListener('mousemove', this.handleMouseMoveBound);
@@ -77,7 +81,7 @@ export class EditorCanvas extends HTMLElement {
     this.shadowRoot.innerHTML = `
       <style>
         :host { display: block; width: 100%; height: 100%; overflow: auto; background-color: var(--color-canvas); }
-        .canvas-workspace { display: flex; min-width: 100%; min-height: 100%; padding: 150px; box-sizing: border-box; }
+        .canvas-work { display: flex; min-width: 100%; min-height: 100%; padding: 150px; box-sizing: border-box; }
         .artboard-scaler { display: block; margin: auto; position: relative; }
         .label-artboard {
           position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
@@ -87,7 +91,7 @@ export class EditorCanvas extends HTMLElement {
       </style>
     `;
 
-    this.workspace.className = 'canvas-workspace';
+    this.workspace.className = 'canvas-work';
     const scaler = document.createElement('div');
     scaler.className = 'artboard-scaler';
     scaler.id = 'scaler';

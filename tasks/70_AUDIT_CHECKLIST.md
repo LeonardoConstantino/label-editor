@@ -14,15 +14,16 @@
 - [x] **Contratos de Interface:** Aplicado.
 
 ## 🔹 Fase 2: Segurança (Zero Trust Pipeline)
-- [x] **XSS Audit (innerHTML):** Removidos vetores dinâmicos.
-- [x] **Data Sanitizer Depth:** Validado e implementado.
-- [x] **External Source Validation:** Auditoria completa.
-- [x] **SVG Hardening:** Implementada whitelist rigorosa.
-- [x] **Input Sanitization:** Auditoria completa.
+- [x] **XSS Audit (innerHTML):** Removidos vetores dinâmicos em AssetLibrary, TypefaceEngine e outros.
+- [x] **Data Sanitizer Depth:** Validado e implementado escape de HTML nativo.
+- [x] **External Source Validation:** Auditoria no DataSourceParser completa.
+- [x] **SVG Hardening:** Implementada whitelist rigorosa via DOMParser.
+- [x] **Input Sanitization:** Auditoria no ElementInspector e inputs de usuário completa.
+- [x] **SSRF Protection:** Implementado SecurityPolicy com Allowlist de hosts.
 
 ## 🔹 Fase 3: CSS & Estética (Prism System)
-- [x] **Hardcoded Colors:** Removidos.
-- [x] **Spacing & Typography:** Padronizado.
+- [x] **Hardcoded Colors:** Removidos hex/rgba manuais de badges, modais e módulos.
+- [x] **Spacing & Typography:** Padronizado com escala Tailwind v4.
 - [x] **Shadow DOM Isolation:** Verificação de vazamento de estilos concluída.
 - [x] **Shared Styles Adoption:** Padronizado em todos os componentes core.
 

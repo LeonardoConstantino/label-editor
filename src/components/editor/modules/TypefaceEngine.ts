@@ -1,4 +1,5 @@
 import { sharedSheet } from '../../../utils/shared-styles';
+import { bridgeTheme } from '../../../utils/theme-bridge';
 import eventBus from '../../../core/EventBus';
 import { store, AppState } from '../../../core/Store';
 import { UISM } from '../../../core/UISoundManager';
@@ -17,6 +18,7 @@ import '../../common/AppButton';
  */
 export class TypefaceEngine extends HTMLElement {
   private _abortController: AbortController | null = null;
+  private _themeCleanup: (() => void) | null = null;
   private _systemFonts: CustomFont[] = [
     { id: 'font-inter', name: 'Inter', url: '', active: true },
     { id: 'font-jetbrains', name: 'JetBrains Mono', url: '', active: true },
@@ -32,12 +34,14 @@ export class TypefaceEngine extends HTMLElement {
   }
 
   connectedCallback() {
+    this._themeCleanup = bridgeTheme(this);
     this.renderSkeleton();
     this.setupListeners();
     this.syncValues();
   }
 
   disconnectedCallback() {
+    this._themeCleanup?.();
     this._abortController?.abort();
   }
 
@@ -273,7 +277,7 @@ export class TypefaceEngine extends HTMLElement {
            ------------------------------------------- */
         .terminal-zone {
           padding: 24px 20px;
-          background: color-mix(in srgb, var(--color-canvas), black 30%);
+          background: color-mix(in srgb, var(--color-canvas), var(--color-surface) 30%);
           border-bottom: 1px solid var(--color-border-ui);
           display: flex;
           flex-direction: column;
@@ -289,17 +293,17 @@ export class TypefaceEngine extends HTMLElement {
         
         .input-prism { 
           flex: 1; height: 36px; /* Levemente maior */
-          background: rgba(255,255,255,0.02); 
+          background: color-mix(in srgb, var(--color-text-main), transparent 98%); 
           border: 1px solid var(--color-border-ui);
           border-radius: 8px; padding: 0 12px 0 34px; /* Espaço para o ícone */
-          color: white; font-family: var(--font-mono); font-size: 11px;
+          color: var(--color-text-main); font-family: var(--font-mono); font-size: 11px;
           outline: none; transition: all 0.3s;
         }
         
         .input-prism:focus { 
           border-color: var(--color-accent-primary); 
           box-shadow: 0 0 15px rgba(99, 102, 241, 0.15); 
-          background: rgba(255,255,255,0.04);
+          background: color-mix(in srgb, var(--color-text-main), transparent 96%);
         }
         .input-prism:focus + .input-icon { color: var(--color-accent-primary); opacity: 1; }
         

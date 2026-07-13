@@ -4,6 +4,7 @@ import { Label, AnyElement } from '../../domain/models/Label';
 import { OverflowResult } from '../../domain/services/OverflowValidator';
 import { UISM } from '../../core/UISoundManager';
 import { sharedSheet } from '../../utils/shared-styles';
+import { bridgeTheme } from '../../utils/theme-bridge';
 import { HelpContentProvider } from '../../utils/HelpContentProvider';
 
 // Imports dos Componentes de UI básicos
@@ -28,6 +29,7 @@ import '../common/UiAlignCluster';
  * Especializado em exibir e editar propriedades de elementos e multi-seleção.
  */
 export class ElementInspector extends HTMLElement {
+  private _themeCleanup: (() => void) | null = null;
   private abortController: AbortController | null = null;
   private currentElementsJson: string = '';
   private currentSelectedId: string | null = null;
@@ -42,12 +44,14 @@ export class ElementInspector extends HTMLElement {
   }
 
   connectedCallback(): void {
+    this._themeCleanup = bridgeTheme(this);
     this.renderSkeleton();
     this.setupListeners();
     this.handleStateChange(store.getState());
   }
 
   disconnectedCallback(): void {
+    this._themeCleanup?.();
     this.cleanup();
   }
 

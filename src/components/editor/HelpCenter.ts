@@ -4,6 +4,7 @@ import { shortcutService } from '../../core/ShortcutService';
 import '../common/icon';
 import { UIKeyboardShortcuts } from '../common/KeyboardShortcuts';
 import { sharedSheet } from '../../utils/shared-styles';
+import { bridgeTheme } from '../../utils/theme-bridge';
 
 /**
  * HelpCenter: Hub de conhecimento dinâmico.
@@ -11,6 +12,7 @@ import { sharedSheet } from '../../utils/shared-styles';
  */
 export class HelpCenter extends HTMLElement {
   private activeTab: 'guide' | 'shortcuts' | 'about' = 'guide';
+  private _themeCleanup: (() => void) | null = null; // <-- novo
 
   constructor() {
     super();
@@ -21,7 +23,12 @@ export class HelpCenter extends HTMLElement {
   }
 
   connectedCallback(): void {
+    this._themeCleanup = bridgeTheme(this); // <-- conecta observer
     this.render();
+  }
+
+  disconnectedCallback(): void {
+    this._themeCleanup?.(); // <-- limpa observer ao sair do DOM
   }
 
   public setTab(tab: 'guide' | 'shortcuts' | 'about'): void {
@@ -43,7 +50,7 @@ export class HelpCenter extends HTMLElement {
         details summary::-webkit-details-marker { display: none; }
       </style>
 
-      <div class="flex flex-col h-full bg-[#0a0c10] overflow-hidden">
+      <div class="flex flex-col h-full bg-canvas overflow-hidden">
         <!-- TABS -->
         <nav class="flex items-center gap-8 px-8 border-b border-border-ui bg-surface-solid/40 backdrop-blur-md">
           <button class="font-mono text-[11px] uppercase tracking-[0.2em] pb-4 pt-6 border-b-2 transition-all duration-300 cursor-pointer ${this.activeTab === 'guide' ? 'border-accent-primary text-text-main font-bold' : 'border-transparent text-text-muted hover:text-text-main'}" data-tab="guide">
@@ -106,7 +113,7 @@ export class HelpCenter extends HTMLElement {
             </div>
 
             <div class="flex-1 w-full">
-              <div class="aspect-video bg-[#050608] border border-border-ui rounded-2xl overflow-hidden relative flex flex-col items-center justify-center group shadow-panel">
+              <div class="aspect-video bg-canvas border border-border-ui rounded-2xl overflow-hidden relative flex flex-col items-center justify-center group shadow-panel">
                 <div class="absolute inset-0 pointer-events-none opacity-20 crt-scanline" style="background-image: radial-gradient(var(--color-border-ui) 1px, transparent 0); background-size: 12px 12px;"></div>
                 <ui-icon name="image" size="2xl" class="text-white/5 group-hover:text-accent-primary/40 transition-all duration-500 group-hover:scale-110"></ui-icon>
                 <span class="font-mono text-[10px] text-text-muted uppercase tracking-[0.2em] text-center px-8 mt-4 leading-loose opacity-60">
@@ -130,7 +137,7 @@ export class HelpCenter extends HTMLElement {
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 relative z-10">
           ${helpData.proTips.map(tip => `
             <div class="flex gap-4 items-start group">
-              <div class="mt-1 p-2 bg-black/40 rounded-xl border border-white/5 shrink-0 group-hover:border-accent-primary/30 transition-colors">
+              <div class="mt-1 p-2 bg-surface-elevated rounded-xl border border-white/5 shrink-0 group-hover:border-accent-primary/30 transition-colors">
                 <ui-icon name="${tip.icon}" size="sm" class="text-text-muted group-hover:text-accent-primary transition-colors"></ui-icon>
               </div>
               <p class="text-xs text-text-main leading-relaxed opacity-80 group-hover:opacity-100 transition-opacity">
@@ -155,7 +162,7 @@ export class HelpCenter extends HTMLElement {
                 ${faq.q}
                 <ui-icon name="chevron-down" size="sm" class="text-text-muted group-open:rotate-180 transition-transform duration-300"></ui-icon>
               </summary>
-              <div class="p-5 pt-0 text-sm text-text-muted leading-relaxed border-t border-white/5 bg-black/20">
+              <div class="p-5 pt-0 text-sm text-text-muted leading-relaxed border-t border-white/5 bg-surface-elevated/50">
                 ${faq.a}
               </div>
             </details>
@@ -183,7 +190,7 @@ export class HelpCenter extends HTMLElement {
           <!-- Glow de fundo -->
           <div class="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-32 bg-accent-primary/10 blur-[60px] pointer-events-none rounded-full"></div>
           
-          <div class="w-20 h-20 bg-[#050608] border border-accent-primary/40 rounded-3xl flex items-center justify-center mb-6 shadow-[inset_0_2px_10px_rgba(0,0,0,0.8),0_0_15px_rgba(99,102,241,0.2)] relative group overflow-hidden">
+          <div class="w-20 h-20 bg-surface-elevated border border-accent-primary/40 rounded-3xl flex items-center justify-center mb-6 shadow-[inset_0_2px_10px_rgba(0,0,0,0.8),0_0_15px_rgba(99,102,241,0.2)] relative group overflow-hidden">
             <!-- Brilho que passa por cima no hover (Wipe effect) -->
             <div class="absolute inset-0 bg-linear-to-tr from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_ease-in-out] pointer-events-none"></div>
             <ui-icon name="layers" size="xl" class="text-accent-primary relative z-10 drop-shadow-[0_0_8px_rgba(99,102,241,0.8)]"></ui-icon>
@@ -199,7 +206,7 @@ export class HelpCenter extends HTMLElement {
           </p>
 
           <!-- System Specs (Mockup Técnico para imersão) -->
-          <div class="flex items-center gap-4 px-6 py-3 bg-black/40 border border-white/5 rounded-xl shadow-inner font-mono text-[9px] uppercase tracking-wider text-text-muted">
+          <div class="flex items-center gap-4 px-6 py-3 bg-surface-elevated border border-white/5 rounded-xl shadow-inner font-mono text-2xs uppercase tracking-wider text-text-muted">
             <div class="flex items-center gap-1.5"><ui-icon name="cpu" class="w-3 h-3 text-accent-primary"></ui-icon> Web Components</div>
             <div class="w-1 h-1 rounded-full bg-border-ui"></div>
             <div class="flex items-center gap-1.5"><ui-icon name="database" class="w-3 h-3 text-accent-primary"></ui-icon> IndexedDB</div>
@@ -212,12 +219,12 @@ export class HelpCenter extends HTMLElement {
         <div class="grid grid-cols-2 gap-4 mb-10">
           ${about.socials.map(social => `
             <a href="${social.url}" target="_blank" rel="noopener" class="flex items-center gap-4 p-4 bg-surface-solid/50 border border-border-ui rounded-xl hover:border-accent-primary/40 hover:bg-accent-primary/5 hover:-translate-y-0.5 hover:shadow-[0_5px_15px_rgba(0,0,0,0.3)] transition-all duration-300 group">
-              <div class="p-2 bg-[#0a0c10] rounded-lg border border-white/5 group-hover:border-accent-primary/30 group-hover:scale-110 transition-all duration-300 shadow-inner">
+              <div class="p-2 bg-canvas rounded-lg border border-border-ui group-hover:border-accent-primary/30 group-hover:scale-110 transition-all duration-300 shadow-inner">
                 <ui-icon name="${social.icon}" size="sm" class="text-text-muted group-hover:text-accent-primary transition-colors"></ui-icon>
               </div>
               <div class="flex flex-col">
                 <span class="text-[11px] font-mono font-bold text-text-main uppercase tracking-wider group-hover:text-accent-primary transition-colors">${social.name}</span>
-                <span class="text-[9px] text-text-muted opacity-60">Establish Connection</span>
+                <span class="text-2xs text-text-muted opacity-60">Establish Connection</span>
               </div>
               <ui-icon name="external-link" size="xs" class="ml-auto opacity-0 -translate-x-2 group-hover:opacity-60 group-hover:translate-x-0 transition-all duration-300"></ui-icon>
             </a>
@@ -260,10 +267,10 @@ export class HelpCenter extends HTMLElement {
         <!-- FOOTER -->
         <div class="mt-12 pt-8 border-t border-white/5 text-center flex flex-col items-center justify-center">
           <ui-icon name="code" class="w-4 h-4 text-border-ui mb-3"></ui-icon>
-          <p class="text-[9px] font-mono text-text-muted opacity-40 uppercase tracking-[0.2em]">
+          <p class="text-2xs font-mono text-text-muted opacity-40 uppercase tracking-[0.2em]">
             Engineered with precision <br> &copy; ${new Date().getFullYear()} Label Forge OS
           </p>
-          <p class="text-[9px] font-mono text-text-muted opacity-40 uppercase tracking-[0.2em]">
+          <p class="text-2xs font-mono text-text-muted opacity-40 uppercase tracking-[0.2em]">
             Powered by leo
           </p>
         </div>
