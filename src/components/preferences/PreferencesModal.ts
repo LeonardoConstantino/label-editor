@@ -2,7 +2,7 @@ import { sharedSheet } from '../../utils/shared-styles';
 import { bridgeTheme } from '../../utils/theme-bridge';
 import eventBus from '../../core/EventBus';
 import { store, AppState } from '../../core/Store';
-import { UISM } from '../../core/UISoundManager';
+import { UISM, SoundPreset } from '../../core/UISoundManager';
 import { UserPreferences } from '../../domain/models/UserPreferences';
 import { HelpContentProvider } from '../../utils/HelpContentProvider';
 
@@ -13,6 +13,22 @@ import '../common/AppSelect';
 import '../common/UINumberScrubber';
 import '../common/icon';
 import '../common/tooltip';
+
+const temaBrilho: SoundPreset = {
+  sweep: {
+    from: 400,
+    to: 1200
+  },
+  duration: 0.14,
+  type: 'sine',
+  volume: 0.04,
+  envelope: {
+    attack: 0.02,
+    decay: 0.12,
+    sustain: 0,
+    release: 0.01
+  }
+};
 
 const settingsSheet = new CSSStyleSheet();
 settingsSheet.replaceSync(`
@@ -357,7 +373,7 @@ export class PreferencesModal extends HTMLElement {
     root.querySelectorAll('.segment-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         this.updateStore('theme', btn.getAttribute('data-val'));
-        UISM.play(UISM.enumPresets.TAP);
+        UISM.playCustom(temaBrilho);
       });
     });
 

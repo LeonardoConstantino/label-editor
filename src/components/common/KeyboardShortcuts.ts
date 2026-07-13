@@ -314,7 +314,7 @@ export class UIKeyboardShortcuts extends HTMLElement {
         row.className = 'flex items-center text-[12px] group';
 
         const desc = document.createElement('span');
-        desc.className = 'text-text-main group-hover:text-white transition-colors';
+        desc.className = 'text-text-main group-hover:text-text-muted transition-colors';
         desc.textContent = this.getDescription(s);
 
         const leader = document.createElement('span');

@@ -277,7 +277,7 @@ export class TypefaceEngine extends HTMLElement {
            ------------------------------------------- */
         .terminal-zone {
           padding: 24px 20px;
-          background: color-mix(in srgb, var(--color-canvas), black 30%);
+          background: color-mix(in srgb, var(--color-canvas), var(--color-surface) 30%);
           border-bottom: 1px solid var(--color-border-ui);
           display: flex;
           flex-direction: column;
