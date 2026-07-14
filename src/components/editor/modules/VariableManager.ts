@@ -110,10 +110,17 @@ export class VariableManager extends HTMLElement {
 
     const textElements = label.elements.filter(el => el.type === ElementType.TEXT) as TextElement[];
     const grouped: Map<string, GroupedVariable> = new Map();
+    // Rastreia quais system vars foram de fato usadas na etiqueta
+    const usedSystemVars = new Set<string>();
 
     textElements.forEach(el => {
       const tags = DataSourceParser.parseTags(el.content);
       tags.forEach((tag: ParsedTag) => {
+        if (tag.isSystemVar) {
+          // Não adiciona system vars à lista de dataset vars
+          usedSystemVars.add(tag.key.toLowerCase());
+          // return;
+        }
         if (!grouped.has(tag.key)) {
           grouped.set(tag.key, { key: tag.key, tags: [] });
         }
@@ -122,7 +129,7 @@ export class VariableManager extends HTMLElement {
     });
 
     this._variables = Array.from(grouped.values());
-    this.updateUI();
+    this.updateUI(usedSystemVars);
   }
 
   private async addFormatter(key: string, formatter: string) {
@@ -178,10 +185,17 @@ export class VariableManager extends HTMLElement {
     }
   }
 
-  private updateUI() {
+  private updateUI(usedSystemVars: Set<string> = new Set()) {
     const shadow = this.shadowRoot!;
     const container = shadow.getElementById('vars-container');
     if (!container) return;
+
+    // Atualiza indicadores de system vars usadas na etiqueta
+    shadow.querySelectorAll('.sys-badge').forEach(badge => {
+      const key = badge.getAttribute('data-key') ?? '';
+      const isUsed = usedSystemVars.has(key);
+      badge.classList.toggle('sys-badge--used', isUsed);
+    });
 
     if (this._variables.length === 0) {
       container.innerHTML = `
@@ -362,6 +376,14 @@ export class VariableManager extends HTMLElement {
           cursor: pointer; transition: all 0.2s;
         }
         .sys-badge:hover { background: color-mix(in srgb, var(--color-accent-primary), transparent 80%); border-color: var(--color-accent-primary); transform: translateY(-1px); }
+        /* Estado: variável de sistema está sendo usada na etiqueta atual */
+        .sys-badge--used {
+          color: var(--color-accent-success);
+          background: color-mix(in srgb, var(--color-accent-success), transparent 88%);
+          border-color: color-mix(in srgb, var(--color-accent-success), transparent 60%);
+          box-shadow: 0 0 8px color-mix(in srgb, var(--color-accent-success), transparent 70%);
+        }
+        .sys-badge--used:hover { background: color-mix(in srgb, var(--color-accent-success), transparent 75%); border-color: var(--color-accent-success); }
 
         #vars-container { flex: 1; overflow-y: auto; padding: var(--spacing-5); display: flex; flex-direction: column; gap: var(--spacing-6); }
         .var-card { background: color-mix(in srgb, var(--color-text-main), transparent 98%); border: 1px solid var(--color-border-ui); border-radius: 12px; padding: var(--spacing-4); margin-bottom: var(--spacing-2); }
@@ -398,17 +420,17 @@ export class VariableManager extends HTMLElement {
       <div class="system-tray">
         <span class="label-prism" style="margin:0">System Metadata</span>
         <div class="system-badges">
-          <ui-tooltip tooltip="The zero-based index of the label in the batch." placement="top">
-            <span class="sys-badge" slot="target" data-copy="{{index}}">{{index}}</span>
+          <ui-tooltip tooltip="The zero-based index of the label in the batch. Glows green when used in this label." placement="top">
+            <span class="sys-badge" slot="target" data-key="index" data-copy="{{index}}">{{index}}</span>
           </ui-tooltip>
-          <ui-tooltip tooltip="The total number of labels in the current batch." placement="top">
-            <span class="sys-badge" slot="target" data-copy="{{total}}">{{total}}</span>
+          <ui-tooltip tooltip="The total number of labels in the current batch. Glows green when used in this label." placement="top">
+            <span class="sys-badge" slot="target" data-key="total" data-copy="{{total}}">{{total}}</span>
           </ui-tooltip>
-          <ui-tooltip tooltip="The current generation date/time." placement="top">
-            <span class="sys-badge" slot="target" data-copy="{{date}}">{{date}}</span>
+          <ui-tooltip tooltip="The current generation date/time. Glows green when used in this label." placement="top">
+            <span class="sys-badge" slot="target" data-key="date" data-copy="{{date}}">{{date}}</span>
           </ui-tooltip>
         </div>
-        <p class="text-2xs text-text-muted italic">Click to copy or type them in any text layer.</p>
+        <p class="text-2xs text-text-muted italic">Click to copy &bull; <span style="color: var(--color-accent-success)">Green</span> = used in this label.</p>
       </div>
 
       <div id="vars-container"></div>
