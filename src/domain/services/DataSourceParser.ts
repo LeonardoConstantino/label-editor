@@ -16,6 +16,8 @@ export interface ParsedTag {
   formatters: string[];
   /** Valor de fallback se a chave não existir nos dados */
   fallback?: string;
+  /** Indica se é uma variável de contexto de sistema (index, total, date) */
+  isSystemVar: boolean;
 }
 
 /**
@@ -227,6 +229,24 @@ export class DataSourceParser {
   private static readonly TAG_REGEX = /\{\{\s*([\w\s."'-]+)(?::([\w,()\s.:-]+))?(?:\|\|([^}]+))?\s*\}\}/g;
 
   /**
+   * Conjunto de chaves reservadas pelo sistema de contexto em runtime.
+   * Estas variáveis são resolvidas automaticamente e NUNCA devem ser
+   * marcadas como "missing" no VariableManager.
+   */
+  public static readonly SYSTEM_VARS: ReadonlySet<string> = new Set([
+    'index',
+    'total',
+    'date',
+  ]);
+
+  /**
+   * Verifica se uma chave de variável é uma variável de sistema (contexto de runtime).
+   */
+  public static isSystemVar(key: string): boolean {
+    return this.SYSTEM_VARS.has(key.toLowerCase().trim());
+  }
+
+  /**
    * Converte um arquivo CSV em um array de objetos usando PapaParse.
    * @param file Arquivo vindo de um input file ou drag-drop.
    */
@@ -343,11 +363,13 @@ export class DataSourceParser {
     this.TAG_REGEX.lastIndex = 0;
 
     while ((match = this.TAG_REGEX.exec(text)) !== null) {
+      const key = match[1].trim();
       tags.push({
         fullMatch: match[0],
-        key: match[1].trim(),
+        key,
         formatters: match[2] ? match[2].split(':').map(f => f.trim()).filter(Boolean) : [],
-        fallback: match[3]?.trim()
+        fallback: match[3]?.trim(),
+        isSystemVar: this.isSystemVar(key),
       });
     }
 
