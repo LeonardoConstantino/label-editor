@@ -536,7 +536,6 @@
     @apply flex gap-2.5 mb-2;
   }
 
-  /* Keyframes para animações tácteis */
   @keyframes slideDown {
     from {
       opacity: 0;

@@ -11,5 +11,5 @@ Diferenciar programaticamente o que é uma variável de dataset (`{{nome}}`) e o
 2. **UI/UX:** Atualizar a UI para que variáveis de contexto não sejam exibidas como "Missing" se não houver valor no dataset (pois o contexto é resolvido em runtime).
 
 ## Critérios de Aceite
-- [ ] Variáveis de contexto não são mais marcadas como "missing" erradamente.
-- [ ] Interface de variáveis claramente separa dados de usuário de dados de sistema.
+- [x] Variáveis de contexto não são mais marcadas como "missing" erradamente.
+- [x] Interface de variáveis claramente separa dados de usuário de dados de sistema.

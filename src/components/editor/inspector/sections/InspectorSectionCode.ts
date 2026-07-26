@@ -105,7 +105,7 @@ export class InspectorSectionCode extends HTMLElement {
         </div>
 
         <div class="switch-row">
-          <span class="font-mono text-[9px] text-text-muted uppercase">Human Readable</span>
+          <span class="font-mono text-2xs text-text-muted uppercase">Human Readable</span>
           <input type="checkbox" data-prop="includeText">
         </div>
       </div>

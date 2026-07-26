@@ -192,7 +192,7 @@ export class InspectorLayerCard extends HTMLElement {
         }
         /* ========================================== */
 
-        .type-tag { font-family: var(--font-mono); font-size: 9px; padding: 2px 4px; background: rgba(0,0,0,0.3); border-radius: 4px; color: var(--color-text-muted); text-transform: uppercase; }
+        /*.type-tag { font-family: var(--font-mono); font-size: 9px; padding: 2px 4px; background: rgba(0,0,0,0.3); border-radius: 4px; color: var(--color-text-muted); text-transform: uppercase; }*/
         .layer-name { font-size: 11px; font-weight: 500; color: var(--color-text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; }
         
         .action-btn { background: transparent; border: none; cursor: pointer; padding: 4px; border-radius: 4px; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }

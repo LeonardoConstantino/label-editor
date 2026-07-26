@@ -110,7 +110,7 @@ export class InspectorSectionEffects extends HTMLElement {
       </div>
 
       <div class="switch-row">
-        <span class="font-mono text-[9px] text-text-muted uppercase">Enable Shadow/Glow</span>
+        <span class="font-mono text-2xs text-text-muted uppercase">Enable Shadow/Glow</span>
         <input type="checkbox" data-prop="effects.enabled" ${effects.enabled ? 'checked' : ''}>
       </div>
 
