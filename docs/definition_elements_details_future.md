@@ -43,6 +43,19 @@ Foco em utilidade e estética premium.
 | `direction` | `enum` | `clockwise` | `counter-clockwise` |
 **Impacto:** Visual "Premium" para selos de garantia, marcas artesanais e rótulos redondos.
 
+#### UniqueIdElement 🔑🏷️ (Nova Sugestão!)
+**Propósito:** Gerador dinâmico de identificadores exclusivos de nível industrial (lotes, serialização e rastreabilidade), com suporte a prefixos, sufixos, algoritmos de hashing determinísticos baseados em seed, e variáveis de dataset/sistema.
+**Propriedades Específicas:**
+| Propriedade | Type | Descrição |
+| ----------- | ---- | --------- |
+| `strategy` | `enum` | Algoritmo de geração: `numeric` \| `alphabetic` \| `alphanumeric` \| `uuid_v4` |
+| `seed` | `string` | Base de inicialização (suporta variáveis como `{{id_produto}}` para gerar hashes determinísticos) |
+| `prefix` | `string` | Prefixo a ser inserido (suporta variáveis, ex: `LOT-{{date:year}}-`) |
+| `suffix` | `string` | Sufixo a ser inserido (suporta variáveis, ex: `-{{index}}`) |
+| `length` | `number` | Comprimento do ID gerado (truncagem ou preenchimento com zeros) |
+| `casing` | `enum` | Caixa do texto gerado: `upper` \| `lower` \| `none` |
+**Impacto:** Essencial para rastreabilidade de estoque, serialização automática de itens de lote e segurança de autenticidade (anti-falsificação) sem dependência de banco de dados centralizado.
+
 #### DateTimeElement
 **Propósito:** Datas inteligentes com cálculos automáticos (Validade/Lote).
 **Impacto:** Reduz erro humano na produção de etiquetas de perecíveis.
@@ -68,7 +81,8 @@ Recursos estéticos e casos de uso de nicho.
 | TableElement      | ⭐⭐⭐       | Alta         | Alto    | Backlog |
 | IconElement       | ⭐⭐         | Média        | Médio   | Backlog |
 | CurvedTextElement | ⭐⭐         | Média        | Premium | **NOVO!** |
+| UniqueIdElement   | ⭐⭐         | Média        | Alto    | **NOVO!** |
 | DateTimeElement   | ⭐⭐         | Baixa        | Médio   | Backlog |
 
 ---
-**Última Atualização:** 25/05/2026 (Sessão Estética)
+**Última Atualização:** 26/07/2026 (Sessão de Ideação de Elemento)
