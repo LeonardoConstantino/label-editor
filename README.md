@@ -1,6 +1,8 @@
 # Label Forge OS | Tactile Prism | [🚀 Live Demo](https://leonardoconstantino.github.io/label-editor/)
 
-[![Project Status: Alpha](https://img.shields.io/badge/Status-Alpha-orange.svg)]()
+![Label Forge OS Banner](src/assets/img/banner.png)
+
+[![Project Status: Active](https://img.shields.io/badge/Status-Active-brightgreen.svg)]()
 [![Build: Success](https://img.shields.io/badge/Build-Success-brightgreen.svg)]()
 [![Privacy: Local-Only](https://img.shields.io/badge/Privacy-Local--Only-blue.svg)]()
 
@@ -8,7 +10,7 @@
 
 > [!NOTE]
 > <!-- GI-01: GIF de apresentação rápida (Overview) -->
-> ![Label Forge OS Overview Placeholder](https://placehold.co/800x400?text=GIF+Overview:+Editor+Interaction+and+Animations)
+> ![Label Forge OS Overview](docs/assets/overview.gif)
 
 ---
 
@@ -19,7 +21,8 @@ Diferente de editores comuns, o Label Forge OS foi projetado com uma arquitetura
 - **Motor Híbrido de Renderização:** Utiliza a Main Thread para design fluido (60 FPS) e **Web Workers + OffscreenCanvas** para geração de PDFs massivos sem travar a interface.
 - **Infiltração de Dados:** Um motor de interpolação robusto com suporte a formatadores matemáticos, lógica de fallback e variáveis de sistema.
 - **Typeface Engine:** Injeção dinâmica de Google Fonts com persistência automática no arquivo do projeto.
-- **Resiliência Industrial:** Auto-save em tempo real no IndexedDB v3 e rastreamento de "Dirty State" para evitar perda de progresso.
+- **Resiliência Industrial:** Auto-save em tempo real no IndexedDB v4 e rastreamento de "Dirty State" para evitar perda de progresso.
+- **Pontes de Escopo (Theme Sync):** Sincronização centralizada de tema reativo via `MutationObserver` Singleton, propagando o Dark/Light mode através da barreira do Shadow DOM em 100% dos componentes de forma ultra-performática.
 
 ---
 
@@ -30,19 +33,20 @@ Gerencie milhares de registros com facilidade. O Studio permite navegar por plan
 - **Imposição Dinâmica:** Suporte a formatos ISO (A4, A3) e US Letter, em Portrait ou Landscape.
 - **Calibração Física:** Controle total sobre margens, gaps, sangria (bleed) e marcas de corte profissionais.
 <!-- IM-01: Imagem do Production Cockpit em ação -->
-![Production Cockpit Placeholder](https://placehold.co/600x300?text=IMAGE:+Production+Cockpit+with+A4+Preview)
+![Production Cockpit](docs/assets/production-cockpit.png)
 
 ### 2. Variable Manager (Visual Data Pipeline)
 Visualize o fluxo de dados desde o input bruto até o output formatado através de uma interface estilo "Lego".
+- **Separação de Contexto:** Distinção precisa entre variáveis de dataset (`{{nome}}`) e variáveis nativas do sistema (`{{index}}`, `{{total}}`, `{{date}}`).
 - **Formatadores Inteligentes:** `:currency`, `:date`, `:upper`, `:math` e mais.
-- **Metadata Tray:** Acesso rápido a variáveis de sistema como `{{index}}` e `{{total}}`.
+- **Metadata Tray:** Acesso rápido a variáveis de sistema com detecção visual de uso ativo (badges luminosos em verde).
 <!-- GI-02: GIF do Variable Manager arrastando formatadores -->
-![Variable Manager GIF Placeholder](https://placehold.co/600x300?text=GIF:+Variable+Manager+Pipeline+Interaction)
+![Variable Manager GIF](docs/assets/variable-manager.gif)
 
 ### 3. Time Machine (Histórico Visual)
 Não apenas uma lista de ações, mas uma fita cronológica com **previews reais** de cada estado anterior do seu design. Viaje no tempo com um clique.
 <!-- IM-02: Screenshot da barra lateral do Time Machine -->
-![Time Machine Placeholder](https://placehold.co/400x600?text=IMAGE:+Visual+History+Timeline+Thumbnails)
+![Time Machine](docs/assets/time-machine.png)
 
 ---
 
@@ -55,6 +59,7 @@ O Label Forge OS passou por uma **Grande Auditoria de Integridade (Task 70)**, e
 2. **Segurança Zero Trust:** Pipeline de dados blindado contra XSS. Implementamos sanitização mandatória de HTML no `DataSanitizer` e Whitelisting rigoroso via DOMParser para injeções de SVG.
 3. **Consistência Visual (Prism System):** Padronização de 100% dos estilos usando Tailwind v4.2, eliminando cores hardcoded e seguindo um grid tátil de 4px para espaçamentos e fontes.
 4. **Resiliência Matemática:** Suíte de testes unitários (Vitest) cobrindo 100% dos cenários críticos de Layout, Snapping magnético e conversão de unidades.
+5. **Alinhamento do Canvas:** Desenho de grade e snapper de precisão delegados inteiramente ao `EditorCanvas.ts`, garantindo paridade total entre o design ativo e as coordenadas físicas.
 
 ### Auditoria Determinística (Fallow CLI):
 Utilizamos o **Fallow CLI** para garantir a saúde contínua do ecossistema:
@@ -110,6 +115,9 @@ npm run build
 - [x] **Task 58:** Suporte Expandido a Barcodes (EAN/UPC).
 - [x] **Task 78:** Asset Library (Parts Bin).
 - [x] **Task 39:** Efeitos Prism (Sombras e Filtros).
+- [x] **TACT-01:** Otimização do CanvasRenderer (Desenho da Grade).
+- [x] **TACT-02:** Correção do Theme Sync (Pontes do Shadow DOM).
+- [x] **TACT-03:** Refatoração da Lógica de Variáveis (VariableManager).
 
 ---
 
@@ -118,4 +126,4 @@ npm run build
 Este é um software de código aberto sob a licença **ISC**. 
 Desenvolvido com precisão e 💙 pela **Tactile Prism**.
 
-*Última grande atualização técnica: 05/06/2026*
+*Última grande atualização técnica: 26/07/2026*
