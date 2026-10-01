@@ -3,8 +3,8 @@
 Este Master Plan coordena a fase final de desenvolvimento, focando em estabilidade, performance de renderização e ferramentas de produtividade para o usuário final.
 
 ## Status do Projeto
-- **Progresso Geral:** 88% ✅
-- **Fase Atual:** Refinamento Tático e Otimização de Core.
+- **Progresso Geral:** 89% ✅
+- **Fase Atual:** Cloud Sync via GistDB + Refinamento Tático.
 - **Stack:** TS, Vite, Tailwind v4.2, Shadow DOM, Event-Driven Architecture.
 
 ## Workflow de Execução (Obrigatório)
@@ -89,7 +89,18 @@ Este Master Plan coordena a fase final de desenvolvimento, focando em estabilida
 |----|------|-----|--------|------|--------|
 | **91** | [Refatoração Orchestrator: Preferences](./tasks/91_preferences_refactor.md) | 03 | [ ] | 75 | `task/91-preferences-refactor` |
 
----
+### Fase F: Cloud Sync — GistDB (Multi-dispositivo)
+> Integração da biblioteca [GistDB](https://github.com/seu-usuario/gistdb) como camada de persistência em nuvem opcional e não-destrutiva sobre o IndexedDB existente. Nenhuma task desta fase altera o comportamento atual para usuários sem configuração de token.
+
+| ID | Task | Pri | Status | Deps | Branch |
+|----|------|-----|--------|------|--------|
+| **92** | [CloudSyncService — Orquestrador GistDB](./tasks/92_cloud_sync_service.md) | 08 | [ ] | — | `task/92-cloud-sync-service` |
+| **93** | [UserPreferences — Campos Cloud Sync](./tasks/93_cloud_preferences_model.md) | 07 | [ ] | — | `task/93-cloud-prefs-model` |
+| **94** | [PreferencesModal — Aba "Cloud Sync"](./tasks/94_cloud_settings_ui.md) | 07 | [ ] | 92, 93 | `task/94-cloud-settings-ui` |
+| **95** | [TemplateManager — Dual-write & Pull](./tasks/95_template_cloud_sync.md) | 07 | [ ] | 92 | `task/95-template-cloud-sync` |
+| **96** | [PreferenceManager & SessionManager — Push](./tasks/96_prefs_session_cloud_sync.md) | 06 | [ ] | 92 | `task/96-prefs-session-sync` |
+| **97** | [EventBus, StatusBar & Bootstrap — Feedback Visual](./tasks/97_cloud_sync_feedback.md) | 06 | [ ] | 92, 93 | `task/97-cloud-sync-feedback` |
+
 
 ## ✅ Histórico de Conquistas (MVP & Core)
 *(Tasks concluídas movidas para o histórico para manter o foco no futuro)*
