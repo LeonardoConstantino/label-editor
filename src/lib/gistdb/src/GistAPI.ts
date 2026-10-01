@@ -1,0 +1,155 @@
+import { GistDBError } from './errors.js';
+import { Logger } from './Logger.js';
+import { TypedEventEmitter } from './EventEmitter.js';
+import { GistDBEvents } from './types.js';
+
+const GITHUB_API = 'https://api.github.com';
+
+/**
+ * GistAPI — wrapper direto para a GitHub Gist REST API.
+ * Responsabilidade única: mapear operações para HTTP.
+ */
+export class GistAPI {
+  #getToken: () => string | null;
+  #prefix: string;
+  #emitter?: TypedEventEmitter<GistDBEvents>;
+
+  constructor(getToken: () => string | null, prefix: string, emitter?: TypedEventEmitter<GistDBEvents>) {
+    this.#getToken = getToken;
+    this.#prefix = prefix;
+    this.#emitter = emitter;
+  }
+
+  async createGist(
+    files: Record<string, any> = {},
+    isPublic = false,
+    signal?: AbortSignal,
+  ): Promise<string> {
+    const res = await this.#req(
+      'POST',
+      '/gists',
+      {
+        description: `gistdb:${this.#prefix}`,
+        public: isPublic,
+        files,
+      },
+      signal,
+    );
+    return res.id;
+  }
+
+  async getGist(gistId: string, signal?: AbortSignal): Promise<any> {
+    return this.#req('GET', `/gists/${gistId}`, null, signal);
+  }
+
+  async updateGist(
+    gistId: string,
+    files: Record<string, any>,
+    signal?: AbortSignal,
+  ): Promise<any> {
+    return this.#req('PATCH', `/gists/${gistId}`, { files }, signal);
+  }
+
+  async deleteFile(
+    gistId: string,
+    filename: string,
+    signal?: AbortSignal,
+  ): Promise<boolean> {
+    await this.#req(
+      'PATCH',
+      `/gists/${gistId}`,
+      {
+        files: { [filename]: null },
+      },
+      signal,
+    );
+    return true;
+  }
+
+  /**
+   * Lista gists do usuário filtrados pelo prefixo.
+   */
+  async listGists(signal?: AbortSignal): Promise<any[]> {
+    const all = await this.#req('GET', '/gists?per_page=100', null, signal);
+    if (!Array.isArray(all)) return [];
+    return all.filter((g: any) => g.description === `gistdb:${this.#prefix}`);
+  }
+
+  // ─── HTTP INTERNO ────────────────────────────────────────────
+
+  async #req(
+    method: string,
+    path: string,
+    body: any = null,
+    signal?: AbortSignal,
+  ): Promise<any> {
+    const token = this.#getToken();
+    if (!token) throw new GistDBError('NO_TOKEN', 'Token não disponível.');
+
+    const opts: RequestInit = {
+      method,
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: 'application/vnd.github+json',
+        'X-GitHub-Api-Version': '2022-11-28',
+        'Content-Type': 'application/json',
+      },
+      signal,
+    };
+
+    if (body !== null) opts.body = JSON.stringify(body);
+
+    const startTime = Date.now();
+    Logger.debug('GistAPI', `HTTP Request ${method} ${path}`);
+
+    let res: Response;
+    try {
+      res = await fetch(`${GITHUB_API}${path}`, opts);
+    } catch (err: any) {
+      const durationMs = Date.now() - startTime;
+      Logger.error('GistAPI', `HTTP Request Failed: ${method} ${path}`, { durationMs, error: err?.message || String(err) });
+      throw err;
+    }
+
+    const durationMs = Date.now() - startTime;
+    Logger.info('GistAPI', `HTTP Response ${method} ${path} -> ${res.status}`, { durationMs, status: res.status });
+
+    // Inspeciona headers de Rate Limit se presentes
+    if (res.headers && typeof res.headers.get === 'function') {
+      const limitHeader = res.headers.get('X-RateLimit-Limit');
+      const remainingHeader = res.headers.get('X-RateLimit-Remaining');
+      const resetHeader = res.headers.get('X-RateLimit-Reset');
+      if (limitHeader && remainingHeader && resetHeader) {
+        const limit = parseInt(limitHeader, 10);
+        const remaining = parseInt(remainingHeader, 10);
+        const resetAt = new Date(parseInt(resetHeader, 10) * 1000);
+        this.#emitter?.emit('ratelimit', { limit, remaining, resetAt });
+      }
+    }
+
+    if (res.status === 404) return null;
+    if (res.status === 422)
+      throw new GistDBError(
+        'VALIDATION_ERROR',
+        'Payload inválido para a API do GitHub.',
+      );
+    if (res.status === 401) {
+      // Emit auth:error event
+      const authErr = new GistDBError('API_ERROR', 'Authentication failed.');
+      this.#emitter?.emit('auth:error', {
+        error: authErr,
+        status: 401,
+      });
+      throw authErr;
+    }
+    if (res.status === 403)
+      throw new GistDBError('RATE_LIMITED', 'Rate limit atingido.');
+    if (!res.ok) {
+      const msg = await res.text().catch(() => res.statusText);
+      throw new GistDBError('API_ERROR', `GitHub API ${res.status}: ${msg}`);
+    }
+
+    if (res.status === 204) return true;
+    return res.json();
+  }
+}
