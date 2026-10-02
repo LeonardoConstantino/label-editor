@@ -153,10 +153,10 @@ public async configure(token: string, gistId?: string): Promise<void> {
 
 ## ✅ Critérios de Aceite
 
-- [ ] `cloudSyncService.isReady` retorna `false` quando `gistToken` está vazio
-- [ ] `configure('')` emite `cloud:status:change` com `{ status: 'unconfigured' }`
-- [ ] `configure(validToken)` emite `cloud:configured` com o `gistId` após sucesso
-- [ ] Token inválido (401) emite `cloud:status:change` com `{ status: 'error' }` e não lança exceção não-tratada
-- [ ] `pushTemplate()` não falha silenciosamente — loga o erro com `logger.warn`
-- [ ] `destroy()` chama `this.#db?.destroy()` e zera `#db = null`
-- [ ] Build de produção (`npm run build`) sem erros de tipo
+- [x] `cloudSyncService.isReady` retorna `false` quando `gistToken` está vazio
+- [x] `configure('')` emite `cloud:status:change` com `{ status: 'unconfigured' }`
+- [x] `configure(validToken)` emite `cloud:configured` com o `gistId` após sucesso
+- [x] Token inválido (401) emite `cloud:status:change` com `{ status: 'error' }` e não lança exceção não-tratada
+- [x] `pushTemplate()` não falha silenciosamente — loga o erro com `logger.warn`
+- [x] `destroy()` chama `this.#db?.destroy()` e zera `#db = null`
+- [x] Build de produção (`npm run build`) sem erros de tipo

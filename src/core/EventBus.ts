@@ -83,6 +83,14 @@ interface EventMap {
   'command:canvas:drop-asset': { x: number; y: number; asset: { type: string, src: string, name: string } };
   'request:canvas:snapshot': (ctx: CanvasRenderingContext2D) => void;
   'command:canvas:restore': ImageData;
+
+  // Cloud Sync Events (GistDB)
+  'cloud:status:change': { status: 'idle' | 'syncing' | 'error' | 'offline' | 'unconfigured'; error?: unknown };
+  'cloud:configured': { gistId: string };
+  'cloud:sync:start': { collection: string };
+  'cloud:sync:done': { collection: string; count: number };
+  'cloud:sync:error': { collection: string; error: unknown };
+  'vault:refreshed': Record<string, never>;
 }
 
 /**

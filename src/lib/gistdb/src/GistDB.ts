@@ -44,6 +44,10 @@ export class GistDB {
     return this.#deviceInfo?.id || '';
   }
 
+  get gistId(): string | null {
+    return this.#gistId;
+  }
+
   get devices() {
     return {
       list: async (): Promise<DeviceInfo[]> => {
