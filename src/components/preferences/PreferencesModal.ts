@@ -546,11 +546,11 @@ export class PreferencesModal extends HTMLElement {
     if (!badge) return;
 
     const map: Record<SyncStatus, { label: string; color: string }> = {
-      idle: { label: '● Conectado', color: 'var(--color-success)' },
-      syncing: { label: '↻ Sincronizando…', color: 'var(--color-info)' },
-      error: { label: '✗ Erro', color: 'var(--color-error)' },
-      offline: { label: '◌ Offline', color: 'var(--color-warning)' },
-      unconfigured: { label: '● Não configurado', color: 'var(--color-text-muted)' },
+      idle: { label: '● Conectado', color: 'var(--color-accent-success)' },
+      syncing: { label: '↻ Sincronizando…', color: 'var(--color-accent-info)' },
+      error: { label: '✗ Erro', color: 'var(--color-accent-danger)' },
+      offline: { label: '◌ Offline', color: 'var(--color-accent-warning)' },
+      unconfigured: { label: '● Não configurado', color: 'var(--color-accent-text-muted)' },
     };
 
     const { label, color } = map[status] || map.unconfigured;
@@ -917,8 +917,8 @@ export class PreferencesModal extends HTMLElement {
                   <span class="setting-desc">Validate token credentials and test connectivity.</span>
                 </div>
                 <div class="setting-control" style="align-items: center; gap: 12px;">
-                  <span data-id="cloud-status-badge" class="cloud-status-badge">&bull; Not configured</span>
-                  <app-button id="cloud-test-btn" variant="secondary" style="--btn-padding: 6px 14px">
+                  <span data-id="cloud-status-badge" class="cloud-status-badge shrink-0">&bull; Not configured</span>
+                  <app-button id="cloud-test-btn" variant="secondary" class="shrink-0">
                     Test Connection
                   </app-button>
                 </div>
