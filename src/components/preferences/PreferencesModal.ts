@@ -5,6 +5,8 @@ import { store, AppState } from '../../core/Store';
 import { UISM, SoundPreset } from '../../core/UISoundManager';
 import { UserPreferences } from '../../domain/models/UserPreferences';
 import { HelpContentProvider } from '../../utils/HelpContentProvider';
+import { cloudSyncService, SyncStatus } from '../../domain/services/CloudSyncService';
+import { preferenceManager } from '../../domain/services/PreferenceManager';
 
 // Registrar componentes necessários
 import '../common/AppButton';
@@ -36,6 +38,30 @@ settingsSheet.replaceSync(`
     display: block;
     width: 100%;
     height: 75dvh;
+  }
+
+  .cloud-status-badge {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: color-mix(in srgb, currentColor 12%, transparent);
+    transition: color 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    font-weight: 600;
+  }
+
+  .cloud-desc-link {
+    color: var(--color-accent-primary);
+    text-decoration: underline;
+    font-size: var(--text-xs);
+    margin-top: 4px;
+    display: inline-block;
+  }
+
+  .cloud-desc-link:hover {
+    color: var(--color-text-main);
   }
 
   .settings-container {
@@ -392,6 +418,41 @@ export class PreferencesModal extends HTMLElement {
         UISM.play(UISM.enumPresets.DELETE);
       }
     });
+
+    // Cloud Sync: Test Connection Button listener
+    root.getElementById('cloud-test-btn')?.addEventListener('click', async () => {
+      const tokenInput = root.querySelector('[data-id="cloud-token-input"]') as any;
+      const gistIdInput = root.querySelector('[data-id="cloud-gist-id-input"]') as any;
+      const token = tokenInput?.value?.trim() ?? '';
+      const gistId = gistIdInput?.value?.trim() ?? '';
+
+      if (!token) {
+        eventBus.emit('notify', { type: 'warning', message: 'Por favor, insira um token GitHub antes de testar.' });
+        return;
+      }
+
+      try {
+        await cloudSyncService.configure(token, gistId || undefined);
+        const resolvedGistId = cloudSyncService.gistId ?? gistId;
+        
+        await preferenceManager.savePreferences({
+          gistToken: token,
+          gistId: resolvedGistId,
+          cloudSync: true,
+        });
+
+        eventBus.emit('notify', { type: 'success', message: 'Cloud Sync conectado e configurado com sucesso!' });
+        UISM.play(UISM.enumPresets.SUCCESS);
+      } catch (err) {
+        eventBus.emit('notify', { type: 'error', message: 'Falha ao conectar ao GitHub Gist. Verifique o token.' });
+        UISM.play(UISM.enumPresets.WARNING);
+      }
+    });
+
+    // Cloud Sync: status change listener
+    eventBus.on('cloud:status:change', ({ status }) => {
+      this.updateCloudStatusBadge(status);
+    }, { signal });
   }
 
   private switchSection(sectionId: string) {
@@ -467,8 +528,34 @@ export class PreferencesModal extends HTMLElement {
       btn.classList.toggle('active', btn.getAttribute('data-val') === prefs.theme);
     });
 
+    // Sincroniza Cloud Sync Fields opacity e status badge
+    const cloudFields = root.querySelectorAll('[data-cloud-field]');
+    cloudFields.forEach(el => {
+      (el as HTMLElement).style.opacity = prefs.cloudSync ? '1' : '0.4';
+      (el as HTMLElement).style.pointerEvents = prefs.cloudSync ? 'auto' : 'none';
+    });
+
+    this.updateCloudStatusBadge(cloudSyncService.status);
+
     // Atualiza preview da grade
     this.drawGridPreview();
+  }
+
+  private updateCloudStatusBadge(status: SyncStatus) {
+    const badge = this.shadowRoot?.querySelector('[data-id="cloud-status-badge"]');
+    if (!badge) return;
+
+    const map: Record<SyncStatus, { label: string; color: string }> = {
+      idle: { label: '● Conectado', color: 'var(--color-success)' },
+      syncing: { label: '↻ Sincronizando…', color: 'var(--color-info)' },
+      error: { label: '✗ Erro', color: 'var(--color-error)' },
+      offline: { label: '◌ Offline', color: 'var(--color-warning)' },
+      unconfigured: { label: '● Não configurado', color: 'var(--color-text-muted)' },
+    };
+
+    const { label, color } = map[status] || map.unconfigured;
+    badge.textContent = label;
+    (badge as HTMLElement).style.color = color;
   }
 
   // TODO: Tornar src\components\editor\EditorCanvas.ts responsável por desenhar a grade, usando as preferências do usuário. Isso garante que a prévia e a grade real estejam sempre sincronizadas, eliminando discrepâncias e melhorando a experiência do usuário.
@@ -537,6 +624,9 @@ export class PreferencesModal extends HTMLElement {
           </div>
           <div class="sidebar-item" data-section="perf">
             <ui-icon name="cpu" style="--icon-size: 14px"></ui-icon> Performance
+          </div>
+          <div class="sidebar-item" data-section="cloud">
+            <ui-icon name="upload-cloud" style="--icon-size: 14px"></ui-icon> Cloud Sync
           </div>
           <div style="flex: 1"></div>
           <div class="sidebar-footer" style="padding: 20px; border-top: 1px solid var(--color-border-ui)">
@@ -767,6 +857,70 @@ export class PreferencesModal extends HTMLElement {
                 </div>
                 <div class="setting-control">
                   <app-select id="log-level-select" data-prop="logLevel" style="width: 160px"></app-select>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- SECTION: CLOUD SYNC -->
+          <section id="section-cloud" class="settings-section">
+            <div class="section-header justify-between">
+              <div class="flex items-center gap-3">
+                <ui-icon name="upload" class="text-accent-primary" style="--icon-size: 24px"></ui-icon>
+                <h2 class="section-title">Cloud Synchronization</h2>
+              </div>
+              ${HelpContentProvider.buildTooltip('pref_cloud' as any)}
+            </div>
+            <div class="card-module">
+              <div class="setting-row">
+                <div class="setting-info">
+                  <span class="setting-label">Enable Cloud Sync</span>
+                  <span class="setting-desc">
+                    Synchronize your templates and preferences across devices using a private GitHub Gist.
+                    <br>
+                    <a href="https://github.com/settings/tokens/new?scopes=gist" target="_blank" rel="noopener" class="cloud-desc-link">
+                      Generate GitHub Token (scope: gist) &rarr;
+                    </a>
+                  </span>
+                </div>
+                <div class="setting-control">
+                  <label class="toggle-switch">
+                    <input type="checkbox" data-prop="cloudSync" ${p.cloudSync ? 'checked' : ''}>
+                    <span class="slider"></span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="setting-row" data-cloud-field>
+                <div class="setting-info">
+                  <span class="setting-label">GitHub Token (PAT)</span>
+                  <span class="setting-desc">Personal access token with gist permissions (saved locally only).</span>
+                </div>
+                <div class="setting-control">
+                  <app-input data-id="cloud-token-input" data-prop="gistToken" type="password" placeholder="ghp_..." style="width: 220px"></app-input>
+                </div>
+              </div>
+
+              <div class="setting-row" data-cloud-field>
+                <div class="setting-info">
+                  <span class="setting-label">Gist ID</span>
+                  <span class="setting-desc">Target Gist repository identifier (auto-generated or custom).</span>
+                </div>
+                <div class="setting-control">
+                  <app-input data-id="cloud-gist-id-input" data-prop="gistId" placeholder="Auto-generated on save" style="width: 220px"></app-input>
+                </div>
+              </div>
+
+              <div class="setting-row">
+                <div class="setting-info">
+                  <span class="setting-label">Connection Test</span>
+                  <span class="setting-desc">Validate token credentials and test connectivity.</span>
+                </div>
+                <div class="setting-control" style="align-items: center; gap: 12px;">
+                  <span data-id="cloud-status-badge" class="cloud-status-badge">&bull; Not configured</span>
+                  <app-button id="cloud-test-btn" variant="secondary" style="--btn-padding: 6px 14px">
+                    Test Connection
+                  </app-button>
                 </div>
               </div>
             </div>

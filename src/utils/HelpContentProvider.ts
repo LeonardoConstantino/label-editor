@@ -237,6 +237,20 @@ export const InspectorHelpData: Record<string, HelpTooltipConfig> = {
       isSuccess: false
     }
   },
+  pref_cloud: {
+    title: 'Cloud Synchronization',
+    icon: 'upload',
+    commands: [
+      { label: 'Token PAT', desc: 'GitHub Token com permissão "gist".' },
+      { label: 'Gist ID', desc: 'Identificador do repositório remoto.' },
+      { label: 'Multi-Device', desc: 'Sincronia entre diferentes navegadores.' }
+    ],
+    proTip: {
+      icon: 'lock',
+      text: 'O seu token é armazenado localmente e nunca é enviado para a nuvem.',
+      isSuccess: true
+    }
+  },
   layers_meta: {
     title: 'Layer Management',
     icon: 'layers',
