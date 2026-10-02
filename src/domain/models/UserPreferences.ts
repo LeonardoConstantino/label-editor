@@ -33,6 +33,11 @@ export interface UserPreferences {
   // --- CREATION DEFAULTS ---
   autoLockOnCreation: boolean; // Task 75 Roadmap
   defaultFontFamily: string;   // Task 75 Roadmap
+
+  // --- CLOUD SYNC (GistDB) ---
+  cloudSync: boolean;    // Habilita/desabilita toda a sincronização em nuvem
+  gistToken: string;     // GitHub Personal Access Token (escopo "gist") — salvo apenas no IDB local
+  gistId: string;        // ID do Gist GitHub (auto-preenchido após primeira configuração)
 }
 
 export const DEFAULT_PREFERENCES: UserPreferences = {
@@ -61,5 +66,10 @@ export const DEFAULT_PREFERENCES: UserPreferences = {
   logLevel: 1, // Default: Errors only in production
 
   autoLockOnCreation: false,
-  defaultFontFamily: 'Inter'
+  defaultFontFamily: 'Inter',
+
+  // --- CLOUD SYNC ---
+  cloudSync: false,
+  gistToken: '',
+  gistId: '',
 };

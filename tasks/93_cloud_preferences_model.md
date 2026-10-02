@@ -52,7 +52,7 @@ O campo `gistToken` é salvo no `IndexedDB` local — **nunca deve ser incluído
 
 ## ✅ Critérios de Aceite
 
-- [ ] Interface `UserPreferences` possui os 3 novos campos tipados corretamente
-- [ ] `DEFAULT_PREFERENCES` possui os 3 defaults (`false`, `''`, `''`)
-- [ ] `npm run build` sem erros de tipo
-- [ ] Nenhum arquivo que consome `UserPreferences` quebra (verificar `PreferenceManager`, `PreferencesModal`, `Store`, `main.ts`)
+- [x] Interface `UserPreferences` possui os 3 novos campos tipados corretamente
+- [x] `DEFAULT_PREFERENCES` possui os 3 defaults (`false`, `''`, `''`)
+- [x] `npm run build` sem erros de tipo
+- [x] Nenhum arquivo que consome `UserPreferences` quebra (verificar `PreferenceManager`, `PreferencesModal`, `Store`, `main.ts`)

@@ -95,7 +95,7 @@ Este Master Plan coordena a fase final de desenvolvimento, focando em estabilida
 | ID | Task | Pri | Status | Deps | Branch |
 |----|------|-----|--------|------|--------|
 | **92** | [CloudSyncService — Orquestrador GistDB](./tasks/92_cloud_sync_service.md) | 08 | [x] | — | `task/92-cloud-sync-service` |
-| **93** | [UserPreferences — Campos Cloud Sync](./tasks/93_cloud_preferences_model.md) | 07 | [ ] | — | `task/93-cloud-prefs-model` |
+| **93** | [UserPreferences — Campos Cloud Sync](./tasks/93_cloud_preferences_model.md) | 07 | [x] | — | `task/93-cloud-prefs-model` |
 | **94** | [PreferencesModal — Aba "Cloud Sync"](./tasks/94_cloud_settings_ui.md) | 07 | [ ] | 92, 93 | `task/94-cloud-settings-ui` |
 | **95** | [TemplateManager — Dual-write & Pull](./tasks/95_template_cloud_sync.md) | 07 | [ ] | 92 | `task/95-template-cloud-sync` |
 | **96** | [PreferenceManager & SessionManager — Push](./tasks/96_prefs_session_cloud_sync.md) | 06 | [ ] | 92 | `task/96-prefs-session-sync` |
