@@ -2,7 +2,11 @@ import { Label } from '../../../domain/models/Label';
 import { UserPreferences } from '../../../domain/models/UserPreferences';
 import { sharedSheet } from '../../../utils/shared-styles';
 import { bridgeTheme } from '../../../utils/theme-bridge';
-import { dispatchInspectorChange, dispatchInspectorAction, resolveInspectorValue } from './inspector-events';
+import {
+  dispatchInspectorChange,
+  dispatchInspectorAction,
+  resolveInspectorValue,
+} from './inspector-events';
 import { escapeHTML } from '../../../utils/sanitize';
 import { LABEL_PRESETS } from '../../../constants/defaults';
 import { HelpContentProvider } from '../../../utils/HelpContentProvider';
@@ -16,6 +20,108 @@ import '../../common/AppSelect';
 interface InputWithMetadata extends HTMLElement {
   value: string | number;
   checked?: boolean;
+}
+
+// ─── Mapas declarativos (definidos fora da classe, são constantes) ───────────
+
+const DOC_VALUE_PROPS: ReadonlyMap<string, keyof Label['config']> = new Map([
+  ['doc.widthMM', 'widthMM'],
+  ['doc.heightMM', 'heightMM'],
+  ['doc.dpi', 'dpi'],
+  ['doc.previewScale', 'previewScale'],
+]);
+
+const DOC_COLOR_PROPS: ReadonlyMap<
+  string,
+  { key: keyof Label['config']; fallback: string }
+> = new Map([
+  ['doc.backgroundColor', { key: 'backgroundColor', fallback: '#ffffff' }],
+]);
+
+const PREF_VALUE_PROPS: ReadonlyMap<string, keyof UserPreferences> = new Map([
+  ['pref.gridSizeMM', 'gridSizeMM'],
+  ['pref.gridOpacity', 'gridOpacity'],
+  ['pref.unit', 'unit'],
+  ['pref.snapThresholdMM', 'snapThresholdMM'],
+]);
+
+const PREF_COLOR_PROPS: ReadonlyMap<
+  string,
+  { key: keyof UserPreferences; fallback: string }
+> = new Map([['pref.gridColor', { key: 'gridColor', fallback: '#6366f1' }]]);
+
+const PREF_CHECK_PROPS: ReadonlyMap<string, keyof UserPreferences> = new Map([
+  ['pref.audioEnabled', 'audioEnabled'],
+  ['pref.showGrid', 'showGrid'],
+  ['pref.snapToGrid', 'snapToGrid'],
+  ['pref.snapToObjects', 'snapToObjects'],
+  ['pref.snapToCanvas', 'snapToCanvas'],
+]);
+
+// ─── Helpers puros (fora da classe) ─────────────────────────────────────────
+
+function syncSelectPreset(shadow: ShadowRoot, config: Label['config']): void {
+  const select = shadow.getElementById('select-preset') as any;
+  if (!select) return;
+
+  const match = LABEL_PRESETS.find(
+    (p) => p.w === config.widthMM && p.h === config.heightMM,
+  );
+  const value = match ? match.value : 'custom';
+  if (select.value !== value) select.value = value;
+}
+
+function resolveInputValue(
+  prop: string,
+  config: Label['config'],
+  prefs: UserPreferences,
+): string | boolean | null {
+  // Checkboxes — retorna boolean
+  const checkKey = PREF_CHECK_PROPS.get(prop);
+  if (checkKey !== undefined) return prefs[checkKey] as boolean;
+
+  // Valores diretos de config
+  const docKey = DOC_VALUE_PROPS.get(prop);
+  if (docKey !== undefined) return String(config[docKey] ?? '');
+
+  // Valores diretos de prefs
+  const prefKey = PREF_VALUE_PROPS.get(prop);
+  if (prefKey !== undefined) return String(prefs[prefKey] ?? '');
+
+  // Cores de config (com fallback)
+  const docColor = DOC_COLOR_PROPS.get(prop);
+  if (docColor) return String(config[docColor.key] || docColor.fallback);
+
+  // Cores de prefs (com fallback)
+  const prefColor = PREF_COLOR_PROPS.get(prop);
+  if (prefColor) return String(prefs[prefColor.key] || prefColor.fallback);
+
+  return null;
+}
+
+function syncInput(
+  input: InputWithMetadata,
+  shadow: ShadowRoot,
+  config: Label['config'],
+  prefs: UserPreferences,
+): void {
+  const prop = input.getAttribute('data-prop');
+  if (!prop) return;
+
+  const isCheckbox =
+    input instanceof HTMLInputElement && input.type === 'checkbox';
+  const isFocused =
+    shadow.activeElement === input || input.shadowRoot?.activeElement;
+  if (isFocused && !isCheckbox) return;
+
+  const resolved = resolveInputValue(prop, config, prefs);
+  if (resolved === null) return;
+
+  if (isCheckbox) {
+    if (input.checked !== resolved) input.checked = resolved as boolean;
+  } else {
+    if (input.value != resolved) input.value = resolved as string;
+  }
 }
 
 /**
@@ -69,8 +175,20 @@ export class InspectorDocumentSetup extends HTMLElement {
   private render(): void {
     if (!this.shadowRoot || !this._labelConfig || !this._preferences) return;
 
-    const { widthMM, heightMM, backgroundColor, dpi, previewScale } = this._labelConfig;
-    const {audioEnabled, showGrid, gridSizeMM, gridColor, gridOpacity, snapToGrid, snapToObjects, snapToCanvas, snapThresholdMM, unit} = this._preferences;
+    const { widthMM, heightMM, backgroundColor, dpi, previewScale } =
+      this._labelConfig;
+    const {
+      audioEnabled,
+      showGrid,
+      gridSizeMM,
+      gridColor,
+      gridOpacity,
+      snapToGrid,
+      snapToObjects,
+      snapToCanvas,
+      snapThresholdMM,
+      unit,
+    } = this._preferences;
 
     this.shadowRoot.innerHTML = `
       <style>
@@ -213,14 +331,14 @@ export class InspectorDocumentSetup extends HTMLElement {
 
   private setupSelects() {
     const shadow = this.shadowRoot!;
-    
+
     const dpiSelect = shadow.getElementById('dpi-select') as any;
     if (dpiSelect) {
       dpiSelect.options = [
         { value: '72', label: '72 DPI', sublabel: 'Web Standard' },
         { value: '150', label: '150 DPI', sublabel: 'Draft Quality' },
         { value: '300', label: '300 DPI', sublabel: 'Print Quality' },
-        { value: '600', label: '600 DPI', sublabel: 'Ultra High-Res' }
+        { value: '600', label: '600 DPI', sublabel: 'Ultra High-Res' },
       ];
     }
 
@@ -229,28 +347,28 @@ export class InspectorDocumentSetup extends HTMLElement {
       unitSelect.options = [
         { value: 'mm', label: 'Millimeters (mm)' },
         { value: 'px', label: 'Pixels (px)' },
-        { value: 'pt', label: 'Points (pt)' }
+        { value: 'pt', label: 'Points (pt)' },
       ];
     }
   }
 
   private setupListeners(): void {
     const root = this.shadowRoot!;
-    
+
     const changeHandler = (e: Event) => {
       const target = e.target as HTMLElement;
       const prop = target.getAttribute('data-prop');
-      
+
       // Se mudar W ou H manualmente, reseta o select para custom
       if (prop === 'doc.widthMM' || prop === 'doc.heightMM') {
-         const select = root.getElementById('select-preset') as any;
-         if (select) select.value = 'custom';
+        const select = root.getElementById('select-preset') as any;
+        if (select) select.value = 'custom';
       }
 
       if (!prop) return;
 
       const value = resolveInspectorValue(e);
-      
+
       if (value !== undefined) {
         dispatchInspectorChange(this, { prop, value });
       }
@@ -263,21 +381,104 @@ export class InspectorDocumentSetup extends HTMLElement {
     root.addEventListener('app-select', changeHandler); // Suporte para os novos selects com data-prop
 
     // Listener para o Preset Select
-    root.getElementById('select-preset')?.addEventListener('app-select', (e: any) => {
-      const presetId = e.detail.value;
-      const preset = LABEL_PRESETS.find(p => p.value === presetId);
-      
-      if (preset && preset.value !== 'custom') {
-        // Dispara as mudanças de W e H simultaneamente
-        dispatchInspectorChange(this, { prop: 'doc.widthMM', value: preset.w });
-        dispatchInspectorChange(this, { prop: 'doc.heightMM', value: preset.h });
-      }
-    });
+    root
+      .getElementById('select-preset')
+      ?.addEventListener('app-select', (e: any) => {
+        const presetId = e.detail.value;
+        const preset = LABEL_PRESETS.find((p) => p.value === presetId);
+
+        if (preset && preset.value !== 'custom') {
+          // Dispara as mudanças de W e H simultaneamente
+          dispatchInspectorChange(this, {
+            prop: 'doc.widthMM',
+            value: preset.w,
+          });
+          dispatchInspectorChange(this, {
+            prop: 'doc.heightMM',
+            value: preset.h,
+          });
+        }
+      });
 
     root.getElementById('btn-open-vault')?.addEventListener('click', () => {
       dispatchInspectorAction(this, { action: 'open-vault' });
     });
   }
+
+  // private syncValues(): void {
+  //   if (!this.shadowRoot || !this._labelConfig || !this._preferences) return;
+
+  //   const shadow = this.shadowRoot;
+  //   const config = this._labelConfig;
+  //   const prefs = this._preferences;
+
+  //   // Sincroniza o Select Preset
+  //   const select = shadow.getElementById('select-preset') as any;
+  //   if (select) {
+  //     const currentPreset = LABEL_PRESETS.find(p => p.w === config.widthMM && p.h === config.heightMM);
+  //     const val = currentPreset ? currentPreset.value : 'custom';
+  //     if (select.value !== val) select.value = val;
+  //   }
+
+  //   const inputs = shadow.querySelectorAll<InputWithMetadata>('[data-prop]');
+  //   inputs.forEach(input => {
+  //     const prop = input.getAttribute('data-prop');
+  //     if (!prop) return;
+
+  //     const isCheckbox = input instanceof HTMLInputElement && input.type === 'checkbox';
+  //     const isFocused = shadow.activeElement === input || input.shadowRoot?.activeElement;
+
+  //     if (isFocused && !isCheckbox) return;
+
+  //     if (prop === 'doc.widthMM') {
+  //        if (input.value != config.widthMM) input.value = config.widthMM;
+  //     }
+  //     else if (prop === 'doc.heightMM') {
+  //        if (input.value != config.heightMM) input.value = config.heightMM;
+  //     }
+  //     else if (prop === 'doc.dpi') {
+  //        if (input.value != config.dpi) input.value = config.dpi;
+  //     }
+  //     else if (prop === 'doc.previewScale') {
+  //        if (input.value != config.previewScale) input.value = config.previewScale;
+  //     }
+  //     else if (prop === 'doc.backgroundColor') {
+  //        const color = config.backgroundColor || '#ffffff';
+  //        if (input.value != color) input.value = color;
+  //     }
+  //     else if (prop === 'pref.audioEnabled') {
+  //        if (input.checked !== prefs.audioEnabled) input.checked = prefs.audioEnabled;
+  //     }
+  //     else if (prop === 'pref.showGrid') {
+  //        if (input.checked !== prefs.showGrid) input.checked = prefs.showGrid;
+  //     }
+  //     else if (prop === 'pref.gridSizeMM') {
+  //        if (input.value != prefs.gridSizeMM) input.value = prefs.gridSizeMM;
+  //     }
+  //     else if (prop === 'pref.gridColor') {
+  //       const color = prefs.gridColor || '#6366f1';
+  //       if (input.value != color) input.value = color;
+  //     }
+  //     else if (prop === 'pref.gridOpacity') {
+  //       if (input.value != prefs.gridOpacity) input.value = prefs.gridOpacity;
+  //     }
+  //     else if (prop === 'pref.unit') {
+  //        if (input.value !== prefs.unit) input.value = prefs.unit;
+  //     }
+  //     else if (prop === 'pref.snapToGrid') {
+  //       if (input.checked !== prefs.snapToGrid) input.checked = prefs.snapToGrid;
+  //     }
+  //     else if (prop === 'pref.snapToObjects') {
+  //       if (input.checked !== prefs.snapToObjects) input.checked = prefs.snapToObjects;
+  //     }
+  //     else if (prop === 'pref.snapToCanvas') {
+  //       if (input.checked !== prefs.snapToCanvas) input.checked = prefs.snapToCanvas;
+  //     }
+  //     else if (prop === 'pref.snapThresholdMM') {
+  //       if (input.value != prefs.snapThresholdMM) input.value = prefs.snapThresholdMM;
+  //     }
+  //   });
+  // }
 
   private syncValues(): void {
     if (!this.shadowRoot || !this._labelConfig || !this._preferences) return;
@@ -286,79 +487,18 @@ export class InspectorDocumentSetup extends HTMLElement {
     const config = this._labelConfig;
     const prefs = this._preferences;
 
-    // Sincroniza o Select Preset
-    const select = shadow.getElementById('select-preset') as any;
-    if (select) {
-      const currentPreset = LABEL_PRESETS.find(p => p.w === config.widthMM && p.h === config.heightMM);
-      const val = currentPreset ? currentPreset.value : 'custom';
-      if (select.value !== val) select.value = val;
-    }
+    syncSelectPreset(shadow, config);
 
-    const inputs = shadow.querySelectorAll<InputWithMetadata>('[data-prop]');
-    inputs.forEach(input => {
-      const prop = input.getAttribute('data-prop');
-      if (!prop) return;
-
-      const isCheckbox = input instanceof HTMLInputElement && input.type === 'checkbox';
-      const isFocused = shadow.activeElement === input || input.shadowRoot?.activeElement;
-      
-      if (isFocused && !isCheckbox) return;
-
-      if (prop === 'doc.widthMM') {
-         if (input.value != config.widthMM) input.value = config.widthMM;
-      }
-      else if (prop === 'doc.heightMM') {
-         if (input.value != config.heightMM) input.value = config.heightMM;
-      }
-      else if (prop === 'doc.dpi') {
-         if (input.value != config.dpi) input.value = config.dpi;
-      }
-      else if (prop === 'doc.previewScale') {
-         if (input.value != config.previewScale) input.value = config.previewScale;
-      }
-      else if (prop === 'doc.backgroundColor') {
-         const color = config.backgroundColor || '#ffffff';
-         if (input.value != color) input.value = color;
-      }
-      else if (prop === 'pref.audioEnabled') {
-         if (input.checked !== prefs.audioEnabled) input.checked = prefs.audioEnabled;
-      }
-      else if (prop === 'pref.showGrid') {
-         if (input.checked !== prefs.showGrid) input.checked = prefs.showGrid;
-      }
-      else if (prop === 'pref.gridSizeMM') {
-         if (input.value != prefs.gridSizeMM) input.value = prefs.gridSizeMM;
-      }
-      else if (prop === 'pref.gridColor') {
-        const color = prefs.gridColor || '#6366f1';
-        if (input.value != color) input.value = color;
-      }
-      else if (prop === 'pref.gridOpacity') {
-        if (input.value != prefs.gridOpacity) input.value = prefs.gridOpacity;
-      }
-      else if (prop === 'pref.unit') {
-         if (input.value !== prefs.unit) input.value = prefs.unit;
-      }
-      else if (prop === 'pref.snapToGrid') {
-        if (input.checked !== prefs.snapToGrid) input.checked = prefs.snapToGrid;
-      }
-      else if (prop === 'pref.snapToObjects') {
-        if (input.checked !== prefs.snapToObjects) input.checked = prefs.snapToObjects;
-      }
-      else if (prop === 'pref.snapToCanvas') {
-        if (input.checked !== prefs.snapToCanvas) input.checked = prefs.snapToCanvas;
-      }
-      else if (prop === 'pref.snapThresholdMM') {
-        if (input.value != prefs.snapThresholdMM) input.value = prefs.snapThresholdMM;
-      }
-    });
+    shadow
+      .querySelectorAll<InputWithMetadata>('[data-prop]')
+      .forEach((input) => syncInput(input, shadow, config, prefs));
   }
 
   private updateDigitalTwinVisuals(): void {
     const shadow = this.shadowRoot;
     if (!shadow || !this._labelConfig) return;
     const { widthMM, heightMM, backgroundColor } = this._labelConfig;
-    
+
     const box = shadow.getElementById('twin-box');
     const img = shadow.getElementById('monitor-img') as HTMLImageElement;
     const badgeW = shadow.getElementById('badge-w');
@@ -375,7 +515,9 @@ export class InspectorDocumentSetup extends HTMLElement {
   }
 
   private syncDigitalTwin(): void {
-    const img = this.shadowRoot?.getElementById('monitor-img') as HTMLImageElement;
+    const img = this.shadowRoot?.getElementById(
+      'monitor-img',
+    ) as HTMLImageElement;
     if (img && this._thumbnailUrl) {
       img.src = this._thumbnailUrl;
       img.style.backgroundColor = 'transparent';
