@@ -2,6 +2,68 @@ import { UISM } from '../../core/UISoundManager';
 import { sharedSheet } from '../../utils/shared-styles';
 import { bridgeTheme } from '../../utils/theme-bridge';
 
+// ─── Parser aritmético puro — sem eval, sem Function ────────────────────────
+// Gramática suportada: expr = term ((+|-) term)*
+//                      term = factor ((*|/) factor)*
+//                      factor = número | (expr) | -factor
+
+function parseArithmetic(raw: string): number {
+  const src = raw.replace(/,/g, '.').replace(/\s+/g, '');
+  let pos = 0;
+
+  function peek(): string {
+    return src[pos] ?? '';
+  }
+  function consume(): string {
+    return src[pos++];
+  }
+
+  function parseNumber(): number {
+    let num = '';
+    if (peek() === '-') num += consume(); // sinal unário
+    while (/[0-9.]/.test(peek())) num += consume();
+    if (num === '' || num === '-') throw new Error('Número inválido');
+    return parseFloat(num);
+  }
+
+  function parseFactor(): number {
+    if (peek() === '(') {
+      consume(); // consome '('
+      const val = parseExpr();
+      if (consume() !== ')') throw new Error('Parêntese não fechado');
+      return val;
+    }
+    return parseNumber();
+  }
+
+  function parseTerm(): number {
+    let left = parseFactor();
+    while (peek() === '*' || peek() === '/') {
+      const op = consume();
+      const right = parseFactor();
+      if (op === '/' && right === 0) throw new Error('Divisão por zero');
+      left = op === '*' ? left * right : left / right;
+    }
+    return left;
+  }
+
+  function parseExpr(): number {
+    let left = parseTerm();
+    while (peek() === '+' || peek() === '-') {
+      const op = consume();
+      left = op === '+' ? left + parseTerm() : left - parseTerm();
+    }
+    return left;
+  }
+
+  const result = parseExpr();
+
+  // Garante que toda a string foi consumida — rejeita lixo no final
+  if (pos !== src.length) throw new Error('Expressão inválida');
+
+  return result;
+}
+
 /**
  * ui-number-scrubber
  * Um input numérico de alta precisão com suporte a "scrubbing" (clique e arraste),
@@ -21,7 +83,15 @@ export class UINumberScrubber extends HTMLElement {
   #sensitivity = 5;
   #initialValue: number = 0;
 
-  static observedAttributes = ['value', 'min', 'max', 'step', 'label', 'unit', 'disabled'];
+  static observedAttributes = [
+    'value',
+    'min',
+    'max',
+    'step',
+    'label',
+    'unit',
+    'disabled',
+  ];
 
   constructor() {
     super();
@@ -77,8 +147,10 @@ export class UINumberScrubber extends HTMLElement {
   attributeChangedCallback(name: string, _old: string, newVal: string) {
     if (!this.#input) return;
     if (name === 'value') this.#updateValue(parseFloat(newVal), false);
-    if (name === 'label') this.#shadow.querySelector('.label-text')!.textContent = newVal;
-    if (name === 'unit') this.#shadow.querySelector('.scrubber-unit')!.textContent = newVal;
+    if (name === 'label')
+      this.#shadow.querySelector('.label-text')!.textContent = newVal;
+    if (name === 'unit')
+      this.#shadow.querySelector('.scrubber-unit')!.textContent = newVal;
     if (name === 'disabled') this.#syncDisabled();
   }
 
@@ -94,13 +166,27 @@ export class UINumberScrubber extends HTMLElement {
     const { signal } = this.#controller;
 
     const label = this.#shadow.querySelector('.scrubber-label') as HTMLElement;
-    this.#input = this.#shadow.querySelector('.scrubber-input') as HTMLInputElement;
-    this.#wrapper = this.#shadow.querySelector('.scrubber-wrapper') as HTMLDivElement;
+    this.#input = this.#shadow.querySelector(
+      '.scrubber-input',
+    ) as HTMLInputElement;
+    this.#wrapper = this.#shadow.querySelector(
+      '.scrubber-wrapper',
+    ) as HTMLDivElement;
 
-    label.addEventListener('pointerdown', (e) => this.#onPointerDown(e), { signal });
-    this.#input.addEventListener('keydown', (e) => this.#onKeyDown(e), { signal });
-    this.#input.addEventListener('input', () => UISM.play(UISM.enumPresets.TAP), { signal });
-    this.#input.addEventListener('blur', () => this.#finalizeChange(), { signal });
+    label.addEventListener('pointerdown', (e) => this.#onPointerDown(e), {
+      signal,
+    });
+    this.#input.addEventListener('keydown', (e) => this.#onKeyDown(e), {
+      signal,
+    });
+    this.#input.addEventListener(
+      'input',
+      () => UISM.play(UISM.enumPresets.TAP),
+      { signal },
+    );
+    this.#input.addEventListener('blur', () => this.#finalizeChange(), {
+      signal,
+    });
   }
 
   #onPointerDown(e: PointerEvent) {
@@ -122,11 +208,11 @@ export class UINumberScrubber extends HTMLElement {
       let multiplier = moveEvent.shiftKey ? 10 : moveEvent.altKey ? 0.1 : 1;
       const change = (deltaX / this.#sensitivity) * this.step * multiplier;
       const newVal = this.#startValue + change;
-      
+
       if (Math.abs(newVal - this.value) >= this.step) {
         UISM.play(UISM.enumPresets.TAP);
       }
-      
+
       this.#updateValue(newVal, true);
     };
 
@@ -165,7 +251,11 @@ export class UINumberScrubber extends HTMLElement {
 
   #updateValue(rawVal: number, isInteractive: boolean) {
     let val = Math.min(Math.max(rawVal, this.min), this.max);
-    const precision = this.getAttribute('step')?.includes('.') ? 2 : val % 1 === 0 ? 0 : 2;
+    const precision = this.getAttribute('step')?.includes('.')
+      ? 2
+      : val % 1 === 0
+        ? 0
+        : 2;
     const formattedVal = val.toFixed(precision);
 
     if (this.#input.value !== formattedVal) {
@@ -173,35 +263,50 @@ export class UINumberScrubber extends HTMLElement {
       this.#updateProgress();
 
       if (isInteractive) {
-        this.dispatchEvent(new CustomEvent('input', {
-          detail: { value: parseFloat(formattedVal), property: this.getAttribute('property') },
-          bubbles: true, composed: true
-        }));
+        this.dispatchEvent(
+          new CustomEvent('input', {
+            detail: {
+              value: parseFloat(formattedVal),
+              property: this.getAttribute('property'),
+            },
+            bubbles: true,
+            composed: true,
+          }),
+        );
       }
     }
   }
 
-  #finalizeChange() {
-    const expression = this.#input.value.replace(',', '.');
+  // ─── Método refatorado ───────────────────────────────────────────────────────
+
+  #finalizeChange(): void {
+    const expression = this.#input.value;
+
     try {
-      if (/[^-+*/().0-9 ]/g.test(expression) === false) {
-        const result = new Function(`return (${expression})`)();
-        this.#updateValue(result, false);
-      }
-    } catch (e) {
+      const result = parseArithmetic(expression);
+      // isFinite rejeita Infinity e NaN — resultados aritmeticamente inválidos
+      if (!isFinite(result)) throw new Error('Resultado inválido');
+      this.#updateValue(result, false);
+    } catch {
       this.#updateValue(this.value, false);
     }
 
-    this.dispatchEvent(new CustomEvent('change', {
-      detail: { value: this.value, property: this.getAttribute('property') },
-      bubbles: true, composed: true
-    }));
+    this.dispatchEvent(
+      new CustomEvent('change', {
+        detail: { value: this.value, property: this.getAttribute('property') },
+        bubbles: true,
+        composed: true,
+      }),
+    );
   }
 
   #updateProgress() {
     if (this.min === -Infinity || this.max === Infinity) return;
     const percentage = ((this.value - this.min) / (this.max - this.min)) * 100;
-    this.style.setProperty('--progress', `${Math.max(0, Math.min(100, percentage))}%`);
+    this.style.setProperty(
+      '--progress',
+      `${Math.max(0, Math.min(100, percentage))}%`,
+    );
   }
 
   #render() {
