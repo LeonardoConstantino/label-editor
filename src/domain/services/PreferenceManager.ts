@@ -1,6 +1,8 @@
 import { db } from '../../core/Database';
 import { UserPreferences, DEFAULT_PREFERENCES } from '../models/UserPreferences';
 import eventBus from '../../core/EventBus';
+import { cloudSyncService } from './CloudSyncService';
+import { logger } from '../../core/Logger';
 
 class PreferenceManager {
   private readonly STORE_NAME = 'preferences';
@@ -34,7 +36,15 @@ class PreferenceManager {
       id: this.PREF_ID,
       ...updated
     });
-    
+
+    // Cloud Sync: remove gistToken antes de sincronizar (credencial nunca sai do dispositivo)
+    if (cloudSyncService.isReady) {
+      const { gistToken: _ignored, ...prefsToSync } = updated;
+      cloudSyncService.pushPreferences(prefsToSync).catch((err) => {
+        logger.warn('PreferenceManager', 'Cloud push failed for preferences:', err);
+      });
+    }
+
     eventBus.emit('preferences:change', updated);
   }
 }
