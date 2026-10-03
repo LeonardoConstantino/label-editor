@@ -180,11 +180,11 @@ cloudFields.forEach(el => (el as HTMLElement).style.opacity = prefs.cloudSync ? 
 
 ## ✅ Critérios de Aceite
 
-- [ ] Aba "☁️ Cloud Sync" aparece na sidebar do modal de preferências
-- [ ] Campos de token e Gist ID são preenchidos ao abrir o modal (via `syncValues()`)
-- [ ] Botão "Testar Conexão" chama `cloudSyncService.configure()` e exibe toast de sucesso/erro
-- [ ] Badge de status atualiza em tempo real ao receber `cloud:status:change`
-- [ ] Campos ficam com opacidade reduzida quando `cloudSync === false`
-- [ ] Token nunca é exibido em texto claro (input `type="password"`)
-- [ ] Nenhum `innerHTML = ...` utilizado para atualizar valores (Atomic Sync)
-- [ ] `npm run build` sem erros de tipo
+- [x] Aba "☁️ Cloud Sync" aparece na sidebar do modal de preferências
+- [x] Campos de token e Gist ID são preenchidos ao abrir o modal (via `syncValues()`)
+- [x] Botão "Testar Conexão" chama `cloudSyncService.configure()` e exibe toast de sucesso/erro
+- [x] Badge de status atualiza em tempo real ao receber `cloud:status:change`
+- [x] Campos ficam com opacidade reduzida quando `cloudSync === false`
+- [x] Token nunca é exibido em texto claro (input `type="password"`)
+- [x] Nenhum `innerHTML = ...` utilizado para atualizar valores (Atomic Sync)
+- [x] `npm run build` sem erros de tipo

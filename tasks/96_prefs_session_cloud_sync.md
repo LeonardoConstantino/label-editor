@@ -73,9 +73,9 @@ if (cloudSyncService.isReady) {
 
 ## ✅ Critérios de Aceite
 
-- [ ] `preferenceManager.savePreferences()` não inclui `gistToken` no push para GistDB
-- [ ] `preferenceManager.savePreferences()` não quebra quando `cloudSyncService.isReady === false`
-- [ ] `sessionManager.saveSession()` não inclui `thumbnail` no push para GistDB
-- [ ] `sessionManager.saveSession()` não quebra quando `cloudSyncService.isReady === false`
-- [ ] Falha de rede em qualquer push **não** lança exceção não-tratada nem bloqueia a operação local
-- [ ] `npm run build` sem erros de tipo (atenção ao `{ gistToken: _ignored, ...rest }` em strict mode)
+- [x] `preferenceManager.savePreferences()` não inclui `gistToken` no push para GistDB
+- [x] `preferenceManager.savePreferences()` não quebra quando `cloudSyncService.isReady === false`
+- [x] `sessionManager.saveSession()` não inclui `thumbnail` no push para GistDB
+- [x] `sessionManager.saveSession()` não quebra quando `cloudSyncService.isReady === false`
+- [x] Falha de rede em qualquer push **não** lança exceção não-tratada nem bloqueia a operação local
+- [x] `npm run build` sem erros de tipo (atenção ao `{ gistToken: _ignored, ...rest }` em strict mode)

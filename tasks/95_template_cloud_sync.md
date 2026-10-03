@@ -105,11 +105,11 @@ public async syncFromCloud(): Promise<void> {
 
 ## ✅ Critérios de Aceite
 
-- [ ] `saveCurrentLabel()` continua funcionando normalmente mesmo que o push na nuvem falhe
-- [ ] `deleteTemplate()` continua funcionando normalmente mesmo que o delete na nuvem falhe
-- [ ] `syncFromCloud()` só executa se `cloudSyncService.isReady === true`
-- [ ] `syncFromCloud()` usa last-write-wins baseado em `updatedAt`
-- [ ] `syncFromCloud()` emite `vault:refreshed` ao final (mesmo que 0 templates sejam mesclados)
-- [ ] `syncFromCloud()` exibe toast de sucesso com contagem e toast de erro em falha
-- [ ] Nenhum template local com `updatedAt` mais recente é sobrescrito pelo remoto
-- [ ] `npm run build` sem erros de tipo
+- [x] `saveCurrentLabel()` continua funcionando normalmente mesmo que o push na nuvem falhe
+- [x] `deleteTemplate()` continua funcionando normalmente mesmo que o delete na nuvem falhe
+- [x] `syncFromCloud()` só executa se `cloudSyncService.isReady === true`
+- [x] `syncFromCloud()` usa last-write-wins baseado em `updatedAt`
+- [x] `syncFromCloud()` emite `vault:refreshed` ao final (mesmo que 0 templates sejam mesclados)
+- [x] `syncFromCloud()` exibe toast de sucesso com contagem e toast de erro em falha
+- [x] Nenhum template local com `updatedAt` mais recente é sobrescrito pelo remoto
+- [x] `npm run build` sem erros de tipo

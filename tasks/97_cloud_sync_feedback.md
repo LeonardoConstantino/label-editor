@@ -131,11 +131,11 @@ eventBus.on('cloud:configured', ({ gistId }) => {
 
 ## ✅ Critérios de Aceite
 
-- [ ] `EventMap` contém todos os 6 novos eventos `cloud:*` e `vault:refreshed` com payloads tipados
-- [ ] StatusBar exibe o indicador de nuvem quando `cloudSync` está ativo
-- [ ] Indicador muda de visual a cada `cloud:status:change` sem recriar o DOM
-- [ ] Indicador está `hidden` quando status é `unconfigured`
-- [ ] Bootstrap em `main.ts` não bloqueia a inicialização da app (`.catch()` tratado)
-- [ ] `gistId` gerado automaticamente é persistido nas preferências via `cloud:configured`
-- [ ] App inicializa normalmente quando `prefs.cloudSync === false` (sem erros no console)
-- [ ] `npm run build` sem erros de tipo
+- [x] `EventMap` contém todos os 6 novos eventos `cloud:*` e `vault:refreshed` com payloads tipados
+- [x] StatusBar exibe o indicador de nuvem quando `cloudSync` está ativo
+- [x] Indicador muda de visual a cada `cloud:status:change` sem recriar o DOM
+- [x] Indicador está `hidden` quando status é `unconfigured`
+- [x] Bootstrap em `main.ts` não bloqueia a inicialização da app (`.catch()` tratado)
+- [x] `gistId` gerado automaticamente é persistido nas preferências via `cloud:configured`
+- [x] App inicializa normalmente quando `prefs.cloudSync === false` (sem erros no console)
+- [x] `npm run build` sem erros de tipo
