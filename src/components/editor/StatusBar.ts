@@ -28,6 +28,8 @@ export class StatusBar {
   private get zoomLvlEl() { return document.getElementById('zoom-lvl'); }
   // private get dirtyIndicator() { return document.getElementById('dirty-indicator'); }
   private get tpl() { return document.getElementById('telemetric-balloon') as HTMLTemplateElement; }
+  private get cloudIndicator() { return document.getElementById('cloud-sync-indicator') as HTMLElement | null; }
+  private get cloudSeparator() { return document.getElementById('cloud-sync-separator') as HTMLElement | null; }
 
   init(): void {
     const { signal } = this.abortController;
@@ -69,8 +71,38 @@ export class StatusBar {
 
     this.led?.addEventListener('click', () => this.handleLedClick());
 
+    eventBus.on('cloud:status:change', ({ status }) => {
+      this.updateCloudIndicator(status);
+    }, { signal });
+
     this.startFpsLoop();
     this.updateTelemetry(store.getState());
+  }
+
+  private updateCloudIndicator(status: string): void {
+    const indicator = this.cloudIndicator;
+    const separator = this.cloudSeparator;
+    if (!indicator) return;
+
+    const map: Record<string, { icon: string; text: string; color: string; show: boolean }> = {
+      idle:         { icon: '☁️', text: 'Sync OK',       color: 'var(--color-accent-success)', show: true  },
+      syncing:      { icon: '↻',  text: 'Sincronizando', color: 'var(--color-accent-primary)', show: true  },
+      error:        { icon: '⚠',  text: 'Sync Error',    color: 'var(--color-accent-danger)',  show: true  },
+      offline:      { icon: '◌',  text: 'Offline',       color: 'var(--color-warning)',        show: true  },
+      unconfigured: { icon: '☁️', text: '',              color: '',                            show: false },
+    };
+
+    const cfg = map[status] ?? map['unconfigured'];
+    indicator.hidden = !cfg.show;
+    if (separator) separator.hidden = !cfg.show;
+
+    const icon  = indicator.querySelector('#cloud-sync-icon');
+    const label = indicator.querySelector('#cloud-sync-label');
+    if (icon)  icon.textContent  = cfg.icon;
+    if (label) label.textContent = cfg.text;
+    if (cfg.color) indicator.style.color = cfg.color;
+
+    indicator.title = `Cloud Sync: ${cfg.text || 'Não configurado'}`;
   }
 
   private resetProductionUI(tempText?: string) {
