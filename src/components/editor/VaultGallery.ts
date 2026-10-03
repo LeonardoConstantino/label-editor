@@ -38,6 +38,7 @@ export class VaultGallery extends HTMLElement {
   disconnectedCallback(): void {
     this._themeCleanup?.();
     this.cleanup();
+    this.isSkeletonRendered = false;
   }
 
   private cleanup(): void {
@@ -331,7 +332,11 @@ export class VaultGallery extends HTMLElement {
       setTimeout(() => {
         this.loadAndRender();
       }, 500);
-    });
+    }, { signal });
+
+    eventBus.on('vault:refreshed', () => {
+      this.loadAndRender();
+    }, { signal });
 
     shadow.getElementById('vault-import-btn')?.addEventListener('click', () => {
       document.getElementById('global-import-input')?.click();
