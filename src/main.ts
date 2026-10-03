@@ -5,6 +5,7 @@ import { logger, LogLevelType } from './core/Logger';
 import './styles/main.css';
 
 import { templateManager } from './domain/services/TemplateManager';
+import { cloudSyncService } from './domain/services/CloudSyncService';
 import { ElementFactory } from './domain/models/elements/ElementFactory';
 import { shortcutService } from './core/ShortcutService';
 import { Label } from './domain/models/Label';
@@ -83,6 +84,33 @@ document.addEventListener('DOMContentLoaded', async () => {
   const { preferenceManager } = await import('./domain/services/PreferenceManager');
   const prefs = await preferenceManager.getPreferences();
   store.loadPreferences(prefs);
+
+  // Bootstrap Cloud Sync (lazy, não bloqueia o boot da app)
+  if (prefs.cloudSync && prefs.gistToken) {
+    cloudSyncService
+      .configure(prefs.gistToken, prefs.gistId || undefined)
+      .then(() => {
+        // Se o GistDB criou um Gist novo, persiste o ID gerado
+        const newGistId = cloudSyncService.gistId;
+        if (newGistId && newGistId !== prefs.gistId) {
+          preferenceManager.savePreferences({ gistId: newGistId });
+        }
+        // Pull dos templates da nuvem após conexão bem-sucedida
+        return templateManager.syncFromCloud();
+      })
+      .catch((err) => {
+        logger.error('Main', 'Cloud Sync bootstrap failed:', err);
+        // Não exibe toast de erro no boot — o indicador na StatusBar comunica o estado
+      });
+  }
+
+  // Persiste gistId gerado automaticamente sempre que o GistDB criar um Gist novo
+  eventBus.on('cloud:configured', ({ gistId }) => {
+    const currentPrefs = store.getState().preferences;
+    if (gistId !== currentPrefs?.gistId) {
+      preferenceManager.savePreferences({ gistId });
+    }
+  });
 
   // Se não houver override via URL, aplica a preferência do usuário (Task 88)
   if (debugOverride === null) {
