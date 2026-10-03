@@ -613,7 +613,7 @@ export class PreferencesModal extends HTMLElement {
             <ui-icon name="cpu" style="--icon-size: 14px"></ui-icon> Performance
           </div>
           <div class="sidebar-item" data-section="cloud">
-            <ui-icon name="upload-cloud" style="--icon-size: 14px"></ui-icon> Cloud Sync
+            <ui-icon name="cloud" style="--icon-size: 14px"></ui-icon> Cloud Sync
           </div>
           <div style="flex: 1"></div>
           <div class="sidebar-footer" style="padding: 20px; border-top: 1px solid var(--color-border-ui)">
@@ -853,7 +853,7 @@ export class PreferencesModal extends HTMLElement {
           <section id="section-cloud" class="settings-section">
             <div class="section-header justify-between">
               <div class="flex items-center gap-3">
-                <ui-icon name="upload" class="text-accent-primary" style="--icon-size: 24px"></ui-icon>
+                <ui-icon name="cloud" class="text-accent-primary" style="--icon-size: 24px"></ui-icon>
                 <h2 class="section-title">Cloud Synchronization</h2>
               </div>
               ${HelpContentProvider.buildTooltip('pref_cloud' as any)}
