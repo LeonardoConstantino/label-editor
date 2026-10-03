@@ -466,6 +466,23 @@
   }
 }
 
+@layer components {
+  #cloud-sync-indicator {
+    --icon-stroke-width: 1.5px;
+    transition: color 0.3s var(--ease-spring);
+  }
+
+  #cloud-sync-indicator.animate-spin-slow::part(svg) {
+    animation: spin-smooth 1.2s linear infinite;
+    transform-origin: center;
+  }
+
+  @keyframes spin-smooth {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+}
+
 /* ==========================================
    ADVANCED UI: INSPECTOR & EDITOR SPECIFIC
    ========================================== */

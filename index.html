@@ -79,16 +79,20 @@
                   >100</span
                 >%</span
               >
-              <span class="w-px h-2.5 bg-border-ui mx-1 opacity-50" id="cloud-sync-separator" hidden></span>
-              <span
+              <span 
+                class="w-px h-2.5 bg-border-ui mx-1 opacity-50" 
+                id="cloud-sync-separator" 
+                hidden
+              ></span>
+
+              <ui-icon
                 id="cloud-sync-indicator"
-                class="flex items-center gap-1 transition-colors duration-300"
+                name="cloud"
+                size="sm"
+                class="transition-colors duration-300 cursor-default"
                 title="Cloud Sync: Não configurado"
                 hidden
-              >
-                <span id="cloud-sync-icon">☁️</span
-                ><span id="cloud-sync-label" class="ml-0.5">—</span>
-              </span>
+              ></ui-icon>
             </div>
           </div>
         </ui-tooltip>
@@ -196,6 +200,9 @@
 
           <span class="opacity-50 uppercase">Environment:</span>
           <span class="text-text-main tabular-nums" id="os-info">Detecting...</span>
+
+          <span class="opacity-50 uppercase">Sync Status:</span>
+          <span class="text-text-main tabular-nums" id="cloud-sync-status">Not Configured</span>
         </div>
 
         <div
@@ -208,7 +215,7 @@
           ></ui-icon>
           <span class="leading-relaxed"
             >Engine: Tactile Render v4.0.</br>Hardware acceleration enabled via 2D
-            Canvas context.</br>Persistence via IndexedDB Storage.</span
+            Canvas context.</br>Persistence via IndexedDB Storage.</br>Sincronização em segundo plano via GistDb.</span
           >
         </div>
       </div>
