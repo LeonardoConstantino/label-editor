@@ -47,6 +47,43 @@ class PreferenceManager {
 
     eventBus.emit('preferences:change', updated);
   }
+
+  /**
+   * Faz pull das preferências da nuvem e mescla com as locais,
+   * preservando as credenciais locais (gistToken e gistId).
+   */
+  async syncFromCloud(): Promise<void> {
+    if (!cloudSyncService.isReady) return;
+
+    try {
+      const remotePrefs = await cloudSyncService.pullPreferences();
+      if (!remotePrefs || Object.keys(remotePrefs).length === 0) return;
+
+      const current = await this.getPreferences();
+      // Mescla remotas sobre locais, mas preserva credenciais locais
+      const merged: UserPreferences = {
+        ...current,
+        ...remotePrefs,
+        gistToken: current.gistToken,
+        gistId: current.gistId || (remotePrefs as any).gistId || '',
+        cloudSync: current.cloudSync,
+      };
+
+      await db.put(this.STORE_NAME, {
+        id: this.PREF_ID,
+        ...merged
+      });
+
+      // Atualiza a store em memória sem re-disparar savePreferences/push
+      const { store } = await import('../../core/Store');
+      store.loadPreferences(merged);
+
+      eventBus.emit('preferences:change', merged);
+      logger.info('PreferenceManager', 'Preferences successfully synced from cloud');
+    } catch (err) {
+      logger.warn('PreferenceManager', 'Failed to sync preferences from cloud:', err);
+    }
+  }
 }
 
 export const preferenceManager = new PreferenceManager();

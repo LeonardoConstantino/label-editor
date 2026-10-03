@@ -95,8 +95,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (newGistId && newGistId !== prefs.gistId) {
           preferenceManager.savePreferences({ gistId: newGistId });
         }
-        // Pull dos templates da nuvem após conexão bem-sucedida
-        return templateManager.syncFromCloud();
+        // Pull dos templates e preferências da nuvem após conexão bem-sucedida
+        return Promise.all([
+          templateManager.syncFromCloud(),
+          preferenceManager.syncFromCloud()
+        ]);
       })
       .catch((err) => {
         logger.error('Main', 'Cloud Sync bootstrap failed:', err);
