@@ -2,6 +2,7 @@ import { db } from '../../core/Database';
 import { Label } from '../models/Label';
 import eventBus from '../../core/EventBus';
 import { logger } from '../../core/Logger';
+import { cloudSyncService } from './CloudSyncService';
 
 /**
  * SessionManager: Gerencia a persistência automática (Auto-save) da sessão ativa.
@@ -50,6 +51,15 @@ class SessionManager {
         timestamp: Date.now()
       };
       await db.put(this.STORE_NAME, sessionData);
+
+      // Cloud Sync: exclui thumbnail (payload base64 desnecessário para sessão cross-device)
+      if (cloudSyncService.isReady) {
+        const { thumbnail: _ignored, ...labelWithoutThumb } = label;
+        cloudSyncService.pushSession(labelWithoutThumb).catch((err) => {
+          logger.warn('SessionManager', 'Cloud session push failed:', err);
+        });
+      }
+
       logger.debug('SessionManager', 'Auto-save completed');
     } catch (err) {
       logger.error('SessionManager', 'Failed to auto-save session:', err);
