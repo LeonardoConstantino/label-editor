@@ -52,24 +52,11 @@ settingsSheet.replaceSync(`
     font-weight: 600;
   }
 
-  .cloud-desc-link {
-    color: var(--color-accent-primary);
-    text-decoration: underline;
-    font-size: var(--text-xs);
-    margin-top: 4px;
-    display: inline-block;
-  }
-
-  .cloud-desc-link:hover {
-    color: var(--color-text-main);
-  }
-
   .settings-container {
     display: flex;
     height: 100%;
     background-color: var(--color-canvas);
     overflow: hidden;
-    border-radius: 12px;
   }
 
   /* Sidebar Styles */
@@ -878,8 +865,12 @@ export class PreferencesModal extends HTMLElement {
                   <span class="setting-desc">
                     Synchronize your templates and preferences across devices using a private GitHub Gist.
                     <br>
-                    <a href="https://github.com/settings/tokens/new?scopes=gist" target="_blank" rel="noopener" class="cloud-desc-link">
-                      Generate GitHub Token (scope: gist) &rarr;
+                      <a href="https://github.com/settings/tokens/new?scopes=gist"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="link-prism link-prism-external mt-1"
+                    >
+                      Generate GitHub Token (scope: gist)
                     </a>
                   </span>
                 </div>

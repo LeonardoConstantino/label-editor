@@ -7,6 +7,7 @@ import { ElementFactory } from '../models/elements/ElementFactory';
 import eventBus from '../../core/EventBus';
 import { logger } from '../../core/Logger';
 import { FontLoader } from '../../utils/FontLoader';
+import { cloudSyncService } from './CloudSyncService';
 
 class TemplateManager {
   private readonly STORE_NAME = 'templates';
@@ -44,6 +45,13 @@ class TemplateManager {
 
     await db.put(this.STORE_NAME, labelToSave);
 
+    // Cloud Sync: fire-and-forget — falha nunca bloqueia o salvamento local
+    if (cloudSyncService.isReady) {
+      cloudSyncService.pushTemplate(labelToSave).catch((err) => {
+        logger.warn('TemplateManager', 'Cloud push failed for template:', err);
+      });
+    }
+
     eventBus.emit('template:saved', labelToSave);
 
     logger.debug('TemplateManager', 'Label saved to IndexedDB:', labelToSave.name);
@@ -72,6 +80,55 @@ class TemplateManager {
    */
   public async deleteTemplate(id: string): Promise<void> {
     await db.delete(this.STORE_NAME, id);
+
+    // Cloud Sync: fire-and-forget — falha nunca bloqueia a exclusão local
+    if (cloudSyncService.isReady) {
+      cloudSyncService.deleteTemplate(id).catch((err) => {
+        logger.warn('TemplateManager', 'Cloud delete failed for template:', err);
+      });
+    }
+  }
+
+  /**
+   * Faz pull de todos os templates da nuvem e os mescla no IndexedDB local.
+   * Usa last-write-wins: se um template com o mesmo ID já existir localmente,
+   * o remoto prevalece apenas se tiver `updatedAt` mais recente.
+   * Emite 'vault:refreshed' ao final para forçar re-render do VaultGallery.
+   *
+   * Thumbnails são incluídas no push/pull: geração em webp 400px @ q0.8,
+   * tipicamente < 20KB, útil para renderizar o Vault em outros dispositivos.
+   */
+  public async syncFromCloud(): Promise<void> {
+    if (!cloudSyncService.isReady) {
+      eventBus.emit('notify', { type: 'info', message: 'Cloud Sync não configurado.' });
+      return;
+    }
+
+    try {
+      const remoteTemplates = await cloudSyncService.pullTemplates();
+      const localTemplates  = await this.getTemplates();
+      const localMap        = new Map(localTemplates.map(t => [t.id, t]));
+
+      let merged = 0;
+      for (const remote of remoteTemplates) {
+        const local = localMap.get(remote.id);
+        if (!local || remote.updatedAt > local.updatedAt) {
+          await db.put(this.STORE_NAME, remote);
+          merged++;
+        }
+      }
+
+      eventBus.emit('vault:refreshed', {});
+      eventBus.emit('notify', {
+        type: 'success',
+        message: `${merged} template(s) sincronizado(s) da nuvem.`,
+        duration: 4000,
+      });
+      logger.info('TemplateManager', `syncFromCloud: ${merged}/${remoteTemplates.length} merged`);
+    } catch (err) {
+      logger.error('TemplateManager', 'syncFromCloud failed:', err);
+      eventBus.emit('notify', { type: 'error', message: 'Falha ao sincronizar da nuvem.' });
+    }
   }
 
   /**
