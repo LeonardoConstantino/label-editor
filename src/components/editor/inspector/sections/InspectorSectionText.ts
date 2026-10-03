@@ -94,7 +94,7 @@ export class InspectorSectionText extends HTMLElement {
       </div>
 
       <div class="switch-row">
-          <span class="font-mono text-[9px] text-text-muted uppercase">Justify</span>
+          <span class="font-mono text-2xs text-text-muted uppercase">Justify</span>
           <input type="checkbox" data-prop="justify" ${el.justify ? 'checked' : ''}>
       </div>
 
