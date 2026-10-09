@@ -103,3 +103,34 @@ export function formatDate(
 
   return new Intl.DateTimeFormat(locale, options).format(date);
 }
+
+export function createTimer(logger: any): { init: () => void; end: (label?: string) => number | null } {
+
+  let startTime: number | null = null;
+
+  function init(): void {
+    startTime = performance.now();
+  }
+
+  function end(label: string = "Elapsed"): number | null {
+    if (startTime === null) {
+      logger.warn("Timer", "Call init() before end().");
+      return null;
+    }
+
+    const elapsed = performance.now() - startTime;
+    startTime = null;
+
+    const formatted =
+      elapsed < 1
+        ? `${elapsed.toFixed(3)} ms`
+        : elapsed < 1000
+        ? `${elapsed.toFixed(2)} ms`
+        : `${(elapsed / 1000).toFixed(3)} s`;
+
+    logger.info('Timer', `${label}: ${formatted}`);
+    return elapsed;
+  }
+
+  return { init, end };
+}

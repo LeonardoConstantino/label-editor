@@ -31,9 +31,24 @@ import './components/common/ui-hud-tips';
 
 import helpData from './assets/data/helpData';
 import { InspectorHelpData } from './utils/HelpContentProvider';
+import { createTimer } from './utils/utils';
 import { StatusBar } from './components/editor/StatusBar';
 import { FORMATTERS } from './domain/services/DataSourceParser';
 import { UserPreferences } from './domain/models/UserPreferences';
+
+const bootTime = createTimer(logger);
+bootTime.init();
+
+const onModulesReady = (): void => {
+  const splash = document.getElementById('app-splash');
+  if (!splash) return;
+
+  splash.classList.add('splash--out');
+
+  splash.addEventListener('transitionend', () => {
+    splash.remove();
+  }, { once: true });
+}
 
 // Global Notification Listener
 eventBus.on('notify', (options: ToastOptions) => {
@@ -217,6 +232,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
+  onModulesReady();
+
   // 3. Se nada foi carregado, mostra Welcome ou Blank
   if (!loadedFromSession) {
     if (!hasSeenGuide) {
@@ -249,6 +266,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   logger.info('Main', 'Application Initialized');
+  bootTime.end('Initialization');
 
   eventBus.emit('notify', {
     type: 'info',
