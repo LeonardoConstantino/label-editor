@@ -3,6 +3,72 @@
  * Organizado para facilitar manutenção e ajustes futuros de engenharia de prompt.
  */
 
+import { FORMATTERS } from "./DataSourceParser";
+
+type FormatterDef = {
+  name: string;
+  category: string;
+  tip: string;
+};
+
+export function generateFormatterRules(
+  formatters: Record<string, FormatterDef>,
+): string {
+  const categories = new Map<string, FormatterDef[]>();
+
+  for (const formatter of Object.values(formatters)) {
+    const items = categories.get(formatter.category) ?? [];
+    items.push(formatter);
+    categories.set(formatter.category, items);
+  }
+
+  const table = [...categories.entries()]
+    .map(([category, items]) => {
+      const syntax = items
+        .map(
+          ({ tip, name }) =>
+            tip.match(/^:\w+(?:\([^)]*\))?/)?.[0] ?? `:${name}`,
+        )
+        .join('  ');
+
+      return `${category.padEnd(10)} | ${syntax}`;
+    })
+    .join('\n');
+
+  const exampleLines = [...categories.entries()]
+    .map(([_, items]) => {
+      const first = items[0];
+
+      return `- {{${first.tip}}}`;
+    })
+    .join('\n');
+
+  return `### FORMATADORES DE VARIÁVEIS DINÂMICAS
+
+Sintaxe: \`{{coluna:formatador}}\` ou \`{{coluna:formatador(p1,p2)}}\`
+
+Categoria  | Formatadores
+-----------|-------------------------------------------------------------
+${table}
+
+Exemplos rápidos:
+${exampleLines}
+
+Encadeamento: {{estoque:mul(1.1):number(pt-BR)}}
+
+Variáveis de sistema (sempre disponíveis em toda etiqueta, sem declaração):
+- {{index}}  → índice da linha atual no dataset (0-based)
+- {{total}}  → total de linhas no dataset
+- {{date}}   → data atual em ISO (YYYY-MM-DD); combine com formatadores: {{date:date_format(pt-BR,long)}}
+- {{nome}}   → valor da linha quando o dataset é uma lista simples de coluna única`;
+}
+
+/**
+ * AI_FORMATTER_RULES: Documentação compacta dos formatadores de variáveis.
+ * Incluído apenas no system prompt (turno 1) — não repita em prompts de iteração.
+ */
+export const AI_FORMATTER_RULES = generateFormatterRules(FORMATTERS);
+
 export const AI_PROMPT_CONSTANTS = {
   IMAGE_PLACEHOLDER: '[IMAGE_DATA_RETAINED]',
   MAX_TURNS_PER_CONVERSATION: 50,
@@ -24,11 +90,31 @@ Sua função é gerar ou modificar arquivos JSON estruturados no formato de etiq
 4. Variáveis Dinâmicas:
    - Suporte a interpolação de dados usando sintaxe Mustache: {{nome_da_coluna}} (ex: {{produto}}, {{preco}}, {{codigo_barras}}).
 5. Imagens e Placeholders:
-   - Se encontrar o valor "${AI_PROMPT_CONSTANTS.IMAGE_PLACEHOLDER}" em um campo src de imagem, NUNCA altere esse valor a menos que seja solicitado explicitamente trocar a imagem.
+   - Imagens com src = "${AI_PROMPT_CONSTANTS.IMAGE_PLACEHOLDER}" representam imagens do usuário — NUNCA altere esse valor salvo instrução explícita.
+6. Fontes Customizadas (config.customFonts):
+   - Fontes nativas (Inter, Roboto, Montserrat, JetBrains Mono, Arial, Impact) NÃO precisam de declaração.
+   - Qualquer outra fonte DEVE ser declarada: { "id": "uuid", "name": "Nome Exato", "url": "https://fonts.googleapis.com/css2?family=...", "active": true }
+   - O campo "name" em customFonts deve ser IDÊNTICO ao "fontFamily" usado nos elementos.
 
 ---
 
 ### 🧩 TIPOS DE ELEMENTOS SUPORTADOS:
+
+### 🏗️ CAMPOS UNIVERSAIS (obrigatórios em TODOS os elementos):
+- id: string único sequencial (ex: "el_1", "el_2")
+- type: string (ver tipos abaixo)
+- name: string descritiva (ex: "Título do Produto", "QR Code Principal")
+- position: { x: number, y: number } (mm)
+- zIndex: number (0 = fundo; valores maiores ficam à frente)
+- rotation: number (0–360, graus)
+- opacity: number (0.0–1.0)
+- locked: boolean
+- visible: boolean
+- keepRatio: boolean (use true em imagens para manter proporção)
+- effects (opcional): { enabled: true, color: string, blur: number, offsetX: number, offsetY: number }
+  → Omita o campo inteiramente quando não há efeito (enabled: false é desnecessário).
+
+---
 
 1. "text" (Caixas de Texto):
    - id: string único
@@ -38,7 +124,7 @@ Sua função é gerar ou modificar arquivos JSON estruturados no formato de etiq
    - content: string (texto estático ou {{variavel}})
    - fontFamily: string
    - fontSize: number (pt)
-   - fontWeight: "400" | "600" | "700" | "bold"
+   - fontWeight: number (ex: 400, 600, 700 — NUNCA use string como "bold" ou "400")
    - fontStyle: "normal" | "italic"
    - color: string (hex "#000000")
    - textAlign: "left" | "center" | "right"
@@ -83,10 +169,12 @@ Sua função é gerar ou modificar arquivos JSON estruturados no formato de etiq
 5. "border" (Moldura Perimetral da Etiqueta):
    - id: string único
    - type: "border"
+   - ⚠️ NÃO possui "dimensions". O campo position.x/y define a margem interna em relação ao canvas.
    - style: "solid" | "dashed" | "dotted" | "double"
-   - width: number (mm)
+   - width: number (espessura em mm)
    - color: string (hex)
-   - radius: number (mm)
+   - radius: number (arredondamento dos cantos em mm)
+   - Use no máximo UM elemento border por etiqueta.
 
 6. "image" (Logotipos e Imagens):
    - id: string único
@@ -95,4 +183,7 @@ Sua função é gerar ou modificar arquivos JSON estruturados no formato de etiq
    - dimensions: { width: number, height: number } (mm)
    - src: string (URL ou "${AI_PROMPT_CONSTANTS.IMAGE_PLACEHOLDER}")
    - fit: "contain" | "cover" | "fill" | "none"
-   - smoothing: boolean`;
+   - smoothing: boolean
+   - compositeOperation: "source-over" | "multiply" | "screen" | "overlay" | "darken" | "lighten" | "color-dodge" | "color-burn" | "hard-light" | "soft-light" | "difference" | "exclusion"
+
+   ${AI_FORMATTER_RULES}`;

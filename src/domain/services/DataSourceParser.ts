@@ -30,8 +30,10 @@ export interface FormatterDef {
   label: string;
   /** Exemplo de transformação para a UI */
   sublabel: string;
+  /** Categoria do formatador */
+  category: string;
   /** Dica de uso detalhada (ex: :currency(locale, symbol)) */
-  tip?: string;
+  tip: string;
   /** Função de execução: recebe o valor bruto e parâmetros opcionais */
   fn: (value: any, params: string[]) => any;
 }
@@ -45,6 +47,7 @@ export const FORMATTERS: Record<string, FormatterDef> = {
     name: 'upper',
     label: 'UPPERCASE',
     sublabel: 'TEXT -> TEXT',
+    category: 'Text',
     tip: ':upper (No parameters)',
     fn: (v) => String(v).toUpperCase()
   },
@@ -52,6 +55,7 @@ export const FORMATTERS: Record<string, FormatterDef> = {
     name: 'lower',
     label: 'lowercase',
     sublabel: 'TEXT -> text',
+    category: 'Text',
     tip: ':lower (No parameters)',
     fn: (v) => String(v).toLowerCase()
   },
@@ -59,6 +63,7 @@ export const FORMATTERS: Record<string, FormatterDef> = {
     name: 'trim',
     label: 'Trim Space',
     sublabel: ' text -> text',
+    category: 'Text',
     tip: ':trim (Removes start/end spaces)',
     fn: (v) => String(v).trim()
   },
@@ -66,6 +71,7 @@ export const FORMATTERS: Record<string, FormatterDef> = {
     name: 'capitalize',
     label: 'Capitalize',
     sublabel: 'text -> Text',
+    category: 'Text',
     tip: ':capitalize (Only first letter)',
     fn: (v) => {
       const s = String(v);
@@ -76,6 +82,7 @@ export const FORMATTERS: Record<string, FormatterDef> = {
     name: 'title',
     label: 'Title Case',
     sublabel: 'tEXt -> Text',
+    category: 'Text',
     tip: ':title (Capitalizes Every Word)',
     fn: (v) => String(v).replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase())
   },
@@ -83,6 +90,7 @@ export const FORMATTERS: Record<string, FormatterDef> = {
     name: 'currency',
     label: 'Currency (Locale)',
     sublabel: '12.5 -> R$ 12,50',
+    category: 'Financial',
     tip: ':currency(locale, currencyCode) - e.g. :currency(en-US, USD)',
     fn: (v, params) => {
       const locale = params[0] || 'pt-BR';
@@ -94,6 +102,7 @@ export const FORMATTERS: Record<string, FormatterDef> = {
     name: 'number',
     label: 'Number (Locale)',
     sublabel: '1250.5 -> 1.250,50',
+    category: 'Financial',
     tip: ':number(locale) - e.g. :number(de-DE)',
     fn: (v, params) => {
       const locale = params[0] || 'pt-BR';
@@ -104,6 +113,7 @@ export const FORMATTERS: Record<string, FormatterDef> = {
     name: 'percent',
     label: 'Percent (Locale)',
     sublabel: '0.12 -> 12%',
+    category: 'Financial',
     tip: ':percent(locale) - e.g. :percent(en-US)',
     fn: (v, params) => {
       const locale = params[0] || 'pt-BR';
@@ -118,6 +128,7 @@ export const FORMATTERS: Record<string, FormatterDef> = {
     name: 'truncate',
     label: 'Truncate...',
     sublabel: 'Long text -> Long...',
+    category: 'Text',
     tip: ':truncate(length) - e.g. :truncate(15)',
     fn: (v, params) => {
       const limit = parseInt(params[0]) || 20;
@@ -129,6 +140,7 @@ export const FORMATTERS: Record<string, FormatterDef> = {
     name: 'date',
     label: 'Date (BR)',
     sublabel: '2023-01 -> 01/01/2023',
+    category: 'Data',
     tip: ':date (Short Brazilian format)',
     fn: (v) => DataSourceParser.formatDate(v, false)
   },
@@ -136,6 +148,7 @@ export const FORMATTERS: Record<string, FormatterDef> = {
     name: 'datetime',
     label: 'DateTime (BR)',
     sublabel: '2023-01... -> 01/01... 12:00',
+    category: 'Data',
     tip: ':datetime (BR date with hours)',
     fn: (v) => DataSourceParser.formatDate(v, true)
   },
@@ -143,6 +156,7 @@ export const FORMATTERS: Record<string, FormatterDef> = {
     name: 'date_format',
     label: 'Date Format (Custom)',
     sublabel: 'ISO -> Locale String',
+    category: 'Data',
     tip: ':date_format(locale, style) - style: long | full',
     fn: (v, params) => {
       const locale = params[0] || 'pt-BR';
@@ -163,6 +177,7 @@ export const FORMATTERS: Record<string, FormatterDef> = {
     name: 'date_add',
     label: 'Date: Add Offset',
     sublabel: 'Today -> +30 days',
+    category: 'Data',
     tip: ':date_add(amount, unit) - unit: days | months | years',
     fn: (v, params) => DataSourceParser.applyDateOffset(v, params, 'add')
   },
@@ -170,6 +185,7 @@ export const FORMATTERS: Record<string, FormatterDef> = {
     name: 'date_sub',
     label: 'Date: Sub Offset',
     sublabel: 'Today -> -7 days',
+    category: 'Data',
     tip: ':date_sub(amount, unit) - unit: days | months | years',
     fn: (v, params) => DataSourceParser.applyDateOffset(v, params, 'sub')
   },
@@ -177,6 +193,7 @@ export const FORMATTERS: Record<string, FormatterDef> = {
     name: 'json',
     label: 'JSON Raw',
     sublabel: '{obj} -> {"a":1}',
+    category: 'Other',
     tip: ':json (Format object as JSON string)',
     fn: (v) => {
       try {
@@ -191,6 +208,7 @@ export const FORMATTERS: Record<string, FormatterDef> = {
     name: 'add',
     label: 'Math: Add',
     sublabel: '10 -> 11',
+    category: 'Math',
     tip: ':add(number) - e.g. :add(1)',
     fn: (v, params) => (parseFloat(v) || 0) + (parseFloat(params[0]) || 0)
   },
@@ -198,6 +216,7 @@ export const FORMATTERS: Record<string, FormatterDef> = {
     name: 'sub',
     label: 'Math: Subtract',
     sublabel: '10 -> 9',
+    category: 'Math',
     tip: ':sub(number) - e.g. :sub(1)',
     fn: (v, params) => (parseFloat(v) || 0) - (parseFloat(params[0]) || 0)
   },
@@ -205,6 +224,7 @@ export const FORMATTERS: Record<string, FormatterDef> = {
     name: 'mul',
     label: 'Math: Multiply',
     sublabel: '10 -> 20',
+    category: 'Math',
     tip: ':mul(number) - e.g. :mul(2)',
     fn: (v, params) => (parseFloat(v) || 0) * (parseFloat(params[0]) || 1)
   },
@@ -212,6 +232,7 @@ export const FORMATTERS: Record<string, FormatterDef> = {
     name: 'div',
     label: 'Math: Divide',
     sublabel: '10 -> 5',
+    category: 'Math',
     tip: ':div(number) - e.g. :div(2)',
     fn: (v, params) => {
       const divisor = parseFloat(params[0]) || 1;
@@ -234,9 +255,9 @@ export class DataSourceParser {
    * marcadas como "missing" no VariableManager.
    */
   public static readonly SYSTEM_VARS: ReadonlySet<string> = new Set([
-    'index',
-    'total',
-    'date',
+    'index', // Índice da linha atual (0-based)
+    'total', // Total de linhas no dataset
+    'date', // Data atual no formato ISO (YYYY-MM-DD)
   ]);
 
   /**

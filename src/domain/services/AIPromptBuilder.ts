@@ -55,9 +55,10 @@ export class AIPromptBuilder {
    */
   public buildSystemPrompt(context: AIPromptContext): string {
     const sanitized = this.sanitizeLabelForPrompt(context.currentLabel);
-    const variablesSection = context.availableVariables && context.availableVariables.length > 0
-      ? `\n### 🏷️ VARIÁVEIS DE DADOS DISPONÍVEIS NO PROJETO:\n${context.availableVariables.map((v) => `- {{${v}}}`).join('\n')}\n`
-      : '';
+    const userVars = context.availableVariables?.length
+  ? `Dados do projeto: ${context.availableVariables.map((v) => `{{${v}}}`).join(' | ')}\n`
+  : '';
+const variablesSection = `\n### 🏷️ VARIÁVEIS DISPONÍVEIS:\nSistema (sempre presentes): {{index}} | {{total}} | {{date}} | {{nome}}\n${userVars}Use formatadores quando aplicável: {{variavel:upper}}, {{date:date_format(pt-BR,long)}}, etc.\n`;
 
     return `${AI_SYSTEM_PROMPT_RULES}
 ${variablesSection}
@@ -89,9 +90,10 @@ OU
    */
   public buildIterationPrompt(context: AIPromptContext): string {
     const sanitized = this.sanitizeLabelForPrompt(context.currentLabel);
-    const variablesSection = context.availableVariables && context.availableVariables.length > 0
-      ? `Variáveis disponíveis: ${context.availableVariables.map((v) => `{{${v}}}`).join(', ')}\n`
-      : '';
+    const userVars = context.availableVariables?.length
+  ? ` | ${context.availableVariables.map((v) => `{{${v}}}`).join(' | ')}`
+  : '';
+const variablesSection = `Variáveis: {{index}} | {{total}} | {{date}} | {{nome}}${userVars}\n`;
 
     return `[Turno #${context.turnIndex}] Refine a etiqueta de acordo com a instrução abaixo.
 
@@ -104,8 +106,9 @@ Instrução de alteração:
 "${context.userInstruction.trim()}"
 
 Lembrete:
-- Responda apenas com o bloco JSON.
-- Você pode retornar a etiqueta completa ou apenas a chave "elements" com os itens modificados (mantendo os mesmos IDs para merge).`;
+- Responda apenas com o bloco JSON (completo ou apenas "elements" com IDs preservados para merge).
+- NÃO altere src = "${AI_PROMPT_CONSTANTS.IMAGE_PLACEHOLDER}" salvo instrução explícita.
+- "thumbnail" nunca deve ser incluído na resposta.`;
   }
 
   /**
