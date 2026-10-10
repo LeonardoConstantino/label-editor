@@ -111,10 +111,11 @@ class ShortcutService {
       'blueprint',
       'layers',
       'assets',
-      'batch',
       'history',
       'variables',
       'typeface',
+      'prompt-studio',
+      'batch',
     ];
     modules.forEach((id, i) => {
       this.manager.register(

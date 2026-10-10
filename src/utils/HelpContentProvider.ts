@@ -361,6 +361,20 @@ export const InspectorHelpData: Record<string, HelpTooltipConfig> = {
       text: 'Use DPI 300 para garantir a leitura de códigos de barras.',
       isSuccess: true
     }
+  },
+  mod_ai: {
+    title: 'Prompt Studio',
+    icon: 'sparkles',
+    commands: [
+      { label: 'Prompts', desc: 'Gera System Prompts e deltas de iteração.' },
+      { label: 'Sanitize', desc: 'Preserva imagens substituindo por placeholders.' },
+      { label: 'Resilient', desc: 'Aplica JSON puro ou blocos markdown no Canvas.' }
+    ],
+    proTip: {
+      icon: 'sparkles',
+      text: 'Você pode pedir à IA para alterar apenas elementos específicos pelo ID.',
+      isSuccess: true
+    }
   }
 };
 

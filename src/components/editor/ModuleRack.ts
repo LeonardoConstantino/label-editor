@@ -205,7 +205,8 @@ export class ModuleRack extends HTMLElement {
       'assets': { label: 'Asset Library', icon: 'image' },
       'history': { label: 'Time Machine', icon: 'clock' },
       'variables': { label: 'Variable Manager', icon: 'cpu' },
-      'typeface': { label: 'Typeface Engine', icon: 'text' }
+      'typeface': { label: 'Typeface Engine', icon: 'text' },
+      'prompt-studio': { label: 'Prompt Studio', icon: 'sparkles' }
     };
 
     const info = moduleMap[activeId] || moduleMap['blueprint'];
@@ -374,6 +375,20 @@ export class ModuleRack extends HTMLElement {
               ${this.getShortcutHTML('ALT+6')}
             </div>
             <span class="item-desc">Custom fonts and Google Fonts terminal.</span>
+          </div>
+        </div>
+
+        <div class="rack-item" data-id="prompt-studio">
+          <ui-icon name="sparkles" class="mt-0.5 text-accent-primary" style="pointer-events: none;"></ui-icon>
+          <div class="item-text">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="item-title">Prompt Studio</span>
+                ${HelpContentProvider.buildTooltip('mod_ai' as any, 'bottom')}
+              </div>
+              ${this.getShortcutHTML('ALT+7')}
+            </div>
+            <span class="item-desc">AI design prompts, iteration and auto-layout.</span>
           </div>
         </div>
 
