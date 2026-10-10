@@ -17,6 +17,7 @@ import './modules/VariableManager';
 import './modules/ProductionStudio';
 import './modules/TypefaceEngine';
 import './modules/AssetLibrary';
+import './modules/PromptStudio';
 
 /**
  * AppCockpit: O orquestrador central do painel lateral (Aside).
@@ -149,6 +150,8 @@ export class AppCockpit extends HTMLElement {
       component = document.createElement('typeface-engine');
     } else if (moduleId === 'batch') {
       component = document.createElement('production-studio');
+    } else if (moduleId === 'prompt-studio') {
+      component = document.createElement('ui-prompt-studio');
     } else {
       // Default: blueprint
       component = document.createElement('inspector-document-setup');

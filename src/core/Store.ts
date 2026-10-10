@@ -16,7 +16,7 @@ export interface AppState {
   canRedo: boolean;
   isDirty: boolean;
   preferences: UserPreferences;
-  activeModuleId: 'blueprint' | 'layers' | 'assets' | 'history' | 'variables' | 'batch' | 'typeface';
+  activeModuleId: 'blueprint' | 'layers' | 'assets' | 'history' | 'variables' | 'batch' | 'typeface' | 'prompt-studio';
   
   // Production State
   productionData: Record<string, unknown>[];
