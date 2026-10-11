@@ -209,7 +209,7 @@ Lembrete:
    * - Faz merge cirúrgico por ID no caso de resposta parcial de elementos.
    * - Valida e completa elementos ausentes com ElementFactory se necessário.
    */
-  public applyMerge(currentLabel: Label, parsed: AIParsedResult): Label {
+  public applyMerge(currentLabel: Label, parsed: AIParsedResult, turnIndex: number): Label {
     // Mapa de imagens originais para restauração de dados
     const originalImageMap = new Map<string, string>();
     currentLabel.elements.forEach((el) => {
@@ -236,6 +236,7 @@ Lembrete:
         ...currentLabel,
         ...parsed.label,
         id: currentLabel.id, // Preserva ID original do projeto
+        iaTurnIndex: turnIndex, // Atualiza o turno de IA
         config: {
           ...currentLabel.config,
           ...(parsed.label.config || {}),

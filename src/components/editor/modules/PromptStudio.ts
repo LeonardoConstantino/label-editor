@@ -14,7 +14,6 @@ import '../../common/tooltip';
 export class PromptStudio extends HTMLElement {
   private _abortController: AbortController | null = null;
   private _themeCleanup: (() => void) | null = null;
-  private _currentMode: 'create' | 'iterate' = 'create';
   private _turnIndex = 1;
   private _userInstruction = '';
   private _responseText = '';
@@ -44,23 +43,7 @@ export class PromptStudio extends HTMLElement {
     const { signal } = this._abortController;
     const root = this.shadowRoot!;
 
-    // 1. Alternância de Modos (Criar do Zero vs Iterar)
-    root.querySelectorAll<HTMLButtonElement>('.mode-pill').forEach((btn) => {
-      btn.addEventListener(
-        'click',
-        () => {
-          const mode = btn.dataset.mode as 'create' | 'iterate';
-          if (mode && mode !== this._currentMode) {
-            this._currentMode = mode;
-            UISM.play(UISM.enumPresets.TAP);
-            this.syncValues();
-          }
-        },
-        { signal }
-      );
-    });
-
-    // 2. Input de Instrução do Usuário
+    // 1. Input de Instrução do Usuário
     const instructionInput = root.getElementById('ai-instruction-input') as HTMLTextAreaElement | null;
     instructionInput?.addEventListener(
       'input',
@@ -70,7 +53,7 @@ export class PromptStudio extends HTMLElement {
       { signal }
     );
 
-    // 3. Input de Resposta da LLM
+    // 2. Input de Resposta da LLM
     const responseInput = root.getElementById('ai-response-input') as HTMLTextAreaElement | null;
     responseInput?.addEventListener(
       'input',
@@ -80,25 +63,26 @@ export class PromptStudio extends HTMLElement {
       { signal }
     );
 
-    // 4. Ação: Copiar Prompt para a Área de Transferência
+    // 3. Ação: Copiar Prompt para a Área de Transferência
     const copyPromptBtn = root.getElementById('copy-prompt-btn');
     copyPromptBtn?.addEventListener('click', () => this.handleCopyPrompt(), { signal });
 
-    // 5. Ação: Copiar System Prompt Avulso (no modo Iterar)
+    // 4. Ação: Copiar System Prompt Avulso (no modo Iterar)
     const copySystemBtn = root.getElementById('copy-system-prompt-btn');
     copySystemBtn?.addEventListener('click', () => this.handleCopySystemPrompt(), { signal });
 
-    // 6. Ação: Aplicar JSON no Canvas
+    // 5. Ação: Aplicar JSON no Canvas
     const applyBtn = root.getElementById('apply-response-btn');
     applyBtn?.addEventListener('click', () => this.handleApplyResponse(), { signal });
 
-    // 7. Ação: Reiniciar Sessão de Chat
+    // 6. Ação: Reiniciar Sessão de Chat
     const resetChatBtn = root.getElementById('reset-chat-btn');
     resetChatBtn?.addEventListener(
       'click',
       () => {
         this._turnIndex = 1;
         this._responseText = '';
+        store.updateLabelIAIndex(1);
         this.syncValues();
         eventBus.emit('notify', {
           type: 'info',
@@ -110,7 +94,7 @@ export class PromptStudio extends HTMLElement {
       { signal }
     );
 
-    // 8. Botões de Undo / Redo Rápidos
+    // 7. Botões de Undo / Redo Rápidos
     root.getElementById('ai-undo-btn')?.addEventListener(
       'click',
       () => {
@@ -129,6 +113,32 @@ export class PromptStudio extends HTMLElement {
       { signal }
     );
 
+    // 8. Validação live do JSON + habilitação do btn-apply
+    const jsonStatus    = root.getElementById('json-status');
+    const jsonStatusTxt = root.getElementById('json-status-text');
+    const applyBtnEl    = root.getElementById('apply-response-btn') as HTMLButtonElement | null;
+
+    responseInput?.addEventListener('input', () => {
+      const val = (responseInput as HTMLTextAreaElement).value.trim();
+
+      if (!val) {
+        if (jsonStatus)  jsonStatus.className = 'json-status';
+        if (applyBtnEl)  applyBtnEl.disabled = true;
+        return;
+      }
+
+      try {
+        JSON.parse(val);
+        if (jsonStatus)  { jsonStatus.className = 'json-status visible valid'; }
+        if (jsonStatusTxt) jsonStatusTxt.textContent = 'JSON válido — pronto para aplicar';
+        if (applyBtnEl)  applyBtnEl.disabled = false;
+      } catch {
+        if (jsonStatus)  { jsonStatus.className = 'json-status visible invalid'; }
+        if (jsonStatusTxt) jsonStatusTxt.textContent = 'JSON inválido — verifique a sintaxe';
+        if (applyBtnEl)  applyBtnEl.disabled = true;
+      }
+    }, { signal });
+
     // Escuta atualizações de estado para habilitar/desabilitar Undo e Redo
     eventBus.on(
       'state:change',
@@ -137,6 +147,26 @@ export class PromptStudio extends HTMLElement {
       },
       { signal }
     );
+  }
+
+  private setFooterState(state: 'idle' | 'applying' | 'error') {
+    const led    = this.shadowRoot?.getElementById('studio-led');
+    const status = this.shadowRoot?.getElementById('studio-status');
+    if (!led || !status) return;
+
+    const map = {
+      idle:     { color: 'var(--color-accent-success)', glow: 'rgba(16,185,129,0.5)',  text: 'pronto para receber prompt' },
+      applying: { color: 'var(--color-accent-primary)', glow: 'rgba(99,102,241,0.5)',  text: 'aplicando no canvas…'       },
+      error:    { color: 'var(--color-accent-danger)',  glow: 'rgba(244,63,94,0.5)',   text: 'erro ao aplicar'            },
+    };
+
+    const cfg = map[state];
+    led.style.background = cfg.color;
+    led.style.boxShadow  = `0 0 6px ${cfg.glow}`;
+    status.textContent   = cfg.text;
+
+    // LED pulsa apenas em idle — nos outros estados é estático
+    led.classList.toggle('animate-pulse-led', state === 'idle');
   }
 
   private getAvailableVariables(): string[] {
@@ -174,7 +204,7 @@ export class PromptStudio extends HTMLElement {
     const availableVariables = this.getAvailableVariables();
     let promptText = '';
 
-    if (this._currentMode === 'create' || this._turnIndex === 1) {
+    if (this._turnIndex === 1) {
       promptText = aiPromptBuilder.buildSystemPrompt({
         currentLabel,
         availableVariables,
@@ -237,6 +267,7 @@ export class PromptStudio extends HTMLElement {
 
   private handleApplyResponse() {
     const rawText = this._responseText.trim();
+    this.setFooterState('applying');
     if (!rawText) {
       eventBus.emit('notify', {
         type: 'warning',
@@ -260,7 +291,7 @@ export class PromptStudio extends HTMLElement {
       eventBus.emit('history:snapshot', { description: actionDesc });
 
       // 3. Aplica o merge cirúrgico
-      const mergedLabel = aiPromptBuilder.applyMerge(currentLabel, parsed);
+      const mergedLabel = aiPromptBuilder.applyMerge(currentLabel, parsed, this._turnIndex + 1);
 
       // 4. Carrega a nova etiqueta na Store
       store.loadLabel(mergedLabel);
@@ -270,6 +301,8 @@ export class PromptStudio extends HTMLElement {
       this._responseText = '';
       this.syncValues();
 
+      this.setFooterState('idle');
+
       UISM.play(UISM.enumPresets.SUCCESS);
       eventBus.emit('notify', {
         type: 'success',
@@ -277,6 +310,8 @@ export class PromptStudio extends HTMLElement {
         duration: 4000,
       });
     } catch (err: any) {
+      this.setFooterState('error');
+
       UISM.play(UISM.enumPresets.WARNING);
       eventBus.emit('notify', {
         type: 'error',
@@ -301,21 +336,18 @@ export class PromptStudio extends HTMLElement {
     const root = this.shadowRoot;
     if (!root) return;
 
-    // Atualiza pills de modo
-    root.querySelectorAll<HTMLButtonElement>('.mode-pill').forEach((btn) => {
-      btn.classList.toggle('active', btn.dataset.mode === this._currentMode);
-    });
+    // Atualiza turnIndex na Store para referência futura
+    const state = store.getState();
+    const currentLabel = state.currentLabel;
+
+    if (currentLabel) {
+      this._turnIndex = currentLabel.iaTurnIndex ?? 1;
+    }
 
     // Atualiza indicador de turno
     const turnBadge = root.getElementById('chat-turn-badge');
     if (turnBadge) {
       turnBadge.textContent = `Turno #${this._turnIndex}`;
-    }
-
-    // Exibe/oculta botão auxiliar de system prompt
-    const auxSystemContainer = root.getElementById('aux-system-prompt-container');
-    if (auxSystemContainer) {
-      auxSystemContainer.style.display = this._currentMode === 'iterate' ? 'flex' : 'none';
     }
 
     // Textareas
@@ -330,7 +362,6 @@ export class PromptStudio extends HTMLElement {
     }
 
     // Atualiza estado do Undo/Redo
-    const state = store.getState();
     this.updateUndoRedoButtons(state.canUndo, state.canRedo);
   }
 
@@ -344,264 +375,236 @@ export class PromptStudio extends HTMLElement {
           flex-direction: column;
           height: 100%;
           min-height: 0;
-          color: var(--color-text-main);
-          font-family: var(--font-sans);
           overflow: hidden;
         }
 
-        .studio-header {
-          padding: 16px 20px 12px;
-          border-bottom: 1px solid var(--color-border-ui);
-          background: var(--color-surface-solid);
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-        }
-
-        .studio-title {
-          font-size: 13px;
+        .step-number {
+          width: 18px;
+          height: 18px;
+          border-radius: 50%;
+          background: color-mix(in srgb, var(--color-accent-primary) 12%, transparent);
+          border: 1px solid color-mix(in srgb, var(--color-accent-primary) 30%, transparent);
+          color: var(--color-accent-primary);
+          font-family: var(--font-mono);
+          font-size: 9px;
           font-weight: 700;
           display: flex;
           align-items: center;
-          gap: 8px;
-          color: var(--color-accent-primary);
-          text-transform: uppercase;
-          letter-spacing: 0.08em;
-          font-family: var(--font-mono);
+          justify-content: center;
+          flex-shrink: 0;
         }
 
-        .chat-turn-pill {
-          font-family: var(--font-mono);
-          font-size: 10px;
-          padding: 2px 8px;
-          border-radius: 9999px;
-          background: rgba(99, 102, 241, 0.12);
-          border: 1px solid rgba(99, 102, 241, 0.3);
-          color: var(--color-accent-primary);
-          font-weight: 600;
-        }
-
-        .mode-selector {
-          display: flex;
-          gap: 4px;
-          padding: 8px 20px;
-          background: color-mix(in srgb, var(--color-surface-solid), transparent 40%);
-          border-bottom: 1px solid var(--color-border-ui);
-        }
-
-        .mode-pill {
-          flex: 1;
+        .btn-copy {
+          width: 100%;
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 6px;
-          padding: 6px 12px;
-          background: transparent;
-          border: 1px solid transparent;
-          border-radius: 6px;
-          color: var(--color-text-muted);
-          font-size: 11px;
-          font-weight: 600;
-          cursor: pointer;
-          transition: all 0.2s var(--ease-spring);
-        }
-
-        .mode-pill:hover {
-          color: var(--color-text-main);
-          background: rgba(255, 255, 255, 0.04);
-        }
-
-        .mode-pill.active {
-          background: var(--color-surface-elevated);
+          gap: 8px;
+          padding: 9px 14px;
+          border-radius: 8px;
+          border: 1px dashed color-mix(in srgb, var(--color-accent-primary) 35%, transparent);
+          background: color-mix(in srgb, var(--color-accent-primary) 4%, transparent);
           color: var(--color-accent-primary);
-          border-color: rgba(99, 102, 241, 0.3);
-          box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+          font-family: var(--font-mono);
+          font-size: 10px;
+          font-weight: 500;
+          letter-spacing: 0.04em;
+          cursor: pointer;
+          transition: all 0.18s ease-out;
+        }
+        .btn-copy:hover {
+          border-style: solid;
+          border-color: color-mix(in srgb, var(--color-accent-primary) 60%, transparent);
+          background: color-mix(in srgb, var(--color-accent-primary) 10%, transparent);
+          box-shadow: var(--shadow-neon-primary);
+        }
+        .btn-copy:active {
+          transform: translateY(1px);
+          filter: brightness(0.9);
         }
 
-        .studio-body {
-          flex: 1;
-          padding: 16px 20px;
-          overflow-y: auto;
-          display: flex;
-          flex-direction: column;
-          gap: 16px;
+        .code-input {
+          font-family: var(--font-mono) !important;
+          font-size: 11px !important;
+          min-height: 80px;
+          background: color-mix(in srgb, var(--color-canvas) 60%, transparent) !important;
+          color: var(--color-accent-primary) !important;
+        }
+        .code-input::placeholder {
+          font-family: var(--font-sans) !important;
+          color: var(--color-text-muted) !important;
+          opacity: 0.4 !important;
         }
 
-        .field-group {
-          display: flex;
-          flex-direction: column;
-          gap: 6px;
-        }
-
-        .field-label {
-          font-size: 11px;
-          font-weight: 600;
-          color: var(--color-text-muted);
+        .json-status {
           display: flex;
           align-items: center;
-          justify-content: space-between;
+          gap: 5px;
+          margin-top: 5px;
+          font-family: var(--font-mono);
+          font-size: 9px;
+          opacity: 0;
+          transition: opacity 0.2s ease;
+        }
+        .json-status.visible { opacity: 1; }
+        .json-status.valid   { color: var(--color-accent-success); }
+        .json-status.invalid { color: var(--color-accent-danger); }
+        .json-status-dot {
+          width: 5px;
+          height: 5px;
+          border-radius: 50%;
+          background: currentColor;
+          flex-shrink: 0;
         }
 
-        .studio-textarea {
+        .section-divider {
+          height: 1px;
+          background: var(--color-border-ui);
+          margin: 0 -20px;
+          opacity: 0.6;
+        }
+
+        .studio-footer {
+          padding: 10px 16px;
+          border-top: 1px solid var(--color-border-ui);
+          background: var(--color-surface-solid);
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          flex-shrink: 0;
+        }
+        .footer-led {
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          background: var(--color-accent-success);
+          box-shadow: 0 0 6px color-mix(in srgb, var(--color-accent-success) 50%, transparent);
+          flex-shrink: 0;
+          transition: background 0.2s ease-out, box-shadow 0.2s ease-out;
+          /* A classe animate-pulse-led já existe no design system global */
+        }
+
+        /* Botões desabilitados: padrão Tactile Prism */
+        button:disabled {
+          opacity: 0.35;
+          cursor: not-allowed;
+          pointer-events: none;
+        }
+
+        /* Apply btn: largura total, ação primária máxima */
+        #apply-response-btn {
           width: 100%;
+          font-size: 12px;
+          padding: 10px 16px;
+        }
+        .footer-status {
+          font-family: var(--font-mono);
+          font-size: 9px;
+          color: var(--color-text-muted);
+          opacity: 0.6;
+          flex: 1;
+        }
+        .footer-model {
+          font-family: var(--font-mono);
+          font-size: 8px;
+          padding: 2px 6px;
+          border-radius: 4px;
           background: var(--color-surface-elevated);
           border: 1px solid var(--color-border-ui);
-          border-radius: 8px;
-          padding: 10px 12px;
-          color: var(--color-text-main);
-          font-family: var(--font-sans);
-          font-size: 12px;
-          line-height: 1.4;
-          resize: vertical;
-          min-height: 70px;
-          outline: none;
-          transition: border-color 0.2s, box-shadow 0.2s;
-          box-sizing: border-box;
-        }
-
-        .studio-textarea:focus {
-          border-color: var(--color-accent-primary);
-          box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
-        }
-
-        .studio-textarea.code-font {
-          font-family: var(--font-mono);
-          font-size: 11px;
-          min-height: 90px;
-        }
-
-        .actions-row {
-          display: flex;
-          gap: 8px;
-          align-items: center;
-        }
-
-        .history-controls {
-          margin-top: auto;
-          padding-top: 12px;
-          border-top: 1px solid var(--color-border-ui);
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 8px;
-        }
-
-        .btn-icon-label {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 6px;
-          width: 100%;
-        }
-
-        .sub-link {
-          font-size: 10px;
-          color: var(--color-accent-primary);
-          cursor: pointer;
-          background: none;
-          border: none;
-          padding: 0;
-          text-decoration: underline;
-          opacity: 0.85;
-          transition: opacity 0.2s;
-        }
-
-        .sub-link:hover {
-          opacity: 1;
+          color: var(--color-text-muted);
         }
       </style>
 
-      <!-- Cabeçalho Fixo -->
-      <div class="studio-header">
-        <div class="studio-title">
-          <ui-icon name="sparkles" style="--icon-size: 16px"></ui-icon>
-          <span>Prompt Studio</span>
+      <!-- Cabeçalho -->
+      <div class="flex items-center justify-between px-4 py-3 border-b border-border-ui bg-surface-solid shrink-0">
+        <div class="flex items-center gap-2.5">
+          <span class="text-sm font-semibold text-text-main tracking-tight">Prompt Studio</span>
+          <!-- Badge BETA: discreto, mono, opacidade reduzida -->
+          <span class="inspector-badge" style="opacity: 0.5;">BETA</span>
         </div>
         <div class="flex items-center gap-2">
-          <span class="chat-turn-pill" id="chat-turn-badge">Turno #1</span>
-          <button id="reset-chat-btn" class="sub-link" title="Limpa o histórico de turnos">Resetar</button>
+          <span class="variable-badge" id="chat-turn-badge">Turno #1</span>
+          <button id="reset-chat-btn" class="link-prism link-prism-external text-[10px]" title="Reiniciar sessão de chat">
+            Resetar
+          </button>
         </div>
       </div>
 
-      <!-- Seletor de Modo -->
-      <div class="mode-selector">
-        <button class="mode-pill active" data-mode="create">
-          <ui-icon name="plus" style="--icon-size: 12px"></ui-icon>
-          <span>Criar do Zero</span>
-        </button>
-        <button class="mode-pill" data-mode="iterate">
-          <ui-icon name="refresh" style="--icon-size: 12px"></ui-icon>
-          <span>Iterar / Editar</span>
-        </button>
-      </div>
+      <!-- Corpo -->
+      <div class="flex-1 overflow-y-auto flex flex-col gap-4 p-5 min-h-0">
 
-      <!-- Corpo com Rolagem -->
-      <div class="studio-body">
-        <!-- 1. Instrução do Usuário -->
-        <div class="field-group">
-          <div class="field-label">
-            <span>1. O que deseja fazer?</span>
+        <!-- Step 1 -->
+        <div class="flex flex-col gap-2">
+          <div class="flex items-center gap-2">
+            <div class="step-number">1</div>
+            <span class="text-[11px] font-medium text-text-muted">O que deseja fazer?</span>
           </div>
           <textarea
             id="ai-instruction-input"
-            class="studio-textarea"
-            placeholder="Ex: Crie uma etiqueta de alimentos 100x60mm com nome do produto em destaque, tabela e código de barras..."
+            class="input-prism resize-none"
+            placeholder="Ex: Crie uma etiqueta 100×60mm com nome do produto em destaque e código de barras..."
+            rows="5"
           ></textarea>
         </div>
 
-        <!-- Botão Primário: Copiar Prompt -->
-        <div class="actions-row">
-          <app-button id="copy-prompt-btn" variant="primary" style="width: 100%;">
-            <div class="btn-icon-label">
-              <ui-icon name="sparkles"></ui-icon>
-              <span>Copiar Prompt p/ LLM</span>
-            </div>
-          </app-button>
-        </div>
+        <!-- Copiar prompt -->
+        <button class="btn-copy" id="copy-prompt-btn">
+          <ui-icon name="copy" style="--icon-size: 13px"></ui-icon>
+          <span>Copiar Prompt para LLM</span>
+        </button>
 
-        <!-- Link auxiliar para copiar System Prompt no modo Iterar -->
-        <div id="aux-system-prompt-container" style="display: none; justify-content: flex-end;">
-          <button id="copy-system-prompt-btn" class="sub-link flex items-center gap-1">
-            <ui-icon name="tag" style="--icon-size: 10px"></ui-icon>
-            <span>Copiar System Prompt Completo</span>
-          </button>
-        </div>
+        <!-- Divider -->
+        <div class="section-divider"></div>
 
-        <!-- 2. Resposta da IA -->
-        <div class="field-group" style="margin-top: 6px;">
-          <div class="field-label">
-            <span>2. Cole a resposta da IA (JSON)</span>
+        <!-- Step 2 -->
+        <div class="flex flex-col gap-2">
+          <div class="flex items-center gap-2">
+            <div class="step-number">2</div>
+            <span class="text-[11px] font-medium text-text-muted">Cole a resposta da IA</span>
           </div>
           <textarea
             id="ai-response-input"
-            class="studio-textarea code-font"
-            placeholder="Cole o JSON ou bloco markdown gerado pelo ChatGPT/Claude aqui..."
+            class="input-prism code-input"
+            placeholder='{ "elements": [ … ] }'
+            rows="5"
           ></textarea>
-        </div>
-
-        <!-- Botão de Aplicação no Canvas -->
-        <div class="actions-row">
-          <app-button id="apply-response-btn" variant="secondary" style="width: 100%;">
-            <div class="btn-icon-label">
-              <ui-icon name="lightning"></ui-icon>
-              <span>Aplicar no Canvas</span>
-            </div>
-          </app-button>
-        </div>
-
-        <!-- Controles de Histórico (Undo / Redo) -->
-        <div class="history-controls">
-          <div class="flex items-center gap-2">
-            <app-button id="ai-undo-btn" variant="ghost" size="sm" title="Desfazer alteração da IA (Ctrl+Z)">
-              <ui-icon name="arrow-uturn-down" style="--icon-size: 12px; transform: scaleX(-1);"></ui-icon>
-              <span>Desfazer</span>
-            </app-button>
-            <app-button id="ai-redo-btn" variant="ghost" size="sm" title="Refazer alteração (Ctrl+Y)">
-              <ui-icon name="arrow-uturn-down" style="--icon-size: 12px"></ui-icon>
-              <span>Refazer</span>
-            </app-button>
+          <div class="json-status" id="json-status">
+            <div class="json-status-dot"></div>
+            <span id="json-status-text"></span>
           </div>
         </div>
+
+        <!-- Aplicar -->
+        <button class="btn-prism btn-primary w-full" id="apply-response-btn" disabled>
+          <ui-icon name="zap" style="--icon-size: 14px; --icon-stroke-width: 2px"></ui-icon>
+          Aplicar no Canvas
+        </button>
+
+        <!-- Histórico: secundários em hierarquia, com kbd-prism para atalhos -->
+        <div class="grid grid-cols-2 gap-1.5">
+          <button class="btn-prism btn-secondary gap-1.5 text-[10px] justify-between px-3" id="ai-undo-btn" disabled>
+            <div class="flex items-center gap-1.5">
+              <ui-icon name="undo-2" style="--icon-size: 12px"></ui-icon>
+              <span>Desfazer</span>
+            </div>
+            <kbd class="kbd-prism">Z</kbd>
+          </button>
+          <button class="btn-prism btn-secondary gap-1.5 text-[10px] justify-between px-3" id="ai-redo-btn" disabled>
+            <div class="flex items-center gap-1.5">
+              <ui-icon name="redo-2" style="--icon-size: 12px"></ui-icon>
+              <span>Refazer</span>
+            </div>
+            <kbd class="kbd-prism">Y</kbd>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Rodapé: LED à esquerda, status centralizado, badge do modelo à direita -->
+      <div class="studio-footer">
+        <div class="footer-led animate-pulse-led" id="studio-led"></div>
+        <span class="footer-status" id="studio-status">pronto para receber prompt</span>
+        <span class="footer-model" id="studio-model">gpt-4o</span>
       </div>
     `;
   }

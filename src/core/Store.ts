@@ -386,6 +386,12 @@ class Store {
     eventBus.emit('state:change', this.getState());
   }
 
+  public updateLabelIAIndex(index: number): void {
+    if (this.state.currentLabel) {
+      this.state.currentLabel.iaTurnIndex = index;
+    }
+  }
+
   public getState(): Readonly<AppState> {
     // Otimização: Não usamos mais JSON.stringify em todo o estado.
     // productionData pode ser enorme e travar a Main Thread.

@@ -31,6 +31,7 @@ export interface CanvasConfig {
 
 export interface Label {
   id: string;
+  iaTurnIndex?: number; // Task 85: Turno de IA atual
   name: string;
   config: CanvasConfig;
   elements: AnyElement[];
