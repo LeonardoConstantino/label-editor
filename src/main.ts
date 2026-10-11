@@ -10,7 +10,7 @@ import { cloudSyncService } from './domain/services/CloudSyncService';
 import { shortcutService } from './core/ShortcutService';
 // import { Label } from './domain/models/Label';
 import { defaultLabel } from './constants/Etiqueta_Padrão_Tactile_Prism';
-import { MelodyOptions, NotePreset, UISM } from './core/UISoundManager';
+import { UISM } from './core/UISoundManager';
 import { ToastManager, ToastOptions } from './components/common/toast';
 import { getOSInfo } from './utils/os-detection';
 import './components/editor/EditorCanvas';

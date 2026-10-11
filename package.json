@@ -7,7 +7,9 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "deploy": "gh-pages -d dist",
-    "test": "vitest"
+    "test": "vitest",
+    "icons:gen": "node scripts/generate-icons.mjs",
+  "icons:gen:npm": "node scripts/generate-icons.mjs node_modules/lucide-static/icons"
   },
   "keywords": [],
   "author": "",
@@ -21,6 +23,7 @@
     "fake-indexeddb": "^6.2.5",
     "gh-pages": "^6.3.0",
     "jsdom": "^28.1.0",
+    "lucide-static": "^1.55.0",
     "tailwindcss": "^4.2.1",
     "typescript": "^5.9.3",
     "vite": "^8.0.0",

@@ -1,0 +1,38 @@
+{
+    "biohazard": {
+        "name": "Biohazard",
+        "viewBox": [
+            0,
+            0,
+            24,
+            24
+        ],
+        "stroke": false,
+        "tags": [
+            "iso",
+            "hazard",
+            "safety"
+        ],
+        "paths": [
+            "M12 2a5 5 0 0 1 4.33 2.5 5 5 0 0 1 4.33 7.5 5 5 0 0 1-4.33 7.5A5 5 0 0 1 12 22a5 5 0 0 1-4.33-2.5A5 5 0 0 1 3.34 12a5 5 0 0 1 4.33-7.5A5 5 0 0 1 12 2z"
+        ]
+    },
+    "ce-mark": {
+        "name": "CE Mark",
+        "viewBox": [
+            0,
+            0,
+            100,
+            60
+        ],
+        "stroke": false,
+        "tags": [
+            "certification",
+            "iso",
+            "europe"
+        ],
+        "paths": [
+            "M30 15 a15 15 0 1 0 0 30 M55 15 v30 M55 30 h30 M55 45 h30 M85 15 v30 M70 15 v30"
+        ]
+    }
+}

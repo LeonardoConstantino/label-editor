@@ -23,3 +23,5 @@ yarn-debug.log*
 yarn-error.log*
 /.openclaude-profile.json
 /.env
+/scripts/vendor/lucide
+/scripts/vendor/lucide-curated
