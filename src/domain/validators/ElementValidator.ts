@@ -122,7 +122,7 @@ class ElementValidator {
   }
 
   private static isValidHex(color: string): boolean {
-    return this.HEX_COLOR_REGEX.test(color);
+    return color === 'transparent'? true : this.HEX_COLOR_REGEX.test(color);
   }
 }
 
