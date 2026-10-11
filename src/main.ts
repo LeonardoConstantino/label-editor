@@ -10,7 +10,7 @@ import { ElementFactory } from './domain/models/elements/ElementFactory';
 import { shortcutService } from './core/ShortcutService';
 import { Label } from './domain/models/Label';
 import { DEFAULTS } from './constants/defaults';
-import { UISM } from './core/UISoundManager';
+import { MelodyOptions, NotePreset, UISM } from './core/UISoundManager';
 import { ToastManager, ToastOptions } from './components/common/toast';
 import { getOSInfo } from './utils/os-detection';
 import './components/editor/EditorCanvas';
@@ -39,16 +39,133 @@ import { UserPreferences } from './domain/models/UserPreferences';
 const bootTime = createTimer(logger);
 bootTime.init();
 
+const forgeOSBoot: { notes: NotePreset[]; options: MelodyOptions } = {
+  notes: [
+    // 1. VAZIO CÓSMICO — O som emerge do silêncio
+    {
+      sound: {
+        freq: [55, 82.41],
+        duration: 0.82,
+        type: 'sine',
+        volume: 0.065,
+        envelope: {
+          attack: 0.16,
+          decay: 0.20,
+          sustain: 0.42,
+          release: 0.30
+        },
+        noise: {
+          amount: 0.006,
+          type: 'brown',
+          duration: 0.65
+        },
+        filter: {
+          type: 'lowpass',
+          frequency: 300,
+          Q: 0.7
+        }
+      },
+      beats: 0.18
+    },
+
+    // 2. DESPERTAR — O campo harmônico se expande
+    {
+      sound: {
+        freq: [55, 82.41, 110, 123.47],
+        duration: 0.86,
+        type: 'sine',
+        volume: 0.055,
+        envelope: {
+          attack: 0.17,
+          decay: 0.22,
+          sustain: 0.45,
+          release: 0.32
+        },
+        noise: {
+          amount: 0.005,
+          type: 'brown',
+          duration: 0.65
+        },
+        filter: {
+          type: 'lowpass',
+          frequency: 460,
+          Q: 0.75
+        }
+      },
+      beats: 0.18
+    },
+
+    // 3. TRANSCENDÊNCIA — O cluster ganha corpo e luminosidade
+    {
+      sound: {
+        freq: [82.41, 110, 123.47, 146.83, 164.81],
+        duration: 0.90,
+        type: 'triangle',
+        volume: 0.050,
+        envelope: {
+          attack: 0.18,
+          decay: 0.23,
+          sustain: 0.46,
+          release: 0.35
+        },
+        noise: {
+          amount: 0.004,
+          type: 'brown',
+          duration: 0.65
+        },
+        filter: {
+          type: 'lowpass',
+          frequency: 800,
+          Q: 0.8
+        }
+      },
+      beats: 0.18
+    },
+
+    // 4. MONÓLITO — Abertura sonora, sem um golpe de clímax
+    {
+      sound: {
+        freq: [55, 82.41, 110, 164.81, 220, 329.63],
+        duration: 0.92,
+        type: 'sine',
+        volume: 0.045,
+        envelope: {
+          attack: 0.20,
+          decay: 0.25,
+          sustain: 0.40,
+          release: 0.42
+        },
+        noise: {
+          amount: 0.003,
+          type: 'brown',
+          duration: 0.60
+        },
+        filter: {
+          type: 'lowpass',
+          frequency: 1400,
+          Q: 0.7
+        }
+      },
+      beats: 0.18
+    }
+  ],
+  options: { bpm: 60, loop: false, onComplete: () => logger.info('Main', 'Forge OS boot melody completed.') },
+};
+
 const onModulesReady = (): void => {
   const splash = document.getElementById('app-splash');
   if (!splash) return;
 
   splash.classList.add('splash--out');
 
-  splash.addEventListener('transitionend', () => {
-    splash.remove();
-  }, { once: true });
-}
+  splash.addEventListener(
+    'transitionend',
+    () => {
+      splash.remove();
+    },
+    { once: true },
+  );
+};
 
 // Global Notification Listener
 eventBus.on('notify', (options: ToastOptions) => {
@@ -96,7 +213,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // 2. Carrega preferências do usuário imediatamente
-  const { preferenceManager } = await import('./domain/services/PreferenceManager');
+  const { preferenceManager } =
+    await import('./domain/services/PreferenceManager');
   const prefs = await preferenceManager.getPreferences();
   store.loadPreferences(prefs);
 
@@ -113,7 +231,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Pull dos templates e preferências da nuvem após conexão bem-sucedida
         return Promise.all([
           templateManager.syncFromCloud(),
-          preferenceManager.syncFromCloud()
+          preferenceManager.syncFromCloud(),
         ]);
       })
       .catch((err) => {
@@ -150,9 +268,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Helper para resolver o tema de acordo com as preferências
   const systemThemeMedia = window.matchMedia('(prefers-color-scheme: dark)');
   const resolveAndApplyTheme = (theme: 'dark' | 'light' | 'system') => {
-    const activeTheme = theme === 'system' 
-      ? (systemThemeMedia.matches ? 'dark' : 'light') 
-      : theme;
+    const activeTheme =
+      theme === 'system'
+        ? systemThemeMedia.matches
+          ? 'dark'
+          : 'light'
+        : theme;
     document.documentElement.setAttribute('data-theme', activeTheme);
   };
 
@@ -185,23 +306,31 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const allShortcuts = shortcutService.listShortcuts();
   // Injeta no SSoT de atalhos
-  const { UIKeyboardShortcuts } = await import('./components/common/KeyboardShortcuts');
+  const { UIKeyboardShortcuts } =
+    await import('./components/common/KeyboardShortcuts');
   const tempShortcuts = new UIKeyboardShortcuts();
   tempShortcuts.data = allShortcuts;
 
-  const inspectorTips = Object.values(InspectorHelpData).flatMap(section => [
-    ...section.commands.map(cmd => `${section.title}: ${cmd.key ? `[${cmd.key}] ` : ''}${cmd.label} - ${cmd.desc}`),
-    ...(section.proTip ? [section.proTip.text.replace(/<[^>]*>/g, '')] : [])
+  const inspectorTips = Object.values(InspectorHelpData).flatMap((section) => [
+    ...section.commands.map(
+      (cmd) =>
+        `${section.title}: ${cmd.key ? `[${cmd.key}] ` : ''}${cmd.label} - ${cmd.desc}`,
+    ),
+    ...(section.proTip ? [section.proTip.text.replace(/<[^>]*>/g, '')] : []),
   ]);
 
-  document.querySelector('ui-hud-tips')?.setTips([
-    ...allShortcuts.map(i => `[${i.key||i.sequence}] - ${i.description}`),
-    ...helpData.proTips.map(i => i.tip),
-    ...inspectorTips,
-    ...Object.keys(FORMATTERS).map(key => `Formate dados da etiqueta Use → ${FORMATTERS[key].tip}`),
-    'Dica: Use [Ctrl+Z] para desfazer ações.',
-    'Dica: Use as setas do teclado para mover elementos selecionados.',
-  ]);
+  document
+    .querySelector('ui-hud-tips')
+    ?.setTips([
+      ...allShortcuts.map((i) => `[${i.key || i.sequence}] - ${i.description}`),
+      ...helpData.proTips.map((i) => i.tip),
+      ...inspectorTips,
+      ...Object.keys(FORMATTERS).map(
+        (key) => `Formate dados da etiqueta Use → ${FORMATTERS[key].tip}`,
+      ),
+      'Dica: Use [Ctrl+Z] para desfazer ações.',
+      'Dica: Use as setas do teclado para mover elementos selecionados.',
+    ]);
 
   const statusBar = new StatusBar();
   statusBar.init();
@@ -219,7 +348,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     store.loadLabel(savedSession);
     loadedFromSession = true;
     logger.info('Main', 'Session restored from auto-save');
-  } 
+  }
   // 2. Fallback: Tenta restaurar último projeto ativo do Vault
   else if (lastProjectId) {
     const templates = await templateManager.getTemplates();
@@ -272,7 +401,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     type: 'info',
     message: 'Aplicação inicializada com sucesso!',
     duration: 5000,
+    silent: true,
   });
+
+  UISM.playMelody(forgeOSBoot.notes, forgeOSBoot.options);
 });
 
 // Listener para solicitações de som de componentes customizados

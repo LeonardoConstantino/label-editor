@@ -75,6 +75,18 @@ export interface SoundPreset {
   filter?: FilterConfig;
 }
 
+export interface NotePreset {
+  sound: SoundPreset;
+  beats?: number;
+  pauseBeats?: number;
+}
+
+export interface MelodyOptions {
+  bpm?: number;
+  loop?: boolean;
+  onComplete?: () => void;
+}
+
 /**
  * Nomes de presets disponíveis
  */
@@ -345,6 +357,8 @@ class UISoundManager {
   };
 
   private readonly context: AudioContext | null;
+  private currentMelody: { playing: boolean } | null = null;
+  private melodyTimeoutIds: number[] = [];
   private enabled: boolean;
   private readonly throttleMs: number;
   private readonly logger: UISoundManagerOptions['logger'];
@@ -398,6 +412,8 @@ class UISoundManager {
 
     if (now - lastPlay < this.throttleMs) return false;
     this.lastPlayTime.set(presetName, now);
+
+    this.logger!.debug('UISoundManager', `Preset "${presetName}" reproduzido`, preset);
 
     this.synthesize(preset);
     return true;
@@ -523,6 +539,102 @@ class UISoundManager {
     );
 
     this.synthesize(preset);
+    return true;
+  }
+
+  /**
+   * Reproduz sequência de sons (melodia)
+   * 
+   * @param notes - Array de configurações de notas
+   * @param options - Opções de reprodução (BPM, loop, callback)
+   * @returns ID único da melodia (use com stopMelody())
+   * 
+   * @example
+   * // Melodia simples (3 notas)
+   * const melodyId = manager.playMelody([
+   *   { sound: { freq: 440, duration: 0.3 }, beats: 1 },
+   *   { sound: { freq: 554, duration: 0.3 }, beats: 1 },
+   *   { sound: { freq: 659, duration: 0.5 }, beats: 2 }
+   * ], { bpm: 100 });
+   * 
+   * @example
+   * // Melodia com pausas e loop
+   * manager.playMelody([
+   *   { sound: { freq: [523, 659], duration: 0.2 }, pauseBeats: 0.5 },
+   *   { sound: { freq: 784, duration: 0.4 }, beats: 2 }
+   * ], { bpm: 140, loop: true });
+   */
+  public playMelody(notes: NotePreset[], options: MelodyOptions = {}): number {
+    if (!this.context || !this.enabled) return -1;
+    this.stopMelody();
+
+    if (!Array.isArray(notes) || notes.length === 0) {
+      this.logger!.warn('UISoundManager', 'playMelody requer array não vazio de notas');
+      return -1;
+    }
+
+    const bpm = Math.max(20, Math.min(300, options.bpm ?? 120));
+    const beatDuration = 60 / bpm; // segundos por beat
+    const loop = options.loop ?? false;
+
+    // Cria identificador único
+    const melodyId = Date.now();
+    const melodyState = { playing: true };
+    this.currentMelody = melodyState;
+
+    const playSequence = (startIndex = 0) => {
+      if (!melodyState.playing) return;
+
+      let currentTime = 0;
+
+      for (let i = startIndex; i < notes.length; i++) {
+        const note = notes[i];
+        const beats = note.beats ?? 1;
+        const pauseBeats = note.pauseBeats ?? 0;
+
+        const timeoutId = window.setTimeout(() => {
+          if (!melodyState.playing) return;
+          this.playCustom(note.sound);
+        }, currentTime * 1000);
+
+        this.melodyTimeoutIds.push(timeoutId);
+        currentTime += beats * beatDuration + pauseBeats * beatDuration;
+      }
+
+      // Agenda próxima iteração (loop) ou callback final
+      const finalTimeoutId = window.setTimeout(() => {
+        if (!melodyState.playing) return;
+
+        if (loop) {
+          playSequence(0);
+        } else {
+          this.currentMelody = null;
+          options.onComplete?.();
+        }
+      }, currentTime * 1000);
+
+      this.melodyTimeoutIds.push(finalTimeoutId);
+    };
+
+    playSequence();
+    return melodyId;
+  }
+
+  /**
+   * Interrompe melodia em reprodução
+   * @returns true se interrompido, false se nenhuma melodia ativa
+   */
+  public stopMelody(): boolean {
+    if (!this.currentMelody) return false;
+
+    this.currentMelody.playing = false;
+    this.currentMelody = null;
+
+    // Limpa todos os timeouts agendados
+    this.melodyTimeoutIds.forEach(id => window.clearTimeout(id));
+    this.melodyTimeoutIds = [];
+
+    this.logger!.debug('UISoundManager', 'Melodia interrompida');
     return true;
   }
 
