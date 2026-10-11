@@ -1,15 +1,15 @@
 import { AppState, store } from './core/Store';
-import { ElementType } from './domain/models/elements/BaseElement';
+// import { ElementType } from './domain/models/elements/BaseElement';
 import eventBus from './core/EventBus';
 import { logger, LogLevelType } from './core/Logger';
 import './styles/main.css';
 
 import { templateManager } from './domain/services/TemplateManager';
 import { cloudSyncService } from './domain/services/CloudSyncService';
-import { ElementFactory } from './domain/models/elements/ElementFactory';
+// import { ElementFactory } from './domain/models/elements/ElementFactory';
 import { shortcutService } from './core/ShortcutService';
-import { Label } from './domain/models/Label';
-import { DEFAULTS } from './constants/defaults';
+// import { Label } from './domain/models/Label';
+import { defaultLabel } from './constants/Etiqueta_Padrão_Tactile_Prism';
 import { MelodyOptions, NotePreset, UISM } from './core/UISoundManager';
 import { ToastManager, ToastOptions } from './components/common/toast';
 import { getOSInfo } from './utils/os-detection';
@@ -149,7 +149,7 @@ const forgeOSBoot: { notes: NotePreset[]; options: MelodyOptions } = {
       beats: 0.18
     }
   ],
-  options: { bpm: 60, loop: false, onComplete: () => logger.info('Main', 'Forge OS boot melody completed.') },
+  options: { bpm: 60, loop: false },
 };
 
 const onModulesReady = (): void => {
@@ -185,18 +185,18 @@ eventBus.on('ui:open:help', (options: any = {}) => {
 });
 
 // Inicializa a aplicação com uma etiqueta padrão
-const defaultLabel: Label = {
-  id: crypto.randomUUID(),
-  name: 'Nova Etiqueta',
-  config: { ...DEFAULTS.CANVAS },
-  elements: [
-    ElementFactory.create(ElementType.TEXT, {
-      content: 'Minha Nova Etiqueta',
-    }),
-  ],
-  createdAt: Date.now(),
-  updatedAt: Date.now(),
-};
+// const defaultLabel: Label = {
+//   id: crypto.randomUUID(),
+//   name: 'Nova Etiqueta',
+//   config: { ...DEFAULTS.CANVAS },
+//   elements: [
+//     ElementFactory.create(ElementType.TEXT, {
+//       content: 'Minha Nova Etiqueta',
+//     }),
+//   ],
+//   createdAt: Date.now(),
+//   updatedAt: Date.now(),
+// };
 
 document.addEventListener('DOMContentLoaded', async () => {
   const { isMac } = getOSInfo();
