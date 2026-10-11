@@ -1,4 +1,4 @@
-import { ElementType, BorderStyle, TextOverflow, ImageFit } from '../domain/models/elements/BaseElement';
+import { ElementType, BorderStyle, TextOverflow, ImageFit, CompositeOperation } from '../domain/models/elements/BaseElement';
 
 /**
  * LABEL_PRESETS: Dimensões comuns de etiquetas do mercado.
@@ -84,7 +84,7 @@ export const DEFAULTS = {
     src: '',
     fit: ImageFit.CONTAIN,
     smoothing: true,
-    compositeOperation: 'source-over',
+    compositeOperation: CompositeOperation.SOURCE_OVER,
     keepRatio: true
   },
 

@@ -409,7 +409,7 @@ disconnectedCallback(): void {
     if (normalized === TRANSPARENT) {
       this.#swatchColorEl.removeAttribute('data-color');
       this.#swatchColorEl.style.removeProperty('--_current-color');
-      this.#hexTextEl.textContent = 'None';
+      this.#hexTextEl.textContent = TRANSPARENT;
     } else {
       this.#swatchColorEl.setAttribute('data-color', normalized);
       this.#swatchColorEl.style.setProperty('--_current-color', normalized);

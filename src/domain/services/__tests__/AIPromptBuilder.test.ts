@@ -175,7 +175,7 @@ Espero que tenha gostado do resultado!
 \`\`\`
       `);
 
-      const updated = builder.applyMerge(sampleLabel, parsedResult);
+      const updated = builder.applyMerge(sampleLabel, parsedResult, 2);
 
       // Texto modificado
       const textEl = updated.elements.find((e) => e.id === 'text-1') as TextElement;
@@ -208,7 +208,7 @@ Espero que tenha gostado do resultado!
 \`\`\`
       `);
 
-      const updated = builder.applyMerge(sampleLabel, parsedResult);
+      const updated = builder.applyMerge(sampleLabel, parsedResult, 3);
       expect(updated.elements.length).toBe(3);
       expect(updated.elements.some((e) => e.id === 'new-code-1')).toBe(true);
     });
