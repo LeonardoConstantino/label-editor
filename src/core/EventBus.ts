@@ -40,7 +40,8 @@ interface EventMap {
   'notify': { 
     message: string; 
     type: 'success' | 'error' | 'info' | 'warning'; 
-    duration?: number 
+    duration?: number;
+    silent?: boolean; 
   };
   'perf:render': { duration: number };
   'ui:modal:open': { id: string };

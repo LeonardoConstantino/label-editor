@@ -61,6 +61,8 @@ export interface ToastOptions {
    * @default 4000
    */
   duration?: number;
+
+  silent?: boolean; // Se true, não toca som (mesmo que UISM esteja habilitado)
 }
 
 /** Payload do CustomEvent `'ui-toast:dismissed'`. */
@@ -585,6 +587,7 @@ export class UiToastManager extends HTMLElement {
     type = DEFAULTS.type,
     message = DEFAULTS.message,
     duration = DEFAULTS.duration,
+    silent = false,
   }: ToastOptions): UiToast {
     // Aplica limite de pilha: descarta o mais antigo antes de adicionar o novo
     const current = this.querySelectorAll<UiToast>('ui-toast');
@@ -597,7 +600,10 @@ export class UiToastManager extends HTMLElement {
     toast.setAttribute('message', message);
     toast.setAttribute('duration', String(duration));
     this.appendChild(toast);
-    UISM.play(UISM.enumPresets.NOTIFY);
+    
+    if (!silent) {
+      UISM.play(UISM.enumPresets.NOTIFY);
+    }
     return toast;
   }
 
