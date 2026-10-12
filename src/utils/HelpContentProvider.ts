@@ -348,6 +348,21 @@ export const InspectorHelpData: Record<string, HelpTooltipConfig> = {
       isSuccess: false
     }
   },
+  mod_typeface_ingestion: {
+    title: 'Font Ingestion',
+    icon: 'pencil-ruler',
+    commands: [
+      { label: 'Google Fonts',        desc: 'Acesse fonts.google.com e localize a família.' },
+      { label: 'Selecione os estilos', desc: 'Clique em "Get font" e escolha pesos e estilos.' },
+      { label: 'Embed code',          desc: 'Copie o bloco <link> ou @import — ambos funcionam.' },
+      { label: 'Cole no Injection',   desc: 'A URL é extraída automaticamente do código colado.' }
+    ],
+    proTip: {
+      icon: 'pencil-ruler',
+      text: 'Inclua só os pesos usados nas etiquetas para reduzir o carregamento.',
+      isSuccess: false
+    }
+  },
   mod_production: {
     title: 'Production Studio',
     icon: 'lightning',

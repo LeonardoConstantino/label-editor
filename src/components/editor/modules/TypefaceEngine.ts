@@ -85,17 +85,17 @@ export class TypefaceEngine extends HTMLElement {
 
   private handleInjection() {
     const input = this.shadowRoot?.getElementById('font-url-input') as HTMLInputElement;
-    const url = input?.value.trim();
-    if (!url) return;
+    const raw = input?.value.trim();
+    if (!raw) return;
 
-    // Regex para extrair nome da família do Google Fonts
-    const match = url.match(/family=([^:&]+)/);
-    if (match) {
+    const url = this.extractGoogleFontsUrl(raw);
+    const match = url?.match(/family=([^:&]+)/);
+
+    if (url && match) {
       const fontName = match[1].replace(/\+/g, ' ');
       this.addCustomFont(fontName, url);
       input.value = '';
-      
-      // Feedback Juice
+
       input.classList.add('scanning');
       setTimeout(() => input.classList.remove('scanning'), 1000);
       UISM.play(UISM.enumPresets.SUCCESS);
@@ -103,6 +103,25 @@ export class TypefaceEngine extends HTMLElement {
       eventBus.emit('notify', { type: 'error', message: 'Invalid Google Fonts URL' });
       UISM.play(UISM.enumPresets.WARNING);
     }
+  }
+
+  // Aceita URL limpa, bloco <link> ou bloco @import — retorna sempre a URL da API.
+  private extractGoogleFontsUrl(raw: string): string | null {
+    const normalized = raw.trim();
+
+    // 1. URL direta
+    if (normalized.startsWith('https://fonts.googleapis.com')) return normalized;
+
+    // 2. @import url('...')
+    const importMatch = normalized.match(/@import\s+url\((?:['"])?(https:\/\/fonts\.googleapis\.com[^'")\s]+)(?:['"])?\)/i);
+    if (importMatch?.[1]) return importMatch[1];
+
+    // 3. <link href="..."> — pega a última URL da API do bloco
+    const linkUrls = [...normalized.matchAll(/href=['"](https:\/\/fonts\.googleapis\.com[^'"]+)['"]/gi)].map((match) => match[1]);
+    const lastLinkUrl = linkUrls.slice(-1)[0];
+    if (lastLinkUrl) return lastLinkUrl;
+
+    return null;
   }
 
   private addCustomFont(name: string, url: string) {
@@ -388,7 +407,12 @@ export class TypefaceEngine extends HTMLElement {
       </div>
 
       <div class="terminal-zone">
-        <span class="label-prism">Font Ingestion Terminal</span>
+        <div class="flex items-center justify-between gap-2">
+          <span class="label-prism mb-0">Font Ingestion Terminal</span>
+          <a title="Obter Fonts" class="link-prism link-prism-external text-sm" href="https://fonts.google.com/" target="_blank" rel="noopener noreferrer">Obter Fonts</a>
+          ${HelpContentProvider.buildTooltip('mod_typeface_ingestion', 'bottom')}
+        </div>
+        
         <div class="input-group">
           <ui-icon name="link" class="input-icon w-4 h-4"></ui-icon> <!-- ÍCONE AQUI -->
           <input type="text" id="font-url-input" class="input-prism" placeholder="Google Fonts URL...">
