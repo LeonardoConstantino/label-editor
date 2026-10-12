@@ -576,7 +576,7 @@ export class PromptStudio extends HTMLElement {
 
         <!-- Aplicar -->
         <button class="btn-prism btn-primary w-full" id="apply-response-btn" disabled>
-          <ui-icon name="zap" style="--icon-size: 14px; --icon-stroke-width: 2px"></ui-icon>
+          <ui-icon name="lightning" style="--icon-size: 14px; --icon-stroke-width: 2px"></ui-icon>
           Aplicar no Canvas
         </button>
 
@@ -584,14 +584,14 @@ export class PromptStudio extends HTMLElement {
         <div class="grid grid-cols-2 gap-1.5">
           <button class="btn-prism btn-secondary gap-1.5 text-[10px] justify-between px-3" id="ai-undo-btn" disabled>
             <div class="flex items-center gap-1.5">
-              <ui-icon name="undo-2" style="--icon-size: 12px"></ui-icon>
+              <ui-icon name="undo" style="--icon-size: 12px"></ui-icon>
               <span>Desfazer</span>
             </div>
             <kbd class="kbd-prism">Z</kbd>
           </button>
           <button class="btn-prism btn-secondary gap-1.5 text-[10px] justify-between px-3" id="ai-redo-btn" disabled>
             <div class="flex items-center gap-1.5">
-              <ui-icon name="redo-2" style="--icon-size: 12px"></ui-icon>
+              <ui-icon name="redo" style="--icon-size: 12px"></ui-icon>
               <span>Refazer</span>
             </div>
             <kbd class="kbd-prism">Y</kbd>

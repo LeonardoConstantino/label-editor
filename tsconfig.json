@@ -19,6 +19,12 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src/**/*.ts", "./*.d.ts", "test/**/*.ts"],
+  "include": [
+    "src/**/*.ts",
+    "./*.d.ts",
+    "test/**/*.ts",
+    "src/constants/icons.ts.disabled",
+    "src/constants/Etiqueta_Padrão_Tactile_Prism.ts"
+, "src/domain/services/AssetResolver.ts.disabled"  ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

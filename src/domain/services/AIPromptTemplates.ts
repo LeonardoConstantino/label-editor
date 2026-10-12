@@ -55,6 +55,7 @@ Exemplos rápidos:
 ${exampleLines}
 
 Encadeamento: {{estoque:mul(1.1):number(pt-BR)}}
+Fallback: {{var||Valor}}
 
 Variáveis de sistema (sempre disponíveis em toda etiqueta, sem declaração):
 - {{index}}  → índice da linha atual no dataset (0-based)

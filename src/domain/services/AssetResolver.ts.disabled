@@ -1,4 +1,7 @@
-import { ICON_REGISTRY, IconDefinition } from '../../constants/icons';
+import {
+  ICON_REGISTRY,
+  IconDefinition,
+} from '../../constants/icons.ts.disabled';
 import { DataSourceParser } from './DataSourceParser';
 import { RenderContext } from './renderers/renderer-types';
 
@@ -64,7 +67,7 @@ export function getAssetDisplayName(src: string): string {
  */
 export function preloadAssets(
   srcs: string[],
-  cache: Map<string, HTMLImageElement | ImageBitmap>
+  cache: Map<string, HTMLImageElement | ImageBitmap>,
 ): Promise<void> {
   const tasks: Promise<void>[] = [];
 
@@ -74,12 +77,17 @@ export function preloadAssets(
 
     if (typeof Image !== 'undefined') {
       // Main thread
-      tasks.push(new Promise<void>((resolve) => {
-        const img = new Image();
-        img.onload = () => { cache.set(resolved, img); resolve(); };
-        img.onerror = () => resolve();
-        img.src = resolved;
-      }));
+      tasks.push(
+        new Promise<void>((resolve) => {
+          const img = new Image();
+          img.onload = () => {
+            cache.set(resolved, img);
+            resolve();
+          };
+          img.onerror = () => resolve();
+          img.src = resolved;
+        }),
+      );
     } else if (
       typeof fetch !== 'undefined' &&
       typeof createImageBitmap !== 'undefined'
@@ -89,8 +97,10 @@ export function preloadAssets(
         fetch(resolved)
           .then((r) => r.blob())
           .then((blob) => createImageBitmap(blob))
-          .then((bitmap) => { cache.set(resolved, bitmap); })
-          .catch(() => undefined)
+          .then((bitmap) => {
+            cache.set(resolved, bitmap);
+          })
+          .catch(() => undefined),
       );
     }
   }
@@ -108,14 +118,14 @@ export function preloadAssets(
  */
 export function resolveElementSrc(
   rawSrc: string,
-  ctx: Pick<RenderContext, 'data' | 'context'>
+  ctx: Pick<RenderContext, 'data' | 'context'>,
 ): string {
   if (!rawSrc) return '';
 
   const interpolated = DataSourceParser.interpolate(
     rawSrc,
     (ctx.data as Record<string, unknown>) ?? {},
-    (ctx.context as Record<string, unknown>) ?? {}
+    (ctx.context as Record<string, unknown>) ?? {},
   );
 
   // Tag não resolvida → src inválido. Devolve '' para não renderizar lixo.
