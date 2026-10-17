@@ -4,7 +4,8 @@ export enum ElementType {
   TEXT = 'text',
   IMAGE = 'image',
   CODE = 'code',
-  LINE = 'line'
+  LINE = 'line',
+  ICON = 'icon'
 }
 
 export enum BorderStyle {

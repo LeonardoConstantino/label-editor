@@ -4,7 +4,8 @@ import {
   RectangleElement, 
   ImageElement, 
   BorderElement,
-  CodeElement
+  CodeElement,
+  IconElement
 } from '../models/elements/SpecificElements';
 import { DEFAULTS } from '../../constants/defaults';
 
@@ -60,6 +61,9 @@ class ElementValidator {
         break;
       case ElementType.CODE:
         this.validateCode(element as CodeElement, errors);
+        break;
+      case ElementType.ICON:
+        this.validateIcon(element as IconElement, errors);
         break;
     }
 
@@ -119,6 +123,18 @@ class ElementValidator {
     }
     // A validação de formato rígido (EAN, UPC) foi movida para o OverflowValidator
     // para gerar avisos (warnings) em vez de rejeições fatais.
+  }
+
+  private static validateIcon(el: IconElement, errors: string[]): void {
+    if (!el.iconName || el.iconName.trim() === '') {
+      errors.push('Nome do ícone não pode estar vazio.');
+    }
+    if (!this.isValidHex(el.color)) {
+      errors.push('Cor do ícone inválida.');
+    }
+    if (el.strokeWidth !== undefined && el.strokeWidth < 0) {
+      errors.push('Espessura do traço não pode ser negativa.');
+    }
   }
 
   private static isValidHex(color: string): boolean {

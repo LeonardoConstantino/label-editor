@@ -101,6 +101,22 @@ Este Master Plan coordena a fase final de desenvolvimento, focando em estabilida
 | **96** | [PreferenceManager & SessionManager — Push](./tasks/96_prefs_session_cloud_sync.md) | 06 | [x] | 92 | `task/96-prefs-session-sync` |
 | **97** | [EventBus, StatusBar & Bootstrap — Feedback Visual](./tasks/97_cloud_sync_feedback.md) | 06 | [x] | 92, 93 | `task/97-cloud-sync-feedback` |
 
+### Fase G: Inteligência Artificial (Prompt Studio)
+| ID | Task | Pri | Status | Deps | Branch |
+|----|------|-----|--------|------|--------|
+| **98** | [AIPromptBuilder & Resilient Parser (Domain Engine)](./tasks/98_ai_prompt_engine.md) | 08 | [x] | — | `task/98-ai-prompt-engine` |
+| **99** | [PromptStudio UI Component & Cartridge Integration](./tasks/99_prompt_studio_ui.md) | 08 | [x] | 98 | `task/99-prompt-studio-ui` |
+
+### Fase H: Elemento de Ícones & Biblioteca Vetorial (Símbolos & Variáveis)
+> Implementação do `IconElement` de primeira classe vetorial (`Path2D`), feed virtual infinito na `AssetLibrary` com colorização adaptativa ao tema da aplicação, busca instantânea $O(\text{tokens})$ e suporte a variáveis de lote.
+
+| ID | Task | Pri | Status | Deps | Branch |
+|----|------|-----|--------|------|--------|
+| **100** | [Icon Engine & Pure Vector Renderer (Path2D Core)](./tasks/100_icon_engine_core.md) | 08 | [x] | — | `task/100-icon-engine-core` |
+| **101** | [Theme-Adaptive DOM SVGs & Infinite Virtual Feed (AssetLibrary UX)](./tasks/101_asset_library_icon_feed.md) | 08 | [ ] | 100 | `task/101-asset-library-icon-feed` |
+| **102** | [Instant Search & Recents Engine (O(tokens) Cache)](./tasks/102_icon_search_recents.md) | 07 | [ ] | 101 | `task/102-icon-search-recents` |
+| **103** | [InspectorSectionIcon & Variable Integration (Atomic Sync)](./tasks/103_inspector_icon_section.md) | 07 | [ ] | 100, 101, 102 | `task/103-inspector-icon-section` |
+
 
 ## ✅ Histórico de Conquistas (MVP & Core)
 *(Tasks concluídas movidas para o histórico para manter o foco no futuro)*

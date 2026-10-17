@@ -79,7 +79,7 @@ Recursos estéticos e casos de uso de nicho.
 | LineElement       | ✅         | —            | Médio   | Concluído |
 | GroupElement      | ⭐⭐⭐       | Alta         | Alto    | Backlog |
 | TableElement      | ⭐⭐⭐       | Alta         | Alto    | Backlog |
-| IconElement       | ⭐⭐         | Média        | Médio   | Backlog |
+| IconElement       | ⭐⭐         | Média        | Médio   | **Tasks 100-103** 🚀 |
 | CurvedTextElement | ⭐⭐         | Média        | Premium | **NOVO!** |
 | UniqueIdElement   | ⭐⭐         | Média        | Alto    | **NOVO!** |
 | DateTimeElement   | ⭐⭐         | Baixa        | Médio   | Backlog |

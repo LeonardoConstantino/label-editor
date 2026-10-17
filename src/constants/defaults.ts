@@ -111,5 +111,13 @@ export const DEFAULTS = {
     strokeWidth: 0.5,
     color: '#000000',
     style: BorderStyle.SOLID
+  },
+
+  [ElementType.ICON]: {
+    dimensions: { width: 16, height: 16 },
+    iconName: 'alert-triangle',
+    color: '#000000',
+    strokeWidth: 2,
+    keepRatio: true
   }
 } as const;

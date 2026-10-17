@@ -62,3 +62,10 @@ export interface LineElement extends BaseElement {
   color: string;
   style: BorderStyle;
 }
+
+export interface IconElement extends BaseElement {
+  dimensions: Dimensions; // Largura e Altura em mm
+  iconName: string;       // Chave do ícone (ex: 'biohazard') ou variável de lote ('{{simbolo}}')
+  color: string;          // Cor vetorial do ícone (hex, ex: '#000000')
+  strokeWidth?: number;   // Espessura do traço quando o ícone for stroke: true
+}

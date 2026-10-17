@@ -7,6 +7,7 @@ import { ImageRenderer } from './renderers/ImageRenderer';
 import { BorderRenderer } from './renderers/BorderRenderer';
 import { CodeRenderer } from './renderers/CodeRenderer';
 import { LineRenderer } from './renderers/LineRenderer';
+import { IconRenderer } from './renderers/IconRenderer';
 import { UnitConverter } from '../../utils/units';
 import eventBus from '../../core/EventBus';
 import { RenderContext } from './renderers/renderer-types';
@@ -24,6 +25,7 @@ export class CanvasRenderer {
     this.renderers.set(ElementType.BORDER, new BorderRenderer());
     this.renderers.set(ElementType.CODE, new CodeRenderer());
     this.renderers.set(ElementType.LINE, new LineRenderer());
+    this.renderers.set(ElementType.ICON, new IconRenderer());
   }
 
   /**

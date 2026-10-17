@@ -5,13 +5,14 @@ import {
   RectangleElement, 
   BorderElement,
   CodeElement,
-  LineElement
+  LineElement,
+  IconElement
 } from './elements/SpecificElements';
 
 // Re-exportando para facilitar o acesso de outros componentes
 export { ElementType };
 
-export type AnyElement = TextElement | ImageElement | RectangleElement | BorderElement | CodeElement | LineElement;
+export type AnyElement = TextElement | ImageElement | RectangleElement | BorderElement | CodeElement | LineElement | IconElement;
 
 export interface CustomFont {
   id: string;
