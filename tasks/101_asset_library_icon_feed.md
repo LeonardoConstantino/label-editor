@@ -90,9 +90,12 @@ Para evitar carregar 1.170+ elementos SVG no DOM de uma só vez:
 
 ## 📋 Critérios de Aceite
 
-- [ ] Categoria/Aba "Symbols & Icons" ativa no `AssetLibrary`.
-- [ ] SVGs no DOM usam `currentColor` e mudam de cor dinamicamente com o tema (Dark / Light) via `bridgeTheme`.
-- [ ] Feed virtual infinito renderiza inicialmente 48 ícones e expande sob demanda via `IntersectionObserver`.
-- [ ] Sub-filtros por nicho (Alertas, Logística, ISO, etc.) funcionais e reativos.
-- [ ] Arraste nativo (Drag & Drop) funcional da Asset Library para o Canvas, gerando `IconElement` na posição do cursor.
-- [ ] Zero impacto de jank (scroll liso a 60 FPS na gaveta lateral).
+- [x] Categoria/Aba "Symbols & Icons" ativa no `AssetLibrary`.
+- [x] SVGs no DOM usam `currentColor` e mudam de cor dinamicamente com o tema (Dark / Light) via `bridgeTheme`.
+- [x] Feed virtual infinito renderiza inicialmente 48 ícones e expande sob demanda via `IntersectionObserver`.
+- [x] Sub-filtros por nicho (Alertas, Logística, ISO, etc.) funcionais e reativos.
+- [x] Arraste nativo (Drag & Drop) funcional da Asset Library para o Canvas, gerando `IconElement` na posição do cursor.
+- [x] Zero impacto de jank (scroll liso a 60 FPS na gaveta lateral).
+
+---
+**Status:** Concluído 🚀

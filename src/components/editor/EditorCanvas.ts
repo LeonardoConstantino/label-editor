@@ -7,7 +7,7 @@ import { sharedSheet } from '../../utils/shared-styles';
 import { bridgeTheme } from '../../utils/theme-bridge';
 import { snapService, SnapResult } from '../../domain/services/SnapService';
 import { ElementFactory } from '../../domain/models/elements/ElementFactory';
-import { ElementType } from '../../domain/models/Label';
+import { ElementType, AnyElement } from '../../domain/models/Label';
 
 const gridSnapFeedback: SoundPreset = {
   freq: 1100,
@@ -165,12 +165,23 @@ export class EditorCanvas extends HTMLElement {
     const centeredX = x - (wMM / 2);
     const centeredY = y - (hMM / 2);
 
-    const element = ElementFactory.create(ElementType.IMAGE, {
-      src: asset.src,
-      name: asset.name,
-      position: { x: centeredX, y: centeredY },
-      dimensions: { width: wMM, height: hMM }
-    });
+    let element: AnyElement;
+
+    if (asset.type === 'icon') {
+      element = ElementFactory.create(ElementType.ICON, {
+        iconName: asset.iconName,
+        name: asset.name || asset.iconName,
+        position: { x: centeredX, y: centeredY },
+        dimensions: { width: Math.max(wMM, 10), height: Math.max(hMM, 10) }
+      });
+    } else {
+      element = ElementFactory.create(ElementType.IMAGE, {
+        src: asset.src,
+        name: asset.name,
+        position: { x: centeredX, y: centeredY },
+        dimensions: { width: wMM, height: hMM }
+      });
+    }
     
     eventBus.emit('element:add', element);
     UISM.play(UISM.enumPresets.OPEN); // Som de "encaixe"

@@ -113,7 +113,7 @@ Este Master Plan coordena a fase final de desenvolvimento, focando em estabilida
 | ID | Task | Pri | Status | Deps | Branch |
 |----|------|-----|--------|------|--------|
 | **100** | [Icon Engine & Pure Vector Renderer (Path2D Core)](./tasks/100_icon_engine_core.md) | 08 | [x] | — | `task/100-icon-engine-core` |
-| **101** | [Theme-Adaptive DOM SVGs & Infinite Virtual Feed (AssetLibrary UX)](./tasks/101_asset_library_icon_feed.md) | 08 | [ ] | 100 | `task/101-asset-library-icon-feed` |
+| **101** | [Theme-Adaptive DOM SVGs & Infinite Virtual Feed (AssetLibrary UX)](./tasks/101_asset_library_icon_feed.md) | 08 | [x] | 100 | `task/101-asset-library-icon-feed` |
 | **102** | [Instant Search & Recents Engine (O(tokens) Cache)](./tasks/102_icon_search_recents.md) | 07 | [ ] | 101 | `task/102-icon-search-recents` |
 | **103** | [InspectorSectionIcon & Variable Integration (Atomic Sync)](./tasks/103_inspector_icon_section.md) | 07 | [ ] | 100, 101, 102 | `task/103-inspector-icon-section` |
 
