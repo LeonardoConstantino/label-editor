@@ -205,6 +205,15 @@ export class AssetLibrary extends HTMLElement {
       target.closest('.asset-item')?.classList.remove('is-dragging');
     }, { signal });
 
+    const nicheBar = root.querySelector<HTMLElement>('.niche-bar');
+    nicheBar?.addEventListener('wheel', (evt: WheelEvent) => {
+      // If vertical scroll is detected, convert it to horizontal scroll
+      if (evt.deltaY !== 0) {
+        evt.preventDefault();
+        nicheBar.scrollLeft += evt.deltaY;
+      }
+    }, { passive: false, signal });
+
     eventBus.on('ui:modal:close', (data: { id?: string }) => {
       if (data?.id === 'image-editor-modal') {
         this.loadAssets();
@@ -640,8 +649,41 @@ export class AssetLibrary extends HTMLElement {
           background: color-mix(in srgb, var(--color-canvas), black 10%);
           border-bottom: 1px solid var(--color-border-ui);
           overflow-x: auto;
-          scrollbar-width: none;
+
+          /* Cria o efeito de fade nas bordas para indicar scroll */
+          mask-image: linear-gradient(to right, 
+            transparent, 
+            var(--color-text-main) 20px, 
+            var(--color-text-main) calc(100% - 20px), 
+            transparent
+          );
+          -webkit-mask-image: linear-gradient(to right, 
+            transparent, 
+            var(--color-text-main) 20px, 
+            var(--color-text-main) calc(100% - 20px), 
+            transparent
+          );
+          
+          /* Esconde a scrollbar por padrão */
+          scrollbar-width: none; /* Firefox */
+          -ms-overflow-style: none; /* IE 10+ */
         }
+
+        /* Esconde a scrollbar no Chrome/Safari por padrão */
+        .niche-bar::-webkit-scrollbar {
+          height: 4px;
+          display: none;
+        }
+
+        /* 2. Scrollbar que aparece no Hover */
+        .niche-bar:hover {
+          scrollbar-width: thin; /* Firefox */
+        }
+
+        .niche-bar:hover::-webkit-scrollbar {
+          display: block;
+        }
+          
         .niche-pill {
           padding: 3px 8px;
           border-radius: 6px;
@@ -723,7 +765,7 @@ export class AssetLibrary extends HTMLElement {
         }
         .icon-cells-grid {
           display: grid;
-          grid-template-columns: repeat(4, 1fr);
+          grid-template-columns: repeat(4, minmax(0, 1fr));
           gap: 8px;
         }
 
