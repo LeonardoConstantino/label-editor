@@ -36,6 +36,12 @@
 
 ## Session Logs
 
+### 2026-10-23: Instant Search & Recents Engine (Task 102)
+- **Task 102 (Instant Search & Recents Engine):**
+  - **Busca em Tempo Real O(tokens):** Busca instantânea (< 5ms) por substring e tags semânticas via `ICON_TOKEN_INDEX` com debounce de 150ms e dicionário de sinônimos (`ICON_SYNONYMS`).
+  - **Barra de Recentes (Pinned Rack):** Rack horizontal com rolagem suave no topo da aba de símbolos (`.recent-icons-rack`), persistindo os últimos 8 ícones no IndexedDB (`preferences.recent_icons`).
+  - **UX & Interatividade:** Suporte a Drag & Drop nativo a partir dos recentes e do catálogo, clique direto para inserção no Canvas com som tátil `UISM.TAP`, e estado vazio elegante com sugestão de termos.
+
 ### 2026-05-21: Biblioteca de Ativos & Drag and Drop
 - **Task 78 (Asset Library):** Implementado o gerenciador de recursos visuais ("The Parts Bin").
   - **Grid Masonry:** Miniaturas organizadas em 2 colunas com suporte a categorias (SVGs, Logos, Uploads).

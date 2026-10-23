@@ -8,7 +8,9 @@ import { DataSanitizer } from '../../../core/DataSanitizer';
 import { logger } from '../../../core/Logger';
 import { HelpContentProvider } from '../../../utils/HelpContentProvider';
 import { confirmDialog } from '../../common/confirm';
-import { ICON_REGISTRY, IconDefinition } from '../../../constants/icons';
+import { ICON_REGISTRY, IconDefinition, searchIcons } from '../../../constants/icons';
+import { ElementType, AnyElement } from '../../../domain/models/Label';
+import { ElementFactory } from '../../../domain/models/elements/ElementFactory';
 
 // Sub-componentes
 import '../../common/icon';
@@ -36,7 +38,7 @@ const NICHE_KEYWORDS: Record<Exclude<SymbolNiche, 'all' | 'geral'>, string[]> = 
 
 /**
  * AssetLibrary: Gerenciador de recursos visuais (The Parts Bin).
- * Implementa Drag & Drop nativo para o Canvas e feed virtual de símbolos (Tasks 78 & 101).
+ * Implementa Drag & Drop nativo para o Canvas, feed virtual de símbolos e busca O(tokens) com Recents (Tasks 78, 101, 102).
  */
 export class AssetLibrary extends HTMLElement {
   private _abortController: AbortController | null = null;
@@ -44,6 +46,12 @@ export class AssetLibrary extends HTMLElement {
   private _activeCategory: AssetCategory = 'all';
   private _activeNiche: SymbolNiche = 'all';
   private _themeCleanup: (() => void) | null = null;
+
+  // Search & Recents State (Task 102)
+  private _searchQuery: string = '';
+  private _searchDebounceTimer: ReturnType<typeof setTimeout> | null = null;
+  private _recentIconKeys: string[] = [];
+  private readonly _maxRecentIcons: number = 8;
 
   // Virtual Feed State (Task 101)
   private _iconKeys: string[] = [];
@@ -63,12 +71,17 @@ export class AssetLibrary extends HTMLElement {
     this._themeCleanup = bridgeTheme(this);
     this.renderSkeleton();
     this.loadAssets();
+    this.loadRecentIcons();
     this.setupListeners();
   }
 
   disconnectedCallback(): void {
     this._themeCleanup?.();
     this._abortController?.abort();
+    if (this._searchDebounceTimer) {
+      clearTimeout(this._searchDebounceTimer);
+      this._searchDebounceTimer = null;
+    }
     this.disconnectIconObserver();
   }
 
@@ -77,6 +90,63 @@ export class AssetLibrary extends HTMLElement {
       this._iconObserver.disconnect();
       this._iconObserver = null;
     }
+  }
+
+  private async loadRecentIcons(): Promise<void> {
+    try {
+      const record = await db.get<{ id: string; keys: string[] }>('preferences', 'recent_icons');
+      if (record && Array.isArray(record.keys)) {
+        this._recentIconKeys = record.keys.filter((k) => !!ICON_REGISTRY[k]).slice(0, this._maxRecentIcons);
+        this.renderRecentIconsRack();
+      }
+    } catch (err) {
+      logger.error('AssetLibrary', 'Failed to load recent icons', err);
+    }
+  }
+
+  private async addRecentIcon(key: string): Promise<void> {
+    if (!ICON_REGISTRY[key]) return;
+    this._recentIconKeys = [key, ...this._recentIconKeys.filter((k) => k !== key)].slice(0, this._maxRecentIcons);
+    try {
+      await db.put('preferences', { id: 'recent_icons', keys: this._recentIconKeys });
+    } catch (err) {
+      logger.warn('AssetLibrary', 'Failed to save recent icons', err);
+    }
+    this.renderRecentIconsRack();
+  }
+
+  private renderRecentIconsRack(): void {
+    const rack = this.shadowRoot?.getElementById('recent-icons-rack');
+    const container = this.shadowRoot?.getElementById('recent-icons-container');
+    if (!rack || !container) return;
+
+    if (this._recentIconKeys.length === 0 || this._activeCategory !== 'symbols') {
+      container.style.display = 'none';
+      rack.innerHTML = '';
+      return;
+    }
+
+    container.style.display = 'flex';
+    rack.innerHTML = '';
+
+    const fragment = document.createDocumentFragment();
+    for (const key of this._recentIconKeys) {
+      const def = ICON_REGISTRY[key];
+      if (!def) continue;
+
+      const item = document.createElement('div');
+      item.className = 'recent-icon-item';
+      item.draggable = true;
+      item.setAttribute('data-icon-key', key);
+      item.setAttribute('data-icon-name', def.name);
+      item.title = `${def.name} (${key})`;
+
+      const svgEl = this.buildAdaptiveSvg(def);
+      item.appendChild(svgEl);
+      fragment.appendChild(item);
+    }
+
+    rack.appendChild(fragment);
   }
 
   private setupListeners(): void {
@@ -95,10 +165,51 @@ export class AssetLibrary extends HTMLElement {
       if (file) await this.handleFileUpload(file);
     }, { signal });
 
-    // 2. Filtros de Categoria e Sub-Pills de Nicho
+    // 2. Busca de Ícones (Task 102 - Instant Search com Debounce de 150ms)
+    const searchInput = root.getElementById('icon-search-input') as HTMLInputElement | null;
+    const clearBtn = root.getElementById('icon-search-clear') as HTMLElement | null;
+
+    searchInput?.addEventListener('input', (e: Event) => {
+      const val = (e.target as HTMLInputElement).value;
+      if (clearBtn) clearBtn.style.display = val ? 'flex' : 'none';
+
+      if (this._searchDebounceTimer) clearTimeout(this._searchDebounceTimer);
+      this._searchDebounceTimer = setTimeout(() => {
+        this._searchQuery = val.trim();
+        this.initIconFeed();
+      }, 150);
+    }, { signal });
+
+    clearBtn?.addEventListener('click', () => {
+      if (searchInput) {
+        searchInput.value = '';
+        searchInput.focus();
+      }
+      if (clearBtn) clearBtn.style.display = 'none';
+      this._searchQuery = '';
+      this.initIconFeed();
+    }, { signal });
+
+    // 3. Filtros de Categoria, Nicho, Remoção, Edição e Seleção de Ícones
     root.addEventListener('click', async (e: Event) => {
       const target = e.target as HTMLElement;
 
+      // Sugestão de busca clicada
+      const suggestionBtn = target.closest<HTMLElement>('.suggestion-term');
+      if (suggestionBtn) {
+        const term = suggestionBtn.getAttribute('data-term');
+        if (term && searchInput) {
+          searchInput.value = term;
+          if (clearBtn) clearBtn.style.display = 'flex';
+          this._searchQuery = term;
+          this.initIconFeed();
+          searchInput.focus();
+          UISM.play(UISM.enumPresets.TAP);
+        }
+        return;
+      }
+
+      // Filtro principal de categoria
       const filterBtn = target.closest<HTMLElement>('.filter-pill');
       if (filterBtn) {
         const cat = filterBtn.getAttribute('data-cat') as AssetCategory;
@@ -110,6 +221,7 @@ export class AssetLibrary extends HTMLElement {
         }
       }
 
+      // Sub-pills de nicho
       const nicheBtn = target.closest<HTMLElement>('.niche-pill');
       if (nicheBtn) {
         const niche = nicheBtn.getAttribute('data-niche') as SymbolNiche;
@@ -121,6 +233,25 @@ export class AssetLibrary extends HTMLElement {
         }
       }
 
+      // Seleção / Adição direta de Ícone (Grade do catálogo ou Rack de Recentes)
+      const iconCell = target.closest<HTMLElement>('.icon-cell, .recent-icon-item');
+      if (iconCell) {
+        const iconKey = iconCell.getAttribute('data-icon-key');
+        const iconName = iconCell.getAttribute('data-icon-name') || iconKey || 'Icon';
+        if (iconKey) {
+          UISM.play(UISM.enumPresets.TAP);
+          this.addRecentIcon(iconKey);
+          const element = ElementFactory.create(ElementType.ICON, {
+            iconName: iconKey,
+            name: iconName,
+            dimensions: { width: 16, height: 16 }
+          });
+          eventBus.emit('element:add', element);
+        }
+        return;
+      }
+
+      // Deletar Asset
       const deleteBtn = target.closest<HTMLElement>('.btn-delete-asset');
       if (deleteBtn) {
         e.stopPropagation();
@@ -144,6 +275,7 @@ export class AssetLibrary extends HTMLElement {
         return;
       }
 
+      // Editar Asset
       const editBtn = target.closest<HTMLElement>('.btn-edit-asset');
       if (editBtn) {
         e.stopPropagation();
@@ -155,25 +287,26 @@ export class AssetLibrary extends HTMLElement {
       }
     }, { signal });
 
-    // 3. Drag Logic (Delegação para imagens e ícones)
-    root.getElementById('asset-grid')?.addEventListener('dragstart', (e: DragEvent) => {
-      const target = e.target as HTMLElement;
+    // 4. Drag Logic (Delegação para imagens e ícones do grid e dos recentes)
+    root.addEventListener('dragstart', (e: Event) => {
+      const dragEvent = e as DragEvent;
+      const target = dragEvent.target as HTMLElement;
 
-      // Arraste de Ícones (Task 101)
-      const iconItem = target.closest<HTMLElement>('.icon-cell');
-      if (iconItem && e.dataTransfer) {
+      // Arraste de Ícones (Task 101 & 102 - Catálogo e Recents)
+      const iconItem = target.closest<HTMLElement>('.icon-cell, .recent-icon-item');
+      if (iconItem && dragEvent.dataTransfer) {
         const iconKey = iconItem.getAttribute('data-icon-key');
         const iconName = iconItem.getAttribute('data-icon-name') || iconKey || 'Icon';
         if (iconKey) {
-          e.dataTransfer.setData('application/json', JSON.stringify({
+          dragEvent.dataTransfer.setData('application/json', JSON.stringify({
             type: 'icon',
             iconName: iconKey,
             name: iconName,
             widthPx: 60,
             heightPx: 60
           }));
-          e.dataTransfer.effectAllowed = 'copy';
-          UISM.playCustom({ freq: 800, duration: 0.05, type: 'sawtooth', volume: 0.02 });
+          dragEvent.dataTransfer.effectAllowed = 'copy';
+          UISM.play(UISM.enumPresets.TAP);
           iconItem.classList.add('is-dragging');
         }
         return;
@@ -181,38 +314,54 @@ export class AssetLibrary extends HTMLElement {
 
       // Arraste de Imagens existentes
       const assetItem = target.closest<HTMLElement>('.asset-item');
-      if (assetItem && e.dataTransfer) {
+      if (assetItem && dragEvent.dataTransfer) {
         const id = assetItem.getAttribute('data-id');
         const asset = this._assets.find(a => a.id === id);
         if (asset) {
-          e.dataTransfer.setData('application/json', JSON.stringify({
+          dragEvent.dataTransfer.setData('application/json', JSON.stringify({
             type: 'image',
             src: asset.src,
             name: asset.name,
             widthPx: asset.width,
             heightPx: asset.height
           }));
-          e.dataTransfer.effectAllowed = 'copy';
+          dragEvent.dataTransfer.effectAllowed = 'copy';
           UISM.playCustom({ freq: 800, duration: 0.05, type: 'sawtooth', volume: 0.02 });
           assetItem.classList.add('is-dragging');
         }
       }
     }, { signal });
 
-    root.getElementById('asset-grid')?.addEventListener('dragend', (e: DragEvent) => {
+    root.addEventListener('dragend', (e: Event) => {
       const target = e.target as HTMLElement;
       target.closest('.icon-cell')?.classList.remove('is-dragging');
+      target.closest('.recent-icon-item')?.classList.remove('is-dragging');
       target.closest('.asset-item')?.classList.remove('is-dragging');
     }, { signal });
 
+    // Rolagem horizontal com roda do mouse
     const nicheBar = root.querySelector<HTMLElement>('.niche-bar');
     nicheBar?.addEventListener('wheel', (evt: WheelEvent) => {
-      // If vertical scroll is detected, convert it to horizontal scroll
       if (evt.deltaY !== 0) {
         evt.preventDefault();
         nicheBar.scrollLeft += evt.deltaY;
       }
     }, { passive: false, signal });
+
+    const recentRack = root.querySelector<HTMLElement>('.recent-icons-rack');
+    recentRack?.addEventListener('wheel', (evt: WheelEvent) => {
+      if (evt.deltaY !== 0) {
+        evt.preventDefault();
+        recentRack.scrollLeft += evt.deltaY;
+      }
+    }, { passive: false, signal });
+
+    // Sincronização de ícones recentes quando um ícone é adicionado ao Canvas
+    eventBus.on('element:add', (element: AnyElement) => {
+      if (element?.type === ElementType.ICON && (element as any).iconName) {
+        this.addRecentIcon((element as any).iconName);
+      }
+    }, { signal });
 
     eventBus.on('ui:modal:close', (data: { id?: string }) => {
       if (data?.id === 'image-editor-modal') {
@@ -326,7 +475,47 @@ export class AssetLibrary extends HTMLElement {
   }
 
   /**
-   * Inicializa o feed de ícones da categoria 'symbols' com suporte a Nichos.
+   * Filtra chaves de ícone pelo nicho especificado.
+   */
+  private filterKeysByNiche(keys: string[], niche: SymbolNiche): string[] {
+    if (niche === 'all') return keys;
+
+    if (niche === 'geral') {
+      const specializedWords = new Set<string>();
+      Object.values(NICHE_KEYWORDS).forEach(words => words.forEach(w => specializedWords.add(w)));
+
+      return keys.filter(key => {
+        const def = ICON_REGISTRY[key];
+        if (!def) return false;
+        const tokens = [key, def.name.toLowerCase(), ...(def.tags || []).map(t => t.toLowerCase())];
+        return !tokens.some(t => [...specializedWords].some(sw => t.includes(sw)));
+      });
+    }
+
+    const keywords = NICHE_KEYWORDS[niche];
+    return keys.filter(key => {
+      const def = ICON_REGISTRY[key];
+      if (!def) return false;
+      const tokens = [key, def.name.toLowerCase(), ...(def.tags || []).map(t => t.toLowerCase())];
+      return tokens.some(t => keywords.some(kw => t.includes(kw)));
+    });
+  }
+
+  private escapeHtml(str: string): string {
+    return str.replace(/[&<>"']/g, (m) => {
+      switch (m) {
+        case '&': return '&amp;';
+        case '<': return '&lt;';
+        case '>': return '&gt;';
+        case '"': return '&quot;';
+        case "'": return '&#39;';
+        default: return m;
+      }
+    });
+  }
+
+  /**
+   * Inicializa o feed de ícones da categoria 'symbols' com suporte a Busca Instantânea e Nichos.
    */
   private initIconFeed(): void {
     const grid = this.shadowRoot?.getElementById('asset-grid');
@@ -339,58 +528,67 @@ export class AssetLibrary extends HTMLElement {
       btn.classList.toggle('active', btn.getAttribute('data-niche') === this._activeNiche);
     });
 
-    // Filtra chaves de acordo com o nicho ativo
-    const allKeys = Object.keys(ICON_REGISTRY);
-
-    if (this._activeNiche === 'all') {
-      this._iconKeys = allKeys;
-    } else if (this._activeNiche === 'geral') {
-      // Itens que não caíram em nenhum nicho específico
-      const specializedWords = new Set<string>();
-      Object.values(NICHE_KEYWORDS).forEach(words => words.forEach(w => specializedWords.add(w)));
-
-      this._iconKeys = allKeys.filter(key => {
-        const def = ICON_REGISTRY[key];
-        const tokens = [key, def.name.toLowerCase(), ...(def.tags || []).map(t => t.toLowerCase())];
-        return !tokens.some(t => [...specializedWords].some(sw => t.includes(sw)));
-      });
+    // Filtra chaves através do motor de busca O(tokens) ou catálogo padrão
+    if (this._searchQuery) {
+      const searchMatches = searchIcons(this._searchQuery).map(([k]) => k);
+      this._iconKeys = this.filterKeysByNiche(searchMatches, this._activeNiche);
     } else {
-      const keywords = NICHE_KEYWORDS[this._activeNiche];
-      this._iconKeys = allKeys.filter(key => {
-        const def = ICON_REGISTRY[key];
-        const tokens = [key, def.name.toLowerCase(), ...(def.tags || []).map(t => t.toLowerCase())];
-        return tokens.some(t => keywords.some(kw => t.includes(kw)));
-      });
+      const allKeys = Object.keys(ICON_REGISTRY);
+      this._iconKeys = this.filterKeysByNiche(allKeys, this._activeNiche);
     }
 
     grid.className = 'icon-mode';
     grid.innerHTML = '';
     this._renderedIconCount = 0;
 
+    // Estado vazio
     if (this._iconKeys.length === 0) {
-      grid.innerHTML = `
-        <div class="empty-state">
-          <ui-icon name="alert-triangle" style="--icon-size: 32px; opacity: 0.2;"></ui-icon>
-          <p>Nenhum símbolo encontrado neste nicho</p>
-        </div>
-      `;
+      if (this._searchQuery) {
+        grid.innerHTML = `
+          <div class="empty-state">
+            <ui-icon name="alert-triangle" style="--icon-size: 32px; opacity: 0.2;"></ui-icon>
+            <p>No symbols found matching "${this.escapeHtml(this._searchQuery)}"</p>
+            <div class="search-suggestions">
+              <span class="suggestion-label">Try terms like:</span>
+              <button class="suggestion-term" data-term="skull">skull</button>
+              <button class="suggestion-term" data-term="arrow">arrow</button>
+              <button class="suggestion-term" data-term="mail">mail</button>
+              <button class="suggestion-term" data-term="alert">alert</button>
+              <button class="suggestion-term" data-term="tag">tag</button>
+            </div>
+          </div>
+        `;
+      } else {
+        grid.innerHTML = `
+          <div class="empty-state">
+            <ui-icon name="alert-triangle" style="--icon-size: 32px; opacity: 0.2;"></ui-icon>
+            <p>Nenhum símbolo encontrado neste nicho</p>
+          </div>
+        `;
+      }
       return;
     }
 
-    // Cria contêiner para os itens e sentinela de scroll
+    // Cria contêiner para os itens
     const container = document.createElement('div');
     container.id = 'icon-container';
     container.className = 'icon-cells-grid';
     grid.appendChild(container);
 
+    // Se resultado for menor ou igual ao tamanho do lote (< 48), desliga IntersectionObserver (Task 102)
+    if (this._iconKeys.length <= this._iconBatchSize) {
+      this.appendIconBatch();
+      this.disconnectIconObserver();
+      return;
+    }
+
+    // Caso contrário, configura sentinela e IntersectionObserver para scroll infinito
     const sentinel = document.createElement('div');
     sentinel.id = 'icon-scroll-sentinel';
     grid.appendChild(sentinel);
 
-    // Renderiza primeiro lote de 48 ícones
     this.appendIconBatch();
 
-    // Configura IntersectionObserver para scroll infinito a 60 FPS
     this._iconObserver = new IntersectionObserver((entries) => {
       const [entry] = entries;
       if (entry.isIntersecting) {
@@ -406,7 +604,7 @@ export class AssetLibrary extends HTMLElement {
   }
 
   /**
-   * Adiciona o próximo lote de 48 ícones no DOM de forma atômica.
+   * Adiciona o próximo lote de ícones no DOM de forma atômica.
    */
   private appendIconBatch(): void {
     const container = this.shadowRoot?.getElementById('icon-container');
@@ -470,18 +668,23 @@ export class AssetLibrary extends HTMLElement {
 
     const uploadZone = shadow.querySelector<HTMLElement>('.upload-zone');
     const nicheBar = shadow.querySelector<HTMLElement>('.niche-bar');
+    const searchBar = shadow.getElementById('icon-search-bar');
 
-    // Alterna visibilidade da barra de upload e sub-filtros de nicho
+    // Alterna visibilidade da barra de upload e sub-filtros de nicho / busca
     if (this._activeCategory === 'symbols') {
       if (uploadZone) uploadZone.style.display = 'none';
+      if (searchBar) searchBar.style.display = 'block';
       if (nicheBar) nicheBar.style.display = 'flex';
+      this.renderRecentIconsRack();
       this.initIconFeed();
       return;
     }
 
     // Modo Imagem / Uploads
     if (uploadZone) uploadZone.style.display = 'block';
+    if (searchBar) searchBar.style.display = 'none';
     if (nicheBar) nicheBar.style.display = 'none';
+    this.renderRecentIconsRack();
     grid.className = 'asset-mode';
 
     const filtered = this._activeCategory === 'all'
@@ -641,6 +844,139 @@ export class AssetLibrary extends HTMLElement {
           box-shadow: 0 0 10px color-mix(in srgb, var(--color-accent-primary), transparent 80%); 
         }
 
+        /* Search Bar (Task 102) */
+        .icon-search-bar {
+          display: none;
+          padding: 8px 16px;
+          border-bottom: 1px solid var(--color-border-ui);
+          background: color-mix(in srgb, var(--color-canvas), black 8%);
+        }
+        .icon-search-input-wrapper {
+          position: relative;
+          display: flex;
+          align-items: center;
+          width: 100%;
+          background: var(--color-surface-solid);
+          border: 1px solid var(--color-border-ui);
+          border-radius: 8px;
+          padding: 0 10px;
+          height: 32px;
+          box-sizing: border-box;
+          transition: all 0.2s ease;
+        }
+        .icon-search-input-wrapper:focus-within {
+          border-color: var(--color-accent-primary);
+          box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-accent-primary), transparent 85%);
+        }
+        .search-icon {
+          --icon-size: 14px;
+          color: var(--color-text-muted);
+          margin-right: 8px;
+          flex-shrink: 0;
+          pointer-events: none;
+        }
+        #icon-search-input {
+          flex: 1;
+          min-width: 0;
+          background: transparent;
+          border: none;
+          outline: none;
+          font-family: var(--font-sans);
+          font-size: 11px;
+          color: var(--color-text-main);
+        }
+        #icon-search-input::placeholder {
+          color: var(--color-text-muted);
+          opacity: 0.6;
+        }
+        .icon-search-clear {
+          background: none;
+          border: none;
+          cursor: pointer;
+          color: var(--color-text-muted);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 2px;
+          border-radius: 4px;
+          flex-shrink: 0;
+          transition: color 0.15s ease;
+        }
+        .icon-search-clear:hover {
+          color: var(--color-text-main);
+        }
+        .icon-search-clear ui-icon {
+          --icon-size: 12px;
+        }
+
+        /* Recents & Pinned Rack (Task 102) */
+        .recent-icons-container {
+          display: none;
+          flex-direction: column;
+          gap: 6px;
+          padding: 8px 16px;
+          background: color-mix(in srgb, var(--color-canvas), black 12%);
+          border-bottom: 1px solid var(--color-border-ui);
+        }
+        .recent-icons-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        }
+        .recent-icons-title {
+          font-family: var(--font-mono);
+          font-size: 8.5px;
+          font-weight: 700;
+          color: var(--color-text-muted);
+          text-transform: uppercase;
+          letter-spacing: 0.08em;
+        }
+        .recent-icons-rack {
+          display: flex;
+          gap: 8px;
+          overflow-x: auto;
+          scrollbar-width: none;
+          padding: 2px 0;
+        }
+        .recent-icons-rack::-webkit-scrollbar {
+          display: none;
+        }
+        .recent-icons-rack:hover {
+          scrollbar-width: thin;
+        }
+        .recent-icon-item {
+          flex: 0 0 32px;
+          width: 32px;
+          height: 32px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: var(--color-surface-elevated);
+          border: 1px solid var(--color-border-ui);
+          border-radius: 7px;
+          color: var(--color-text-muted);
+          cursor: grab;
+          user-select: none;
+          transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease, transform 0.15s var(--ease-spring);
+        }
+        .recent-icon-item:hover {
+          color: var(--color-text-main);
+          border-color: var(--color-accent-primary);
+          background-color: color-mix(in srgb, var(--color-accent-primary) 12%, var(--color-surface-elevated));
+          transform: translateY(-2px);
+          box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        .recent-icon-item.is-dragging {
+          opacity: 0.35;
+          transform: scale(0.9);
+        }
+        .recent-icon-item svg {
+          width: 18px;
+          height: 18px;
+          display: block;
+          pointer-events: none;
+        }
+
         /* Sub-filtros por Nicho para Símbolos (Task 101) */
         .niche-bar {
           display: none;
@@ -649,37 +985,15 @@ export class AssetLibrary extends HTMLElement {
           background: color-mix(in srgb, var(--color-canvas), black 10%);
           border-bottom: 1px solid var(--color-border-ui);
           overflow-x: auto;
-
-          /* Cria o efeito de fade nas bordas para indicar scroll */
-          mask-image: linear-gradient(to right, 
-            transparent, 
-            var(--color-text-main) 20px, 
-            var(--color-text-main) calc(100% - 20px), 
-            transparent
-          );
-          -webkit-mask-image: linear-gradient(to right, 
-            transparent, 
-            var(--color-text-main) 20px, 
-            var(--color-text-main) calc(100% - 20px), 
-            transparent
-          );
-          
-          /* Esconde a scrollbar por padrão */
-          scrollbar-width: none; /* Firefox */
-          -ms-overflow-style: none; /* IE 10+ */
+          scrollbar-width: none;
         }
-
-        /* Esconde a scrollbar no Chrome/Safari por padrão */
         .niche-bar::-webkit-scrollbar {
           height: 4px;
           display: none;
         }
-
-        /* 2. Scrollbar que aparece no Hover */
         .niche-bar:hover {
-          scrollbar-width: thin; /* Firefox */
+          scrollbar-width: thin;
         }
-
         .niche-bar:hover::-webkit-scrollbar {
           display: block;
         }
@@ -822,7 +1136,7 @@ export class AssetLibrary extends HTMLElement {
 
         .empty-state { 
           grid-column: 1 / -1; 
-          padding: 40px 0; 
+          padding: 36px 16px; 
           text-align: center; 
           color: var(--color-text-muted); 
           font-size: 11px; 
@@ -831,6 +1145,34 @@ export class AssetLibrary extends HTMLElement {
           align-items: center;
           gap: 8px;
         }
+        .search-suggestions {
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+          justify-content: center;
+          gap: 6px;
+          margin-top: 8px;
+        }
+        .suggestion-label {
+          font-size: 10px;
+          color: var(--color-text-muted);
+        }
+        .suggestion-term {
+          background: color-mix(in srgb, var(--color-accent-primary) 15%, var(--color-surface-elevated));
+          border: 1px solid color-mix(in srgb, var(--color-accent-primary) 30%, transparent);
+          color: var(--color-accent-primary);
+          border-radius: 4px;
+          padding: 2px 6px;
+          font-family: var(--font-mono);
+          font-size: 9px;
+          cursor: pointer;
+          transition: all 0.15s ease;
+        }
+        .suggestion-term:hover {
+          background: var(--color-accent-primary);
+          color: #ffffff;
+        }
+
         #asset-upload-input { display: none; }
       </style>
 
@@ -853,6 +1195,31 @@ export class AssetLibrary extends HTMLElement {
         <button class="filter-pill" data-cat="svg">SVGs</button>
         <button class="filter-pill" data-cat="logo">Logos</button>
         <button class="filter-pill" data-cat="upload">Uploads</button>
+      </div>
+
+      <div class="icon-search-bar" id="icon-search-bar">
+        <div class="icon-search-input-wrapper">
+          <ui-icon name="search" class="search-icon"></ui-icon>
+          <input 
+            type="text" 
+            id="icon-search-input" 
+            placeholder="Search symbols (e.g. bio, box, alert)..." 
+            autocomplete="off" 
+            spellcheck="false" 
+          />
+          <button id="icon-search-clear" class="icon-search-clear" style="display: none;" title="Clear search">
+            <ui-icon name="close"></ui-icon>
+          </button>
+        </div>
+      </div>
+
+      <div class="recent-icons-container" id="recent-icons-container">
+        <div class="recent-icons-header">
+          <span class="recent-icons-title">Recents & Pinned</span>
+        </div>
+        <div class="recent-icons-rack" id="recent-icons-rack">
+          <!-- Rendered dynamically -->
+        </div>
       </div>
 
       <div class="niche-bar">

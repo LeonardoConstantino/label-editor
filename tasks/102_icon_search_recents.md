@@ -45,9 +45,9 @@ Eliminar a fricção de descoberta em um catálogo com mais de 1.000 símbolos i
 
 ## 📋 Critérios de Aceite
 
-- [ ] Campo de busca integrado à aba de ícones no `AssetLibrary`.
-- [ ] Busca em tempo real responsiva (< 5ms de execução do filtro) utilizando `ICON_TOKEN_INDEX`.
-- [ ] Suporte a busca por nome de ícone e tags semânticas (ex: "hazard", "europe", "warning").
-- [ ] Barra de ícones recentes funcional, persistindo os últimos 8 itens usados no IndexedDB.
-- [ ] Ícones recentes reaparecem automaticamente após recarregar a página.
-- [ ] Feedback tátil com som `UISM.TAP` ao selecionar ou arrastar itens dos recentes.
+- [x] Campo de busca integrado à aba de ícones no `AssetLibrary`.
+- [x] Busca em tempo real responsiva (< 5ms de execução do filtro) utilizando `ICON_TOKEN_INDEX`.
+- [x] Suporte a busca por nome de ícone e tags semânticas (ex: "hazard", "europe", "warning").
+- [x] Barra de ícones recentes funcional, persistindo os últimos 8 itens usados no IndexedDB.
+- [x] Ícones recentes reaparecem automaticamente após recarregar a página.
+- [x] Feedback tátil com som `UISM.TAP` ao selecionar ou arrastar itens dos recentes.
