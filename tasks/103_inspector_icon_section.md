@@ -43,10 +43,10 @@ Criar a seção de Nível 3 [InspectorSectionIcon](file:///mnt/h/programa%C3%A7%
 
 ## 📋 Critérios de Aceite
 
-- [ ] `InspectorSectionIcon` implementado seguindo o padrão `renderSkeleton()` e `syncValues()`.
-- [ ] Alteração de cor no `AppColorPicker` reflete imediatamente no Canvas em tempo real.
-- [ ] O campo `iconName` aceita variáveis interpoladas (`{{icone}}`) com validação visual.
-- [ ] Botão "Quick Picker" abre popover de seleção rápida com busca e recentes.
-- [ ] Seção devidamente incorporada ao fluxo de camadas de `InspectorLayerCard.ts`.
-- [ ] Botão e atalho de adicionar ícone integrados à `Toolbar.ts`.
-- [ ] Build e testes unitários 100% verdes sem erros de tipagem (`npm run build` e `npm test`).
+- [x] `InspectorSectionIcon` implementado seguindo o padrão `renderSkeleton()` e `syncValues()`.
+- [x] Alteração de cor no `AppColorPicker` reflete imediatamente no Canvas em tempo real.
+- [x] O campo `iconName` aceita variáveis interpoladas (`{{icone}}`) com validação visual.
+- [x] Botão "Quick Picker" abre popover de seleção rápida com busca e recentes.
+- [x] Seção devidamente incorporada ao fluxo de camadas de `InspectorLayerCard.ts`.
+- [x] Botão e atalho de adicionar ícone integrados à `Toolbar.ts`.
+- [x] Build e testes unitários 100% verdes sem erros de tipagem (`npm run build` e `npm test`).

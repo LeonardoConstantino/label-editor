@@ -20,11 +20,26 @@ export class IconRenderer implements IRenderer {
       iconKey = DataSourceParser.interpolate(iconKey, data, context.context);
     }
 
-    if (!iconKey || iconKey.includes('{{')) return;
+    if (!iconKey || iconKey.includes('{{')) {
+      // Renderiza placeholder de erro quando a interpolação falha (ex: variável inexistente)
+      const x = element.position.x * scale;
+      const y = element.position.y * scale;
+      const w = element.dimensions.width * scale;
+      const h = element.dimensions.height * scale;
+      this.renderErrorPlaceholder(ctx, x, y, w, h, 'UNRESOLVED');
+      return;
+    }
 
     // 2. Busca da definição no catálogo indexado
     const iconDef = getIcon(iconKey.trim());
-    if (!iconDef || !iconDef.paths || iconDef.paths.length === 0) return;
+    if (!iconDef || !iconDef.paths || iconDef.paths.length === 0) {
+      const x = element.position.x * scale;
+      const y = element.position.y * scale;
+      const w = element.dimensions.width * scale;
+      const h = element.dimensions.height * scale;
+      this.renderErrorPlaceholder(ctx, x, y, w, h, 'ICON');
+      return;
+    }
 
     const x = element.position.x * scale;
     const y = element.position.y * scale;
@@ -68,6 +83,39 @@ export class IconRenderer implements IRenderer {
       }
     }
 
+    ctx.restore();
+  }
+
+  /**
+   * Placeholder visual — mesma linguagem do CodeRenderer:
+   * fundo escuro, contorno danger, texto mono centralizado.
+   */
+  private renderErrorPlaceholder(
+    ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D,
+    x: number, y: number, w: number, h: number,
+    label: string
+  ): void {
+    ctx.save();
+    ctx.fillStyle = '#1a1d24';
+    ctx.strokeStyle = '#f43f5e';
+    ctx.lineWidth = 2;
+    ctx.fillRect(x, y, w, h);
+    ctx.strokeRect(x, y, w, h);
+
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x + w, y + h);
+    ctx.moveTo(x + w, y);
+    ctx.lineTo(x, y + h);
+    ctx.stroke();
+
+    ctx.fillStyle = '#f43f5e';
+    ctx.font = `bold ${Math.max(8, w / 10)*1.2}px monospace`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('IMAGE', x + w / 2, y + h / 2 - Math.max(4, w / 20));
+    ctx.font = `${Math.max(6, w / 15)*1.2}px monospace`;
+    ctx.fillText(label, x + w / 2, y + h / 2 + Math.max(4, w / 20));
     ctx.restore();
   }
 }

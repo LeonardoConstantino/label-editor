@@ -19,6 +19,7 @@ import './sections/InspectorSectionBorder';
 import './sections/InspectorSectionCode';
 import './sections/InspectorSectionEffects';
 import './sections/InspectorSectionLine';
+import './sections/InspectorSectionIcon';
 
 interface ActionIcon extends HTMLElement {
   name: string;
@@ -345,6 +346,8 @@ export class InspectorLayerCard extends HTMLElement {
       container.appendChild(createSection('inspector-section-code'));
     } else if (el.type === ElementType.LINE) {
       container.appendChild(createSection('inspector-section-line'));
+    } else if (el.type === ElementType.ICON) {
+      container.appendChild(createSection('inspector-section-icon'));
     }
 
     container.appendChild(createSection('inspector-section-effects'));

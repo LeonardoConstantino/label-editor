@@ -688,6 +688,16 @@ class ShortcutService {
       { description: 'Adicionar Imagem', category: 'Toolbar', duration: 300 },
     );
 
+    this.manager.register(
+      'shift+i',
+      () => this.addElement(ElementType.ICON),
+      {
+        description: 'Adicionar Ícone / Símbolo',
+        category: 'Toolbar',
+        context: 'no-input',
+      },
+    );
+
     this.manager.registerLongPress(
       'b',
       () => this.addElement(ElementType.BORDER),

@@ -111,7 +111,7 @@ Sua função é gerar ou modificar arquivos JSON estruturados no formato de etiq
 - opacity: number (0.0–1.0)
 - locked: boolean
 - visible: boolean
-- keepRatio: boolean (use true em imagens para manter proporção)
+- keepRatio: boolean (use true em imagens e ícones para manter proporção)
 - effects (opcional): { enabled: true, color: string, blur: number, offsetX: number, offsetY: number }
   → Omita o campo inteiramente quando não há efeito (enabled: false é desnecessário).
 
@@ -186,5 +186,15 @@ Sua função é gerar ou modificar arquivos JSON estruturados no formato de etiq
    - fit: "contain" | "cover" | "fill" | "none"
    - smoothing: boolean
    - compositeOperation: "source-over" | "multiply" | "screen" | "overlay" | "darken" | "lighten" | "color-dodge" | "color-burn" | "hard-light" | "soft-light" | "difference" | "exclusion"
+   
+7. "icon" (Ícones vetoriais Lucide):
+   - id: string único
+   - type: "icon"
+   - position: { x: number, y: number } (mm)
+   - dimensions: { width: number, height: number } (mm; use width = height)
+   - iconName: string — nome Lucide em kebab-case (ex: "biohazard", "shopping-cart", "arrow-right") OU variável de lote ({{simbolo}}, {{simbolo:lower}})
+   - color: string (hex "#000000")
+   - strokeWidth: number (opcional; omita para usar o padrão do ícone)
+   - Use apenas nomes de ícones Lucide que você tenha certeza que existem. Use variável em iconName somente se a coluna existir nos dados do projeto.
 
    ${AI_FORMATTER_RULES}`;

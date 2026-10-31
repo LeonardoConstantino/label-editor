@@ -25,7 +25,18 @@ describe('IconRenderer', () => {
       translate: vi.fn(),
       scale: vi.fn(),
       stroke: vi.fn(),
+      strokeRect: vi.fn(),
       fill: vi.fn(),
+      fillRect: vi.fn(),
+      beginPath: vi.fn(),
+      moveTo: vi.fn(),
+      lineTo: vi.fn(),
+      closePath: vi.fn(),
+      setTransform: vi.fn(),
+      fillText: vi.fn(),
+      font: '',
+      textAlign: '',
+      textBaseline: '',
       fillStyle: '#000000',
       strokeStyle: '#000000',
       lineWidth: 1,
@@ -118,7 +129,7 @@ describe('IconRenderer', () => {
     expect(mockCtx.fill).toHaveBeenCalled();
   });
 
-  it('skips rendering if dynamic variable remains unresolved or icon not found', () => {
+  it('renders error placeholder when icon name is an unresolved dynamic variable', () => {
     const element: IconElement = {
       id: 'icon-4',
       name: 'Unresolved Icon',
@@ -137,7 +148,15 @@ describe('IconRenderer', () => {
     };
 
     renderer.render(element, { ctx: mockCtx, scale: 1, dpi: 300, data: {} });
-    expect(mockCtx.stroke).not.toHaveBeenCalled();
-    expect(mockCtx.fill).not.toHaveBeenCalled();
+
+    // placeholder desenhado (fundo + contorno)
+    expect(mockCtx.fillRect).toHaveBeenCalled();
+    expect(mockCtx.strokeRect).toHaveBeenCalled();
+    // rótulo visível
+    expect(mockCtx.fillText).toHaveBeenCalledWith(
+      'IMAGE',
+      expect.any(Number),
+      expect.any(Number)
+    );
   });
 });

@@ -193,6 +193,21 @@ export class EditorToolbar extends HTMLElement {
           </p>
         </div>
       </ui-tooltip>
+
+      <ui-tooltip placement="bottom" delay="300">
+        <app-button slot="target" id="add-icon" variant="secondary">
+          <ui-icon name="alert-triangle"></ui-icon>
+        </app-button>
+        <div slot="content" class="tooltip-rich-panel">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-text-main text-[12px] font-semibold tracking-wide">Ícone / Símbolo</span>
+            ${this.getShortcutHTML('shift+i')}
+          </div>
+          <p class="text-text-muted text-[10px] leading-relaxed">
+            Insere um símbolo vetorial de segurança, logística ou certificação.
+          </p>
+        </div>
+      </ui-tooltip>
       
       <div class="divider"></div>
       
@@ -333,6 +348,10 @@ export class EditorToolbar extends HTMLElement {
 
     shadow.getElementById('add-code')?.addEventListener('click', () => {
       eventBus.emit('element:add', ElementFactory.create(ElementType.CODE));
+    });
+
+    shadow.getElementById('add-icon')?.addEventListener('click', () => {
+      eventBus.emit('element:add', ElementFactory.create(ElementType.ICON));
     });
 
     shadow
