@@ -67,6 +67,13 @@ export class AppCockpit extends HTMLElement {
     eventBus.on('state:change', (state: AppState) => {
       if (state.activeModuleId !== this._activeModuleId) {
         this.syncModule(state.activeModuleId);
+      } else if (this._activeModuleId === 'blueprint') {
+        const slot = root.getElementById('active-slot');
+        const docSetup = slot?.querySelector('inspector-document-setup') as any;
+        if (docSetup && state.currentLabel) {
+          docSetup.labelConfig = state.currentLabel.config;
+          docSetup.preferences = state.preferences;
+        }
       }
       this.updateDigitalTwin(state.currentLabel);
     }, { signal });

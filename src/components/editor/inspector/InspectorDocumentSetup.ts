@@ -144,12 +144,22 @@ export class InspectorDocumentSetup extends HTMLElement {
 
   set labelConfig(config: Label['config']) {
     this._labelConfig = config;
+    if (this.shadowRoot && !this.shadowRoot.innerHTML && this._labelConfig && this._preferences) {
+      this.render();
+      this.setupSelects();
+      this.setupListeners();
+    }
     this.syncValues();
     this.updateDigitalTwinVisuals();
   }
 
   set preferences(prefs: UserPreferences) {
     this._preferences = prefs;
+    if (this.shadowRoot && !this.shadowRoot.innerHTML && this._labelConfig && this._preferences) {
+      this.render();
+      this.setupSelects();
+      this.setupListeners();
+    }
     this.syncValues();
   }
 
