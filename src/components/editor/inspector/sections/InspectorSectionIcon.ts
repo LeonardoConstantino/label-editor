@@ -252,6 +252,7 @@ export class InspectorSectionIcon extends HTMLElement {
           display: grid;
           grid-template-columns: repeat(5, 1fr);
           gap: 6px;
+          padding: 1.8px;
         }
         .quick-icon-cell {
           aspect-ratio: 1;

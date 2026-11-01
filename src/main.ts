@@ -72,20 +72,6 @@ eventBus.on('ui:open:help', (options: any = {}) => {
   }
 });
 
-// Inicializa a aplicação com uma etiqueta padrão
-// const defaultLabel: Label = {
-//   id: crypto.randomUUID(),
-//   name: 'Nova Etiqueta',
-//   config: { ...DEFAULTS.CANVAS },
-//   elements: [
-//     ElementFactory.create(ElementType.TEXT, {
-//       content: 'Minha Nova Etiqueta',
-//     }),
-//   ],
-//   createdAt: Date.now(),
-//   updatedAt: Date.now(),
-// };
-
 document.addEventListener('DOMContentLoaded', async () => {
   const { isMac } = getOSInfo();
 

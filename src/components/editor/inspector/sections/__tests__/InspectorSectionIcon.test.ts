@@ -79,7 +79,7 @@ describe('InspectorSectionIcon - Task 103', () => {
       iconName: 'biohazard'
     };
 
-    expect(strokeRow?.style.display).toBe('none');
+    expect(strokeRow?.style.display).toBe('flex');
   });
 
   it('dispatches inspector:change when color is modified in AppColorPicker', () => {

@@ -9,7 +9,7 @@
     "deploy": "gh-pages -d dist",
     "test": "vitest",
     "icons:gen": "node scripts/generate-icons.mjs",
-  "icons:gen:npm": "node scripts/generate-icons.mjs node_modules/lucide-static/icons"
+    "icons:gen:npm": "node scripts/generate-icons.mjs node_modules/lucide-static/icons"
   },
   "keywords": [],
   "author": "",
