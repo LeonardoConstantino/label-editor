@@ -229,7 +229,7 @@ class TemplateManager {
   /**
    * Gera uma imagem base64 do design atual de forma pública.
    */
-  public async captureThumbnail(label: Label): Promise<string> {
+  public async captureThumbnail(label: Label, format: 'image/webp' | 'image/png' = 'image/webp', quality: number = 0.8): Promise<string> {
     return new Promise((resolve) => {
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d', { alpha: true });
@@ -267,8 +267,21 @@ class TemplateManager {
         }
       });
 
-      resolve(canvas.toDataURL('image/webp', 0.8));
+      resolve(canvas.toDataURL(format, quality));
     });
+  }
+
+  /**
+   * Exporta um label para um arquivo PNG.
+   */
+  public async exportToPng(label: Label): Promise<void> {
+    const dataUrl = await this.captureThumbnail(label, 'image/png', 0.8);
+    const link = document.createElement('a');
+    link.href = dataUrl;
+    link.download = `${label.name}.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   }
 
   private injectFontsFromLabel(label: Label): void {

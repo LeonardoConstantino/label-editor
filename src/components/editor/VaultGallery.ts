@@ -238,6 +238,10 @@ export class VaultGallery extends HTMLElement {
                       data-id="${safeId}" title="Exportar para arquivo .label">
                 <ui-icon name="download" size="sm"></ui-icon>
               </button>
+              <button class="w-10 h-10 rounded-lg flex items-center justify-center cursor-pointer bg-surface-elevated border border-white/10 text-text-muted hover:text-accent-info hover:border-accent-info/40 hover:bg-accent-info/10 transition-all action-export-label-png" 
+                      data-id="${safeId}" title="Exportar para arquivo .PNG">
+                <ui-icon name="image" size="sm"></ui-icon>
+              </button>
               <button class="w-10 h-10 rounded-lg flex items-center justify-center cursor-pointer bg-surface-elevated border border-white/10 text-text-muted hover:text-white hover:border-white/30 hover:bg-white/10 transition-all action-duplicate" title="Duplicate" data-id="${safeId}">
                 <ui-icon name="copy" size="sm"></ui-icon>
               </button>
@@ -357,12 +361,22 @@ export class VaultGallery extends HTMLElement {
       const dupBtn = target.closest('.action-duplicate');
       const delBtn = target.closest('.action-delete');
       const exportBtn = target.closest('.action-export-label');
+      const exportBtnPng = target.closest('.action-export-label-png');
 
       if (exportBtn) {
         const id = (exportBtn as HTMLElement).dataset.id!;
         const label = this.templates.find(t => t.id === id);
         if (label) {
           templateManager.exportToFile(label);
+          UISM.play(UISM.enumPresets.SUCCESS);
+        }
+      }
+
+      if (exportBtnPng) {
+        const id = (exportBtnPng as HTMLElement).dataset.id!;
+        const label = this.templates.find(t => t.id === id);
+        if (label) {
+          templateManager.exportToPng(label);
           UISM.play(UISM.enumPresets.SUCCESS);
         }
       }
